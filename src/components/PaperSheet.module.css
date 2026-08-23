@@ -17,3 +17,21 @@
     gap: 34px;
   }
 }
+
+/*
+ * На бумаге лист занимает всю страницу: без тени, рамки и скруглений.
+ * display: block обязателен — flex-контейнеры Chrome разбивает по страницам криво.
+ */
+@media print {
+  .sheet {
+    display: block;
+    /* Не заливаем весь A4 кремовым — фон остаётся у самих секций. */
+    background: transparent;
+    max-width: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+}

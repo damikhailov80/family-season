@@ -76,3 +76,29 @@
     padding: 8px 16px;
   }
 }
+
+@media print {
+  .ribbon:empty {
+    display: none;
+  }
+
+  /* Печатная ширина A4 попадает под мобильный брейкпоинт — рисунки возвращаем. */
+  .heart,
+  .family {
+    display: block;
+  }
+
+  .header {
+    padding-top: 0;
+  }
+
+  .title {
+    font-size: 46px;
+  }
+
+  .ribbon {
+    margin-top: 8px;
+    padding: 6px 20px;
+    font-size: 11px;
+  }
+}

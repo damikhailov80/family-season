@@ -1,0 +1,77 @@
+.wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.star {
+  flex: none;
+  align-self: center;
+  color: var(--orange);
+  transform: rotate(-12deg);
+}
+
+.box {
+  flex: 1;
+  min-width: 0;
+  padding-block: 22px 16px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  padding-top: 2px;
+}
+
+.ideas {
+  white-space: pre-line;
+  font-family: var(--font-script);
+  font-size: clamp(17px, 2.1vw, 21px);
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* Пустое место под записи: на экране фиксированное, на печати тянется до низа. */
+.space {
+  flex: 1;
+  min-height: 120px;
+}
+
+@media (max-width: 720px) {
+  .wrap {
+    flex-wrap: wrap;
+  }
+
+  .star {
+    display: none;
+  }
+}
+
+/*
+ * Идеи забирают остаток второй страницы: чем меньше семья, тем больше здесь
+ * места под запись.
+ */
+@media print {
+  .wrap {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /*
+   * На бумаге блок берёт ровно остаток страницы: экранный min-height здесь
+   * снят, иначе при семье из пяти человек вторая страница переполняется.
+   */
+  .space {
+    min-height: 0;
+  }
+
+  /* Записи не печатаются и не занимают места — их вписывают от руки. */
+  .ideas {
+    display: none;
+  }
+
+  /* Печатная ширина A4 попадает под мобильный брейкпоинт — звезду возвращаем. */
+  .star {
+    display: block;
+  }
+}

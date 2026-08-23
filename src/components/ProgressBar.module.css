@@ -13,15 +13,25 @@
   background: var(--accent);
 }
 
-/* Десять равных делений: линии на каждых 10% ширины шкалы. */
-.track::after {
-  content: '';
+/* На бумаге шкала всегда пустая — прогресс закрашивают руками. */
+@media print {
+  .fill {
+    display: none;
+  }
+}
+
+/* Десять равных делений: девять линий между ячейками одинаковой ширины. */
+.ticks {
   position: absolute;
   inset: 2px;
+  display: flex;
   pointer-events: none;
-  background: repeating-linear-gradient(
-    to right,
-    rgb(26 26 26 / 45%) 0 1px,
-    transparent 1px 10%
-  );
+}
+
+.tick {
+  flex: 1;
+}
+
+.tick + .tick {
+  border-left: 1px solid rgb(26 26 26 / 45%);
 }

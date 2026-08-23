@@ -1,20 +1,24 @@
-import { DAYS_IN_MONTH, moodRows, moodSection } from '../data/content'
+import { ACCENT_BY_FACE } from '../model/accents'
+import { moodValues } from '../model/fill'
+import { LABELS, MOOD_LEGEND } from '../model/labels'
+import { useDoc } from '../state/docContext'
 import { AvatarFace } from './AvatarFace'
 import { Badge } from './Badge'
 import { MoodFace } from './MoodFace'
 import styles from './MoodSection.module.css'
 
-const days = Array.from({ length: DAYS_IN_MONTH }, (_, index) => index + 1)
-
 export function MoodSection() {
+  const { template, fill, days } = useDoc()
+  const dayNumbers = Array.from({ length: days }, (_, index) => index + 1)
+
   return (
     <section aria-labelledby="mood-label" className={styles.section}>
       <div className={styles.head}>
         <Badge accent="purple">
-          <span id="mood-label">{moodSection.badge}</span>
+          <span id="mood-label">{LABELS.mood}</span>
         </Badge>
         <ul className={styles.legend}>
-          {moodSection.legend.map((item) => (
+          {MOOD_LEGEND.map((item) => (
             <li key={item.mood} className={styles.legendItem}>
               <MoodFace mood={item.mood} size={22} />
               <span>{item.label}</span>
@@ -25,13 +29,13 @@ export function MoodSection() {
 
       <div className={styles.tableWrap}>
         <table className={styles.table}>
-          <caption className={styles.caption}>Настроение каждого члена семьи по дням месяца</caption>
+          <caption className={styles.caption}>{LABELS.moodCaption}</caption>
           <thead>
             <tr>
               <th scope="col" className={styles.whoHead}>
-                Кто
+                {LABELS.moodWho}
               </th>
-              {days.map((day) => (
+              {dayNumbers.map((day) => (
                 <th key={day} scope="col" className={styles.dayHead}>
                   {day}
                 </th>
@@ -39,18 +43,20 @@ export function MoodSection() {
             </tr>
           </thead>
           <tbody>
-            {moodRows.map((row) => (
-              <tr key={row.role}>
+            {template.people.map((person) => (
+              <tr key={person.id}>
                 <th
                   scope="row"
                   className={styles.who}
-                  style={{ '--accent': `var(--${row.accent})` } as React.CSSProperties}
+                  style={
+                    { '--accent': `var(--${ACCENT_BY_FACE[person.face]})` } as React.CSSProperties
+                  }
                 >
-                  <AvatarFace variant={row.face} size={20} className={styles.whoFace} />
-                  <span>{row.role}</span>
+                  <AvatarFace variant={person.face} size={20} className={styles.whoFace} />
+                  <span>{person.name}</span>
                 </th>
-                {row.values.map((mood, index) => (
-                  <td key={days[index]} className={styles.cell}>
+                {moodValues(fill.moods[person.id], days).map((mood, index) => (
+                  <td key={index} className={styles.cell}>
                     {mood && <MoodFace mood={mood} size={19} className={styles.cellFace} />}
                   </td>
                 ))}

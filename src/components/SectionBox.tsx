@@ -7,8 +7,6 @@ interface SectionBoxProps {
   label?: string
   /** Подпись справа от плашки (курсивом, как на макете). */
   note?: React.ReactNode
-  /** Произвольное содержимое строки заголовка вместо note. */
-  headerExtra?: React.ReactNode
   children: React.ReactNode
   className?: string
   bodyClassName?: string
@@ -23,7 +21,6 @@ export function SectionBox({
   accent,
   label,
   note,
-  headerExtra,
   children,
   className,
   bodyClassName,
@@ -34,7 +31,7 @@ export function SectionBox({
       className={[styles.box, className].filter(Boolean).join(' ')}
       style={{ '--accent': `var(--${accent})` } as React.CSSProperties}
     >
-      {(label || note || headerExtra) && (
+      {(label || note) && (
         <div className={styles.head}>
           {label && (
             <Badge accent={accent} className={styles.badge}>
@@ -42,7 +39,6 @@ export function SectionBox({
             </Badge>
           )}
           {note && <span className={styles.note}>{note}</span>}
-          {headerExtra}
         </div>
       )}
       <div className={[styles.body, bodyClassName].filter(Boolean).join(' ')}>{children}</div>

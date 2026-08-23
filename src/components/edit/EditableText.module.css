@@ -1,0 +1,44 @@
+/* Многострочное поле: одна строка модели с '\n' вместо набора <span>. */
+.multiline {
+  white-space: pre-line;
+}
+
+.editable {
+  outline: none;
+  border-radius: 4px;
+  cursor: text;
+  box-shadow: inset 0 -1px 0 0 color-mix(in srgb, var(--purple) 45%, transparent);
+  transition: background-color 0.12s ease;
+}
+
+.editable:hover {
+  background: color-mix(in srgb, var(--purple) 7%, transparent);
+}
+
+.editable:focus {
+  background: color-mix(in srgb, var(--purple) 10%, transparent);
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--purple) 55%, transparent),
+    inset 0 -1px 0 0 transparent;
+}
+
+/* Пустое поле показывает подсказку — но только в правке и только на экране. */
+.editable:empty::before {
+  content: attr(data-placeholder);
+  /* currentColor, а не серый: подсказка читается и на тёмной ленте заголовка. */
+  color: currentcolor;
+  opacity: 0.45;
+}
+
+@media print {
+  .editable,
+  .editable:hover,
+  .editable:focus {
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .editable:empty::before {
+    content: '';
+  }
+}

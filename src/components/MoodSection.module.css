@@ -116,3 +116,58 @@
     font-size: 17px;
   }
 }
+
+/*
+ * На бумаге ширина ограничена печатной областью A4 (~718px при полях 10 мм),
+ * поэтому колонки дней сужаются, а горизонтальный скролл отключается.
+ */
+@media print {
+  .tableWrap {
+    overflow: visible;
+  }
+
+  /* Легенда прижата к правому краю — оставляем поле, иначе край подрезается. */
+  .legend {
+    gap: 16px;
+    padding-right: 4px;
+  }
+
+  .legendItem {
+    font-size: 17px;
+  }
+
+  .whoHead {
+    width: 74px;
+    min-width: 74px;
+  }
+
+  .dayHead {
+    width: 19px;
+    min-width: 19px;
+    font-size: 9px;
+    padding: 4px 0;
+  }
+
+  .who {
+    height: 24px;
+    font-size: 10px;
+    padding: 3px 4px;
+    gap: 4px;
+  }
+
+  .cell {
+    height: 24px;
+  }
+
+  /* Клетки печатаются пустыми — настроение отмечают руками (легенда остаётся). */
+  .cellFace {
+    display: none;
+  }
+}
+
+/* Таблица настроений фиксированной высоты — растягиваются проекты и итоги. */
+@media print {
+  .section {
+    flex: 0 0 auto;
+  }
+}

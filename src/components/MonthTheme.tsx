@@ -1,14 +1,20 @@
-import { monthTheme } from '../data/content'
+import { monthName } from '../model/calendar'
+import { LABELS, PLACEHOLDERS } from '../model/labels'
+import { useDoc } from '../state/docContext'
+import { Badge } from './Badge'
 import { MegaphoneDoodle, SparkStar } from './doodles'
+import { EditableText } from './edit/EditableText'
 import { SectionBox } from './SectionBox'
 import styles from './MonthTheme.module.css'
 
 export function MonthTheme() {
+  const { template, fill, field, editing, stepMonth } = useDoc()
+
   return (
-    <section aria-labelledby="theme-label">
+    <section aria-labelledby="theme-label" className={styles.section}>
       <SectionBox
         accent="purple"
-        label={monthTheme.badge}
+        label={LABELS.theme}
         labelId="theme-label"
         bodyClassName={styles.body}
       >
@@ -20,12 +26,51 @@ export function MonthTheme() {
           <SparkStar className={styles.starSmall} size={18} />
         </div>
 
-        <p className={styles.month}>{monthTheme.month}</p>
-        <p className={styles.subtitle}>{monthTheme.subtitle}</p>
+        {/* Месяц подставляется от даты; в правке его переключают стрелками. */}
+        <div className={styles.monthRow}>
+          {editing && (
+            <button
+              type="button"
+              className={styles.monthNav}
+              onClick={() => stepMonth(-1)}
+              aria-label="Предыдущий месяц"
+            >
+              ‹
+            </button>
+          )}
+          <p className={styles.month}>{monthName(template.theme)}</p>
+          {editing && (
+            <button
+              type="button"
+              className={styles.monthNav}
+              onClick={() => stepMonth(1)}
+              aria-label="Следующий месяц"
+            >
+              ›
+            </button>
+          )}
+          {editing && <span className={styles.year}>{template.theme.year}</span>}
+        </div>
 
+        <EditableText
+          as="p"
+          className={styles.subtitle}
+          placeholder={PLACEHOLDERS.subtitle}
+          {...field('theme.subtitle')}
+        />
+
+        {/* Итоги месяца: вопрос из шаблона, ответ вписывают руками (слой заполнения). */}
         <div className={styles.answerBox}>
-          <p className={styles.question}>{monthTheme.question}</p>
-          <p className={styles.answer}>{monthTheme.answer}</p>
+          <Badge accent="purple" size="sm" className={styles.answerBadge}>
+            {LABELS.themeSummary}
+          </Badge>
+          <EditableText
+            as="p"
+            className={styles.question}
+            placeholder={PLACEHOLDERS.question}
+            {...field('theme.question')}
+          />
+          <p className={styles.answer}>{fill.summaryAnswer}</p>
         </div>
       </SectionBox>
     </section>

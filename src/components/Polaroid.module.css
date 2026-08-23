@@ -33,8 +33,28 @@
   object-fit: cover;
 }
 
+/* Пустое место под вклейку бумажного фото: ровный светлый прямоугольник. */
 .placeholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(150deg, #f3f0e7 0%, #e7e3d7 55%, #dcd7c8 100%);
+  background: #fdfcf8;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%);
+}
+
+@media print {
+  /*
+   * Размеры и пропорции те же, что на экране — на бумаге меняется только то,
+   * что не печатается: тень заменяется тонкой рамкой.
+   */
+  .polaroid {
+    box-shadow: none;
+    border: 1px solid #ddd8cc;
+  }
+}
+
+/* Фото — слой заполнения: в бланке остаётся пустая рамка под вклейку. */
+@media print {
+  .image {
+    display: none;
+  }
 }

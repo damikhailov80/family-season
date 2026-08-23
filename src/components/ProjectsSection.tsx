@@ -1,63 +1,121 @@
-import { projects, projectsSection } from '../data/content'
+import { ACCENT_BY_FACE, FACE_LABELS } from '../model/accents'
+import { percentFor } from '../model/fill'
+import { LABELS, PLACEHOLDERS } from '../model/labels'
+import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
+import { useDoc } from '../state/docContext'
 import { AvatarFace } from './AvatarFace'
 import { Badge } from './Badge'
 import { RocketDoodle } from './doodles'
+import { EditableText } from './edit/EditableText'
 import { ProgressBar } from './ProgressBar'
 import styles from './ProjectsSection.module.css'
 
 export function ProjectsSection() {
+  const { template, fill, field, editing, addPerson, removePerson, cycleFace } = useDoc()
+  const people = template.people
+
   return (
     <section aria-labelledby="projects-label" className={styles.section}>
       <div className={styles.head}>
         <Badge accent="blue">
-          <span id="projects-label">{projectsSection.badge}</span>
+          <span id="projects-label">{LABELS.projects}</span>
         </Badge>
-        <span className={styles.note}>{projectsSection.note}</span>
+        <EditableText
+          className={styles.note}
+          placeholder={PLACEHOLDERS.projectsNote}
+          {...field('projectsNote')}
+        />
         <RocketDoodle className={styles.rocket} size={48} />
       </div>
 
       <div className={styles.list}>
-        {projects.map((person) => (
-          <article
-            key={person.role}
-            className={styles.row}
-            style={{ '--accent': `var(--${person.accent})` } as React.CSSProperties}
-          >
-            <div className={styles.avatarBlock}>
-              <span className={styles.avatarRing}>
-                <AvatarFace variant={person.face} size={48} />
-              </span>
-              <span className={styles.role}>{person.role}</span>
-            </div>
-
-            <div className={styles.content}>
-              <div className={styles.main}>
-                <p className={styles.projectLine}>
-                  <span className={styles.fieldLabel}>Проект:</span>
-                  <span className={styles.projectName}>{person.project}</span>
-                </p>
-                <p className={styles.description}>
-                  {person.description.map((line) => (
-                    <span key={line}>{line}</span>
-                  ))}
-                </p>
+        {people.map((person, index) => {
+          const percent = percentFor(fill, person.id)
+          return (
+            <article
+              key={person.id}
+              className={styles.row}
+              style={{ '--accent': `var(--${ACCENT_BY_FACE[person.face]})` } as React.CSSProperties}
+            >
+              <div className={styles.avatarBlock}>
+                {editing ? (
+                  <button
+                    type="button"
+                    className={`${styles.avatarRing} ${styles.avatarButton}`}
+                    onClick={() => cycleFace(person.id)}
+                    title="Сменить рисунок"
+                    aria-label={`Рисунок: ${FACE_LABELS[person.face]}. Сменить`}
+                  >
+                    <AvatarFace variant={person.face} size={48} />
+                  </button>
+                ) : (
+                  <span className={styles.avatarRing}>
+                    <AvatarFace variant={person.face} size={48} />
+                  </span>
+                )}
+                <EditableText
+                  className={styles.role}
+                  placeholder={PLACEHOLDERS.name}
+                  {...field(`people.${index}.name`)}
+                />
               </div>
 
-              <div className={styles.progress}>
-                <span className={styles.fieldLabel}>Прогресс</span>
-                <div className={styles.progressRow}>
-                  <ProgressBar percent={person.percent} label={person.project} />
-                  <span className={styles.percent}>{person.percent}%</span>
+              <div className={styles.content}>
+                <div className={styles.main}>
+                  <p className={styles.projectLine}>
+                    <span className={styles.fieldLabel}>{LABELS.fieldProject}</span>
+                    <EditableText
+                      className={styles.projectName}
+                      placeholder={PLACEHOLDERS.project}
+                      {...field(`people.${index}.project`)}
+                    />
+                  </p>
+                  <EditableText
+                    as="p"
+                    multiline
+                    className={styles.description}
+                    placeholder={PLACEHOLDERS.description}
+                    {...field(`people.${index}.description`)}
+                  />
                 </div>
+
+                <div className={styles.progress}>
+                  <span className={styles.fieldLabel}>{LABELS.fieldProgress}</span>
+                  <div className={styles.progressRow}>
+                    <ProgressBar percent={percent} label={person.project || person.name} />
+                  </div>
+                </div>
+
+                <p className={styles.goal}>
+                  <span className={styles.fieldLabel}>{LABELS.fieldGoal}</span>
+                  <EditableText
+                    className={styles.goalText}
+                    placeholder={PLACEHOLDERS.personGoal}
+                    {...field(`people.${index}.goal`)}
+                  />
+                </p>
               </div>
 
-              <p className={styles.goal}>
-                <span className={styles.fieldLabel}>Моя цель месяца:</span>
-                <span className={styles.goalText}>{person.monthGoal}</span>
-              </p>
-            </div>
-          </article>
-        ))}
+              {editing && people.length > MIN_PEOPLE && (
+                <button
+                  type="button"
+                  className={styles.remove}
+                  onClick={() => removePerson(person.id)}
+                  aria-label={`Убрать: ${person.name || FACE_LABELS[person.face]}`}
+                  title="Убрать из листа"
+                >
+                  ×
+                </button>
+              )}
+            </article>
+          )
+        })}
+
+        {editing && people.length < MAX_PEOPLE && (
+          <button type="button" className={styles.add} onClick={addPerson}>
+            + Добавить человека
+          </button>
+        )}
       </div>
     </section>
   )

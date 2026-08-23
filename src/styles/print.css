@@ -1,0 +1,32 @@
+/*
+ * Печать и экспорт в PDF. Печатается всегда бланк: тулбар и подсказки правки
+ * скрыты, цвета рамок и плашек сохраняются.
+ */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  /* min-height: 100vh с экрана мешает разбиению на страницы. */
+  #root {
+    padding: 0;
+    min-height: 0;
+  }
+
+  *,
+  *::before,
+  *::after {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  section,
+  article {
+    break-inside: avoid;
+  }
+}
