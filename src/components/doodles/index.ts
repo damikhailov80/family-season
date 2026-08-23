@@ -1,0 +1,7 @@
+export { HeartDoodle } from './HeartDoodle'
+export { FamilyIcon } from './FamilyIcon'
+export { SparkleRays } from './SparkleRays'
+export { SparkStar } from './SparkStar'
+export { MegaphoneDoodle } from './MegaphoneDoodle'
+export { RocketDoodle } from './RocketDoodle'
+export { TargetDoodle } from './TargetDoodle'

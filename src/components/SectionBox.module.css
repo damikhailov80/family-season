@@ -1,0 +1,63 @@
+.box {
+  position: relative;
+  border: var(--border-w) solid var(--accent);
+  border-radius: var(--radius-box);
+  background: var(--paper);
+  padding: 26px 20px 20px;
+}
+
+.head {
+  position: absolute;
+  top: 0;
+  left: 18px;
+  right: 18px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  pointer-events: none;
+}
+
+.badge {
+  pointer-events: auto;
+}
+
+.note {
+  font-family: var(--font-hand);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--paper);
+  padding: 2px 8px;
+  line-height: 1.1;
+}
+
+.body {
+  min-width: 0;
+}
+
+/*
+ * На узких экранах плашка с подписью перестаёт быть «наездом» на рамку:
+ * в две строки абсолютное позиционирование перекрыло бы содержимое бокса.
+ */
+@media (max-width: 560px) {
+  .box {
+    padding-top: 14px;
+  }
+
+  .head {
+    position: static;
+    transform: none;
+    left: auto;
+    right: auto;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .note {
+    font-size: 17px;
+    background: transparent;
+    padding: 0;
+  }
+}

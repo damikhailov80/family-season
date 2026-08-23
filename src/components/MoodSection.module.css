@@ -1,0 +1,118 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  margin-left: auto;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-hand);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--grid-line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.whoHead,
+.dayHead {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: #f4f2ea;
+  border: 1px solid var(--grid-line);
+  padding: 5px 2px;
+  text-transform: uppercase;
+}
+
+.whoHead {
+  width: 92px;
+  min-width: 92px;
+}
+
+.dayHead {
+  width: 24px;
+  min-width: 24px;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--grid-line);
+  padding: 4px 6px;
+  height: 30px;
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--paper);
+}
+
+.whoFace {
+  flex: none;
+}
+
+.cell {
+  border: 1px solid var(--grid-line);
+  height: 30px;
+  padding: 0;
+  text-align: center;
+}
+
+.cellFace {
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .legend {
+    margin-left: 0;
+    gap: 14px;
+  }
+
+  .legendItem {
+    font-size: 17px;
+  }
+}

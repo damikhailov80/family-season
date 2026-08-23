@@ -1,0 +1,19 @@
+.sheet {
+  max-width: 940px;
+  margin: 0 auto;
+  background: var(--paper);
+  border: 1px solid var(--sheet-border);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
+  padding: 34px 34px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+@media (max-width: 640px) {
+  .sheet {
+    padding: 24px 16px 30px;
+    gap: 34px;
+  }
+}

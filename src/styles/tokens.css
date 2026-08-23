@@ -1,0 +1,44 @@
+:root {
+  /* Бумага и фон */
+  --paper: #faf8f2;
+  --page-bg: #e8e6df;
+  --sheet-border: #d9d5c8;
+
+  /* Текст */
+  --ink: #2b2b2b;
+  --ink-soft: #4a4a4a;
+  --ink-muted: #7a7a7a;
+
+  /* Акценты секций */
+  --navy: #1f3a6b;
+  --purple: #7b5ea7;
+  --green: #6a9b3e;
+  --orange: #e2a13c;
+  --yellow: #f2c230;
+
+  /* Персоны */
+  --blue: #2e5aa0;
+  --pink: #d6467a;
+  --leaf: #4e8b3a;
+  --tangerine: #e2712a;
+
+  /* Настроения */
+  --mood-good: #5aa832;
+  --mood-ok: #efc94c;
+  --mood-bad: #e05252;
+
+  /* Полароид */
+  --tape: #efe3c0;
+  --photo-frame: #ffffff;
+
+  /* Формы */
+  --radius-box: 14px;
+  --radius-badge: 8px;
+  --border-w: 2px;
+  --grid-line: #cfcabb;
+
+  /* Шрифты */
+  --font-ui: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-hand: 'Caveat', 'Nunito', cursive;
+  --font-script: 'Marck Script', 'Caveat', cursive;
+}

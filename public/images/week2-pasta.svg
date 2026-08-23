@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Тарелка пасты с томатным соусом и базиликом на деревянном столе">
+  <defs>
+    <linearGradient id="table" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a0714a"/>
+      <stop offset="1" stop-color="#7b5231"/>
+    </linearGradient>
+    <radialGradient id="plate" cx="0.4" cy="0.34" r="0.75">
+      <stop offset="0" stop-color="#fffdf8"/>
+      <stop offset="1" stop-color="#e3ddcd"/>
+    </radialGradient>
+    <radialGradient id="sauce" cx="0.4" cy="0.32" r="0.72">
+      <stop offset="0" stop-color="#dc5330"/>
+      <stop offset="1" stop-color="#a52e1a"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="400" height="400" fill="url(#table)"/>
+  <g stroke="#6b4529" stroke-opacity="0.4" stroke-width="3" fill="none">
+    <path d="M0 44c120 14 260 8 400-6M0 130c140 16 250 6 400-10M0 272c130 18 270 6 400-8M0 356c110 12 280 6 400-10"/>
+  </g>
+
+  <ellipse cx="202" cy="212" rx="150" ry="148" fill="#000" opacity="0.2"/>
+  <circle cx="198" cy="202" r="150" fill="url(#plate)"/>
+  <circle cx="198" cy="202" r="118" fill="#f5f1e6"/>
+
+  <!-- гнездо спагетти -->
+  <g fill="none" stroke="#eec96a" stroke-width="9" stroke-linecap="round">
+    <path d="M92 202c0-58 48-102 106-102s106 44 106 102-48 102-106 102S92 260 92 202Z" opacity="0.95"/>
+    <path d="M106 202c0-50 42-88 92-88s92 38 92 88-42 88-92 88-92-38-92-88Z"/>
+    <path d="M122 196c4-44 40-76 82-74 42 2 76 38 74 82"/>
+    <path d="M132 232c-8-44 24-84 66-88 44-4 82 28 86 72"/>
+    <path d="M118 176c22-40 66-60 110-50"/>
+    <path d="M146 288c-32-24-46-64-36-102"/>
+    <path d="M252 292c38-18 60-58 54-100"/>
+  </g>
+  <g fill="none" stroke="#f7dc95" stroke-width="4" stroke-linecap="round">
+    <path d="M114 208c0-48 40-86 88-86"/>
+    <path d="M140 268c-24-22-34-56-24-88"/>
+    <path d="M282 208c0 44-32 80-74 86"/>
+    <path d="M160 128c34-16 74-12 104 12"/>
+  </g>
+
+  <!-- соус -->
+  <path d="M190 136c40-6 72 16 78 50 6 34-16 64-50 70-34 6-64-16-70-50-6-34 12-64 42-70Z" fill="url(#sauce)"/>
+  <g fill="#8d2716" opacity="0.7">
+    <circle cx="202" cy="176" r="9"/><circle cx="234" cy="204" r="7"/>
+    <circle cx="198" cy="228" r="8"/><circle cx="170" cy="198" r="6"/>
+    <circle cx="226" cy="240" r="5"/>
+  </g>
+  <g fill="#f08a63" opacity="0.5">
+    <ellipse cx="186" cy="158" rx="16" ry="9" transform="rotate(-24 186 158)"/>
+  </g>
+
+  <!-- базилик -->
+  <g fill="#3f7d2e">
+    <path d="M208 140c-16-10-16-32 0-42 16 10 16 32 0 42Z"/>
+    <path d="M252 166c4-18 24-26 38-16-6 18-24 26-38 16Z"/>
+    <path d="M162 244c-18 2-30-14-24-30 18 0 30 14 24 30Z"/>
+  </g>
+  <g stroke="#2f5f22" stroke-width="2" fill="none">
+    <path d="M208 98v42M256 162l30-10M164 242l-22-24"/>
+  </g>
+
+  <!-- вилка -->
+  <g fill="#ccd1d8">
+    <rect x="332" y="148" width="10" height="184" rx="5"/>
+    <path d="M324 112h6v44h-6zM335 112h6v44h-6zM346 112h6v44h-6z"/>
+    <path d="M320 154h36v12a18 18 0 0 1-36 0z"/>
+  </g>
+</svg>

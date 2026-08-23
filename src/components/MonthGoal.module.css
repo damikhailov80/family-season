@@ -1,0 +1,50 @@
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.target {
+  flex: none;
+  color: var(--ink);
+}
+
+.box {
+  flex: 1;
+  min-width: 0;
+  padding-block: 22px 18px;
+}
+
+.body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-script);
+  font-size: clamp(18px, 2.4vw, 24px);
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.heart {
+  flex: none;
+  color: var(--ink);
+  transform: rotate(6deg);
+}
+
+@media (max-width: 720px) {
+  .target {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .heart {
+    display: none;
+  }
+}

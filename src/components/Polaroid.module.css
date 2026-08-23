@@ -1,0 +1,40 @@
+.polaroid {
+  position: relative;
+  margin: 18px auto 0;
+  width: 92%;
+  background: var(--photo-frame);
+  padding: 7px 7px 26px;
+  border-radius: 2px;
+  box-shadow: 0 3px 8px rgb(0 0 0 / 18%);
+  transform: rotate(var(--tilt));
+}
+
+.tape {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 46px;
+  height: 20px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: var(--tape);
+  opacity: 0.9;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 6%);
+}
+
+.photo {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #efece3;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(150deg, #f3f0e7 0%, #e7e3d7 55%, #dcd7c8 100%);
+}
