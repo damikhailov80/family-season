@@ -2,33 +2,52 @@
 
 import { useEffect, useState } from 'react'
 import App from '../../App'
-import { decodeTemplate, readEditFlag, readHashPayload, readNewFlag } from '../../model/codec'
+import {
+  decodeTemplate,
+  readEditFlag,
+  readFillId,
+  readHashPayload,
+  readNewFlag,
+} from '../../model/codec'
+import { DEFAULT_FILL_ID, knownFillId } from '../../model/fills'
+import { modeFromPath } from '../../model/site'
 import { createDemoTemplate, createEmptyTemplate } from '../../model/templates'
 import type { Boot } from '../../state/DocProvider'
 
-function demoBoot(): Boot {
-  return { template: createDemoTemplate(), source: 'demo', mode: 'view' }
+function exampleBoot(fillId: string): Boot {
+  return { template: createDemoTemplate(), fillId, mode: 'view' }
 }
 
 /**
- * Ссылки в адресе нет — пример показываем сразу, без ожидания. Компонент грузится
- * только в браузере (ssr: false), поэтому location доступен уже в первом рендере.
+ * Что показывать, решают путь и хэш — компонент грузится только в браузере
+ * (ssr: false), поэтому `location` доступен уже в первом рендере.
  *
- * `#new=1` — приход с лендинга по кнопке «Создать свой лист»: пустой бланк сразу
- * в правке. Записи в историю здесь нет и быть не должно — позади лежит лендинг,
- * а не пример, поэтому «К примеру» уведёт на /sheet, а не назад.
+ *   /sheet                — пример; голый адрес равен `#data=demo-1`
+ *   /sheet#data=<id>      — другой пример: шаблон свой, заполнение по id
+ *   /sheet#d=…&data=<id>  — пример целиком из ссылки
+ *   /sheet#d=…            — свой лист в просмотре
+ *   /sheet/edit#d=…       — он же в правке
+ *   /sheet/edit           — пустой бланк «с нуля»
+ *
+ * Пример не правится: `data=<id>` перебивает путь и оставляет просмотр. Приведением
+ * адреса к этим правилам занимается DocProvider — здесь только чтение.
  */
 function initialBoot(): Boot | null {
-  if (readHashPayload()) return null
-  if (readNewFlag()) return { template: createEmptyTemplate(), source: 'custom', mode: 'edit' }
-  return demoBoot()
+  if (readHashPayload()) return null // дальше асинхронное декодирование
+  const fillId = knownFillId(readFillId())
+  if (fillId) return exampleBoot(fillId)
+  // `new=1` — легаси-адрес кнопок «Собрать свой сезон», теперь это голый /sheet/edit.
+  if (modeFromPath() === 'edit' || readNewFlag()) {
+    return { template: createEmptyTemplate(), fillId: null, mode: 'edit' }
+  }
+  return exampleBoot(DEFAULT_FILL_ID)
 }
 
 export default function Sheet() {
   const [boot, setBoot] = useState<Boot | null>(initialBoot)
 
   // Декодирование ссылки асинхронное. Пока оно идёт, лист не рисуем: показать
-  // демо и через мгновение подменить его присланным листом — хуже, чем пауза.
+  // пример и через мгновение подменить его присланным листом — хуже, чем пауза.
   useEffect(() => {
     if (boot) return
     const payload = readHashPayload()
@@ -36,10 +55,17 @@ export default function Sheet() {
     void (async () => {
       const template = payload ? await decodeTemplate(payload) : null
       if (cancelled) return
-      // Своя ссылка из кнопки форка помечена `edit=1` — открываем сразу в правке.
-      setBoot(
-        template ? { template, source: 'custom', mode: readEditFlag() ? 'edit' : 'view' } : demoBoot(),
-      )
+      if (!template) {
+        setBoot(exampleBoot(DEFAULT_FILL_ID))
+        return
+      }
+      const fillId = knownFillId(readFillId())
+      setBoot({
+        template,
+        fillId,
+        // `edit=1` — легаси-пометка ссылок форка; сегодня режим несёт путь.
+        mode: fillId ? 'view' : readEditFlag() ? 'edit' : modeFromPath(),
+      })
     })()
     return () => {
       cancelled = true

@@ -33,7 +33,7 @@ export function Hero() {
         <a className={styles.primary} href={ROUTES.sheet}>
           Посмотреть пример
         </a>
-        <a className={styles.ghost} href={ROUTES.newSheet}>
+        <a className={styles.ghost} href={ROUTES.sheetEdit}>
           Собрать свой сезон
         </a>
       </div>

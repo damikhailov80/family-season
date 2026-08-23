@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Первый киновечер всей семьёй</title>
+  <defs>
+    <linearGradient id="w1screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff6dc"/>
+      <stop offset="1" stop-color="#f2c230"/>
+    </linearGradient>
+    <radialGradient id="w1glow" cx="50%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#ffd98a" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#ffd98a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Тёмная комната -->
+  <rect width="200" height="200" fill="#1b2a4d"/>
+
+  <!-- Экран на стене -->
+  <rect x="24" y="20" width="152" height="84" rx="6" fill="#0f1a33"/>
+  <rect x="28" y="24" width="144" height="76" rx="4" fill="url(#w1screen)"/>
+  <!-- Кадр на экране: герой в плаще на фоне неба -->
+  <path d="M28 82h144v14a4 4 0 0 1-4 4H32a4 4 0 0 1-4-4z" fill="#e2a13c" opacity=".55"/>
+  <path d="M104 42c6 0 10 5 10 11 0 4-2 7-4 9l10 24H84l10-24c-2-2-4-5-4-9 0-6 4-11 10-11z" fill="#1f3a6b" opacity=".8"/>
+  <path d="M92 60c-8 3-14 12-16 26h48c-2-14-8-23-16-26" fill="#1f3a6b" opacity=".55"/>
+  <circle cx="52" cy="42" r="3" fill="#fff" opacity=".7"/>
+  <circle cx="148" cy="50" r="2.4" fill="#fff" opacity=".6"/>
+
+  <!-- Свет от экрана -->
+  <ellipse cx="100" cy="120" rx="115" ry="80" fill="url(#w1glow)"/>
+
+  <!-- Диван -->
+  <rect x="2" y="140" width="196" height="60" rx="16" fill="#2c3f6d"/>
+  <rect x="2" y="168" width="196" height="32" rx="12" fill="#23335a"/>
+  <path d="M100 141v27" stroke="#23335a" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Семья со спины: силуэты разного роста -->
+  <g fill="#131f38">
+    <!-- папа: борода -->
+    <circle cx="40" cy="122" r="16"/>
+    <path d="M28 128c0 9 5 15 12 15s12-6 12-15z" opacity=".9"/>
+    <path d="M14 152c2-13 12-20 26-20s24 7 26 20z"/>
+    <!-- мама: каре -->
+    <path d="M82 106c10 0 16 7 16 17 0 7-1 12-3 17h-26c-2-5-3-10-3-17 0-10 6-17 16-17z"/>
+    <path d="M58 152c2-12 11-19 24-19s22 7 24 19z"/>
+    <!-- сын: вихор сбоку, а не торчком: иначе силуэт читается как яблоко -->
+    <circle cx="128" cy="132" r="12"/>
+    <path d="M119 124c-1-7 4-13 12-13-5 3-8 7-8 13z"/>
+    <path d="M110 158c2-10 8-15 18-15s16 5 18 15z"/>
+    <!-- дочь: хвостики ниже уровня макушки, иначе похоже на уши -->
+    <circle cx="164" cy="132" r="12"/>
+    <ellipse cx="151" cy="136" rx="4.5" ry="6"/>
+    <ellipse cx="177" cy="136" rx="4.5" ry="6"/>
+    <path d="M146 158c2-10 8-15 18-15s16 5 18 15z"/>
+  </g>
+
+  <!-- Попкорн между своими -->
+  <g>
+    <path d="M92 170h22l-3 24H95z" fill="#e05252"/>
+    <path d="M96 170h4l-2 24h-3zm10 0h4l-1 24h-4z" fill="#fdfcf8" opacity=".85"/>
+    <circle cx="97" cy="167" r="4" fill="#fff3d0"/>
+    <circle cx="105" cy="164" r="4.5" fill="#fff6dc"/>
+    <circle cx="112" cy="168" r="3.6" fill="#fff3d0"/>
+  </g>
+</svg>

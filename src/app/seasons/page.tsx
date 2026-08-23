@@ -25,7 +25,7 @@ export default function SeasonsPage() {
           Пока сезон хранится целиком в ссылке: нажмите «Скопировать ссылку» на постере и положите
           её в закладки — это и есть ваш сезон.
         </p>
-        <a className={styles.primary} href={ROUTES.newSheet}>
+        <a className={styles.primary} href={ROUTES.sheetEdit}>
           Собрать свой сезон
         </a>
       </SectionBox>

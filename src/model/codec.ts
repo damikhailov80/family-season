@@ -18,6 +18,7 @@ import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
  */
 
 const HASH_PARAM = 'd'
+const DATA_PARAM = 'data'
 const EDIT_PARAM = 'edit'
 const NEW_PARAM = 'new'
 const PACKED = '2z'
@@ -208,24 +209,30 @@ export function readHashPayload(hash: string = location.hash): string | null {
 }
 
 /**
- * Пометку `edit=1` ставит только ссылка кнопок форка: открытый в новой вкладке
- * свой лист сразу готов к правке. В присланную ссылку она не попадает, а первая
- * же правка перезаписывает хэш без неё.
+ * `data=<id>` — какой набор заполнения показать поверх бланка (`src/model/fills.ts`).
+ * Это пометка примера, а не часть шаблона: своя ссылка (`buildShareUrl`) её не несёт,
+ * форк сбрасывает, а неизвестный id считается отсутствующим.
+ */
+export function readFillId(hash: string = location.hash): string | null {
+  return new URLSearchParams(hash.replace(/^#/, '')).get(DATA_PARAM)
+}
+
+/**
+ * Легаси: в первой версии сайта режим и «пустой бланк» жили пометками в хэше.
+ * Теперь их несёт путь (`/sheet` и `/sheet/edit`), но старые ссылки читать надо:
+ * `edit=1` какое-то время висел в адресной строке после форка и мог быть скопирован,
+ * а `new=1` стоял в кнопках «Собрать свой сезон». Оба флага читаются один раз при
+ * загрузке и тут же превращаются в путь; в новые адреса они не пишутся.
  */
 export function readEditFlag(hash: string = location.hash): boolean {
   return new URLSearchParams(hash.replace(/^#/, '')).get(EDIT_PARAM) === '1'
 }
 
-/**
- * Пометка `new=1` приходит только с лендинга: кнопка «Создать свой лист» не может
- * закодировать пустой шаблон на сервере, поэтому просит лист сделать это сам.
- * Как и `edit=1`, в разосланную ссылку она не попадает — первая же запись URL
- * заменяет её на `d=`.
- */
+/** Легаси, см. `readEditFlag`. Заменён на голый `/sheet/edit`. */
 export function readNewFlag(hash: string = location.hash): boolean {
   return new URLSearchParams(hash.replace(/^#/, '')).get(NEW_PARAM) === '1'
 }
 
-export function hashFor(payload: string, edit = false): string {
-  return `#${HASH_PARAM}=${payload}${edit ? `&${EDIT_PARAM}=1` : ''}`
+export function hashFor(payload: string, fillId: string | null = null): string {
+  return `#${HASH_PARAM}=${payload}${fillId ? `&${DATA_PARAM}=${fillId}` : ''}`
 }

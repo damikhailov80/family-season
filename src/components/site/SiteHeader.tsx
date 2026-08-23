@@ -24,7 +24,7 @@ export function SiteHeader() {
           Мои сезоны
         </Link>
         {/* В лист — обычная <a>: он ведёт историю сам, см. комментарий в Hero. */}
-        <a className={styles.action} href={ROUTES.newSheet}>
+        <a className={styles.action} href={ROUTES.sheetEdit}>
           Новый сезон
         </a>
       </nav>

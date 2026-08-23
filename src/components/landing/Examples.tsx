@@ -24,7 +24,7 @@ export function Examples() {
               </span>
             ))}
           </div>
-          <h3 className={styles.title}>Месяц Marvel</h3>
+          <h3 className={styles.title}>Marvel-лихорадка</h3>
           <p className={styles.text}>
             Сезон на четверых: фильмы по неделям, паста как в кино, робот из LEGO и первый комикс.
           </p>
@@ -40,7 +40,7 @@ export function Examples() {
           <p className={styles.hand}>
             Сезон целиком помещается в ссылку: отправили — и у близких открылся тот же постер.
           </p>
-          <a className={styles.ghost} href={ROUTES.newSheet}>
+          <a className={styles.ghost} href={ROUTES.sheetEdit}>
             Собрать свой сезон
           </a>
         </div>

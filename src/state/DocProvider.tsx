@@ -5,41 +5,74 @@ import {
   decodeTemplate,
   encodeTemplate,
   hashFor,
-  readEditFlag,
+  readFillId,
   readHashPayload,
   readNewFlag,
 } from '../model/codec'
-import { demoFill } from '../model/demoFill'
 import { templateDays } from '../model/fill'
+import { DEFAULT_FILL_ID, fillById, knownFillId } from '../model/fills'
+import { modeFromPath, pathForMode, ROUTES } from '../model/site'
 import { createDemoTemplate, createEmptyTemplate, createPerson, nextPersonId } from '../model/templates'
 import type { Template } from '../model/types'
-import { EMPTY_FILL, MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
+import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
 import type { DocMode, DocSource, DocValue } from './docContext'
 import { DocContext } from './docContext'
 
 export interface Boot {
   template: Template
-  source: DocSource
+  /** id набора заполнения из `data=`; null — свой лист, слой заполнения пуст. */
+  fillId: string | null
   mode: DocMode
 }
 
 const URL_SYNC_DELAY = 400
 
 /**
- * Пометка на записи истории: её создала кнопка форка, а значит позади в истории
- * лежит пример. Живёт в `history.state`, а не в React: переживает перезагрузку и
- * привязана к конкретной записи. По ней «К примеру» уходит назад, а не толкает
- * новую запись — только так лист остаётся впереди и кнопка «вперёд» работает.
+ * Пометки на записи истории. Они описывают не лист, а соседей записи, поэтому
+ * живут в `history.state`, а не в React: переживают перезагрузку и привязаны к
+ * конкретной записи.
  */
-const OWN_ENTRY = { own: true }
-
-function isOwnEntry(): boolean {
-  return (history.state as { own?: boolean } | null)?.own === true
+interface EntryMarks {
+  /** Позади лежит пример. Ставит только форк; по ней «К примеру» уходит назад. */
+  own?: boolean
+  /** id сеанса правки: связывает запись правки и запись просмотра под ней. */
+  viewOf?: number
+  /** Эту запись создала кнопка «Править», позади — просмотр того же листа. */
+  edit?: boolean
 }
 
-/** Адрес без хэша — на нём живёт пример. */
-function bareUrl(): string {
-  return location.pathname + location.search
+function marksOf(): EntryMarks {
+  return (history.state ?? {}) as EntryMarks
+}
+
+function isOwnEntry(): boolean {
+  return marksOf().own === true
+}
+
+/**
+ * Состояние для НОВОЙ записи истории. Служебные поля Next (`__NA`, дерево) обязаны
+ * уехать в неё: с ними патченный Next-ом `pushState` уходит мимо роутера, маршрут не
+ * перерисовывается и лист не теряет несохранённый шаблон. Свои пометки, наоборот,
+ * не наследуются — у новой записи другие соседи.
+ */
+function entryState(marks: EntryMarks): Record<string, unknown> {
+  const state = { ...(history.state as Record<string, unknown> | null) }
+  delete state.own
+  delete state.viewOf
+  delete state.edit
+  return { ...state, ...marks }
+}
+
+/**
+ * Путь — проекция режима: правка живёт на /sheet/edit, всё остальное на /sheet.
+ * Здесь же приводятся к правилам легаси-адреса (`edit=1`, `new=1`) и попытка
+ * открыть пример в правке. Передавать `history.state` обязательно — иначе вызов
+ * пойдёт мимо короткого пути в патче Next (см. `entryState`).
+ */
+function syncPath(mode: DocMode, fillId: string | null) {
+  const path = pathForMode(fillId ? 'view' : mode)
+  if (location.pathname.replace(/\/+$/, '') === path) return
+  history.replaceState(history.state, '', path + location.hash)
 }
 
 /** Иммутабельная запись по пути 'people.0.name'. Документ маленький, клон дешёвый. */
@@ -64,7 +97,7 @@ function getByPath(template: Template, path: string): string {
 
 export function DocProvider({ boot, children }: { boot: Boot; children: React.ReactNode }) {
   const [template, setTemplate] = useState<Template>(boot.template)
-  const [source, setSource] = useState<DocSource>(boot.source)
+  const [fillId, setFillId] = useState<string | null>(boot.fillId)
   const [mode, setMode] = useState<DocMode>(boot.mode)
 
   /**
@@ -73,85 +106,128 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
    */
   const navSeq = useRef(0)
 
-  const showDemo = useCallback(() => {
+  /**
+   * id текущего сеанса правки, начатой кнопкой «Править». Совпадение с пометкой
+   * `viewOf` на записи — единственный признак «подо мной просмотр этого же листа».
+   * После перезагрузки id другой, и работает обычное чтение адреса.
+   */
+  const editSession = useRef<number | null>(null)
+
+  const showExample = useCallback((id: string) => {
     setTemplate(createDemoTemplate())
-    setSource('demo')
+    setFillId(id)
     setMode('view')
+    syncPath('view', id)
   }, [])
 
-  // Переход по истории (назад/вперёд, правка адреса). Перезагружать страницу не нужно:
-  // всё состояние листа и так лежит в хэше.
+  // Адрес приводится к правилам один раз при загрузке: легаси-флаги и попытка открыть
+  // пример в правке превращаются в правильный путь. `boot` за жизнь провайдера не
+  // меняется, дальше за путь отвечают переходы и переключение режима.
   useEffect(() => {
-    const onHashChange = () => {
-      const seq = (navSeq.current += 1)
-      const payload = readHashPayload()
-      if (!payload) {
-        // `#new=1` — просьба лендинга открыть пустой бланк. Через 400 мс запись URL
-        // заменит её на `#d=…`, так что в истории эта пометка почти не задерживается.
-        if (readNewFlag()) {
-          setTemplate(createEmptyTemplate())
-          setSource('custom')
-          setMode('edit')
-          return
-        }
-        showDemo()
+    syncPath(boot.mode, boot.fillId)
+  }, [boot.mode, boot.fillId])
+
+  // Переход по истории (назад/вперёд, правка адреса). Перезагружать страницу не нужно:
+  // всё состояние листа и так лежит в адресе.
+  useEffect(() => {
+    const onNavigate = () => {
+      const marks = marksOf()
+
+      // Вышли «назад» из правки на просмотр того же листа. Адрес этой записи хранит
+      // допоследнюю версию — свежий шаблон лежит в памяти, его и оставляем, а хэш
+      // перепишет обычная синхронизация URL. Пометку сеанса не сбрасываем: по хэшу
+      // приходят сразу два события, и вторая проходка должна попасть сюда же.
+      if (editSession.current !== null && marks.viewOf === editSession.current && !marks.edit) {
+        navSeq.current += 1
+        setMode('view')
         return
       }
+
+      const seq = (navSeq.current += 1)
+      editSession.current = marks.edit ? (marks.viewOf ?? null) : null
+
+      const id = knownFillId(readFillId())
+      const payload = readHashPayload()
+
+      if (!payload) {
+        if (id) {
+          showExample(id)
+          return
+        }
+        // Голый /sheet/edit — пустой бланк; `new=1` тот же адрес в легаси-виде.
+        if (modeFromPath() === 'edit' || readNewFlag()) {
+          setTemplate(createEmptyTemplate())
+          setFillId(null)
+          setMode('edit')
+          syncPath('edit', null)
+          return
+        }
+        showExample(DEFAULT_FILL_ID)
+        return
+      }
+
       void decodeTemplate(payload).then((next) => {
         if (navSeq.current !== seq) return
         if (!next) {
-          showDemo()
+          showExample(DEFAULT_FILL_ID)
           return
         }
+        // Пример не правится: `data=` перебивает путь и оставляет просмотр.
+        const nextMode: DocMode = id ? 'view' : modeFromPath()
         setTemplate(next)
-        setSource('custom')
-        // Вернулись «вперёд» в свой лист — продолжаем прерванный сеанс правки.
-        setMode(isOwnEntry() || readEditFlag() ? 'edit' : 'view')
+        setFillId(id)
+        setMode(nextMode)
+        syncPath(nextMode, id)
       })
     }
-    addEventListener('hashchange', onHashChange)
-    return () => removeEventListener('hashchange', onHashChange)
-  }, [showDemo])
 
-  // Адресная строка — единственное хранилище листа. Правка следов в истории не
-  // оставляет: replaceState переписывает ту же запись, сохраняя её пометку.
-  useEffect(() => {
-    if (source !== 'custom') return
-    const seq = navSeq.current
-    let cancelled = false
-    const timer = setTimeout(() => {
-      void encodeTemplate(template).then((payload) => {
-        if (cancelled || navSeq.current !== seq) return
-        const hash = hashFor(payload)
-        if (hash === location.hash) return
-        // history.state обязателен: null затёр бы пометку своей записи.
-        history.replaceState(history.state, '', hash)
-      })
-    }, URL_SYNC_DELAY)
-
+    // Смена одного пути не порождает `hashchange`, а правка адреса руками не порождает
+    // `popstate` — нужны оба. При переходе по хэшу приходят оба сразу: разбор
+    // идемпотентен, а поздний результат отбрасывает `navSeq`.
+    addEventListener('popstate', onNavigate)
+    addEventListener('hashchange', onNavigate)
     return () => {
-      cancelled = true
-      clearTimeout(timer)
+      removeEventListener('popstate', onNavigate)
+      removeEventListener('hashchange', onNavigate)
     }
-  }, [template, source])
+  }, [showExample])
 
   // Адрес кнопки форка: он же уходит в pushState, так что обычный клик и клик
   // с модификатором (новая вкладка) ведут в одно и то же место.
   const [forkLink, setForkLink] = useState('')
 
+  /*
+   * Адресная строка — единственное хранилище листа. Правка следов в истории не
+   * оставляет: replaceState переписывает ту же запись, сохраняя её пометки.
+   * `mode` в зависимостях не ради хэша, а ради выхода «назад» из правки: там
+   * меняется только он, а хэш записи просмотра остаётся от предыдущей версии.
+   */
   useEffect(() => {
-    if (source !== 'demo') return
+    const seq = navSeq.current
     let cancelled = false
-    void encodeTemplate(template).then((payload) => {
-      if (cancelled) return
-      setForkLink(hashFor(payload, true))
-    })
+    // Пример не правят — его адрес приводится к каноническому сразу, без дебаунса.
+    const timer = setTimeout(
+      () => {
+        void encodeTemplate(template).then((payload) => {
+          if (cancelled || navSeq.current !== seq) return
+          if (fillId) setForkLink(ROUTES.sheetEdit + hashFor(payload))
+          const hash = hashFor(payload, fillId)
+          if (hash === location.hash) return
+          // history.state обязателен: null затёр бы пометки своей записи.
+          history.replaceState(history.state, '', hash)
+        })
+      },
+      fillId ? 0 : URL_SYNC_DELAY,
+    )
+
     return () => {
       cancelled = true
+      clearTimeout(timer)
     }
-  }, [source, template])
+  }, [template, fillId, mode])
 
-  const fill = source === 'demo' ? demoFill : EMPTY_FILL
+  const source: DocSource = fillId ? 'demo' : 'custom'
+  const fill = fillById(fillId)
   const days = templateDays(template)
 
   const update = useCallback((recipe: (current: Template) => Template) => {
@@ -166,18 +242,50 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     [template],
   )
 
-  // Единственное место, где лист добавляет запись в историю: «назад» из своего
-  // листа возвращает к примеру.
+  // Форк — единственный переход, добавляющий запись «свой лист»: «назад» из него
+  // возвращает к примеру.
   const startCustom = useCallback(async (next: Template) => {
     const payload = await encodeTemplate(next)
     navSeq.current += 1
-    history.pushState(OWN_ENTRY, '', hashFor(payload, true))
+    editSession.current = null
+    history.pushState(entryState({ own: true }), '', ROUTES.sheetEdit + hashFor(payload))
     setTemplate(next)
-    setSource('custom')
+    setFillId(null)
     setMode('edit')
     // Мгновенно, а не smooth: плавная прокрутка сбивается перерисовкой листа.
     scrollTo(0, 0)
   }, [])
+
+  // «Править» — тоже переход: режим виден в адресе, поэтому «назад» из правки
+  // возвращает в просмотр, а «вперёд» — обратно в правку.
+  const enterEdit = useCallback(() => {
+    const session = Date.now()
+    // Штампуем запись просмотра тем же id, чтобы узнать её при возврате.
+    history.replaceState({ ...history.state, viewOf: session }, '', location.href)
+    navSeq.current += 1
+    history.pushState(
+      entryState({ viewOf: session, edit: true }),
+      '',
+      ROUTES.sheetEdit + location.hash,
+    )
+    editSession.current = session
+    setMode('edit')
+  }, [])
+
+  const leaveEdit = useCallback(async () => {
+    const marks = marksOf()
+    // Запись просмотра лежит прямо под нами — возвращаемся на неё, а не плодим новую:
+    // запись правки остаётся впереди, и «вперёд» продолжит прерванный сеанс.
+    if (marks.edit && editSession.current !== null && marks.viewOf === editSession.current) {
+      history.back()
+      return
+    }
+    const payload = await encodeTemplate(template)
+    navSeq.current += 1
+    editSession.current = null
+    history.pushState(entryState({}), '', ROUTES.sheet + hashFor(payload))
+    setMode('view')
+  }, [template])
 
   const value = useMemo<DocValue>(
     () => ({
@@ -187,9 +295,13 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       source,
       days,
       editing: mode === 'edit',
-      links: { fork: forkLink, demo: bareUrl() },
+      links: { fork: forkLink, demo: ROUTES.sheet },
       field,
-      setMode,
+      setMode: (next: DocMode) => {
+        if (next === mode) return
+        if (next === 'edit') enterEdit()
+        else void leaveEdit()
+      },
       fork: () => void startCustom(structuredClone(template)),
       openDemo: () => {
         // Свой лист остаётся в истории впереди: «вперёд» вернёт его целиком.
@@ -198,8 +310,9 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
           return
         }
         navSeq.current += 1
-        history.pushState(null, '', bareUrl())
-        showDemo()
+        editSession.current = null
+        history.pushState(entryState({}), '', ROUTES.sheet)
+        showExample(DEFAULT_FILL_ID)
       },
       addPerson: () =>
         update((current) =>
@@ -233,10 +346,24 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         })),
       buildShareUrl: async () => {
         const payload = await encodeTemplate(template)
-        return `${location.origin}${bareUrl()}${hashFor(payload)}`
+        // Присланная ссылка всегда открывается в просмотре и без набора заполнения.
+        return `${location.origin}${ROUTES.sheet}${hashFor(payload)}`
       },
     }),
-    [template, fill, mode, source, days, forkLink, field, update, startCustom, showDemo],
+    [
+      template,
+      fill,
+      mode,
+      source,
+      days,
+      forkLink,
+      field,
+      update,
+      startCustom,
+      enterEdit,
+      leaveEdit,
+      showExample,
+    ],
   )
 
   return <DocContext.Provider value={value}>{children}</DocContext.Provider>

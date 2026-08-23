@@ -7,8 +7,23 @@ export const CONTACT_EMAIL = 'smart.scriptorium+familyseason.online@gmail.com'
 
 export const ROUTES = {
   home: '/',
+  /** Просмотр: пример (`#d=…&data=<id>`) или свой лист (`#d=…`). */
   sheet: '/sheet',
-  /** Пустой бланк сразу в правке: флаг разбирает `readNewFlag` в codec.ts. */
-  newSheet: '/sheet#new=1',
+  /** Тот же лист в правке. Без `#d=…` — пустой бланк «с нуля». */
+  sheetEdit: '/sheet/edit',
   seasons: '/seasons',
 } as const
+
+/**
+ * Режим листа несёт путь, а не пометка в хэше: адрес правки можно сохранить,
+ * переслать и перезагрузить. Тип берём голым union'ом — `model` не должен
+ * зависеть от `state`, а `DocMode` объявлен там.
+ */
+export function modeFromPath(pathname: string = location.pathname): 'view' | 'edit' {
+  // Хвостовой слэш Next убирает редиректом, но сравнение путей не должно от этого зависеть.
+  return pathname.replace(/\/+$/, '') === ROUTES.sheetEdit ? 'edit' : 'view'
+}
+
+export function pathForMode(mode: 'view' | 'edit'): string {
+  return mode === 'edit' ? ROUTES.sheetEdit : ROUTES.sheet
+}
