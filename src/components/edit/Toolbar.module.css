@@ -24,8 +24,13 @@
   color: var(--ink-muted);
 }
 
+/* Часть «кнопок» — ссылки (клик с модификатором открывает лист в новой вкладке),
+   поэтому inline-flex и снятое подчёркивание: иначе <a> не совпадёт с <button>. */
 .primary,
 .ghost {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
   font-family: var(--font-ui);
   font-weight: 700;
   font-size: 13px;

@@ -37,6 +37,11 @@ export function monthName({ monthIndex }: MonthRef): string {
   return MONTHS_RU[monthIndex] ?? MONTHS_RU[0]
 }
 
+/** Самое длинное название — им подпирают ширину заголовка, чтобы он не прыгал. */
+export const LONGEST_MONTH_RU = MONTHS_RU.reduce((longest, name) =>
+  name.length > longest.length ? name : longest,
+)
+
 /** Сдвиг месяца стрелками в режиме правки: декабрь + 1 = январь следующего года. */
 export function shiftMonth(month: MonthRef, delta: number): MonthRef {
   const date = new Date(month.year, month.monthIndex + delta, 1)

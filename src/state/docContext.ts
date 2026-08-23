@@ -19,13 +19,17 @@ export interface DocValue {
   /** Число дней месяца — считается из темы, отдельного поля в модели нет. */
   days: number
   editing: boolean
-  hasDraft: boolean
+  /**
+   * Адреса навигационных кнопок для `<a href>`: те же, что уходят в историю по
+   * обычному клику, поэтому клик с модификатором открывает лист в новой вкладке.
+   * `fork`/`blank` кодируются асинхронно — до готовности пустые строки.
+   */
+  links: { fork: string; blank: string; demo: string }
   /** Привязка текстового поля по пути в шаблоне: field('people.0.name'). */
   field: (path: string) => FieldBinding
   setMode: (mode: DocMode) => void
   fork: () => void
   startBlank: () => void
-  continueDraft: () => void
   openDemo: () => void
   addPerson: () => void
   removePerson: (id: string) => void

@@ -4,8 +4,7 @@ import './styles/tokens.css'
 import './styles/global.css'
 import './styles/print.css'
 import App from './App.tsx'
-import { decodeTemplate, readHashPayload } from './model/codec.ts'
-import { loadDraft } from './model/storage.ts'
+import { decodeTemplate, readEditFlag, readHashPayload } from './model/codec.ts'
 import { createDemoTemplate } from './model/templates.ts'
 import type { Boot } from './state/DocProvider.tsx'
 
@@ -14,13 +13,13 @@ import type { Boot } from './state/DocProvider.tsx'
  * мелькнёт демо-пример и только потом подменится на присланный лист.
  */
 async function bootstrap(): Promise<Boot> {
-  const hasDraft = loadDraft() !== null
   const payload = readHashPayload()
   if (payload) {
     const template = await decodeTemplate(payload)
-    if (template) return { template, source: 'custom', hasDraft }
+    // Своя ссылка из кнопки форка помечена `edit=1` — открываем сразу в правке.
+    if (template) return { template, source: 'custom', mode: readEditFlag() ? 'edit' : 'view' }
   }
-  return { template: createDemoTemplate(), source: 'demo', hasDraft }
+  return { template: createDemoTemplate(), source: 'demo', mode: 'view' }
 }
 
 void bootstrap().then((boot) => {

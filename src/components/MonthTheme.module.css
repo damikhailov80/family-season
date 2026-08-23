@@ -74,6 +74,9 @@
 }
 
 .month {
+  /* Распорка и название лежат в одной ячейке: ширина = по самому длинному месяцу. */
+  display: grid;
+  justify-items: center;
   font-family: var(--font-hand);
   font-weight: 700;
   font-size: clamp(40px, 7.5vw, 68px);
@@ -81,6 +84,14 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--ink);
+}
+
+.month > * {
+  grid-area: 1 / 1;
+}
+
+.monthSizer {
+  visibility: hidden;
 }
 
 .subtitle {

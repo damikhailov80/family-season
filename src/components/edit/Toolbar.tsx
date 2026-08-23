@@ -2,9 +2,21 @@ import { useEffect, useState } from 'react'
 import { useDoc } from '../../state/docContext'
 import styles from './Toolbar.module.css'
 
+/**
+ * Переходы между примером и своим листом — настоящие ссылки: клик с модификатором
+ * или средней кнопкой должен открывать лист в новой вкладке, как на любом сайте.
+ * Обычный левый клик перехватываем — переход делается на месте, без перезагрузки.
+ */
+function onNavClick(action: () => void) {
+  return (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
+    event.preventDefault()
+    action()
+  }
+}
+
 export function Toolbar() {
-  const { source, editing, setMode, fork, startBlank, continueDraft, openDemo, hasDraft, buildShareUrl } =
-    useDoc()
+  const { source, editing, setMode, fork, startBlank, openDemo, links, buildShareUrl } = useDoc()
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -29,17 +41,13 @@ export function Toolbar() {
       {source === 'demo' ? (
         <>
           <span className={styles.hint}>Это пример — форкните его или начните с чистого листа</span>
-          <button type="button" className={styles.primary} onClick={fork}>
+          {/* href появляется после кодирования; обычный клик работает и без него. */}
+          <a className={styles.primary} href={links.fork || undefined} onClick={onNavClick(fork)}>
             Форкнуть пример
-          </button>
-          <button type="button" className={styles.ghost} onClick={startBlank}>
+          </a>
+          <a className={styles.ghost} href={links.blank || undefined} onClick={onNavClick(startBlank)}>
             Создать с нуля
-          </button>
-          {hasDraft && (
-            <button type="button" className={styles.ghost} onClick={continueDraft}>
-              Продолжить правку
-            </button>
-          )}
+          </a>
         </>
       ) : (
         <>
@@ -56,9 +64,9 @@ export function Toolbar() {
           <button type="button" className={styles.ghost} onClick={() => void copyLink()}>
             {copied ? 'Скопировано ✓' : 'Скопировать ссылку'}
           </button>
-          <button type="button" className={styles.ghost} onClick={openDemo}>
+          <a className={styles.ghost} href={links.demo} onClick={onNavClick(openDemo)}>
             К примеру
-          </button>
+          </a>
         </>
       )}
       <button type="button" className={styles.ghost} onClick={() => print()}>

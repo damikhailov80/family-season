@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { nextFace } from '../model/accents'
 import { shiftMonth } from '../model/calendar'
-import { encodeTemplate, hashFor } from '../model/codec'
+import { decodeTemplate, encodeTemplate, hashFor, readEditFlag, readHashPayload } from '../model/codec'
 import { demoFill } from '../model/demoFill'
 import { templateDays } from '../model/fill'
-import { loadDraft, saveDraft } from '../model/storage'
 import { createDemoTemplate, createEmptyTemplate, createPerson, nextPersonId } from '../model/templates'
 import type { Template } from '../model/types'
 import { EMPTY_FILL, MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
@@ -14,10 +13,27 @@ import { DocContext } from './docContext'
 export interface Boot {
   template: Template
   source: DocSource
-  hasDraft: boolean
+  mode: DocMode
 }
 
 const URL_SYNC_DELAY = 400
+
+/**
+ * Пометка на записи истории: её создала кнопка форка, а значит позади в истории
+ * лежит пример. Живёт в `history.state`, а не в React: переживает перезагрузку и
+ * привязана к конкретной записи. По ней «К примеру» уходит назад, а не толкает
+ * новую запись — только так лист остаётся впереди и кнопка «вперёд» работает.
+ */
+const OWN_ENTRY = { own: true }
+
+function isOwnEntry(): boolean {
+  return (history.state as { own?: boolean } | null)?.own === true
+}
+
+/** Адрес без хэша — на нём живёт пример. */
+function bareUrl(): string {
+  return location.pathname + location.search
+}
 
 /** Иммутабельная запись по пути 'people.0.name'. Документ маленький, клон дешёвый. */
 function setByPath(template: Template, path: string, value: string): Template {
@@ -42,33 +58,62 @@ function getByPath(template: Template, path: string): string {
 export function DocProvider({ boot, children }: { boot: Boot; children: React.ReactNode }) {
   const [template, setTemplate] = useState<Template>(boot.template)
   const [source, setSource] = useState<DocSource>(boot.source)
-  const [mode, setMode] = useState<DocMode>('view')
-  const [hasDraft, setHasDraft] = useState(boot.hasDraft)
+  const [mode, setMode] = useState<DocMode>(boot.mode)
 
-  /** Хэш, который записали мы сами — чтобы не перечитывать собственную же правку. */
-  const ownHash = useRef<string>(location.hash)
+  /**
+   * Счётчик переходов. Кодирование асинхронное, а «назад» — мгновенное: без него
+   * отложенная запись URL может дописать правку в уже другую запись истории.
+   */
+  const navSeq = useRef(0)
 
-  // Чужой хэш в адресной строке (вставили ссылку, кнопка «назад») — читаем лист заново.
+  // Пустой лист создаём один раз: href кнопки и результат клика должны совпадать.
+  const blank = useMemo(() => createEmptyTemplate(), [])
+
+  const showDemo = useCallback(() => {
+    setTemplate(createDemoTemplate())
+    setSource('demo')
+    setMode('view')
+  }, [])
+
+  // Переход по истории (назад/вперёд, правка адреса). Перезагружать страницу не нужно:
+  // всё состояние листа и так лежит в хэше.
   useEffect(() => {
     const onHashChange = () => {
-      if (location.hash !== ownHash.current) location.reload()
+      const seq = (navSeq.current += 1)
+      const payload = readHashPayload()
+      if (!payload) {
+        showDemo()
+        return
+      }
+      void decodeTemplate(payload).then((next) => {
+        if (navSeq.current !== seq) return
+        if (!next) {
+          showDemo()
+          return
+        }
+        setTemplate(next)
+        setSource('custom')
+        // Вернулись «вперёд» в свой лист — продолжаем прерванный сеанс правки.
+        setMode(isOwnEntry() || readEditFlag() ? 'edit' : 'view')
+      })
     }
     addEventListener('hashchange', onHashChange)
     return () => removeEventListener('hashchange', onHashChange)
-  }, [])
+  }, [showDemo])
 
-  // Свой лист всегда отражён в адресной строке и в черновике.
+  // Адресная строка — единственное хранилище листа. Правка следов в истории не
+  // оставляет: replaceState переписывает ту же запись, сохраняя её пометку.
   useEffect(() => {
     if (source !== 'custom') return
+    const seq = navSeq.current
     let cancelled = false
     const timer = setTimeout(() => {
       void encodeTemplate(template).then((payload) => {
-        if (cancelled) return
+        if (cancelled || navSeq.current !== seq) return
         const hash = hashFor(payload)
-        ownHash.current = hash
-        history.replaceState(null, '', hash)
-        saveDraft(template)
-        setHasDraft(true)
+        if (hash === location.hash) return
+        // history.state обязателен: null затёр бы пометку своей записи.
+        history.replaceState(history.state, '', hash)
       })
     }, URL_SYNC_DELAY)
 
@@ -77,6 +122,22 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       clearTimeout(timer)
     }
   }, [template, source])
+
+  // Ссылки навигационных кнопок: их же адреса уходят в pushState, так что обычный
+  // клик и клик с модификатором (новая вкладка) ведут в одно и то же место.
+  const [sheetLinks, setSheetLinks] = useState({ fork: '', blank: '' })
+
+  useEffect(() => {
+    if (source !== 'demo') return
+    let cancelled = false
+    void Promise.all([encodeTemplate(template), encodeTemplate(blank)]).then(([fork, empty]) => {
+      if (cancelled) return
+      setSheetLinks({ fork: hashFor(fork, true), blank: hashFor(empty, true) })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [source, template, blank])
 
   const fill = source === 'demo' ? demoFill : EMPTY_FILL
   const days = templateDays(template)
@@ -93,7 +154,12 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     [template],
   )
 
-  const startCustom = useCallback((next: Template) => {
+  // Единственное место, где лист добавляет запись в историю: «назад» из своего
+  // листа возвращает к примеру.
+  const startCustom = useCallback(async (next: Template) => {
+    const payload = await encodeTemplate(next)
+    navSeq.current += 1
+    history.pushState(OWN_ENTRY, '', hashFor(payload, true))
     setTemplate(next)
     setSource('custom')
     setMode('edit')
@@ -109,22 +175,20 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       source,
       days,
       editing: mode === 'edit',
-      hasDraft,
+      links: { ...sheetLinks, demo: bareUrl() },
       field,
       setMode,
-      fork: () => startCustom(structuredClone(template)),
-      startBlank: () => startCustom(createEmptyTemplate()),
-      continueDraft: () => {
-        const draft = loadDraft()
-        if (draft) startCustom(draft)
-      },
+      fork: () => void startCustom(structuredClone(template)),
+      startBlank: () => void startCustom(structuredClone(blank)),
       openDemo: () => {
-        // Черновик не трогаем: к нему можно вернуться кнопкой «Продолжить правку».
-        setTemplate(createDemoTemplate())
-        setSource('demo')
-        setMode('view')
-        ownHash.current = ''
-        history.replaceState(null, '', location.pathname + location.search)
+        // Свой лист остаётся в истории впереди: «вперёд» вернёт его целиком.
+        if (isOwnEntry()) {
+          history.back()
+          return
+        }
+        navSeq.current += 1
+        history.pushState(null, '', bareUrl())
+        showDemo()
       },
       addPerson: () =>
         update((current) =>
@@ -158,10 +222,10 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         })),
       buildShareUrl: async () => {
         const payload = await encodeTemplate(template)
-        return `${location.origin}${location.pathname}${location.search}${hashFor(payload)}`
+        return `${location.origin}${bareUrl()}${hashFor(payload)}`
       },
     }),
-    [template, fill, mode, source, days, hasDraft, field, update, startCustom],
+    [template, fill, mode, source, days, sheetLinks, blank, field, update, startCustom, showDemo],
   )
 
   return <DocContext.Provider value={value}>{children}</DocContext.Provider>

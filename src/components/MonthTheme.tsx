@@ -1,4 +1,4 @@
-import { monthName } from '../model/calendar'
+import { LONGEST_MONTH_RU, monthName } from '../model/calendar'
 import { LABELS, PLACEHOLDERS } from '../model/labels'
 import { useDoc } from '../state/docContext'
 import { Badge } from './Badge'
@@ -38,7 +38,16 @@ export function MonthTheme() {
               ‹
             </button>
           )}
-          <p className={styles.month}>{monthName(template.theme)}</p>
+          {/*
+            Ширину держит самое длинное название: без распорки строка при
+            переключении месяцев меняет длину и стрелки скачут влево-вправо.
+          */}
+          <p className={styles.month}>
+            <span className={styles.monthSizer} aria-hidden="true">
+              {LONGEST_MONTH_RU}
+            </span>
+            <span>{monthName(template.theme)}</span>
+          </p>
           {editing && (
             <button
               type="button"

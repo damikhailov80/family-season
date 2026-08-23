@@ -18,6 +18,7 @@ import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
  */
 
 const HASH_PARAM = 'd'
+const EDIT_PARAM = 'edit'
 const PACKED = '2z'
 const PLAIN = '2p'
 const PACKED_V1 = '1z'
@@ -205,6 +206,15 @@ export function readHashPayload(hash: string = location.hash): string | null {
   return params.get(HASH_PARAM)
 }
 
-export function hashFor(payload: string): string {
-  return `#${HASH_PARAM}=${payload}`
+/**
+ * Пометку `edit=1` ставит только ссылка кнопок форка: открытый в новой вкладке
+ * свой лист сразу готов к правке. В присланную ссылку она не попадает, а первая
+ * же правка перезаписывает хэш без неё.
+ */
+export function readEditFlag(hash: string = location.hash): boolean {
+  return new URLSearchParams(hash.replace(/^#/, '')).get(EDIT_PARAM) === '1'
+}
+
+export function hashFor(payload: string, edit = false): string {
+  return `#${HASH_PARAM}=${payload}${edit ? `&${EDIT_PARAM}=1` : ''}`
 }
