@@ -2,6 +2,45 @@
 
 Продуктовое описание — в `README.md`. Здесь то, что легко сломать, не зная замысла.
 
+## Каркас: Next.js
+
+Сегодня приложение целиком клиентское: лист живёт в хэше ссылки, а хэш до сервера не
+доходит, поэтому серверных данных нет. Бэкенд планируется — ниже то, что он не должен
+сломать.
+
+- Бандлер — **Turbopack**, это дефолт Next 16 и для `dev`, и для `build`. Ни флага, ни
+  настройки в `next.config.ts` для этого не нужно; webpack, наоборот, включается
+  `--webpack`. Строка `vite-plus` в `package-lock.json` — необязательный peer-dep oxlint,
+  к сборке отношения не имеет.
+- **`output: 'export'` добавлять нельзя.** Статический экспорт выключает роут-хендлеры,
+  то есть закроет дорогу тому самому бэкенду.
+- `ssr: false` на листе бэкенду не мешает: он касается только рендера страницы. Роут-хендлеры
+  (`src/app/api/*/route.ts`) — независимый серверный слой, их можно заводить как обычно.
+  `GET /api/hello` — живой пример и дымовая проверка, что серверная часть поднялась;
+  он намеренно ничего не знает о `Template`. Удалять его стоит вместе с появлением
+  настоящих маршрутов, а не раньше.
+- **Бэкенд не должен становиться вторым хранилищем листа.** Инвариант «ссылка — единственный
+  источник правды» (см. «Ссылка») запрещает не `localStorage` как технологию, а расхождение
+  между двумя копиями состояния. Сервер, который хранит листы, этот инвариант отменяет —
+  это допустимое решение, но принимать его нужно осознанно и переписав раздел «Ссылка»,
+  а не подшивать хранение сбоку к существующей схеме.
+- `src/app/page.tsx` грузит лист через `next/dynamic` с **`ssr: false`**. Так надо: демо
+  подставляет месяц от «сегодня», и серверный рендер разошёлся бы с клиентским при
+  гидратации. Побочная выгода — в `Sheet.tsx` `location` доступен уже в первом рендере,
+  поэтому пример без ссылки показывается сразу, без ожидания декодирования.
+- Обёртка `<div id="root">` в `layout.tsx` осталась от версии на Vite: на `#root` завязаны
+  экранные отступы, `min-height` и рецепт проверки печати. Не убирайте её.
+- Шрифты — `next/font/google` в `layout.tsx`, файлы отдаёт сам сайт. Имена семейств
+  хэшируются, поэтому в `tokens.css` они подставляются переменными `--font-nunito`,
+  `--font-caveat`, `--font-marck-script`, а не строкой `'Nunito'`. Кириллицу в `subsets`
+  нужно указывать явно — css2 подбирал её сам, `next/font` не догадается.
+- Next дописывает в `history.state` свои поля (`__NA`, `__PRIVATE_NEXTJS_INTERNALS_TREE`),
+  причём при `pushState` он **подмешивает** их к нашему объекту, а не затирает его.
+  Поэтому пометка `own` живёт рядом с ними и проверка `history.state?.own === true`
+  работает как раньше. Не «чистите» состояние истории от чужих полей — сломаете роутер.
+- В `.oxlintrc.json` для `src/app/**` выключен `react/only-export-components`: файлы
+  маршрутов Next обязаны экспортировать `metadata` рядом с компонентом.
+
 ## Главный инвариант: два слоя
 
 - `Template` — бланк. **Только он едет в URL и только он печатается.**
@@ -159,7 +198,7 @@ base64url, префикс версии `2z` (сжато) или `2p` (запас
 ```bash
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
   --disable-gpu --no-pdf-header-footer --virtual-time-budget=6000 \
-  --print-to-pdf=out.pdf http://localhost:5173/
+  --print-to-pdf=out.pdf http://localhost:3000/
 grep -ao "/Count [0-9]*" out.pdf | head -1   # число страниц, должно быть 2
 qlmanage -t -s 1200 -o . out.pdf             # превью первой страницы
 ```
@@ -206,14 +245,15 @@ qlmanage -t -s 1200 -o . out.pdf             # превью первой стр�
    ячейками вместо градиента). Такие места уже стоили отладки — не переоткрывайте их.
 8. **Демо-данные живут в `src/data/demoFill.json`.** Не зашивайте примерный текст в
    компоненты и не смешивайте его с бланком.
-9. **Перед завершением задачи:** `npm run lint`, `npx tsc -b`, `npm run build` и печать
+9. **Перед завершением задачи:** `npm run lint`, `npm run typecheck`, `npm run build` и печать
    в 2 страницы. Всё чисто — только тогда работа считается сделанной.
 
 ## Соглашения
 
 - Комментарии и UI — на русском; комментарий объясняет «почему», а не пересказывает код.
 - Стили — только CSS Modules рядом с компонентом; цвета и шрифты — из `src/styles/tokens.css`.
-- `npm run lint` (oxlint) и `npm run build` (tsc + vite) должны проходить чисто.
+- `npm run lint` (oxlint) и `npm run build` (next build, он же тайпчекает) должны
+  проходить чисто.
 - В `tsconfig` включены `noUnusedLocals`/`noUnusedParameters`, но не `strict`.
 - Версии полей в моделях не храним: версия формата живёт в префиксе ссылки. Поле `v`
   в документе не нужно.
@@ -224,3 +264,13 @@ qlmanage -t -s 1200 -o . out.pdf             # превью первой стр�
   бланк заполняют на бумаге.
 - Нет загрузки фото: только пустое место под вклейку.
 - Нет добавления/удаления недель и секций — их состав фиксирован макетом.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

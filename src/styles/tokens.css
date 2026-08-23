@@ -37,8 +37,9 @@
   --border-w: 2px;
   --grid-line: #cfcabb;
 
-  /* Шрифты */
-  --font-ui: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-hand: 'Caveat', 'Nunito', cursive;
-  --font-script: 'Marck Script', 'Caveat', cursive;
+  /* Шрифты. Переменные --font-* задаёт next/font в layout.tsx: имена файлов
+     хэшируются при сборке, поэтому семейство берём из переменной, а не по имени. */
+  --font-ui: var(--font-nunito), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-hand: var(--font-caveat), var(--font-nunito), cursive;
+  --font-script: var(--font-marck-script), var(--font-caveat), cursive;
 }
