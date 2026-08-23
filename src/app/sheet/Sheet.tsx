@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import App from '../App'
-import { decodeTemplate, readEditFlag, readHashPayload } from '../model/codec'
-import { createDemoTemplate } from '../model/templates'
-import type { Boot } from '../state/DocProvider'
+import App from '../../App'
+import { decodeTemplate, readEditFlag, readHashPayload, readNewFlag } from '../../model/codec'
+import { createDemoTemplate, createEmptyTemplate } from '../../model/templates'
+import type { Boot } from '../../state/DocProvider'
 
 function demoBoot(): Boot {
   return { template: createDemoTemplate(), source: 'demo', mode: 'view' }
@@ -13,9 +13,15 @@ function demoBoot(): Boot {
 /**
  * Ссылки в адресе нет — пример показываем сразу, без ожидания. Компонент грузится
  * только в браузере (ssr: false), поэтому location доступен уже в первом рендере.
+ *
+ * `#new=1` — приход с лендинга по кнопке «Создать свой лист»: пустой бланк сразу
+ * в правке. Записи в историю здесь нет и быть не должно — позади лежит лендинг,
+ * а не пример, поэтому «К примеру» уведёт на /sheet, а не назад.
  */
 function initialBoot(): Boot | null {
-  return readHashPayload() ? null : demoBoot()
+  if (readHashPayload()) return null
+  if (readNewFlag()) return { template: createEmptyTemplate(), source: 'custom', mode: 'edit' }
+  return demoBoot()
 }
 
 export default function Sheet() {

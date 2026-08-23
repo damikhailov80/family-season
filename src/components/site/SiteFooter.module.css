@@ -1,0 +1,52 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  /* См. комментарий в SiteHeader.module.css: auto-margin в flex-колонке. */
+  width: 100%;
+  max-width: 940px;
+  margin: 36px auto 0;
+  padding: 18px 16px 0;
+  border-top: 1px solid var(--sheet-border);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.heart {
+  color: var(--pink);
+  transform: rotate(-8deg);
+}
+
+.note {
+  font-family: var(--font-hand);
+  font-size: 20px;
+  color: var(--ink-soft);
+}
+
+.mail {
+  color: var(--navy);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--navy) 40%, transparent);
+  /* Длинный адрес не должен распирать страницу на телефоне. */
+  overflow-wrap: anywhere;
+}
+
+.mail:hover {
+  border-bottom-color: var(--navy);
+}
+
+.mail:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline-offset: 2px;
+}
+
+@media print {
+  .footer {
+    display: none;
+  }
+}

@@ -19,6 +19,7 @@ import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
 
 const HASH_PARAM = 'd'
 const EDIT_PARAM = 'edit'
+const NEW_PARAM = 'new'
 const PACKED = '2z'
 const PLAIN = '2p'
 const PACKED_V1 = '1z'
@@ -213,6 +214,16 @@ export function readHashPayload(hash: string = location.hash): string | null {
  */
 export function readEditFlag(hash: string = location.hash): boolean {
   return new URLSearchParams(hash.replace(/^#/, '')).get(EDIT_PARAM) === '1'
+}
+
+/**
+ * Пометка `new=1` приходит только с лендинга: кнопка «Создать свой лист» не может
+ * закодировать пустой шаблон на сервере, поэтому просит лист сделать это сам.
+ * Как и `edit=1`, в разосланную ссылку она не попадает — первая же запись URL
+ * заменяет её на `d=`.
+ */
+export function readNewFlag(hash: string = location.hash): boolean {
+  return new URLSearchParams(hash.replace(/^#/, '')).get(NEW_PARAM) === '1'
 }
 
 export function hashFor(payload: string, edit = false): string {

@@ -12,8 +12,13 @@
     background: #fff;
   }
 
-  /* min-height: 100vh с экрана мешает разбиению на страницы. */
-  #root {
+  /*
+   * min-height: 100vh с экрана мешает разбиению на страницы, а flex-колонка —
+   * тем более: Chrome кроит не помещающийся flex-контейнер по отдельным листам.
+   */
+  #root,
+  #root > main {
+    display: block;
     padding: 0;
     min-height: 0;
   }

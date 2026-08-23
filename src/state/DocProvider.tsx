@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { nextFace } from '../model/accents'
 import { shiftMonth } from '../model/calendar'
-import { decodeTemplate, encodeTemplate, hashFor, readEditFlag, readHashPayload } from '../model/codec'
+import {
+  decodeTemplate,
+  encodeTemplate,
+  hashFor,
+  readEditFlag,
+  readHashPayload,
+  readNewFlag,
+} from '../model/codec'
 import { demoFill } from '../model/demoFill'
 import { templateDays } from '../model/fill'
 import { createDemoTemplate, createEmptyTemplate, createPerson, nextPersonId } from '../model/templates'
@@ -66,9 +73,6 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
    */
   const navSeq = useRef(0)
 
-  // Пустой лист создаём один раз: href кнопки и результат клика должны совпадать.
-  const blank = useMemo(() => createEmptyTemplate(), [])
-
   const showDemo = useCallback(() => {
     setTemplate(createDemoTemplate())
     setSource('demo')
@@ -82,6 +86,14 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       const seq = (navSeq.current += 1)
       const payload = readHashPayload()
       if (!payload) {
+        // `#new=1` — просьба лендинга открыть пустой бланк. Через 400 мс запись URL
+        // заменит её на `#d=…`, так что в истории эта пометка почти не задерживается.
+        if (readNewFlag()) {
+          setTemplate(createEmptyTemplate())
+          setSource('custom')
+          setMode('edit')
+          return
+        }
         showDemo()
         return
       }
@@ -123,21 +135,21 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     }
   }, [template, source])
 
-  // Ссылки навигационных кнопок: их же адреса уходят в pushState, так что обычный
-  // клик и клик с модификатором (новая вкладка) ведут в одно и то же место.
-  const [sheetLinks, setSheetLinks] = useState({ fork: '', blank: '' })
+  // Адрес кнопки форка: он же уходит в pushState, так что обычный клик и клик
+  // с модификатором (новая вкладка) ведут в одно и то же место.
+  const [forkLink, setForkLink] = useState('')
 
   useEffect(() => {
     if (source !== 'demo') return
     let cancelled = false
-    void Promise.all([encodeTemplate(template), encodeTemplate(blank)]).then(([fork, empty]) => {
+    void encodeTemplate(template).then((payload) => {
       if (cancelled) return
-      setSheetLinks({ fork: hashFor(fork, true), blank: hashFor(empty, true) })
+      setForkLink(hashFor(payload, true))
     })
     return () => {
       cancelled = true
     }
-  }, [source, template, blank])
+  }, [source, template])
 
   const fill = source === 'demo' ? demoFill : EMPTY_FILL
   const days = templateDays(template)
@@ -175,11 +187,10 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       source,
       days,
       editing: mode === 'edit',
-      links: { ...sheetLinks, demo: bareUrl() },
+      links: { fork: forkLink, demo: bareUrl() },
       field,
       setMode,
       fork: () => void startCustom(structuredClone(template)),
-      startBlank: () => void startCustom(structuredClone(blank)),
       openDemo: () => {
         // Свой лист остаётся в истории впереди: «вперёд» вернёт его целиком.
         if (isOwnEntry()) {
@@ -225,7 +236,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         return `${location.origin}${bareUrl()}${hashFor(payload)}`
       },
     }),
-    [template, fill, mode, source, days, sheetLinks, blank, field, update, startCustom, showDemo],
+    [template, fill, mode, source, days, forkLink, field, update, startCustom, showDemo],
   )
 
   return <DocContext.Provider value={value}>{children}</DocContext.Provider>

@@ -1,0 +1,102 @@
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  /* width обязателен: #root — flex-колонка, а auto-margin на растянутом элементе
+     схлопывает его до ширины содержимого. */
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto 18px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  border: 1px solid var(--sheet-border);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 8%);
+  font-family: var(--font-ui);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+  text-decoration: none;
+  color: var(--navy);
+}
+
+.brandHeart {
+  color: var(--pink);
+  transform: rotate(-8deg);
+}
+
+.brandName {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1;
+}
+
+.nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--navy);
+  text-decoration: none;
+  transition: background-color 0.12s ease;
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--navy) 10%, transparent);
+}
+
+.link:focus-visible,
+.action:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* Пунктирная рамка — принятый в макете знак «добавить новое» (ср. кнопку
+   добавления человека в ProjectsSection): действие, а не раздел сайта. */
+.action {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+  padding: 7px 13px;
+  border: 1.5px dashed var(--navy);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--navy);
+  text-decoration: none;
+  transition: background-color 0.12s ease;
+}
+
+.action:hover {
+  background: color-mix(in srgb, var(--navy) 8%, transparent);
+}
+
+@media (max-width: 560px) {
+  .brand {
+    width: 100%;
+    margin-right: 0;
+  }
+}
+
+/* Сайтовая обвязка на бумагу не идёт: печатается только бланк. */
+@media print {
+  .header {
+    display: none;
+  }
+}

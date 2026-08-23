@@ -22,14 +22,13 @@ export interface DocValue {
   /**
    * Адреса навигационных кнопок для `<a href>`: те же, что уходят в историю по
    * обычному клику, поэтому клик с модификатором открывает лист в новой вкладке.
-   * `fork`/`blank` кодируются асинхронно — до готовности пустые строки.
+   * `fork` кодируется асинхронно — до готовности пустая строка.
    */
-  links: { fork: string; blank: string; demo: string }
+  links: { fork: string; demo: string }
   /** Привязка текстового поля по пути в шаблоне: field('people.0.name'). */
   field: (path: string) => FieldBinding
   setMode: (mode: DocMode) => void
   fork: () => void
-  startBlank: () => void
   openDemo: () => void
   addPerson: () => void
   removePerson: (id: string) => void

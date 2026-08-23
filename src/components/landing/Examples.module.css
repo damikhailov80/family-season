@@ -1,0 +1,117 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1.5px solid var(--orange);
+  border-radius: var(--radius-box);
+  background: color-mix(in srgb, var(--orange) 6%, var(--paper));
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.12s ease;
+}
+
+.card:hover {
+  background: color-mix(in srgb, var(--orange) 14%, var(--paper));
+}
+
+.card:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.faces {
+  display: flex;
+  gap: 4px;
+}
+
+.face {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid currentcolor;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.title {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.05;
+  color: var(--orange);
+}
+
+.text {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.more {
+  margin-top: auto;
+  padding-top: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--navy);
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.asideTitle {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.05;
+  color: var(--navy);
+}
+
+.hand {
+  font-family: var(--font-hand);
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--purple);
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  margin-top: auto;
+  padding: 11px 18px;
+  border: 1.5px solid var(--navy);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--navy);
+  text-decoration: none;
+  transition: background-color 0.12s ease;
+}
+
+.ghost:hover {
+  background: color-mix(in srgb, var(--navy) 10%, transparent);
+}
+
+.ghost:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+

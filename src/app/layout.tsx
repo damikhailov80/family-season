@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Caveat, Marck_Script, Nunito } from 'next/font/google'
+import { SiteFooter } from '../components/site/SiteFooter'
+import { SiteHeader } from '../components/site/SiteHeader'
 import '../styles/tokens.css'
 import '../styles/global.css'
 import '../styles/print.css'
@@ -32,7 +34,7 @@ const marckScript = Marck_Script({
 
 export const metadata: Metadata = {
   title: 'Семейный сезон',
-  description: 'Бланк семейного месяца: печатается на двух листах A4 и живёт целиком в ссылке.',
+  description: 'Постер семейного месяца: печатается на двух листах A4 и живёт целиком в ссылке.',
   icons: { icon: '/favicon.svg' },
 }
 
@@ -42,7 +44,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {/* Обёртка #root осталась от версии на Vite: на неё завязаны отступы экрана
             и рецепт проверки печати (сужение до ширины A4). */}
-        <div id="root">{children}</div>
+        <div id="root">
+          <SiteHeader />
+          {/* main растягивается, чтобы подвал прижимался к низу коротких страниц. */}
+          <main>{children}</main>
+          <SiteFooter />
+        </div>
       </body>
     </html>
   )

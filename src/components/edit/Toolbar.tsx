@@ -16,7 +16,7 @@ function onNavClick(action: () => void) {
 }
 
 export function Toolbar() {
-  const { source, editing, setMode, fork, startBlank, openDemo, links, buildShareUrl } = useDoc()
+  const { source, editing, setMode, fork, openDemo, links, buildShareUrl } = useDoc()
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -40,19 +40,18 @@ export function Toolbar() {
     <div className={styles.bar} role="toolbar" aria-label="Действия с листом">
       {source === 'demo' ? (
         <>
-          <span className={styles.hint}>Это пример — форкните его или начните с чистого листа</span>
+          <span className={styles.hint}>
+            Это пример сезона — форкните его и перепишите под свою семью
+          </span>
           {/* href появляется после кодирования; обычный клик работает и без него. */}
           <a className={styles.primary} href={links.fork || undefined} onClick={onNavClick(fork)}>
             Форкнуть пример
-          </a>
-          <a className={styles.ghost} href={links.blank || undefined} onClick={onNavClick(startBlank)}>
-            Создать с нуля
           </a>
         </>
       ) : (
         <>
           <span className={styles.hint}>
-            {editing ? 'Правьте текст прямо на листе' : 'Ваш лист — ссылка хранит его целиком'}
+            {editing ? 'Правьте текст прямо на постере' : 'Ваш сезон — ссылка хранит его целиком'}
           </span>
           <button
             type="button"

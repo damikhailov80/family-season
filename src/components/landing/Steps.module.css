@@ -1,0 +1,89 @@
+.section {
+  --accent-soft: color-mix(in srgb, var(--green) 5%, var(--paper));
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  /* Кружки с номерами наезжают на верх карточек — иначе они упираются в плашку секции. */
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 24px 14px 18px;
+  border: 1.5px solid var(--green);
+  border-radius: var(--radius-box);
+  background: var(--accent-soft);
+  text-align: center;
+}
+
+/* Номер шага «наезжает» на рамку — тот же приём, что у плашек секций. */
+.number {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.doodleSlot {
+  /* Фиксированная высота: у доодлов разные пропорции, иначе заголовки съезжают. */
+  display: grid;
+  place-items: center;
+  height: 52px;
+  margin-bottom: 4px;
+  color: var(--green);
+}
+
+.title {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 23px;
+  line-height: 1.1;
+  color: var(--navy);
+  /*
+   * Место под две строки, чтобы тексты карточек начинались на одной высоте.
+   * Прижимаем к низу слота: у однострочных заголовков запас уходит наверх,
+   * к доодлу, а не повисает дырой между заголовком и текстом.
+   */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 2.2em;
+}
+
+.text {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 440px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
