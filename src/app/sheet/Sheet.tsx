@@ -9,13 +9,13 @@ import {
   readHashPayload,
   readNewFlag,
 } from '../../model/codec'
-import { DEFAULT_FILL_ID, knownFillId } from '../../model/fills'
+import { DEFAULT_EXAMPLE_ID, exampleById, knownExampleId } from '../../model/examples'
 import { modeFromPath } from '../../model/site'
-import { createDemoTemplate, createEmptyTemplate } from '../../model/templates'
+import { createEmptyTemplate } from '../../model/templates'
 import type { Boot } from '../../state/DocProvider'
 
-function exampleBoot(fillId: string): Boot {
-  return { template: createDemoTemplate(), fillId, mode: 'view' }
+function exampleBoot(id: string): Boot {
+  return { template: exampleById(id)!.template(), fillId: id, mode: 'view' }
 }
 
 /**
@@ -34,13 +34,13 @@ function exampleBoot(fillId: string): Boot {
  */
 function initialBoot(): Boot | null {
   if (readHashPayload()) return null // дальше асинхронное декодирование
-  const fillId = knownFillId(readFillId())
+  const fillId = knownExampleId(readFillId())
   if (fillId) return exampleBoot(fillId)
   // `new=1` — легаси-адрес кнопок «Собрать свой сезон», теперь это голый /sheet/edit.
   if (modeFromPath() === 'edit' || readNewFlag()) {
     return { template: createEmptyTemplate(), fillId: null, mode: 'edit' }
   }
-  return exampleBoot(DEFAULT_FILL_ID)
+  return exampleBoot(DEFAULT_EXAMPLE_ID)
 }
 
 export default function Sheet() {
@@ -56,10 +56,10 @@ export default function Sheet() {
       const template = payload ? await decodeTemplate(payload) : null
       if (cancelled) return
       if (!template) {
-        setBoot(exampleBoot(DEFAULT_FILL_ID))
+        setBoot(exampleBoot(DEFAULT_EXAMPLE_ID))
         return
       }
-      const fillId = knownFillId(readFillId())
+      const fillId = knownExampleId(readFillId())
       setBoot({
         template,
         fillId,

@@ -10,9 +10,9 @@ import {
   readNewFlag,
 } from '../model/codec'
 import { templateDays } from '../model/fill'
-import { DEFAULT_FILL_ID, fillById, knownFillId } from '../model/fills'
+import { DEFAULT_EXAMPLE_ID, exampleById, fillOf, knownExampleId } from '../model/examples'
 import { modeFromPath, pathForMode, ROUTES } from '../model/site'
-import { createDemoTemplate, createEmptyTemplate, createPerson, nextPersonId } from '../model/templates'
+import { createEmptyTemplate, createPerson, nextPersonId } from '../model/templates'
 import type { Template } from '../model/types'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
 import type { DocMode, DocSource, DocValue } from './docContext'
@@ -114,7 +114,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
   const editSession = useRef<number | null>(null)
 
   const showExample = useCallback((id: string) => {
-    setTemplate(createDemoTemplate())
+    setTemplate(exampleById(id)!.template())
     setFillId(id)
     setMode('view')
     syncPath('view', id)
@@ -146,7 +146,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       const seq = (navSeq.current += 1)
       editSession.current = marks.edit ? (marks.viewOf ?? null) : null
 
-      const id = knownFillId(readFillId())
+      const id = knownExampleId(readFillId())
       const payload = readHashPayload()
 
       if (!payload) {
@@ -162,14 +162,14 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
           syncPath('edit', null)
           return
         }
-        showExample(DEFAULT_FILL_ID)
+        showExample(DEFAULT_EXAMPLE_ID)
         return
       }
 
       void decodeTemplate(payload).then((next) => {
         if (navSeq.current !== seq) return
         if (!next) {
-          showExample(DEFAULT_FILL_ID)
+          showExample(DEFAULT_EXAMPLE_ID)
           return
         }
         // Пример не правится: `data=` перебивает путь и оставляет просмотр.
@@ -227,7 +227,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
   }, [template, fillId, mode])
 
   const source: DocSource = fillId ? 'demo' : 'custom'
-  const fill = fillById(fillId)
+  const fill = fillOf(fillId)
   const days = templateDays(template)
 
   const update = useCallback((recipe: (current: Template) => Template) => {
@@ -312,7 +312,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         navSeq.current += 1
         editSession.current = null
         history.pushState(entryState({}), '', ROUTES.sheet)
-        showExample(DEFAULT_FILL_ID)
+        showExample(DEFAULT_EXAMPLE_ID)
       },
       addPerson: () =>
         update((current) =>

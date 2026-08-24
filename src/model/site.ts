@@ -27,3 +27,12 @@ export function modeFromPath(pathname: string = location.pathname): 'view' | 'ed
 export function pathForMode(mode: 'view' | 'edit'): string {
   return mode === 'edit' ? ROUTES.sheetEdit : ROUTES.sheet
 }
+
+/**
+ * Короткая ссылка на пример. Закодировать шаблон на сервере лендинг не может —
+ * месяц в примере считается от «сегодня», — поэтому в адресе едет только id,
+ * а лист достраивает бланк из реестра и сам канонизирует адрес в `#d=…&data=<id>`.
+ */
+export function exampleHref(id: string): string {
+  return `${ROUTES.sheet}#data=${id}`
+}

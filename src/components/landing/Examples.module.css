@@ -1,14 +1,15 @@
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  /* auto-fit: три карточки в ряд на десктопе и сами перестраиваются на узком экране */
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
 }
 
 .card {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 16px;
+  padding: 14px;
   border: 1.5px solid var(--orange);
   border-radius: var(--radius-box);
   background: color-mix(in srgb, var(--orange) 6%, var(--paper));
@@ -28,14 +29,16 @@
 
 .faces {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 
+/* Кружок под аватар: пятеро должны умещаться в колонку карточки. */
 .face {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 34px;
+  height: 34px;
   border: 2px solid currentcolor;
   border-radius: 50%;
   background: #fff;
@@ -44,9 +47,18 @@
 .title {
   font-family: var(--font-hand);
   font-weight: 700;
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1.05;
   color: var(--orange);
+}
+
+/* Состав семьи и «прожитость» сезона: примеры нарочно разной наполненности. */
+.note {
+  margin-top: -4px;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--ink-muted);
 }
 
 .text {
@@ -63,11 +75,13 @@
   color: var(--navy);
 }
 
+/* Приписка под карточками: текст слева, кнопка справа. */
 .aside {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 24px;
+  align-items: center;
+  margin-top: 18px;
 }
 
 .asideTitle {
@@ -88,7 +102,6 @@
 .ghost {
   display: inline-flex;
   align-items: center;
-  margin-top: auto;
   padding: 11px 18px;
   border: 1.5px solid var(--navy);
   border-radius: 8px;
@@ -110,8 +123,9 @@
 }
 
 @media (max-width: 640px) {
-  .grid {
+  .aside {
     grid-template-columns: 1fr;
+    justify-items: start;
   }
 }
 

@@ -209,9 +209,11 @@ export function readHashPayload(hash: string = location.hash): string | null {
 }
 
 /**
- * `data=<id>` — какой набор заполнения показать поверх бланка (`src/model/fills.ts`).
- * Это пометка примера, а не часть шаблона: своя ссылка (`buildShareUrl`) её не несёт,
- * форк сбрасывает, а неизвестный id считается отсутствующим.
+ * `data=<id>` — какой пример показать: его бланк и его заполнение лежат в реестре
+ * (`src/model/examples.ts`). Это пометка примера, а не часть шаблона: своя ссылка
+ * (`buildShareUrl`) её не несёт, форк сбрасывает, а неизвестный id считается
+ * отсутствующим. Без `d=` пометка работает и в одиночку: `/sheet#data=<id>` —
+ * короткая ссылка на пример, шаблон лист достраивает из реестра сам.
  */
 export function readFillId(hash: string = location.hash): string | null {
   return new URLSearchParams(hash.replace(/^#/, '')).get(DATA_PARAM)

@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Попкорн и какао перед вторым фильмом</title>
+
+  <!-- Журнальный столик -->
+  <rect width="200" height="200" fill="#8f6039"/>
+  <g stroke="#7d5231" stroke-width="3">
+    <path d="M-10 40h220M-10 106h220M-10 172h220"/>
+  </g>
+
+  <!-- Кружки какао в цветах семьи, вид сверху -->
+  <g>
+    <path d="M57 34a10 10 0 0 1 0 16" fill="none" stroke="#2e5aa0" stroke-width="5"/>
+    <circle cx="32" cy="42" r="21" fill="#2e5aa0"/>
+    <circle cx="32" cy="42" r="15" fill="#fdfcf8"/>
+    <circle cx="32" cy="42" r="12" fill="#5a3620"/>
+    <circle cx="28" cy="38" r="4" fill="#fdfcf8" opacity=".9"/>
+  </g>
+  <g>
+    <path d="M143 40a10 10 0 0 1 0 16" fill="none" stroke="#d6467a" stroke-width="5"/>
+    <circle cx="168" cy="48" r="21" fill="#d6467a"/>
+    <circle cx="168" cy="48" r="15" fill="#fdfcf8"/>
+    <circle cx="168" cy="48" r="12" fill="#5a3620"/>
+    <circle cx="164" cy="44" r="4" fill="#fdfcf8" opacity=".9"/>
+  </g>
+  <g>
+    <path d="M51 146a10 10 0 0 1 0 16" fill="none" stroke="#4e8b3a" stroke-width="5"/>
+    <circle cx="26" cy="154" r="21" fill="#4e8b3a"/>
+    <circle cx="26" cy="154" r="15" fill="#fdfcf8"/>
+    <circle cx="26" cy="154" r="12" fill="#5a3620"/>
+    <circle cx="22" cy="150" r="4" fill="#fdfcf8" opacity=".9"/>
+  </g>
+  <g>
+    <path d="M147 142a10 10 0 0 1 0 16" fill="none" stroke="#e2712a" stroke-width="5"/>
+    <circle cx="172" cy="150" r="21" fill="#e2712a"/>
+    <circle cx="172" cy="150" r="15" fill="#fdfcf8"/>
+    <circle cx="172" cy="150" r="12" fill="#5a3620"/>
+    <circle cx="168" cy="146" r="4" fill="#fdfcf8" opacity=".9"/>
+  </g>
+
+  <!-- Миска попкорна: тёмное нутро, чтобы белые зёрна не слились в пятно -->
+  <circle cx="100" cy="94" r="47" fill="#a82f2f"/>
+  <circle cx="100" cy="94" r="40" fill="#e05252"/>
+  <circle cx="100" cy="94" r="34" fill="#8d6a3a"/>
+  <g stroke="#c9b183" stroke-width="1.6">
+    <g>
+      <circle cx="95" cy="90" r="6.6" fill="#fdfbf0"/>
+      <circle cx="105" cy="90" r="6.3" fill="#fdfbf0"/>
+      <circle cx="99" cy="99" r="6.6" fill="#fdfbf0"/>
+      <circle cx="102" cy="94" r="7.1" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="90" cy="95" r="6.4" fill="#fdfbf0"/>
+      <circle cx="100" cy="95" r="6.2" fill="#fdfbf0"/>
+      <circle cx="94" cy="104" r="6.4" fill="#fdfbf0"/>
+      <circle cx="97" cy="98" r="6.9" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="96" cy="80" r="6.9" fill="#fdfbf0"/>
+      <circle cx="106" cy="81" r="6.7" fill="#fdfbf0"/>
+      <circle cx="100" cy="90" r="6.9" fill="#fdfbf0"/>
+      <circle cx="103" cy="84" r="7.4" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="102" cy="99" r="6.3" fill="#fdfbf0"/>
+      <circle cx="112" cy="100" r="6.1" fill="#fdfbf0"/>
+      <circle cx="106" cy="108" r="6.3" fill="#fdfbf0"/>
+      <circle cx="109" cy="103" r="6.8" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="82" cy="87" r="6.8" fill="#fdfbf0"/>
+      <circle cx="92" cy="88" r="6.5" fill="#fdfbf0"/>
+      <circle cx="86" cy="97" r="6.8" fill="#fdfbf0"/>
+      <circle cx="89" cy="91" r="7.3" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="108" cy="82" r="6.6" fill="#fdfbf0"/>
+      <circle cx="118" cy="82" r="6.4" fill="#fdfbf0"/>
+      <circle cx="112" cy="91" r="6.6" fill="#fdfbf0"/>
+      <circle cx="115" cy="86" r="7.1" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="91" cy="106" r="6.3" fill="#fdfbf0"/>
+      <circle cx="101" cy="106" r="6.1" fill="#fdfbf0"/>
+      <circle cx="95" cy="115" r="6.3" fill="#fdfbf0"/>
+      <circle cx="98" cy="110" r="6.8" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="87" cy="74" r="6.8" fill="#fdfbf0"/>
+      <circle cx="97" cy="75" r="6.5" fill="#fdfbf0"/>
+      <circle cx="91" cy="84" r="6.8" fill="#fdfbf0"/>
+      <circle cx="94" cy="78" r="7.3" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="113" cy="97" r="6.3" fill="#fdfbf0"/>
+      <circle cx="123" cy="97" r="6.0" fill="#fdfbf0"/>
+      <circle cx="117" cy="106" r="6.3" fill="#fdfbf0"/>
+      <circle cx="120" cy="100" r="6.8" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="76" cy="98" r="6.7" fill="#fdfbf0"/>
+      <circle cx="87" cy="98" r="6.4" fill="#fdfbf0"/>
+      <circle cx="81" cy="107" r="6.7" fill="#fdfbf0"/>
+      <circle cx="84" cy="101" r="7.2" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="104" cy="71" r="6.3" fill="#fdfbf0"/>
+      <circle cx="114" cy="71" r="6.1" fill="#fdfbf0"/>
+      <circle cx="108" cy="80" r="6.3" fill="#fdfbf0"/>
+      <circle cx="111" cy="75" r="6.8" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="102" cy="111" r="6.3" fill="#fdfbf0"/>
+      <circle cx="112" cy="112" r="6.1" fill="#fdfbf0"/>
+      <circle cx="106" cy="120" r="6.3" fill="#fdfbf0"/>
+      <circle cx="109" cy="115" r="6.8" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="75" cy="78" r="6.7" fill="#fdfbf0"/>
+      <circle cx="85" cy="79" r="6.4" fill="#fdfbf0"/>
+      <circle cx="79" cy="88" r="6.7" fill="#fdfbf0"/>
+      <circle cx="82" cy="82" r="7.2" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="118" cy="84" r="7.1" fill="#fdfbf0"/>
+      <circle cx="129" cy="85" r="6.8" fill="#fdfbf0"/>
+      <circle cx="123" cy="95" r="7.1" fill="#fdfbf0"/>
+      <circle cx="126" cy="89" r="7.6" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="60" cy="74" r="5.8" fill="#fdfbf0"/>
+      <circle cx="69" cy="74" r="5.6" fill="#fdfbf0"/>
+      <circle cx="64" cy="82" r="5.8" fill="#fdfbf0"/>
+      <circle cx="67" cy="77" r="6.3" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="130" cy="70" r="5.9" fill="#fdfbf0"/>
+      <circle cx="139" cy="71" r="5.7" fill="#fdfbf0"/>
+      <circle cx="134" cy="79" r="5.9" fill="#fdfbf0"/>
+      <circle cx="137" cy="74" r="6.3" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="92" cy="129" r="6.2" fill="#fdfbf0"/>
+      <circle cx="101" cy="130" r="6.0" fill="#fdfbf0"/>
+      <circle cx="96" cy="138" r="6.2" fill="#fdfbf0"/>
+      <circle cx="99" cy="133" r="6.7" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="129" cy="106" r="6.5" fill="#fdfbf0"/>
+      <circle cx="139" cy="106" r="6.2" fill="#fdfbf0"/>
+      <circle cx="133" cy="115" r="6.5" fill="#fdfbf0"/>
+      <circle cx="136" cy="109" r="7.0" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="64" cy="112" r="6.2" fill="#fdfbf0"/>
+      <circle cx="74" cy="112" r="5.9" fill="#fdfbf0"/>
+      <circle cx="68" cy="121" r="6.2" fill="#fdfbf0"/>
+      <circle cx="71" cy="116" r="6.6" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="92" cy="52" r="6.0" fill="#fdfbf0"/>
+      <circle cx="101" cy="53" r="5.8" fill="#fdfbf0"/>
+      <circle cx="96" cy="61" r="6.0" fill="#fdfbf0"/>
+      <circle cx="99" cy="56" r="6.5" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="52" cy="129" r="5.2" fill="#fdfbf0"/>
+      <circle cx="60" cy="129" r="5.0" fill="#fdfbf0"/>
+      <circle cx="56" cy="136" r="5.2" fill="#fdfbf0"/>
+      <circle cx="58" cy="132" r="5.6" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="142" cy="135" r="4.7" fill="#fdfbf0"/>
+      <circle cx="150" cy="135" r="4.5" fill="#fdfbf0"/>
+      <circle cx="146" cy="142" r="4.7" fill="#fdfbf0"/>
+      <circle cx="148" cy="138" r="5.0" fill="#fdfbf0"/>
+    </g>
+    <g>
+      <circle cx="62" cy="23" r="4.7" fill="#fdfbf0"/>
+      <circle cx="70" cy="23" r="4.5" fill="#fdfbf0"/>
+      <circle cx="66" cy="30" r="4.7" fill="#fdfbf0"/>
+      <circle cx="68" cy="26" r="5.0" fill="#fdfbf0"/>
+    </g>
+  </g>
+
+  <!-- Пульт: вечер начинается с него -->
+  <g transform="rotate(-14 100 178)">
+    <rect x="86" y="154" width="30" height="46" rx="7" fill="#3a3a3a"/>
+    <circle cx="101" cy="164" r="4" fill="#e05252"/>
+    <circle cx="94" cy="177" r="2.6" fill="#8f8f8f"/>
+    <circle cx="108" cy="177" r="2.6" fill="#8f8f8f"/>
+    <circle cx="94" cy="186" r="2.6" fill="#8f8f8f"/>
+    <circle cx="108" cy="186" r="2.6" fill="#8f8f8f"/>
+    <circle cx="94" cy="195" r="2.6" fill="#8f8f8f"/>
+    <circle cx="108" cy="195" r="2.6" fill="#8f8f8f"/>
+  </g>
+</svg>
