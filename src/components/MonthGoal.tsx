@@ -20,7 +20,6 @@ export function MonthGoal() {
       >
         <EditableText
           as="p"
-          multiline
           className={styles.text}
           placeholder={PLACEHOLDERS.goal}
           {...field('goal')}

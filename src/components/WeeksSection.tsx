@@ -29,7 +29,6 @@ export function WeeksSection() {
             />
             <EditableText
               as="p"
-              multiline
               className={styles.cardText}
               placeholder={PLACEHOLDERS.weekText}
               {...field(`weeks.${index}.text`)}

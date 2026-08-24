@@ -90,7 +90,9 @@ function unpack(packed: Packed): Template {
 
 function text(value: unknown, fallback = ''): string {
   if (typeof value !== 'string') return fallback
-  return value.slice(0, MAX_TEXT)
+  // Поля бланка однострочные: правленая руками ссылка не должна приносить
+  // переводы строк, которыми лист растягивается на лишние печатные страницы.
+  return value.replace(/\s*\n+\s*/g, ' ').slice(0, MAX_TEXT)
 }
 
 function int(value: unknown, fallback: number, min: number, max: number): number {

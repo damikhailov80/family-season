@@ -14,14 +14,14 @@ export interface Person {
   /** Один из четырёх рисунков; цвет-акцент выводится из него (ACCENT_BY_FACE). */
   face: FaceVariant
   project: string
-  /** Многострочное поле: перевод строки — обычный '\n'. */
+  /** Однострочное поле, как и всё в бланке: перенос делает браузер, не автор. */
   description: string
   goal: string
 }
 
 export interface WeekCard {
   title: string
-  /** Многострочное поле. */
+  /** Однострочное поле: переносы расставляет браузер по ширине карточки. */
   text: string
 }
 

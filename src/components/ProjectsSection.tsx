@@ -72,7 +72,6 @@ export function ProjectsSection() {
                   </p>
                   <EditableText
                     as="p"
-                    multiline
                     className={styles.description}
                     placeholder={PLACEHOLDERS.description}
                     {...field(`people.${index}.description`)}

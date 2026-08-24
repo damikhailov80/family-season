@@ -8,10 +8,13 @@ interface EditableTextProps {
   /** Классы просмотра — в правке они те же, поэтому текст не «прыгает». */
   className?: string
   placeholder?: string
-  /** Разрешить перевод строки (текст недели, цель месяца, описание проекта). */
-  multiline?: boolean
   as?: 'span' | 'p' | 'div' | 'h1' | 'h3'
   id?: string
+}
+
+/** Переносы строк в поля бланка не попадают: схлопываем их в пробел. */
+function singleLine(value: string): string {
+  return value.replace(/\n+$/, '').replace(/\s*\n+\s*/g, ' ')
 }
 
 /**
@@ -19,13 +22,16 @@ interface EditableTextProps {
  *
  * Поле неконтролируемое: React не переписывает текст, пока узел в фокусе, —
  * иначе на каждом вводе символа каретка прыгала бы в начало строки.
+ *
+ * Все поля бланка однострочные. Перевод строки — это ручная вёрстка: ею
+ * подгоняют текст под рамку, лист от неё растёт без предела и разъезжается на
+ * лишние страницы при печати. Высоту блоков задаёт макет, перенос — браузер.
  */
 export function EditableText({
   value,
   onChange,
   className,
   placeholder,
-  multiline = false,
   as = 'span',
   id,
 }: EditableTextProps) {
@@ -41,9 +47,7 @@ export function EditableText({
     }
   }, [value, editing])
 
-  const classes = [className, multiline ? styles.multiline : null, editing ? styles.editable : null]
-    .filter(Boolean)
-    .join(' ')
+  const classes = [className, editing ? styles.editable : null].filter(Boolean).join(' ')
 
   if (!editing) {
     return (
@@ -55,7 +59,7 @@ export function EditableText({
 
   const commit = (node: HTMLElement) => {
     // innerText нормализует переводы строк contentEditable в обычные '\n'.
-    const next = node.innerText.replace(/\n+$/, '')
+    const next = singleLine(node.innerText)
     if (next !== value) onChange(next)
   }
 
@@ -67,15 +71,25 @@ export function EditableText({
       contentEditable="plaintext-only"
       suppressContentEditableWarning
       role="textbox"
-      aria-multiline={multiline}
+      aria-multiline={false}
       aria-label={placeholder}
       data-placeholder={placeholder}
       tabIndex={0}
       onInput={(event: React.FormEvent<HTMLElement>) => commit(event.currentTarget)}
       onBlur={(event: React.FocusEvent<HTMLElement>) => commit(event.currentTarget)}
+      onPaste={(event: React.ClipboardEvent<HTMLElement>) => {
+        // Вставка — единственный оставшийся способ занести перевод строки
+        // (Enter перехвачен ниже). Кладём текст одной строкой сразу, иначе узел
+        // вырастет на экране, хотя модель переносы всё равно схлопнет.
+        event.preventDefault()
+        const text = singleLine(event.clipboardData.getData('text/plain'))
+        // execCommand устарел, но это единственный способ вставить текст,
+        // не потеряв историю отмены contentEditable.
+        document.execCommand('insertText', false, text)
+      }}
       onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
         if (event.key === 'Escape') event.currentTarget.blur()
-        if (event.key === 'Enter' && !multiline) {
+        if (event.key === 'Enter') {
           event.preventDefault()
           event.currentTarget.blur()
         }
