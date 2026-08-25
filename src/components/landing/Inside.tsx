@@ -11,6 +11,9 @@ const PARTS = [
   ['Финал и анонс', 'Чем запомнился сезон и что придумали на следующий — большие поля под заметки.'],
 ]
 
+/* Каждая четвёртая тема: показать все сто — это уже не полоса, а каталог. */
+const SHOWCASE = PALETTE_ORDER.filter((_, index) => index % 4 === 0)
+
 export function Inside() {
   return (
     <SectionBox
@@ -29,21 +32,24 @@ export function Inside() {
         ))}
       </ul>
       {/* Каждый свотч несёт свой data-palette и потому красится своими же
-          переменными — цвета набора нигде не дублируются. */}
+          красками — цвета набора нигде не дублируются. */}
       <div className={styles.palettes}>
-        <h3 className={styles.palettesTitle}>Пять тем оформления</h3>
+        <h3 className={styles.palettesTitle}>Сто тем оформления</h3>
         <ul className={styles.swatches}>
-          {PALETTE_ORDER.map((palette) => (
+          {SHOWCASE.map((palette) => (
             <li className={styles.swatchItem} key={palette}>
-              <span className={styles.swatch} data-palette={palette} aria-hidden="true" />
-              {PALETTE_LABELS[palette]}
+              <span
+                className={styles.swatch}
+                data-palette={palette}
+                title={PALETTE_LABELS[palette]}
+              />
             </li>
           ))}
         </ul>
         <p className={styles.text}>
-          Тему выбирают в правке, и она уезжает в ссылку вместе с сезоном: у близких
-          постер откроется в тех же цветах. Каждую тему задают две краски — остальные
-          цвета листа выводятся из них.
+          В правке кнопка бросает постер в случайную тему, пока не понравится; тема
+          уезжает в ссылку вместе с сезоном, и у близких постер откроется в тех же
+          цветах. Каждую тему задают четыре краски — остальное лист выводит из них.
         </p>
       </div>
 

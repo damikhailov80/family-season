@@ -1,13 +1,19 @@
+import type { PALETTES } from './model/palettes.data'
+
 /**
  * Примитивы оформления. Структура листа описана в `src/model/types.ts`.
  */
 
-/** Пять тем оформления листа; реестр — `src/model/palettes.ts`. */
-export type PaletteId = 'classic' | 'garnet' | 'jungle' | 'midnight' | 'coal'
+/**
+ * Тема оформления постера — id из реестра `src/model/palettes.ts`. Тем сто,
+ * поэтому союз собирается из самого реестра, а не переписывается руками.
+ */
+export type PaletteId = (typeof PALETTES)[number][0]
 
 /**
- * Слот палитры под цветную плашку секции. Это роль, а не цвет: одно и то же
- * `theme` в «Классике» сливовое, а в «Гранате» оливковое (см. `src/styles/tokens.css`).
+ * Слот темы под секцию: у каждого своя краска плашки, свой цвет текста на ней
+ * и свой тёмный оттенок для рамки. Это роль, а не цвет: одно и то же `theme`
+ * в одной теме сливовое, а в другой оливковое (см. `src/styles/tokens.css`).
  */
 export type AccentSlot = 'deep' | 'theme' | 'weeks' | 'goal' | 'projects'
 

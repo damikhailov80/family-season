@@ -1,22 +1,24 @@
 .badge {
   display: inline-block;
   background: var(--badge-color);
-  color: var(--on-accent);
+  color: var(--badge-ink);
+  /* Рамка тёмного оттенка той же краски: у светлых плашек она единственное,
+     что отделяет их от бумаги, у тёмных — просто уплотняет край. */
+  border: 1.5px solid var(--badge-line);
   font-family: var(--font-ui);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   border-radius: var(--radius-badge);
   white-space: nowrap;
-  box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
 }
 
 .md {
   font-size: 15px;
-  padding: 7px 16px;
+  padding: 6px 15px;
 }
 
 .sm {
   font-size: 13px;
-  padding: 5px 13px;
+  padding: 4px 12px;
 }

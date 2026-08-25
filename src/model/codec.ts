@@ -248,10 +248,10 @@ export function readNewFlag(hash: string = location.hash): boolean {
 }
 
 /**
- * `p=<id>` — тема оформления, единственное хранилище темы: `#d=…&p=jungle`.
- * Список id — `src/model/palettes.ts`. Пометки нет или id неизвестен — тема
- * по умолчанию, поэтому ссылки, разосланные до появления тем, открываются
- * «Классикой», ровно такими, какими их отправляли.
+ * `p=<id>` — тема оформления, единственное хранилище темы: `#d=…&p=greece`.
+ * Список id — `src/model/palettes.ts` (сто наборов). Пометки нет или id неизвестен —
+ * тема по умолчанию, поэтому ссылки, разосланные до появления тем, открываются
+ * ровно такими, какими их отправляли.
  */
 export function readPaletteId(hash: string = location.hash): PaletteId | null {
   return paletteOrNull(new URLSearchParams(hash.replace(/^#/, '')).get(PALETTE_PARAM))

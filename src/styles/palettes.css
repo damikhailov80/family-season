@@ -1,0 +1,1614 @@
+/*
+ * Краски тем постера. Файл собирается: tools/palettes/build.mjs (npm run palettes),
+ * руками его не правят — правят tools/palettes/source.json и пересобирают.
+ *
+ * Сто наборов из подборки Canva «100 цветовых сочетаний». В наборе четыре краски,
+ * отсортированные от тёмной к светлой:
+ *
+ *   --c1..--c4    краски набора (плашки, заливки, свотчи);
+ *   --on-c1..4    цвет текста на такой плашке — белый или чернила;
+ *   --d1..--d4    тёмный оттенок краски: рамки, заголовки, чернила.
+ *
+ * Роли («глубокий акцент», «тема месяца», «недели», «цель») раздаются в
+ * src/styles/tokens.css — там же выводятся линии, подложки и чернила.
+ */
+
+/* Пустыня */
+[data-palette='desert'] {
+  --c1: #46211A;
+  --c2: #693D3D;
+  --c3: #A43820;
+  --c4: #BA5536;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: #fff;
+  --d1: #46211A;
+  --d2: #693D3D;
+  --d3: #962A11;
+  --d4: #92300E;
+}
+
+/* Осень */
+[data-palette='autumn'] {
+  --c1: #1E434C;
+  --c2: #8D230F;
+  --c3: #9B4F0F;
+  --c4: #C99E10;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #1E434C;
+  --d2: #8D230F;
+  --d3: #844000;
+  --d4: #6A5200;
+}
+
+/* Тёплая листва */
+[data-palette='foliage'] {
+  --c1: #2E2300;
+  --c2: #6E6702;
+  --c3: #C05805;
+  --c4: #DB9501;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #2E2300;
+  --d2: #5E5700;
+  --d3: #883C00;
+  --d4: #734C00;
+}
+
+/* Пряность */
+[data-palette='spice'] {
+  --c1: #662E1C;
+  --c2: #AF4425;
+  --c3: #C9A66B;
+  --c4: #EBDCB2;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #662E1C;
+  --d2: #952B07;
+  --d3: #704E00;
+  --d4: #695200;
+}
+
+/* Тёплый рустик */
+[data-palette='rustic'] {
+  --c1: #805A3B;
+  --c2: #C60000;
+  --c3: #FD974F;
+  --c4: #F8ECDE;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #714C2D;
+  --d2: #A30000;
+  --d3: #844000;
+  --d4: #62523F;
+}
+
+/* Ювелирные тона */
+[data-palette='jewel'] {
+  --c1: #7F152E;
+  --c2: #D61800;
+  --c3: #E94F08;
+  --c4: #EDAE01;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #7F152E;
+  --d2: #A10F00;
+  --d3: #942E00;
+  --d4: #6E4F00;
+}
+
+/* Шоколадный брауни */
+[data-palette='brownie'] {
+  --c1: #301B28;
+  --c2: #523634;
+  --c3: #B6452C;
+  --c4: #DDC5A2;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #301B28;
+  --d2: #523634;
+  --d3: #97270C;
+  --d4: #704E10;
+}
+
+/* Уют и тепло */
+[data-palette='cozy'] {
+  --c1: #662225;
+  --c2: #B51D0A;
+  --c3: #7D5E3C;
+  --c4: #EAD39C;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #662225;
+  --d2: #A01000;
+  --d3: #6D4E2D;
+  --d4: #6B5100;
+}
+
+/* Винный покой */
+[data-palette='vineyard'] {
+  --c1: #1E0000;
+  --c2: #500805;
+  --c3: #9D331F;
+  --c4: #BC6D4F;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #1E0000;
+  --d2: #500805;
+  --d3: #952B17;
+  --d4: #863C1F;
+}
+
+/* Солнечный городок */
+[data-palette='sunny-town'] {
+  --c1: #785A46;
+  --c2: #D24136;
+  --c3: #EB8A3E;
+  --c4: #EBB582;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #6B4E3A;
+  --d2: #A30106;
+  --d3: #824100;
+  --d4: #7B4700;
+}
+
+/* Средиземноморский полдень */
+[data-palette='mediterranean'] {
+  --c1: #8C0004;
+  --c2: #C8000A;
+  --c3: #E8A735;
+  --c4: #E2C499;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #8C0004;
+  --d2: #A30006;
+  --d3: #724D00;
+  --d4: #724D00;
+}
+
+/* Осенний оранж */
+[data-palette='autumn-orange'] {
+  --c1: #896E69;
+  --c2: #D55448;
+  --c3: #FFA577;
+  --c4: #EEEEF4;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #684E4A;
+  --d2: #9C1B17;
+  --d3: #8A3A00;
+  --d4: #54545C;
+}
+
+/* Золотой полдень */
+[data-palette='golden-noon'] {
+  --c1: #323030;
+  --c2: #882426;
+  --c3: #C29545;
+  --c4: #CDBEA7;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #323030;
+  --d2: #882426;
+  --d3: #704E00;
+  --d4: #67512F;
+}
+
+/* Сила знаний */
+[data-palette='scholar'] {
+  --c1: #42313A;
+  --c2: #6C2D2C;
+  --c3: #9F4636;
+  --c4: #F1DCC9;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #42313A;
+  --d2: #6C2D2C;
+  --d3: #8C3526;
+  --d4: #6B4F34;
+}
+
+/* Тёплая и стильная */
+[data-palette='warm-cool'] {
+  --c1: #444C5C;
+  --c2: #CE5A57;
+  --c3: #78A5A3;
+  --c4: #E1B16A;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #444C5C;
+  --d2: #962629;
+  --d3: #335E5C;
+  --d4: #734D00;
+}
+
+/* Морская волна */
+[data-palette='sea-wave'] {
+  --c1: #003B46;
+  --c2: #06575B;
+  --c3: #66A5AD;
+  --c4: #C4DFE6;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #003B46;
+  --d2: #06575B;
+  --d3: #1D6067;
+  --d4: #345C66;
+}
+
+/* Зелёный туман */
+[data-palette='green-mist'] {
+  --c1: #04202C;
+  --c2: #304040;
+  --c3: #5B7065;
+  --c4: #C9D1C8;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #04202C;
+  --d2: #304040;
+  --d3: #465B50;
+  --d4: #4E594D;
+}
+
+/* Водная синева */
+[data-palette='aqua'] {
+  --c1: #004D47;
+  --c2: #128277;
+  --c3: #52958B;
+  --c4: #B9C4C9;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #004D47;
+  --d2: #00635A;
+  --d3: #1A6259;
+  --d4: #48585F;
+}
+
+/* Туман мегаполиса */
+[data-palette='city-fog'] {
+  --c1: #2C4A52;
+  --c2: #537072;
+  --c3: #8E9B97;
+  --c4: #F4EBDB;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #2C4A52;
+  --d2: #3F5B5D;
+  --d3: #4C5855;
+  --d4: #60543E;
+}
+
+/* Арктический рассвет */
+[data-palette='arctic-dawn'] {
+  --c1: #006C84;
+  --c2: #6EB5C0;
+  --c3: #FFCCBB;
+  --c4: #E2E8E4;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #005F75;
+  --d2: #00616C;
+  --d3: #833F28;
+  --d4: #4F5852;
+}
+
+/* Голубые и серые льды */
+[data-palette='ice'] {
+  --c1: #1995AD;
+  --c2: #BCBABE;
+  --c3: #A1D6E2;
+  --c4: #EEEEEF;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #006071;
+  --d2: #575459;
+  --d3: #00606F;
+  --d4: #555556;
+}
+
+/* Яркая Исландия */
+[data-palette='iceland'] {
+  --c1: #505160;
+  --c2: #598234;
+  --c3: #68829E;
+  --c4: #AEBD38;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #505160;
+  --d2: #3B620E;
+  --d3: #3F5872;
+  --d4: #535B00;
+}
+
+/* Лес после дождя */
+[data-palette='wet-forest'] {
+  --c1: #2E4600;
+  --c2: #7D4427;
+  --c3: #486B00;
+  --c4: #A2C523;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #2E4600;
+  --d2: #7D4427;
+  --d3: #416100;
+  --d4: #4B5E00;
+}
+
+/* Современность */
+[data-palette='modern'] {
+  --c1: #0F1B07;
+  --c2: #5C821A;
+  --c3: #C6D166;
+  --c4: #EEEEEE;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #0F1B07;
+  --d2: #416100;
+  --d3: #555B00;
+  --d4: #555555;
+}
+
+/* Свежая зелень */
+[data-palette='fresh-green'] {
+  --c1: #011C1D;
+  --c2: #004445;
+  --c3: #2C7873;
+  --c4: #6FB98F;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #011C1D;
+  --d2: #004445;
+  --d3: #0D625E;
+  --d4: #00663E;
+}
+
+/* Горное озеро */
+[data-palette='mountain-lake'] {
+  --c1: #324851;
+  --c2: #34675C;
+  --c3: #7DA3A1;
+  --c4: #86AC41;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #324851;
+  --d2: #2D6055;
+  --d3: #395D5B;
+  --d4: #456000;
+}
+
+/* Свежесть и энергия */
+[data-palette='energy'] {
+  --c1: #34675C;
+  --c2: #4CB5F5;
+  --c3: #B3C100;
+  --c4: #B7B8B6;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #2D6055;
+  --d2: #005B87;
+  --d3: #545B00;
+  --d4: #545653;
+}
+
+/* Молодая зелень */
+[data-palette='young-green'] {
+  --c1: #265C00;
+  --c2: #68A225;
+  --c3: #B3DE81;
+  --c4: #EDEFEF;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #265C00;
+  --d2: #3A6200;
+  --d3: #406100;
+  --d4: #535656;
+}
+
+/* Зелёные поля */
+[data-palette='green-fields'] {
+  --c1: #524A3A;
+  --c2: #5A5F37;
+  --c3: #919636;
+  --c4: #F4EFD6;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #524A3A;
+  --d2: #545931;
+  --d3: #575A00;
+  --d4: #5D5633;
+}
+
+/* Цитрус и трава */
+[data-palette='citrus-grass'] {
+  --c1: #4B7447;
+  --c2: #EB8A44;
+  --c3: #8EBA43;
+  --c4: #F9DC24;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #396135;
+  --d2: #844000;
+  --d3: #436000;
+  --d4: #625500;
+}
+
+/* Садовая свежесть */
+[data-palette='garden'] {
+  --c1: #739F3D;
+  --c2: #EE693F;
+  --c3: #F69454;
+  --c4: #EDEEEF;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #3E6200;
+  --d2: #952B00;
+  --d3: #853F00;
+  --d4: #545557;
+}
+
+/* Летняя фиеста */
+[data-palette='fiesta'] {
+  --c1: #7AA802;
+  --c2: #F78B2D;
+  --c3: #E4B600;
+  --c4: #C7DB00;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #446000;
+  --d2: #824200;
+  --d3: #695200;
+  --d4: #535C00;
+}
+
+/* Природная элегантность */
+[data-palette='elegant-nature'] {
+  --c1: #563E20;
+  --c2: #7E7B15;
+  --c3: #B38540;
+  --c4: #EBDF00;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #563E20;
+  --d2: #5B5900;
+  --d3: #734C00;
+  --d4: #5D5800;
+}
+
+/* От заката до сумерек */
+[data-palette='dusk'] {
+  --c1: #363237;
+  --c2: #2D4262;
+  --c3: #73605B;
+  --c4: #D09683;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #363237;
+  --d2: #2D4262;
+  --d3: #63504C;
+  --d4: #8B381B;
+}
+
+/* Лосось и ржаной хлеб */
+[data-palette='salmon-rye'] {
+  --c1: #102A49;
+  --c2: #4B4345;
+  --c3: #755248;
+  --c4: #F79B77;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #102A49;
+  --d2: #4B4345;
+  --d3: #6E4C42;
+  --d4: #903300;
+}
+
+/* С высоты полёта */
+[data-palette='bird-view'] {
+  --c1: #2D3033;
+  --c2: #335252;
+  --c3: #AA4B41;
+  --c4: #D4DDE1;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #2D3033;
+  --d2: #335252;
+  --d3: #8E322A;
+  --d4: #4B585D;
+}
+
+/* Янтарь и лазурь */
+[data-palette='amber-azure'] {
+  --c1: #2A3132;
+  --c2: #763626;
+  --c3: #336B87;
+  --c4: #90AFC5;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #2A3132;
+  --d2: #763626;
+  --d3: #235C77;
+  --d4: #295B7A;
+}
+
+/* Неоновая вывеска */
+[data-palette='neon-sign'] {
+  --c1: #262F34;
+  --c2: #615049;
+  --c3: #F34A4A;
+  --c4: #F1D3BC;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #262F34;
+  --d2: #615049;
+  --d3: #A30018;
+  --d4: #734B29;
+}
+
+/* Экзотика и прочность */
+[data-palette='exotic'] {
+  --c1: #0F1F38;
+  --c2: #1B4B5A;
+  --c3: #8E7970;
+  --c4: #F55449;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #0F1F38;
+  --d2: #1B4B5A;
+  --d3: #645048;
+  --d4: #A3000A;
+}
+
+/* Солнце и небо */
+[data-palette='sun-sky'] {
+  --c1: #211F30;
+  --c2: #32384D;
+  --c3: #217CA3;
+  --c4: #E29930;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #211F30;
+  --d2: #32384D;
+  --d3: #005D7F;
+  --d4: #764A00;
+}
+
+/* Цветочный луг */
+[data-palette='meadow'] {
+  --c1: #3F681C;
+  --c2: #375E97;
+  --c3: #FB6542;
+  --c4: #FFBB00;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #396215;
+  --d2: #2E558D;
+  --d3: #9A2200;
+  --d4: #6F4F00;
+}
+
+/* Утренняя свежесть */
+[data-palette='morning'] {
+  --c1: #FF420E;
+  --c2: #F98866;
+  --c3: #80BD9E;
+  --c4: #89DA59;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #9B2100;
+  --d2: #962B00;
+  --d3: #006643;
+  --d4: #306400;
+}
+
+/* Тропический цветок */
+[data-palette='tropic-flower'] {
+  --c1: #F52549;
+  --c2: #FA6775;
+  --c3: #9BC01C;
+  --c4: #FFD64D;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #A20028;
+  --d2: #A1002E;
+  --d3: #4A5E00;
+  --d4: #685300;
+}
+
+/* Летний подсолнечник */
+[data-palette='sunflower'] {
+  --c1: #4E84BD;
+  --c2: #CA6218;
+  --c3: #7CAA2D;
+  --c4: #FCD301;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #21578D;
+  --d2: #883C00;
+  --d3: #426100;
+  --d4: #665400;
+}
+
+/* Корзинка овощей */
+[data-palette='veggies'] {
+  --c1: #258039;
+  --c2: #CF3721;
+  --c3: #31A9B8;
+  --c4: #F5BE41;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #006823;
+  --d2: #9F1400;
+  --d3: #00616B;
+  --d4: #6D5000;
+}
+
+/* Стойка с лимонадом */
+[data-palette='lemonade'] {
+  --c1: #F70025;
+  --c2: #F25C00;
+  --c3: #F9A603;
+  --c4: #F5EDE0;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #A30014;
+  --d2: #903300;
+  --d3: #754B00;
+  --d4: #5E5442;
+}
+
+/* Весёлая и тропическая */
+[data-palette='tropic-fun'] {
+  --c1: #4897D8;
+  --c2: #FA6E59;
+  --c3: #F8A055;
+  --c4: #FFDB5C;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #005991;
+  --d2: #A10F00;
+  --d3: #7F4400;
+  --d4: #675300;
+}
+
+/* Сыр, инжир и базилик */
+[data-palette='figs-basil'] {
+  --c1: #4C3F54;
+  --c2: #486824;
+  --c3: #D13525;
+  --c4: #F2C057;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #4C3F54;
+  --d2: #41601C;
+  --d3: #A20900;
+  --d4: #6E5000;
+}
+
+/* Солнечный цитрус */
+[data-palette='citrus-sun'] {
+  --c1: #FA4032;
+  --c2: #FA812F;
+  --c3: #FAAF08;
+  --c4: #F8EDDC;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #A30001;
+  --d2: #873D00;
+  --d3: #724D00;
+  --d4: #62533C;
+}
+
+/* Яблочный контраст */
+[data-palette='apple'] {
+  --c1: #A11F0C;
+  --c2: #E73F0B;
+  --c3: #BBCF4A;
+  --c4: #F4EC6A;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #9D1A07;
+  --d2: #992400;
+  --d3: #515C00;
+  --d4: #5D5800;
+}
+
+/* Неоновая ночь */
+[data-palette='neon-night'] {
+  --c1: #231B12;
+  --c2: #F56C57;
+  --c3: #F77604;
+  --c4: #B8D20B;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #231B12;
+  --d2: #9F1504;
+  --d3: #873D00;
+  --d4: #505D00;
+}
+
+/* Дерзость граффити */
+[data-palette='graffiti'] {
+  --c1: #E1315B;
+  --c2: #008DCB;
+  --c3: #F47D4A;
+  --c4: #FFEC5C;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #A00037;
+  --d2: #005C86;
+  --d3: #8F3400;
+  --d4: #605600;
+}
+
+/* Ночная жизнь */
+[data-palette='nightlife'] {
+  --c1: #020509;
+  --c2: #FF0038;
+  --c3: #00CFFA;
+  --c4: #FFCE38;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #020509;
+  --d2: #A20020;
+  --d3: #005F75;
+  --d4: #6A5200;
+}
+
+/* Вечеринка с бассейном */
+[data-palette='pool-party'] {
+  --c1: #344D90;
+  --c2: #E7552C;
+  --c3: #5CC5EF;
+  --c4: #FFB745;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #344D90;
+  --d2: #982700;
+  --d3: #005E7B;
+  --d4: #744C00;
+}
+
+/* Живопись */
+[data-palette='painting'] {
+  --c1: #061283;
+  --c2: #138D90;
+  --c3: #FD3C3C;
+  --c4: #FFB74C;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #061283;
+  --d2: #006264;
+  --d3: #A30012;
+  --d4: #744C00;
+}
+
+/* Чашка капучино */
+[data-palette='cappuccino'] {
+  --c1: #626D71;
+  --c2: #B38867;
+  --c3: #DDBC95;
+  --c4: #CDCDC0;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #4D575B;
+  --d2: #724B2C;
+  --d3: #764B00;
+  --d4: #575744;
+}
+
+/* Ягодная синева */
+[data-palette='berry-blue'] {
+  --c1: #1E1F26;
+  --c2: #283655;
+  --c3: #4D648D;
+  --c4: #D0E1F9;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #1E1F26;
+  --d2: #283655;
+  --d3: #3F557D;
+  --d4: #3F5677;
+}
+
+/* Изысканная простота */
+[data-palette='simple-chic'] {
+  --c1: #867666;
+  --c2: #E1B80D;
+  --c3: #D5C3AA;
+  --c4: #EAE2D6;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #615243;
+  --d2: #675300;
+  --d3: #69502B;
+  --d4: #5E5443;
+}
+
+/* Технология и природа */
+[data-palette='tech-nature'] {
+  --c1: #282623;
+  --c2: #88A550;
+  --c3: #A3A599;
+  --c4: #FBCD4B;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #282623;
+  --d2: #475F00;
+  --d3: #555746;
+  --d4: #6A5200;
+}
+
+/* Городская жизнь */
+[data-palette='urban-life'] {
+  --c1: #232122;
+  --c2: #7BA4A8;
+  --c3: #A5C05B;
+  --c4: #DDDEDE;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #232122;
+  --d2: #365D61;
+  --d3: #4B5E00;
+  --d4: #545555;
+}
+
+/* Городской оазис */
+[data-palette='urban-oasis'] {
+  --c1: #2A2922;
+  --c2: #7D5642;
+  --c3: #506D2F;
+  --c4: #F3EBDD;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #2A2922;
+  --d2: #714B37;
+  --d3: #435F21;
+  --d4: #5F5441;
+}
+
+/* Современный лоск */
+[data-palette='modern-gloss'] {
+  --c1: #2F2E33;
+  --c2: #3A5199;
+  --c3: #D5D6D2;
+  --c4: #EEEEEE;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #2F2E33;
+  --d2: #395097;
+  --d3: #555651;
+  --d4: #555555;
+}
+
+/* Нейтральный шебби-шик */
+[data-palette='shabby-chic'] {
+  --c1: #4F4A45;
+  --c2: #6C5F5B;
+  --c3: #CDAB81;
+  --c4: #DAC3B3;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #4F4A45;
+  --d2: #5F524E;
+  --d3: #754B00;
+  --d4: #6D4E37;
+}
+
+/* Классический металлик */
+[data-palette='metallic'] {
+  --c1: #070706;
+  --c2: #594D46;
+  --c3: #D1B280;
+  --c4: #EEEEED;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #070706;
+  --d2: #594D46;
+  --d3: #714E00;
+  --d4: #555554;
+}
+
+/* Зимние краски */
+[data-palette='winter'] {
+  --c1: #A10115;
+  --c2: #D72C16;
+  --c3: #C0B2B5;
+  --c4: #EFEEEA;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #A10115;
+  --d2: #A01100;
+  --d3: #634F54;
+  --d4: #57554F;
+}
+
+/* Море и пшеница */
+[data-palette='sea-wheat'] {
+  --c1: #00293C;
+  --c2: #1E656D;
+  --c3: #F62A00;
+  --c4: #F0F2CD;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #00293C;
+  --d2: #176068;
+  --d3: #9F1700;
+  --d4: #585921;
+}
+
+/* Самобытная и неожиданная */
+[data-palette='offbeat'] {
+  --c1: #432E33;
+  --c2: #E7472E;
+  --c3: #B1D7D2;
+  --c4: #E5E2CA;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #432E33;
+  --d2: #9F1600;
+  --d3: #21615B;
+  --d4: #5B5634;
+}
+
+/* Городские виды */
+[data-palette='cityscape'] {
+  --c1: #113743;
+  --c2: #C5001A;
+  --c3: #C5BEBA;
+  --c4: #E4E3DB;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #113743;
+  --d2: #A30013;
+  --d3: #5D534E;
+  --d4: #57564B;
+}
+
+/* Индустриальная строгость */
+[data-palette='industrial'] {
+  --c1: #20232A;
+  --c2: #A01D26;
+  --c3: #ACBEBE;
+  --c4: #EFEFEA;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #20232A;
+  --d2: #9D1923;
+  --d3: #405B5B;
+  --d4: #56564F;
+}
+
+/* Профессионализм и власть */
+[data-palette='authority'] {
+  --c1: #1E1E20;
+  --c2: #962715;
+  --c3: #BBC3C6;
+  --c4: #EEEEEE;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #1E1E20;
+  --d2: #962715;
+  --d3: #4C575C;
+  --d4: #555555;
+}
+
+/* Нежные тюльпаны */
+[data-palette='tulips'] {
+  --c1: #F18D9E;
+  --c2: #5BC8AC;
+  --c3: #98DBC6;
+  --c4: #E6D72A;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #9F003F;
+  --d2: #006452;
+  --d3: #006451;
+  --d4: #5E5700;
+}
+
+/* Птицы и ягоды */
+[data-palette='birds-berries'] {
+  --c1: #5D535E;
+  --c2: #9A9EAB;
+  --c3: #EC96A4;
+  --c4: #DFE166;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #5B515C;
+  --d2: #4F5567;
+  --d3: #9B1441;
+  --d4: #595900;
+}
+
+/* Стильное ретро */
+[data-palette='retro'] {
+  --c1: #4F6457;
+  --c2: #75B1A9;
+  --c3: #D9B44A;
+  --c4: #ACD0C0;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #465B4E;
+  --d2: #00635B;
+  --d3: #695200;
+  --d4: #27624D;
+}
+
+/* Летнее барбекю */
+[data-palette='barbecue'] {
+  --c1: #752A07;
+  --c2: #5C8F22;
+  --c3: #EB5E30;
+  --c4: #FBCB7B;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #752A07;
+  --d2: #3A6200;
+  --d3: #952B00;
+  --d4: #714E00;
+}
+
+/* Безмятежность СПА */
+[data-palette='spa'] {
+  --c1: #ED5752;
+  --c2: #92AAC7;
+  --c3: #A1BE95;
+  --c4: #E2DFA2;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #A30015;
+  --d2: #345781;
+  --d3: #386223;
+  --d4: #5D5800;
+}
+
+/* Пастель */
+[data-palette='pastel'] {
+  --c1: #FFCCAC;
+  --c2: #C1E1DC;
+  --c3: #FDD475;
+  --c4: #FFEB94;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #844000;
+  --d2: #2D5F59;
+  --d3: #6C5100;
+  --d4: #645500;
+}
+
+/* Клубника со сливками */
+[data-palette='strawberry'] {
+  --c1: #D8412F;
+  --c2: #FE7A47;
+  --c3: #F5CA99;
+  --c4: #EDEFEF;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #A10C00;
+  --d2: #913100;
+  --d3: #774A00;
+  --d4: #535656;
+}
+
+/* Приглушённая античность */
+[data-palette='antique'] {
+  --c1: #B2473E;
+  --c2: #ACBD78;
+  --c3: #EAB364;
+  --c4: #A4CABC;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #942B25;
+  --d2: #4E5D00;
+  --d3: #744C00;
+  --d4: #226250;
+}
+
+/* Мегаполис */
+[data-palette='metropolis'] {
+  --c1: #5A4E4D;
+  --c2: #7E675E;
+  --c3: #8593AE;
+  --c4: #DDA288;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #5A4E4D;
+  --d2: #665047;
+  --d3: #49556E;
+  --d4: #8C3804;
+}
+
+/* Солнце в городе */
+[data-palette='city-sun'] {
+  --c1: #2B616D;
+  --c2: #FA8D62;
+  --c3: #B2DBD5;
+  --c4: #EEEEEE;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #285E6A;
+  --d2: #903300;
+  --d3: #1A625B;
+  --d4: #555555;
+}
+
+/* Побережье */
+[data-palette='coast'] {
+  --c1: #A99F3C;
+  --c2: #E59D5C;
+  --c3: #A5C3CF;
+  --c4: #F3D3B8;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #5F5700;
+  --d2: #7D4500;
+  --d3: #2D5C6D;
+  --d4: #754A20;
+}
+
+/* Винтаж */
+[data-palette='vintage'] {
+  --c1: #E38B75;
+  --c2: #BAA896;
+  --c3: #E6CCB5;
+  --c4: #FCC875;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #9A2400;
+  --d2: #695035;
+  --d3: #704D2B;
+  --d4: #724D00;
+}
+
+/* Расслабляющее ретро */
+[data-palette='easy-retro'] {
+  --c1: #D35C37;
+  --c2: #BF9A77;
+  --c3: #97B8C2;
+  --c4: #D6C6B9;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #952B00;
+  --d2: #7B4700;
+  --d3: #275E6C;
+  --d4: #66503E;
+}
+
+/* Утончённость */
+[data-palette='refined'] {
+  --c1: #5F968E;
+  --c2: #E05858;
+  --c3: #D5C9B1;
+  --c4: #BFDCCF;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #296059;
+  --d2: #9E1323;
+  --d3: #64532F;
+  --d4: #345F4E;
+}
+
+/* Романтическая прогулка */
+[data-palette='romance'] {
+  --c1: #688B8A;
+  --c2: #A57C65;
+  --c3: #58C8B2;
+  --c4: #F9EED3;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #3B5C5C;
+  --d2: #714B36;
+  --d3: #006456;
+  --d4: #63532C;
+}
+
+/* Нежный контраст */
+[data-palette='soft-contrast'] {
+  --c1: #1A405F;
+  --c2: #337BAE;
+  --c3: #FFBEBD;
+  --c4: #EFEEEC;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #1A405F;
+  --d2: #055A8B;
+  --d3: #8C3339;
+  --d4: #565552;
+}
+
+/* Снова в школу */
+[data-palette='school'] {
+  --c1: #81715E;
+  --c2: #E4535E;
+  --c3: #E38533;
+  --c4: #FAAE3D;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #625240;
+  --d2: #A10229;
+  --d3: #814300;
+  --d4: #754B00;
+}
+
+/* Дымчатый пурпур */
+[data-palette='smoky-purple'] {
+  --c1: #727077;
+  --c2: #A49592;
+  --c3: #E99787;
+  --c4: #EED8C9;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #56545B;
+  --d2: #5F524F;
+  --d3: #9C1E0A;
+  --d4: #6B4E39;
+}
+
+/* Хюгге */
+[data-palette='hygge'] {
+  --c1: #4D585B;
+  --c2: #488A99;
+  --c3: #B4B4B4;
+  --c4: #DBAE58;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #4C575A;
+  --d2: #185F6D;
+  --d3: #555555;
+  --d4: #6F4F00;
+}
+
+/* День и ночь */
+[data-palette='day-night'] {
+  --c1: #001A27;
+  --c2: #053852;
+  --c3: #F0810F;
+  --c4: #E6DF44;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #001A27;
+  --d2: #053852;
+  --d3: #824200;
+  --d4: #5C5800;
+}
+
+/* Шик без вульгарности */
+[data-palette='quiet-chic'] {
+  --c1: #16253D;
+  --c2: #002C54;
+  --c3: #CD7213;
+  --c4: #EFB509;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #16253D;
+  --d2: #002C54;
+  --d3: #804300;
+  --d4: #6D5000;
+}
+
+/* Ягоды земляники */
+[data-palette='wild-berry'] {
+  --c1: #50312F;
+  --c2: #3F6C45;
+  --c3: #CB0000;
+  --c4: #E4EA8C;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: #fff;
+  --on-c4: var(--ink);
+  --d1: #50312F;
+  --d2: #34613B;
+  --d3: #A30000;
+  --d4: #575A00;
+}
+
+/* Яркая ночь */
+[data-palette='bright-night'] {
+  --c1: #000B29;
+  --c2: #D70026;
+  --c3: #EDB83D;
+  --c4: #F2EEEB;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #000B29;
+  --d2: #A3001A;
+  --d3: #6D5000;
+  --d4: #595450;
+}
+
+/* Кухня 1950-х */
+[data-palette='fifties'] {
+  --c1: #FE0000;
+  --c2: #67BACA;
+  --c3: #B3DBC0;
+  --c4: #F3ECEC;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #A30000;
+  --d2: #00606E;
+  --d3: #22643F;
+  --d4: #5C5353;
+}
+
+/* Городские контрасты */
+[data-palette='city-contrast'] {
+  --c1: #2F3131;
+  --c2: #426E86;
+  --c3: #F9BA32;
+  --c4: #F5EEE2;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #2F3131;
+  --d2: #2F5B72;
+  --d3: #6F4F00;
+  --d4: #5D5444;
+}
+
+/* Оранжевый акцент */
+[data-palette='orange-accent'] {
+  --c1: #353C3F;
+  --c2: #756867;
+  --c3: #FF8D3F;
+  --c4: #D5D6D2;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #353C3F;
+  --d2: #5E5251;
+  --d3: #863E00;
+  --d4: #555651;
+}
+
+/* По ту сторону чёрного и белого */
+[data-palette='beyond-bw'] {
+  --c1: #2F2F28;
+  --c2: #AF1C1C;
+  --c3: #31A2AC;
+  --c4: #EEEDFC;
+  --on-c1: #fff;
+  --on-c2: #fff;
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #2F2F28;
+  --d2: #A2040F;
+  --d3: #006169;
+  --d4: #545366;
+}
+
+/* Прибой у песчаного берега */
+[data-palette='surf'] {
+  --c1: #20948B;
+  --c2: #DE7A22;
+  --c3: #6AB187;
+  --c4: #F4CC70;
+  --on-c1: var(--ink);
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #00635C;
+  --d2: #824100;
+  --d3: #00663C;
+  --d4: #6C5100;
+}
+
+/* Греческие каникулы */
+[data-palette='greece'] {
+  --c1: #2F496E;
+  --c2: #2988BC;
+  --c3: #ED8C72;
+  --c4: #F4EADE;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #2F496E;
+  --d2: #005C86;
+  --d3: #982700;
+  --d4: #605342;
+}
+
+/* Морские огни */
+[data-palette='sea-lights'] {
+  --c1: #257985;
+  --c2: #FF4447;
+  --c3: #5EA8A7;
+  --c4: #EEEEEE;
+  --on-c1: #fff;
+  --on-c2: var(--ink);
+  --on-c3: var(--ink);
+  --on-c4: var(--ink);
+  --d1: #00616C;
+  --d2: #A30018;
+  --d3: #0A6262;
+  --d4: #555555;
+}

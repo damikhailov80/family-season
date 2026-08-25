@@ -1,49 +1,71 @@
-.group {
-  display: flex;
+.button {
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-}
-
-.swatch {
-  width: 26px;
-  height: 26px;
-  padding: 0;
-  border-radius: 50%;
-  border: 2px solid var(--sheet-border);
-  background: none;
+  gap: 8px;
+  padding: 6px 12px 6px 7px;
+  border-radius: 8px;
+  border: 1.5px solid var(--sheet-border);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
   cursor: pointer;
-  overflow: hidden;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease;
 }
 
-/* Три сектора вместо кружка одного цвета: по одной краске тему не узнать. */
-.ink {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    135deg,
-    var(--accent-deep) 0 34%,
-    var(--accent-theme) 0 67%,
-    var(--accent-goal) 0
-  );
-}
-
-.swatch:hover {
+.button:hover {
   border-color: var(--ink-muted);
+  background: var(--page-bg);
 }
 
-.swatch[aria-pressed='true'] {
-  border-color: var(--ink);
-  box-shadow: 0 0 0 2px var(--paper);
-}
-
-.swatch:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+.button:focus-visible {
+  outline: 3px solid var(--ink-muted);
   outline-offset: 2px;
 }
 
+/* Четыре сектора: по одной краске набор не узнать, а их в теме ровно четыре. */
+.ink {
+  display: block;
+  width: 24px;
+  height: 24px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--sheet-border);
+  background: linear-gradient(
+    135deg,
+    var(--c1) 0 25%,
+    var(--c2) 0 50%,
+    var(--c3) 0 75%,
+    var(--c4) 0
+  );
+}
+
+/*
+ * Ширина фиксированная, а не по содержимому: названия тем разной длины («Хюгге»
+ * и «По ту сторону чёрного и белого»), и кнопка прыгала бы при каждом
+ * переключении — вместе с ней и вся правая часть тулбара. 206px — самое длинное
+ * название целиком («По ту сторону чёрного и белого»), поэтому многоточие
+ * не появляется ни на одной из ста тем.
+ */
+.label {
+  width: 206px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dice {
+  font-size: 15px;
+  color: var(--ink-muted);
+}
+
 @media print {
-  .group {
+  .button {
     display: none;
   }
 }

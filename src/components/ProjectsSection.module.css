@@ -37,7 +37,9 @@
   align-items: center;
   border: var(--border-w) solid var(--accent);
   border-radius: var(--radius-box);
-  background: color-mix(in srgb, var(--accent) 5%, var(--paper));
+  /* Единственная цветная подложка постера — и на экране, и на бумаге: карточка
+     человека должна читаться как отдельная «полоса» списка (см. tokens.css). */
+  background: color-mix(in srgb, var(--accent) 10%, #fff);
   padding: 12px 16px;
 }
 

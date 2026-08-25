@@ -59,7 +59,7 @@
   font-weight: 700;
   font-size: 11px;
   color: var(--ink-soft);
-  background: color-mix(in srgb, var(--ink) 4%, var(--paper));
+  background: var(--paper);
   border: 1px solid var(--grid-line);
   padding: 5px 2px;
   text-transform: uppercase;

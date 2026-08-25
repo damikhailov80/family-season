@@ -3,6 +3,7 @@ import { Caveat, Marck_Script, Nunito } from 'next/font/google'
 import { SiteFooter } from '../components/site/SiteFooter'
 import { SiteHeader } from '../components/site/SiteHeader'
 import '../styles/tokens.css'
+import '../styles/palettes.css'
 import '../styles/global.css'
 import '../styles/print.css'
 

@@ -61,18 +61,25 @@ export function Toolbar() {
           >
             {editing ? 'Готово' : 'Править'}
           </button>
-          <button type="button" className={styles.ghost} onClick={() => void copyLink()}>
-            {copied ? 'Скопировано ✓' : 'Скопировать ссылку'}
-          </button>
+          {/* Ссылка и печать — действия над готовым листом: в правке они только
+              мешают, а лист всё равно сначала доводят до ума. */}
+          {!editing && (
+            <button type="button" className={styles.ghost} onClick={() => void copyLink()}>
+              {copied ? 'Скопировано ✓' : 'Скопировать ссылку'}
+            </button>
+          )}
           <a className={styles.ghost} href={links.demo} onClick={onNavClick(openDemo)}>
             К примеру
           </a>
         </>
       )}
-      <button type="button" className={styles.ghost} onClick={() => print()}>
-        Печать / PDF
-      </button>
-      {editing && <PaletteSwitcher />}
+      {editing ? (
+        <PaletteSwitcher />
+      ) : (
+        <button type="button" className={styles.ghost} onClick={() => print()}>
+          Печать / PDF
+        </button>
+      )}
     </div>
   )
 }

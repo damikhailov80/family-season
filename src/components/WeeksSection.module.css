@@ -16,7 +16,9 @@
 }
 
 .cardTitle {
-  background: color-mix(in srgb, var(--accent-weeks) 18%, var(--paper));
+  /* Подложки на постере белые (см. tokens.css): полосу заголовка держат
+     подчёркивание и цвет букв, а не заливка. */
+  background: var(--paper);
   border-bottom: 1.5px solid var(--accent-weeks);
   color: var(--accent-weeks);
   font-family: var(--font-ui);

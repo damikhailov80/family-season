@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "oxlint",
+    "palettes": "node tools/palettes/build.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
