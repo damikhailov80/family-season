@@ -1,5 +1,5 @@
 import { moodValues } from '../model/fill'
-import { LABELS, MOOD_LEGEND } from '../model/labels'
+import { LABELS, MOOD_LEGEND, PLACEHOLDERS } from '../model/labels'
 import { useDoc } from '../state/docContext'
 import { AvatarFace } from './AvatarFace'
 import { Badge } from './Badge'
@@ -52,7 +52,7 @@ export function MoodSection() {
                   }
                 >
                   <AvatarFace variant={person.face} size={20} className={styles.whoFace} />
-                  <span>{person.name}</span>
+                  <span>{person.name || PLACEHOLDERS.name}</span>
                 </th>
                 {moodValues(fill.moods[person.id], days).map((mood, index) => (
                   <td key={index} className={styles.cell}>

@@ -6,7 +6,7 @@ import { EditableText } from './edit/EditableText'
 import styles from './Header.module.css'
 
 export function Header() {
-  const { field, editing, template } = useDoc()
+  const { field } = useDoc()
 
   return (
     <header className={styles.header}>
@@ -24,15 +24,13 @@ export function Header() {
         <SparkleRays className={`${styles.rays} ${styles.raysRight}`} />
       </div>
 
-      {/* Пустую ленту не печатаем: тёмная плашка без текста выглядит как брак. */}
-      {(editing || template.header.ribbon) && (
-        <EditableText
-          as="p"
-          className={styles.ribbon}
-          placeholder={PLACEHOLDERS.ribbon}
-          {...field('header.ribbon')}
-        />
-      )}
+      {/* Лента пустой не бывает: без своего девиза печатается девиз по умолчанию. */}
+      <EditableText
+        as="p"
+        className={styles.ribbon}
+        placeholder={PLACEHOLDERS.ribbon}
+        {...field('header.ribbon')}
+      />
     </header>
   )
 }

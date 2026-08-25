@@ -81,7 +81,10 @@ export function ProjectsSection() {
                 <div className={styles.progress}>
                   <span className={styles.fieldLabel}>{LABELS.fieldProgress}</span>
                   <div className={styles.progressRow}>
-                    <ProgressBar percent={percent} label={person.project || person.name} />
+                    <ProgressBar
+                      percent={percent}
+                      label={person.project || person.name || PLACEHOLDERS.project}
+                    />
                   </div>
                 </div>
 

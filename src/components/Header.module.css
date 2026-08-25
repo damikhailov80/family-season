@@ -78,10 +78,6 @@
 }
 
 @media print {
-  .ribbon:empty {
-    display: none;
-  }
-
   /* Печатная ширина A4 попадает под мобильный брейкпоинт — рисунки возвращаем. */
   .heart,
   .family {

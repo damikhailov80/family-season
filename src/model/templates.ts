@@ -2,21 +2,20 @@ import { pickTargetMonth } from './calendar'
 import type { Person, Template } from './types'
 import { WEEKS_COUNT } from './types'
 
-/** Пустой лист «с нуля»: каркас формы есть, содержимое вписывает пользователь. */
+/**
+ * Пустой лист «с нуля»: каркас формы есть, содержимое вписывает пользователь.
+ *
+ * Поля пустые буквально все, включая название и подписи: пустое поле показывает
+ * и печатает свою подсказку (`PLACEHOLDERS`, см. `EditableText`), поэтому второй
+ * копии этих текстов здесь заводить не надо — она бы с подсказками разошлась.
+ */
 export function createEmptyTemplate(): Template {
   return {
-    header: { title: 'Семейный сезон', ribbon: '' },
-    theme: {
-      ...pickTargetMonth(),
-      subtitle: '',
-      question: 'Что уже запомнилось больше всего?',
-    },
-    weeksNote: '4 недели – 4 идеи – 4 воспоминания',
-    weeks: Array.from({ length: WEEKS_COUNT }, (_, index) => ({
-      title: `Неделя ${index + 1}`,
-      text: '',
-    })),
-    projectsNote: 'Наши личные цели и прогресс',
+    header: { title: '', ribbon: '' },
+    theme: { ...pickTargetMonth(), subtitle: '', question: '' },
+    weeksNote: '',
+    weeks: Array.from({ length: WEEKS_COUNT }, () => ({ title: '', text: '' })),
+    projectsNote: '',
     goal: '',
     people: [createPerson('p1', 'dad'), createPerson('p2', 'mom')],
   }

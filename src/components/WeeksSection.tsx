@@ -24,7 +24,7 @@ export function WeeksSection() {
             <EditableText
               as="h3"
               className={styles.cardTitle}
-              placeholder={PLACEHOLDERS.weekTitle}
+              placeholder={`${PLACEHOLDERS.weekTitle} ${index + 1}`}
               {...field(`weeks.${index}.title`)}
             />
             <EditableText

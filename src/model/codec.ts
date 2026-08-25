@@ -150,19 +150,19 @@ export function normalizeTemplate(input: unknown): Template {
 
   return {
     header: {
-      title: text(header.title, 'Семейный сезон'),
+      title: text(header.title),
       ribbon: text(header.ribbon),
     },
     theme: {
       year: int(theme.year, fallbackMonth.year, 1970, 3000),
       monthIndex: int(theme.monthIndex, fallbackMonth.monthIndex, 0, 11),
       subtitle: text(theme.subtitle),
-      question: text(theme.question, 'Что уже запомнилось больше всего?'),
+      question: text(theme.question),
     },
     weeksNote: text(raw.weeksNote),
     weeks: Array.from({ length: WEEKS_COUNT }, (_, index) => {
       const week = (weeks[index] ?? {}) as Record<string, unknown>
-      return { title: text(week.title, `Неделя ${index + 1}`), text: text(week.text) }
+      return { title: text(week.title), text: text(week.text) }
     }),
     projectsNote: text(raw.projectsNote),
     goal: text(raw.goal),
