@@ -1,12 +1,24 @@
+/*
+ * Кнопка плавающая: тема не связана ни с одним состоянием постера и доступна
+ * всегда, поэтому она не в тулбаре, а сама по себе — и остаётся под рукой, пока
+ * лист прокручивают. `z-index` выше липкого тулбара (у того 20), иначе у самого
+ * верха страницы кнопка ныряла бы под него. Фон непрозрачный: она ложится
+ * поверх белой бумаги, и держит её только рамка с тенью.
+ */
 .button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 30;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 6px 12px 6px 7px;
-  border-radius: 8px;
+  border-radius: 999px;
   border: 1.5px solid var(--sheet-border);
   background: var(--surface);
   color: var(--ink-soft);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
   font-family: var(--font-ui);
   font-weight: 700;
   font-size: 13px;
@@ -62,6 +74,22 @@
 .dice {
   font-size: 15px;
   color: var(--ink-muted);
+}
+
+/*
+ * На узком экране от названия темы приходится отказаться: пилюля в 206 px висела бы
+ * поперёк постера. Остаются образец и ⟳ — кружок, а название читает `aria-label`.
+ */
+@media (max-width: 560px) {
+  .button {
+    right: 12px;
+    bottom: 12px;
+    padding: 7px;
+  }
+
+  .label {
+    display: none;
+  }
 }
 
 @media print {

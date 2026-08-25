@@ -27,12 +27,13 @@ export interface DocValue {
    * обычному клику, поэтому клик с модификатором открывает лист в новой вкладке.
    * `fork` кодируется асинхронно — до готовности пустая строка.
    */
-  links: { fork: string; demo: string }
+  links: { fork: string }
   /** Привязка текстового поля по пути в шаблоне: field('people.0.name'). */
   field: (path: string) => FieldBinding
   setMode: (mode: DocMode) => void
   fork: () => void
-  openDemo: () => void
+  /** «Отмена» — шаг назад по истории; своего адреса, в отличие от форка, у неё нет. */
+  cancel: () => void
   addPerson: () => void
   removePerson: (id: string) => void
   cycleFace: (id: string) => void

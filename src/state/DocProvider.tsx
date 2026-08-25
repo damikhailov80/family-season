@@ -38,8 +38,6 @@ const URL_SYNC_DELAY = 400
  * конкретной записи.
  */
 interface EntryMarks {
-  /** Позади лежит пример. Ставит только форк; по ней «К примеру» уходит назад. */
-  own?: boolean
   /** id сеанса правки: связывает запись правки и запись просмотра под ней. */
   viewOf?: number
   /** Эту запись создала кнопка «Править», позади — просмотр того же листа. */
@@ -50,10 +48,6 @@ function marksOf(): EntryMarks {
   return (history.state ?? {}) as EntryMarks
 }
 
-function isOwnEntry(): boolean {
-  return marksOf().own === true
-}
-
 /**
  * Состояние для НОВОЙ записи истории. Служебные поля Next (`__NA`, дерево) обязаны
  * уехать в неё: с ними патченный Next-ом `pushState` уходит мимо роутера, маршрут не
@@ -62,7 +56,6 @@ function isOwnEntry(): boolean {
  */
 function entryState(marks: EntryMarks): Record<string, unknown> {
   const state = { ...(history.state as Record<string, unknown> | null) }
-  delete state.own
   delete state.viewOf
   delete state.edit
   return { ...state, ...marks }
@@ -259,11 +252,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     const payload = await encodeTemplate(next)
     navSeq.current += 1
     editSession.current = null
-    history.pushState(
-      entryState({ own: true }),
-      '',
-      ROUTES.sheetEdit + hashFor(payload, nextPalette),
-    )
+    history.pushState(entryState({}), '', ROUTES.sheetEdit + hashFor(payload, nextPalette))
     setTemplate(next)
     setFillId(null)
     setMode('edit')
@@ -311,7 +300,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       source,
       days,
       editing: mode === 'edit',
-      links: { fork: forkLink, demo: ROUTES.sheet },
+      links: { fork: forkLink },
       field,
       setMode: (next: DocMode) => {
         if (next === mode) return
@@ -319,16 +308,16 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         else void leaveEdit()
       },
       fork: () => void startCustom(structuredClone(template), palette),
-      openDemo: () => {
-        // Свой лист остаётся в истории впереди: «вперёд» вернёт его целиком.
-        if (isOwnEntry()) {
-          history.back()
+      // «Отмена» — ровно шаг назад по истории: позади лежит то, откуда пришли в правку
+      // (пример при форке, лендинг у нового сезона). Своего адреса у неё поэтому нет,
+      // и знать, что там за запись, не нужно — отсюда же отсутствие пометок у форка.
+      cancel: () => {
+        // Правку открыли прямо по ссылке — отступать некуда, уводим на лендинг.
+        if (history.length <= 1) {
+          location.assign(ROUTES.home)
           return
         }
-        navSeq.current += 1
-        editSession.current = null
-        history.pushState(entryState({}), '', ROUTES.sheet)
-        showExample(DEFAULT_EXAMPLE_ID)
+        history.back()
       },
       addPerson: () =>
         update((current) =>
@@ -363,14 +352,16 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       setPalette,
       buildShareUrl: async () => {
         const payload = await encodeTemplate(template)
-        // Присланная ссылка всегда открывается в просмотре и без набора заполнения.
-        return `${location.origin}${ROUTES.sheet}${hashFor(payload, palette)}`
+        // Делимся тем, что на экране: у примера уезжает и его набор заполнения.
+        // Форк, наоборот, `data=` сбрасывает — там начинается свой сезон.
+        return `${location.origin}${ROUTES.sheet}${hashFor(payload, palette, fillId)}`
       },
     }),
     [
       template,
       palette,
       fill,
+      fillId,
       mode,
       source,
       days,
@@ -380,7 +371,6 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       startCustom,
       enterEdit,
       leaveEdit,
-      showExample,
     ],
   )
 
