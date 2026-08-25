@@ -1,6 +1,6 @@
 import { LABELS } from '../model/labels'
 import { useDoc } from '../state/docContext'
-import { SparkStar } from './doodles'
+import { PosterIcon } from './doodles/PosterIcon'
 import { SectionBox } from './SectionBox'
 import styles from './NextMonthIdeas.module.css'
 
@@ -13,7 +13,7 @@ export function NextMonthIdeas() {
 
   return (
     <section aria-labelledby="ideas-label" className={styles.wrap}>
-      <SparkStar className={styles.star} size={44} />
+      <PosterIcon slot="idea" className={styles.star} size={44} />
 
       <SectionBox
         accent="theme"

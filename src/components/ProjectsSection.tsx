@@ -5,7 +5,7 @@ import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
 import { useDoc } from '../state/docContext'
 import { AvatarFace } from './AvatarFace'
 import { Badge } from './Badge'
-import { RocketDoodle } from './doodles'
+import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
 import { ProgressBar } from './ProgressBar'
 import styles from './ProjectsSection.module.css'
@@ -25,7 +25,7 @@ export function ProjectsSection() {
           placeholder={PLACEHOLDERS.projectsNote}
           {...field('projectsNote')}
         />
-        <RocketDoodle className={styles.rocket} size={48} />
+        <PosterIcon slot="path" className={styles.rocket} size={48} />
       </div>
 
       <div className={styles.list}>

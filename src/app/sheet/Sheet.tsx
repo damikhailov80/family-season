@@ -7,22 +7,25 @@ import {
   readEditFlag,
   readFillId,
   readHashPayload,
+  readIconSetId,
   readNewFlag,
   readPaletteId,
 } from '../../model/codec'
 import { DEFAULT_EXAMPLE_ID, exampleById, knownExampleId } from '../../model/examples'
 import { modeFromPath } from '../../model/site'
+import { DEFAULT_ICON_SET } from '../../model/icons'
 import { DEFAULT_PALETTE } from '../../model/palettes'
 import { createEmptyTemplate } from '../../model/templates'
 import type { Boot } from '../../state/DocProvider'
 
 function exampleBoot(id: string): Boot {
   const example = exampleById(id)!
-  // Тема примера — его собственная, но `p=` в адресе сильнее.
+  // Тема и рисунки примера — его собственные, но `p=` и `i=` в адресе сильнее.
   return {
     template: example.template(),
     fillId: id,
     palette: readPaletteId() ?? example.palette,
+    iconSet: readIconSetId() ?? example.iconSet,
     mode: 'view',
   }
 }
@@ -38,8 +41,9 @@ function exampleBoot(id: string): Boot {
  *   /sheet/edit#d=…       — он же в правке
  *   /sheet/edit           — пустой бланк «с нуля»
  *
- * К любому из них можно дописать `&p=<тема>` — она перебивает тему примера.
- * Пометки нет — тема по умолчанию. Список тем — `src/model/palettes.ts`.
+ * К любому из них можно дописать `&p=<тема>` и `&i=<набор рисунков>` — они
+ * перебивают тему и рисунки примера. Пометки нет — значение по умолчанию.
+ * Списки — `src/model/palettes.ts` и `src/model/icons.ts`.
  *
  * Пример не правится: `data=<id>` перебивает путь и оставляет просмотр. Приведением
  * адреса к этим правилам занимается DocProvider — здесь только чтение.
@@ -54,6 +58,7 @@ function initialBoot(): Boot | null {
       template: createEmptyTemplate(),
       fillId: null,
       palette: readPaletteId() ?? DEFAULT_PALETTE,
+      iconSet: readIconSetId() ?? DEFAULT_ICON_SET,
       mode: 'edit',
     }
   }
@@ -81,6 +86,7 @@ export default function Sheet() {
         template,
         fillId,
         palette: readPaletteId() ?? (fillId ? exampleById(fillId)!.palette : DEFAULT_PALETTE),
+        iconSet: readIconSetId() ?? (fillId ? exampleById(fillId)!.iconSet : DEFAULT_ICON_SET),
         // `edit=1` — легаси-пометка ссылок форка; сегодня режим несёт путь.
         mode: fillId ? 'view' : readEditFlag() ? 'edit' : modeFromPath(),
       })

@@ -1,7 +1,8 @@
 import { FACE_ORDER } from './accents'
 import { pickTargetMonth } from './calendar'
+import { iconSetOrNull } from './icons'
 import { paletteOrNull } from './palettes'
-import type { PaletteId } from '../types'
+import type { IconSetId, PaletteId } from '../types'
 import type { Person, Template } from './types'
 import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
 
@@ -27,6 +28,7 @@ import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
 const HASH_PARAM = 'd'
 const DATA_PARAM = 'data'
 const PALETTE_PARAM = 'p'
+const ICONS_PARAM = 'i'
 const EDIT_PARAM = 'edit'
 const NEW_PARAM = 'new'
 const PACKED = '2z'
@@ -258,15 +260,27 @@ export function readPaletteId(hash: string = location.hash): PaletteId | null {
 }
 
 /**
- * Тему пишем всегда, даже когда она по умолчанию: её для того и вынесли из блоба,
- * чтобы она была видна в адресе и правилась руками. Читается и без неё — см.
- * `readPaletteId`, поэтому старые ссылки без `p=` открываются как прежде.
+ * `i=<id>` — набор рисунков, единственное его хранилище: `#d=…&p=greece&i=winter`.
+ * Список id — `src/model/icons.ts` (двадцать наборов). Устроен ровно как `p=`:
+ * пометки нет или id неизвестен — набор по умолчанию, то есть те же рисунки,
+ * что были на постере до появления наборов.
+ */
+export function readIconSetId(hash: string = location.hash): IconSetId | null {
+  return iconSetOrNull(new URLSearchParams(hash.replace(/^#/, '')).get(ICONS_PARAM))
+}
+
+/**
+ * Тему и набор рисунков пишем всегда, даже когда они по умолчанию: их для того
+ * и вынесли из блоба, чтобы они были видны в адресе и правились руками. Читается
+ * и без них — см. `readPaletteId` и `readIconSetId`, поэтому старые ссылки без
+ * `p=` и `i=` открываются как прежде.
  */
 export function hashFor(
   payload: string,
   palette: PaletteId,
+  iconSet: IconSetId,
   fillId: string | null = null,
 ): string {
   const data = fillId ? `&${DATA_PARAM}=${fillId}` : ''
-  return `#${HASH_PARAM}=${payload}&${PALETTE_PARAM}=${palette}${data}`
+  return `#${HASH_PARAM}=${payload}&${PALETTE_PARAM}=${palette}&${ICONS_PARAM}=${iconSet}${data}`
 }

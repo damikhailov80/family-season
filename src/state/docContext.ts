@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { PaletteId } from '../types'
+import type { IconSetId, PaletteId } from '../types'
 import type { FillState, Template } from '../model/types'
 
 export type DocMode = 'view' | 'edit'
@@ -16,6 +16,8 @@ export interface DocValue {
   template: Template
   /** Тема оформления. В бланк не входит: её несёт пометка `p=` в адресе. */
   palette: PaletteId
+  /** Набор рисунков. Тоже не бланк: его несёт пометка `i=` в адресе. */
+  iconSet: IconSetId
   fill: FillState
   mode: DocMode
   source: DocSource
@@ -39,6 +41,7 @@ export interface DocValue {
   cycleFace: (id: string) => void
   stepMonth: (delta: number) => void
   setPalette: (palette: PaletteId) => void
+  setIconSet: (iconSet: IconSetId) => void
   /** Актуальная ссылка на лист (дожидается кодирования, а не читает location). */
   buildShareUrl: () => Promise<string>
 }

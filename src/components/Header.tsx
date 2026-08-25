@@ -1,6 +1,7 @@
 import { PLACEHOLDERS } from '../model/labels'
 import { useDoc } from '../state/docContext'
-import { FamilyIcon, HeartDoodle, SparkleRays } from './doodles'
+import { SparkleRays } from './doodles'
+import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
 import styles from './Header.module.css'
 
@@ -9,8 +10,8 @@ export function Header() {
 
   return (
     <header className={styles.header}>
-      <HeartDoodle className={styles.heart} size={46} />
-      <FamilyIcon className={styles.family} size={66} />
+      <PosterIcon slot="love" className={styles.heart} size={46} />
+      <PosterIcon slot="mark" className={styles.family} size={66} />
 
       <div className={styles.titleRow}>
         <SparkleRays className={styles.rays} />

@@ -2,7 +2,7 @@ import { LONGEST_MONTH_RU, monthName } from '../model/calendar'
 import { LABELS, PLACEHOLDERS } from '../model/labels'
 import { useDoc } from '../state/docContext'
 import { Badge } from './Badge'
-import { MegaphoneDoodle, SparkStar } from './doodles'
+import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
 import { SectionBox } from './SectionBox'
 import styles from './MonthTheme.module.css'
@@ -18,12 +18,12 @@ export function MonthTheme() {
         labelId="theme-label"
         bodyClassName={styles.body}
       >
-        <MegaphoneDoodle className={styles.megaphone} size={78} />
+        <PosterIcon slot="voice" className={styles.megaphone} size={78} />
 
         <div className={styles.stars}>
-          <SparkStar className={styles.starBig} size={34} />
-          <SparkStar className={styles.starMid} size={26} />
-          <SparkStar className={styles.starSmall} size={18} />
+          <PosterIcon slot="spark" className={styles.starBig} size={34} />
+          <PosterIcon slot="spark" className={styles.starMid} size={26} />
+          <PosterIcon slot="spark" className={styles.starSmall} size={18} />
         </div>
 
         {/* Месяц подставляется от даты; в правке его переключают стрелками. */}

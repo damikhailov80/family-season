@@ -8,14 +8,16 @@ import {
   readFillId,
   readHashPayload,
   readNewFlag,
+  readIconSetId,
   readPaletteId,
 } from '../model/codec'
 import { templateDays } from '../model/fill'
 import { DEFAULT_EXAMPLE_ID, exampleById, fillOf, knownExampleId } from '../model/examples'
 import { modeFromPath, pathForMode, ROUTES } from '../model/site'
+import { DEFAULT_ICON_SET } from '../model/icons'
 import { DEFAULT_PALETTE } from '../model/palettes'
 import { createEmptyTemplate, createPerson, nextPersonId } from '../model/templates'
-import type { PaletteId } from '../types'
+import type { IconSetId, PaletteId } from '../types'
 import type { Template } from '../model/types'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
 import type { DocMode, DocSource, DocValue } from './docContext'
@@ -27,6 +29,8 @@ export interface Boot {
   fillId: string | null
   /** Тема из `p=`; пометки нет — тема по умолчанию. Частью бланка она не является. */
   palette: PaletteId
+  /** Набор рисунков из `i=`; устроен как тема и в бланк тоже не входит. */
+  iconSet: IconSetId
   mode: DocMode
 }
 
@@ -97,6 +101,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
   const [template, setTemplate] = useState<Template>(boot.template)
   const [fillId, setFillId] = useState<string | null>(boot.fillId)
   const [palette, setPalette] = useState<PaletteId>(boot.palette)
+  const [iconSet, setIconSet] = useState<IconSetId>(boot.iconSet)
   const [mode, setMode] = useState<DocMode>(boot.mode)
 
   /**
@@ -117,6 +122,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     setTemplate(example.template())
     // Тема примера — его собственная, но `p=` в адресе сильнее.
     setPalette(readPaletteId() ?? example.palette)
+    setIconSet(readIconSetId() ?? example.iconSet)
     setFillId(id)
     setMode('view')
     syncPath('view', id)
@@ -160,6 +166,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         if (modeFromPath() === 'edit' || readNewFlag()) {
           setTemplate(createEmptyTemplate())
           setPalette(readPaletteId() ?? DEFAULT_PALETTE)
+          setIconSet(readIconSetId() ?? DEFAULT_ICON_SET)
           setFillId(null)
           setMode('edit')
           syncPath('edit', null)
@@ -179,6 +186,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         const nextMode: DocMode = id ? 'view' : modeFromPath()
         setTemplate(next)
         setPalette(readPaletteId() ?? (id ? exampleById(id)!.palette : DEFAULT_PALETTE))
+        setIconSet(readIconSetId() ?? (id ? exampleById(id)!.iconSet : DEFAULT_ICON_SET))
         setFillId(id)
         setMode(nextMode)
         syncPath(nextMode, id)
@@ -214,8 +222,8 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       () => {
         void encodeTemplate(template).then((payload) => {
           if (cancelled || navSeq.current !== seq) return
-          if (fillId) setForkLink(ROUTES.sheetEdit + hashFor(payload, palette))
-          const hash = hashFor(payload, palette, fillId)
+          if (fillId) setForkLink(ROUTES.sheetEdit + hashFor(payload, palette, iconSet))
+          const hash = hashFor(payload, palette, iconSet, fillId)
           if (hash === location.hash) return
           // history.state обязателен: null затёр бы пометки своей записи.
           history.replaceState(history.state, '', hash)
@@ -228,7 +236,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       cancelled = true
       clearTimeout(timer)
     }
-  }, [template, fillId, palette, mode])
+  }, [template, fillId, palette, iconSet, mode])
 
   const source: DocSource = fillId ? 'demo' : 'custom'
   const fill = fillOf(fillId)
@@ -248,17 +256,24 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
 
   // Форк — единственный переход, добавляющий запись «свой лист»: «назад» из него
   // возвращает к примеру.
-  const startCustom = useCallback(async (next: Template, nextPalette: PaletteId) => {
-    const payload = await encodeTemplate(next)
-    navSeq.current += 1
-    editSession.current = null
-    history.pushState(entryState({}), '', ROUTES.sheetEdit + hashFor(payload, nextPalette))
-    setTemplate(next)
-    setFillId(null)
-    setMode('edit')
-    // Мгновенно, а не smooth: плавная прокрутка сбивается перерисовкой листа.
-    scrollTo(0, 0)
-  }, [])
+  const startCustom = useCallback(
+    async (next: Template, nextPalette: PaletteId, nextIconSet: IconSetId) => {
+      const payload = await encodeTemplate(next)
+      navSeq.current += 1
+      editSession.current = null
+      history.pushState(
+        entryState({}),
+        '',
+        ROUTES.sheetEdit + hashFor(payload, nextPalette, nextIconSet),
+      )
+      setTemplate(next)
+      setFillId(null)
+      setMode('edit')
+      // Мгновенно, а не smooth: плавная прокрутка сбивается перерисовкой листа.
+      scrollTo(0, 0)
+    },
+    [],
+  )
 
   // «Править» — тоже переход: режим виден в адресе, поэтому «назад» из правки
   // возвращает в просмотр, а «вперёд» — обратно в правку.
@@ -287,14 +302,15 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     const payload = await encodeTemplate(template)
     navSeq.current += 1
     editSession.current = null
-    history.pushState(entryState({}), '', ROUTES.sheet + hashFor(payload, palette))
+    history.pushState(entryState({}), '', ROUTES.sheet + hashFor(payload, palette, iconSet))
     setMode('view')
-  }, [template, palette])
+  }, [template, palette, iconSet])
 
   const value = useMemo<DocValue>(
     () => ({
       template,
       palette,
+      iconSet,
       fill,
       mode,
       source,
@@ -307,7 +323,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         if (next === 'edit') enterEdit()
         else void leaveEdit()
       },
-      fork: () => void startCustom(structuredClone(template), palette),
+      fork: () => void startCustom(structuredClone(template), palette, iconSet),
       // «Отмена» — ровно шаг назад по истории: позади лежит то, откуда пришли в правку
       // (пример при форке, лендинг у нового сезона). Своего адреса у неё поэтому нет,
       // и знать, что там за запись, не нужно — отсюда же отсутствие пометок у форка.
@@ -350,16 +366,18 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
           theme: { ...current.theme, ...shiftMonth(current.theme, delta) },
         })),
       setPalette,
+      setIconSet,
       buildShareUrl: async () => {
         const payload = await encodeTemplate(template)
         // Делимся тем, что на экране: у примера уезжает и его набор заполнения.
         // Форк, наоборот, `data=` сбрасывает — там начинается свой сезон.
-        return `${location.origin}${ROUTES.sheet}${hashFor(payload, palette, fillId)}`
+        return `${location.origin}${ROUTES.sheet}${hashFor(payload, palette, iconSet, fillId)}`
       },
     }),
     [
       template,
       palette,
+      iconSet,
       fill,
       fillId,
       mode,

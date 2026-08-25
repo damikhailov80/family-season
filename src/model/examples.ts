@@ -1,8 +1,9 @@
 import demo1 from '../data/examples/demo-1.json'
 import demo2 from '../data/examples/demo-2.json'
 import demo3 from '../data/examples/demo-3.json'
-import type { FaceVariant, PaletteId } from '../types'
+import type { FaceVariant, IconSetId, PaletteId } from '../types'
 import { FACE_ORDER } from './accents'
+import { knownIconSet } from './icons'
 import { knownPalette } from './palettes'
 import { normalizeTemplate } from './codec'
 import { normalizeFill } from './fill'
@@ -17,8 +18,8 @@ import { EMPTY_FILL } from './types'
  *   template — бланк, он печатается и умещается в ссылку;
  *   fill     — заполнение (настроения, проценты, итоги, фото), на бумагу не идёт.
  *
- * `palette` лежит рядом с ними, а не внутри бланка: тема — оформление постера,
- * в ссылке её несёт отдельная пометка `p=`.
+ * `palette` и `icons` лежат рядом с ними, а не внутри бланка: тема и набор
+ * рисунков — оформление постера, в ссылке их несут отдельные пометки `p=` и `i=`.
  *
  * Месяца в JSON нет: `normalizeTemplate` подставляет его от «сегодня», поэтому шаблон
  * собирается лениво, при открытии примера, а не при загрузке модуля — иначе пример
@@ -30,6 +31,7 @@ interface RawExample {
   summary: string
   note: string
   palette: unknown
+  icons?: unknown
   template: unknown
   fill: unknown
 }
@@ -46,6 +48,8 @@ export interface Example {
   faces: FaceVariant[]
   /** Тема, в которой показывается пример; `p=` в адресе её перебивает. */
   palette: PaletteId
+  /** Набор рисунков примера; `i=` в адресе его перебивает. */
+  iconSet: IconSetId
 }
 
 const RAW: Record<string, RawExample> = {
@@ -75,6 +79,7 @@ const EXAMPLES: Record<string, Example> = Object.fromEntries(
       fill: normalizeFill(raw.fill),
       faces: facesOf(raw),
       palette: knownPalette(raw.palette),
+      iconSet: knownIconSet(raw.icons),
     },
   ]),
 )

@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "oxlint",
     "palettes": "node tools/palettes/build.mjs",
+    "icons": "node tools/icons/build.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

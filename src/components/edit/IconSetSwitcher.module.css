@@ -1,0 +1,83 @@
+/*
+ * Кнопка-близнец переключателя тем: та же пилюля, тот же ⟳, та же логика
+ * «случайный другой». Позиция и `z-index` — на общей обёртке `FloatingControls`,
+ * поэтому здесь их нет: две плавающие кнопки, каждая со своим `position: fixed`,
+ * пришлось бы разводить подобранными вручную отступами.
+ */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 8px;
+  border-radius: 999px;
+  border: 1.5px solid var(--sheet-border);
+  background: var(--surface);
+  color: var(--ink-soft);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 12%);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.button:hover {
+  border-color: var(--ink-muted);
+  background: var(--page-bg);
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--ink-muted);
+  outline-offset: 2px;
+}
+
+/*
+ * Три рисунка, а не один: набор — это подбор, и по одной иконке его не узнать,
+ * как не узнать тему по одной краске. Цвет сайтовый: рисунки различаются формой,
+ * а краску им даёт тема постера — на кнопке её изображать незачем.
+ */
+.sample {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+  color: var(--ink-muted);
+}
+
+/*
+ * Ширина фиксированная по той же причине, что у тем: подписи разной длины
+ * («Дом» и «Городские будни»), и кнопка прыгала бы при каждом переключении.
+ * 132px — самая длинная подпись целиком, поэтому многоточия не бывает.
+ */
+.label {
+  width: 132px;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dice {
+  font-size: 15px;
+  color: var(--ink-muted);
+}
+
+/* На узком экране остаются образец и ⟳; подпись читает `aria-label`. */
+@media (max-width: 560px) {
+  .button {
+    padding: 7px;
+  }
+
+  .label {
+    display: none;
+  }
+}
+
+@media print {
+  .button {
+    display: none;
+  }
+}

@@ -1,24 +1,17 @@
+import { Icon } from './Icon'
+
 interface DoodleProps {
   size?: number
   className?: string
 }
 
+/**
+ * «Сердце» из библиотеки рисунков под старым именем. Геометрия уехала в
+ * `icons.generated.ts` — там же её берут наборы постера, и держать вторую копию
+ * было бы верным способом их развести. Постер зовёт рисунки через `PosterIcon`,
+ * а это имя осталось для сайта: у лендинга, шапки и подвала рисунки свои и
+ * от набора постера не зависят.
+ */
 export function HeartDoodle({ size = 48, className }: DoodleProps) {
-  return (
-    <svg
-      className={className}
-      width={size}
-      height={size * 0.96}
-      viewBox="0 0 50 48"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M25 45C10 33 3 24 3 16 3 8 12 4 18 8c3 2 6 5 7 9 1-4 4-7 7-9 6-4 15 0 15 8 0 8-7 17-22 29Z" />
-    </svg>
-  )
+  return <Icon name="heart" size={size} className={className} />
 }

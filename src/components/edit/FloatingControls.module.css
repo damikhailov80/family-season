@@ -1,0 +1,29 @@
+/*
+ * `z-index` выше липкого тулбара (у того 20), иначе у самого верха страницы
+ * кнопки ныряли бы под него. `align-items: flex-end` — кнопки разной ширины
+ * (у тем подписи длиннее), и прижаты они к правому краю, а не растянуты.
+ */
+.stack {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 560px) {
+  .stack {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+/* Обвязка на бумагу не идёт — как и всё экранное. */
+@media print {
+  .stack {
+    display: none;
+  }
+}

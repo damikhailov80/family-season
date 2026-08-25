@@ -5,7 +5,7 @@ import styles from './Steps.module.css'
 const STEPS = [
   {
     Doodle: FamilyIcon,
-    size: 62,
+    size: 54,
     title: 'Придумайте сезон',
     text: 'Название месяца, кто в главных ролях и чем займётся каждый. Всё правится прямо на постере.',
   },

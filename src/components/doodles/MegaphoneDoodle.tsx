@@ -1,27 +1,17 @@
+import { Icon } from './Icon'
+
 interface DoodleProps {
   size?: number
   className?: string
 }
 
+/**
+ * «Мегафон» из библиотеки рисунков под старым именем. Геометрия уехала в
+ * `icons.generated.ts` — там же её берут наборы постера, и держать вторую копию
+ * было бы верным способом их развести. Постер зовёт рисунки через `PosterIcon`,
+ * а это имя осталось для сайта: у лендинга, шапки и подвала рисунки свои и
+ * от набора постера не зависят.
+ */
 export function MegaphoneDoodle({ size = 74, className }: DoodleProps) {
-  return (
-    <svg
-      className={className}
-      width={size}
-      height={size * 0.78}
-      viewBox="0 0 74 58"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.4"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="M5 22 33 9v40L5 36Z" />
-      <path d="M5 24 1 26v6l4 2" />
-      <path d="M13 34 9 50l8 3 5-15" />
-      <path d="M42 18c6 5 6 17 0 22M52 12c9 8 9 26 0 34" />
-    </svg>
-  )
+  return <Icon name="megaphone" size={size} className={className} />
 }

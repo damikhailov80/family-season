@@ -1,29 +1,17 @@
+import { Icon } from './Icon'
+
 interface DoodleProps {
   size?: number
   className?: string
 }
 
+/**
+ * «Мишень» из библиотеки рисунков под старым именем. Геометрия уехала в
+ * `icons.generated.ts` — там же её берут наборы постера, и держать вторую копию
+ * было бы верным способом их развести. Постер зовёт рисунки через `PosterIcon`,
+ * а это имя осталось для сайта: у лендинга, шапки и подвала рисунки свои и
+ * от набора постера не зависят.
+ */
 export function TargetDoodle({ size = 64, className }: DoodleProps) {
-  return (
-    <svg
-      className={className}
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <circle cx="34" cy="30" r="23" />
-      <circle cx="34" cy="30" r="15" />
-      <circle cx="34" cy="30" r="7" />
-      <path d="M5 59 34 30" />
-      <path d="M5 59v-9M5 59h9" />
-      <path d="M34 30l-9 2M34 30l-2 9" />
-    </svg>
-  )
+  return <Icon name="target" size={size} className={className} />
 }

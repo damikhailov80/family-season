@@ -4,30 +4,39 @@ import { MonthTheme } from './components/MonthTheme'
 import { MoodSection } from './components/MoodSection'
 import { NextMonthIdeas } from './components/NextMonthIdeas'
 import { PaperSheet } from './components/PaperSheet'
+import { IconSetContext } from './components/doodles/iconSetContext'
 import { PrintPage } from './components/PrintPage'
 import { ProjectsSection } from './components/ProjectsSection'
 import { WeeksSection } from './components/WeeksSection'
-import { PaletteSwitcher } from './components/edit/PaletteSwitcher'
+import { FloatingControls } from './components/edit/FloatingControls'
 import { Toolbar } from './components/edit/Toolbar'
 import { useDoc } from './state/docContext'
 import type { Boot } from './state/DocProvider'
 import { DocProvider } from './state/DocProvider'
 
-/** Тема живёт на постере, поэтому читать её нужно уже внутри провайдера. */
+/**
+ * Оформление живёт на постере, а не на странице, поэтому читать его нужно уже
+ * внутри провайдера. Тему раздаёт CSS через атрибут, набор рисунков — контекст:
+ * геометрию SVG атрибутом не подменишь.
+ */
 function ThemedPaper({ children }: { children: React.ReactNode }) {
-  const { palette } = useDoc()
-  return <PaperSheet palette={palette}>{children}</PaperSheet>
+  const { palette, iconSet } = useDoc()
+  return (
+    <IconSetContext value={iconSet}>
+      <PaperSheet palette={palette}>{children}</PaperSheet>
+    </IconSetContext>
+  )
 }
 
 export default function App({ boot }: { boot: Boot }) {
   return (
     <DocProvider boot={boot}>
       <Toolbar />
-      {/* Тема не зависит от состояния постера — она есть и у примера, и в правке,
-          поэтому стоит не в тулбаре, а сама по себе: плавающая кнопка держится
-          в углу окна, пока постер листают. В разметке — сразу за тулбаром, чтобы
-          с клавиатуры до неё доходили раньше самого листа. */}
-      <PaletteSwitcher />
+      {/* Тема и рисунки не зависят от состояния постера — они есть и у примера,
+          и в правке, поэтому стоят не в тулбаре, а сами по себе: плавающие кнопки
+          держатся в углу окна, пока постер листают. В разметке — сразу за
+          тулбаром, чтобы с клавиатуры до них доходили раньше самого листа. */}
+      <FloatingControls />
       <ThemedPaper>
         {/* Лист рассчитан на две страницы A4: по две нумерованные секции на каждой. */}
         <PrintPage>

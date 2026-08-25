@@ -1,3 +1,4 @@
+import type { ICON_SETS } from './model/icons.data'
 import type { PALETTES } from './model/palettes.data'
 
 /**
@@ -9,6 +10,12 @@ import type { PALETTES } from './model/palettes.data'
  * поэтому союз собирается из самого реестра, а не переписывается руками.
  */
 export type PaletteId = (typeof PALETTES)[number][0]
+
+/**
+ * Набор рисунков постера — id из реестра `src/model/icons.ts`. Как и тема,
+ * в бланк не входит: его несёт пометка `i=` в адресе.
+ */
+export type IconSetId = (typeof ICON_SETS)[number][0]
 
 /**
  * Слот темы под секцию: у каждого своя краска плашки, свой цвет текста на ней
