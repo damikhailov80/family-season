@@ -12,7 +12,7 @@ export function MonthGoal() {
     <section aria-labelledby="goal-label" className={styles.wrap}>
       <TargetDoodle className={styles.target} size={72} />
       <SectionBox
-        accent="orange"
+        accent="goal"
         label={LABELS.goal}
         labelId="goal-label"
         className={styles.box}

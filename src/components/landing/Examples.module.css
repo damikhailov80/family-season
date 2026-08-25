@@ -10,20 +10,20 @@
   flex-direction: column;
   gap: 8px;
   padding: 14px;
-  border: 1.5px solid var(--orange);
+  border: 1.5px solid var(--accent-goal);
   border-radius: var(--radius-box);
-  background: color-mix(in srgb, var(--orange) 6%, var(--paper));
+  background: color-mix(in srgb, var(--accent-goal) 6%, var(--paper));
   text-decoration: none;
   color: inherit;
   transition: background-color 0.12s ease;
 }
 
 .card:hover {
-  background: color-mix(in srgb, var(--orange) 14%, var(--paper));
+  background: color-mix(in srgb, var(--accent-goal) 14%, var(--paper));
 }
 
 .card:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
 }
 
@@ -41,7 +41,7 @@
   height: 34px;
   border: 2px solid currentcolor;
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
 }
 
 .title {
@@ -49,7 +49,7 @@
   font-weight: 700;
   font-size: 24px;
   line-height: 1.05;
-  color: var(--orange);
+  color: var(--accent-goal);
 }
 
 /* Состав семьи и «прожитость» сезона: примеры нарочно разной наполненности. */
@@ -72,7 +72,7 @@
   padding-top: 6px;
   font-weight: 700;
   font-size: 13px;
-  color: var(--navy);
+  color: var(--accent-deep);
 }
 
 /* Приписка под карточками: текст слева, кнопка справа. */
@@ -89,36 +89,36 @@
   font-weight: 700;
   font-size: 26px;
   line-height: 1.05;
-  color: var(--navy);
+  color: var(--accent-deep);
 }
 
 .hand {
   font-family: var(--font-hand);
   font-size: 20px;
   line-height: 1.2;
-  color: var(--purple);
+  color: var(--accent-theme);
 }
 
 .ghost {
   display: inline-flex;
   align-items: center;
   padding: 11px 18px;
-  border: 1.5px solid var(--navy);
+  border: 1.5px solid var(--accent-deep);
   border-radius: 8px;
   font-weight: 700;
   font-size: 14px;
   line-height: 1;
-  color: var(--navy);
+  color: var(--accent-deep);
   text-decoration: none;
   transition: background-color 0.12s ease;
 }
 
 .ghost:hover {
-  background: color-mix(in srgb, var(--navy) 10%, transparent);
+  background: color-mix(in srgb, var(--accent-deep) 10%, transparent);
 }
 
 .ghost:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
 }
 

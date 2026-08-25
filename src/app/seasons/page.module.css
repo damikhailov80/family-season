@@ -3,7 +3,7 @@
 }
 
 .rocket {
-  color: var(--orange);
+  color: var(--accent-goal);
   transform: rotate(8deg);
   margin-bottom: 10px;
 }
@@ -13,7 +13,7 @@
   font-weight: 700;
   font-size: clamp(28px, 5vw, 40px);
   line-height: 1.05;
-  color: var(--navy);
+  color: var(--accent-deep);
 }
 
 .text {
@@ -30,7 +30,7 @@
   font-family: var(--font-hand);
   font-size: 21px;
   line-height: 1.25;
-  color: var(--purple);
+  color: var(--accent-theme);
 }
 
 .primary {
@@ -38,10 +38,10 @@
   align-items: center;
   margin-top: 20px;
   padding: 12px 20px;
-  border: 1.5px solid var(--navy);
+  border: 1.5px solid var(--accent-deep);
   border-radius: 8px;
-  background: var(--navy);
-  color: #fff;
+  background: var(--accent-deep);
+  color: var(--on-accent);
   font-weight: 700;
   font-size: 14px;
   line-height: 1;
@@ -50,10 +50,10 @@
 }
 
 .primary:hover {
-  background: color-mix(in srgb, var(--navy) 85%, #000);
+  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
 }
 
 .primary:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
 }

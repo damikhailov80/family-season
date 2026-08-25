@@ -38,33 +38,33 @@
   padding: 9px 14px;
   border-radius: 8px;
   cursor: pointer;
-  border: 1.5px solid var(--navy);
+  border: 1.5px solid var(--accent-deep);
   transition:
     background-color 0.12s ease,
     color 0.12s ease;
 }
 
 .primary {
-  background: var(--navy);
-  color: #fff;
+  background: var(--accent-deep);
+  color: var(--on-accent);
 }
 
 .ghost {
   background: transparent;
-  color: var(--navy);
+  color: var(--accent-deep);
 }
 
 .primary:hover {
-  background: color-mix(in srgb, var(--navy) 85%, #000);
+  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
 }
 
 .ghost:hover {
-  background: color-mix(in srgb, var(--navy) 10%, transparent);
+  background: color-mix(in srgb, var(--accent-deep) 10%, transparent);
 }
 
 .primary:focus-visible,
 .ghost:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
 }
 

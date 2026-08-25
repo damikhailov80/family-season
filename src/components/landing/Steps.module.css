@@ -1,5 +1,5 @@
 .section {
-  --accent-soft: color-mix(in srgb, var(--green) 5%, var(--paper));
+  --accent-soft: color-mix(in srgb, var(--accent-weeks) 5%, var(--paper));
 }
 
 .grid {
@@ -19,7 +19,7 @@
   align-items: center;
   gap: 4px;
   padding: 24px 14px 18px;
-  border: 1.5px solid var(--green);
+  border: 1.5px solid var(--accent-weeks);
   border-radius: var(--radius-box);
   background: var(--accent-soft);
   text-align: center;
@@ -36,8 +36,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--green);
-  color: #fff;
+  background: var(--accent-weeks);
+  color: var(--on-accent);
   font-weight: 800;
   font-size: 13px;
 }
@@ -48,7 +48,7 @@
   place-items: center;
   height: 52px;
   margin-bottom: 4px;
-  color: var(--green);
+  color: var(--accent-weeks);
 }
 
 .title {
@@ -56,7 +56,7 @@
   font-weight: 700;
   font-size: 23px;
   line-height: 1.1;
-  color: var(--navy);
+  color: var(--accent-deep);
   /*
    * Место под две строки, чтобы тексты карточек начинались на одной высоте.
    * Прижимаем к низу слота: у однострочных заголовков запас уходит наверх,

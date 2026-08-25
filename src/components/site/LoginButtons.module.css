@@ -12,7 +12,7 @@
   padding: 8px 13px;
   border-radius: 8px;
   border: 1.5px solid var(--sheet-border);
-  background: #fff;
+  background: var(--surface);
   color: var(--ink-soft);
   font-family: var(--font-ui);
   font-weight: 700;
@@ -25,12 +25,12 @@
 }
 
 .button:hover {
-  border-color: var(--navy);
-  background: color-mix(in srgb, var(--navy) 6%, #fff);
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
 }
 
 .button:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
 }
 
@@ -38,7 +38,7 @@
   font-family: var(--font-hand);
   font-size: 19px;
   line-height: 1.15;
-  color: var(--purple);
+  color: var(--accent-theme);
 }
 
 @media (max-width: 560px) {

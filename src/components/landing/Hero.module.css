@@ -31,7 +31,7 @@
 }
 
 .rays {
-  color: var(--yellow);
+  color: var(--accent-warm);
   flex: none;
 }
 
@@ -44,15 +44,15 @@
   font-weight: 700;
   font-size: clamp(38px, 7vw, 66px);
   line-height: 1;
-  color: var(--navy);
+  color: var(--accent-deep);
   text-transform: uppercase;
   letter-spacing: 0.01em;
 }
 
 /* Та же «лента», что и на самом листе: лёгкая кривизна вместо ровного прямоугольника. */
 .ribbon {
-  background: var(--navy);
-  color: #fff;
+  background: var(--accent-deep);
+  color: var(--on-accent);
   font-weight: 700;
   font-size: clamp(11px, 1.6vw, 14px);
   letter-spacing: 0.08em;
@@ -71,7 +71,7 @@
 .hand {
   font-family: var(--font-hand);
   font-size: 22px;
-  color: var(--purple);
+  color: var(--accent-theme);
 }
 
 .actions {
@@ -94,31 +94,31 @@
   padding: 13px 22px;
   border-radius: 8px;
   cursor: pointer;
-  border: 1.5px solid var(--navy);
+  border: 1.5px solid var(--accent-deep);
   transition: background-color 0.12s ease;
 }
 
 .primary {
-  background: var(--navy);
-  color: #fff;
+  background: var(--accent-deep);
+  color: var(--on-accent);
 }
 
 .ghost {
   background: transparent;
-  color: var(--navy);
+  color: var(--accent-deep);
 }
 
 .primary:hover {
-  background: color-mix(in srgb, var(--navy) 85%, #000);
+  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
 }
 
 .ghost:hover {
-  background: color-mix(in srgb, var(--navy) 10%, transparent);
+  background: color-mix(in srgb, var(--accent-deep) 10%, transparent);
 }
 
 .primary:focus-visible,
 .ghost:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
 }
 

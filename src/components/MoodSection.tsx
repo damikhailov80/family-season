@@ -1,4 +1,3 @@
-import { ACCENT_BY_FACE } from '../model/accents'
 import { moodValues } from '../model/fill'
 import { LABELS, MOOD_LEGEND } from '../model/labels'
 import { useDoc } from '../state/docContext'
@@ -14,7 +13,7 @@ export function MoodSection() {
   return (
     <section aria-labelledby="mood-label" className={styles.section}>
       <div className={styles.head}>
-        <Badge accent="purple">
+        <Badge accent="theme">
           <span id="mood-label">{LABELS.mood}</span>
         </Badge>
         <ul className={styles.legend}>
@@ -49,7 +48,7 @@ export function MoodSection() {
                   scope="row"
                   className={styles.who}
                   style={
-                    { '--accent': `var(--${ACCENT_BY_FACE[person.face]})` } as React.CSSProperties
+                    { '--accent': `var(--person-${person.face})` } as React.CSSProperties
                   }
                 >
                   <AvatarFace variant={person.face} size={20} className={styles.whoFace} />

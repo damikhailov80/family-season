@@ -1,3 +1,4 @@
+import { PALETTE_LABELS, PALETTE_ORDER } from '../../model/palettes'
 import { SectionBox } from '../SectionBox'
 import { SparkStar } from '../doodles'
 import styles from './Inside.module.css'
@@ -13,7 +14,7 @@ const PARTS = [
 export function Inside() {
   return (
     <SectionBox
-      accent="purple"
+      accent="theme"
       label="Что на постере"
       note="две страницы A4"
       className={styles.section}
@@ -27,6 +28,25 @@ export function Inside() {
           </li>
         ))}
       </ul>
+      {/* Каждый свотч несёт свой data-palette и потому красится своими же
+          переменными — цвета набора нигде не дублируются. */}
+      <div className={styles.palettes}>
+        <h3 className={styles.palettesTitle}>Пять тем оформления</h3>
+        <ul className={styles.swatches}>
+          {PALETTE_ORDER.map((palette) => (
+            <li className={styles.swatchItem} key={palette}>
+              <span className={styles.swatch} data-palette={palette} aria-hidden="true" />
+              {PALETTE_LABELS[palette]}
+            </li>
+          ))}
+        </ul>
+        <p className={styles.text}>
+          Тему выбирают в правке, и она уезжает в ссылку вместе с сезоном: у близких
+          постер откроется в тех же цветах. Каждую тему задают две краски — остальные
+          цвета листа выводятся из них.
+        </p>
+      </div>
+
       <p className={styles.footnote}>
         Печатается всегда чистый постер: шкалы на нуле, клетки настроений пустые, поля под
         заметки — свободные. Остальное впишет сам месяц, от руки.

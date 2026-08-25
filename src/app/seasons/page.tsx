@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function SeasonsPage() {
   return (
     <PaperSheet>
-      <SectionBox accent="navy" label="Мои сезоны" note="скоро" className={styles.section}>
+      <SectionBox accent="deep" label="Мои сезоны" note="скоро" className={styles.section}>
         <RocketDoodle className={styles.rocket} size={54} />
         <h1 className={styles.title}>Здесь появятся ваши сезоны</h1>
         <p className={styles.text}>

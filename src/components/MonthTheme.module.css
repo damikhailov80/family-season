@@ -18,7 +18,7 @@
   top: 4px;
   width: 92px;
   height: 96px;
-  color: var(--orange);
+  color: var(--accent-goal);
 }
 
 .starBig {
@@ -56,14 +56,14 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1.5px solid var(--purple);
+  border: 1.5px solid var(--accent-theme);
   background: transparent;
-  color: var(--purple);
+  color: var(--accent-theme);
   cursor: pointer;
 }
 
 .monthNav:hover {
-  background: color-mix(in srgb, var(--purple) 12%, transparent);
+  background: color-mix(in srgb, var(--accent-theme) 12%, transparent);
 }
 
 .year {
@@ -101,7 +101,7 @@
   line-height: 1.1;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--purple);
+  color: var(--accent-theme);
   margin-top: 4px;
 }
 
@@ -110,7 +110,7 @@
   position: relative;
   margin: 30px 10px 0;
   min-height: 260px;
-  border: 1.5px solid var(--purple);
+  border: 1.5px solid var(--accent-theme);
   border-radius: 10px;
   padding: 18px 18px 16px;
 }

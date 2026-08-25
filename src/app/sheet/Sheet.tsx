@@ -8,14 +8,23 @@ import {
   readFillId,
   readHashPayload,
   readNewFlag,
+  readPaletteId,
 } from '../../model/codec'
 import { DEFAULT_EXAMPLE_ID, exampleById, knownExampleId } from '../../model/examples'
 import { modeFromPath } from '../../model/site'
+import { DEFAULT_PALETTE } from '../../model/palettes'
 import { createEmptyTemplate } from '../../model/templates'
 import type { Boot } from '../../state/DocProvider'
 
 function exampleBoot(id: string): Boot {
-  return { template: exampleById(id)!.template(), fillId: id, mode: 'view' }
+  const example = exampleById(id)!
+  // Тема примера — его собственная, но `p=` в адресе сильнее.
+  return {
+    template: example.template(),
+    fillId: id,
+    palette: readPaletteId() ?? example.palette,
+    mode: 'view',
+  }
 }
 
 /**
@@ -29,6 +38,9 @@ function exampleBoot(id: string): Boot {
  *   /sheet/edit#d=…       — он же в правке
  *   /sheet/edit           — пустой бланк «с нуля»
  *
+ * К любому из них можно дописать `&p=<тема>` — она перебивает тему примера.
+ * Пометки нет — тема по умолчанию. Список тем — `src/model/palettes.ts`.
+ *
  * Пример не правится: `data=<id>` перебивает путь и оставляет просмотр. Приведением
  * адреса к этим правилам занимается DocProvider — здесь только чтение.
  */
@@ -38,7 +50,12 @@ function initialBoot(): Boot | null {
   if (fillId) return exampleBoot(fillId)
   // `new=1` — легаси-адрес кнопок «Собрать свой сезон», теперь это голый /sheet/edit.
   if (modeFromPath() === 'edit' || readNewFlag()) {
-    return { template: createEmptyTemplate(), fillId: null, mode: 'edit' }
+    return {
+      template: createEmptyTemplate(),
+      fillId: null,
+      palette: readPaletteId() ?? DEFAULT_PALETTE,
+      mode: 'edit',
+    }
   }
   return exampleBoot(DEFAULT_EXAMPLE_ID)
 }
@@ -63,6 +80,7 @@ export default function Sheet() {
       setBoot({
         template,
         fillId,
+        palette: readPaletteId() ?? (fillId ? exampleById(fillId)!.palette : DEFAULT_PALETTE),
         // `edit=1` — легаси-пометка ссылок форка; сегодня режим несёт путь.
         mode: fillId ? 'view' : readEditFlag() ? 'edit' : modeFromPath(),
       })

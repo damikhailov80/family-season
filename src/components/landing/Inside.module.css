@@ -7,7 +7,7 @@
 .star {
   position: absolute;
   right: 44px;
-  color: var(--yellow);
+  color: var(--accent-warm);
   transform: rotate(-12deg);
 }
 
@@ -21,7 +21,7 @@
 }
 
 .item {
-  border-left: 2px solid color-mix(in srgb, var(--purple) 35%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--accent-theme) 35%, transparent);
   padding-left: 14px;
 }
 
@@ -30,7 +30,7 @@
   font-weight: 700;
   font-size: 24px;
   line-height: 1.1;
-  color: var(--purple);
+  color: var(--accent-theme);
 }
 
 /* Рукописный шрифт — как заполненный от руки текст на самом листе. */
@@ -44,10 +44,57 @@
 .footnote {
   margin-top: 18px;
   padding-top: 14px;
-  border-top: 1px solid color-mix(in srgb, var(--purple) 30%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--accent-theme) 30%, transparent);
   font-size: 14px;
   line-height: 1.45;
   color: var(--ink-muted);
+}
+
+.palettes {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--accent-theme) 30%, transparent);
+}
+
+.palettesTitle {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.1;
+  color: var(--accent-theme);
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 10px 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Подпись и свотч — одна строка: на глаз имя и цвет должны читаться вместе. */
+.swatchItem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--sheet-border);
+  background: linear-gradient(
+    135deg,
+    var(--accent-deep) 0 34%,
+    var(--accent-theme) 0 67%,
+    var(--accent-goal) 0
+  );
 }
 
 @media (max-width: 640px) {

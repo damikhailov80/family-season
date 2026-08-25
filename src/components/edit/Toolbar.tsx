@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDoc } from '../../state/docContext'
+import { PaletteSwitcher } from './PaletteSwitcher'
 import styles from './Toolbar.module.css'
 
 /**
@@ -71,6 +72,7 @@ export function Toolbar() {
       <button type="button" className={styles.ghost} onClick={() => print()}>
         Печать / PDF
       </button>
+      {editing && <PaletteSwitcher />}
     </div>
   )
 }

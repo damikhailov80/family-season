@@ -1,8 +1,9 @@
 import demo1 from '../data/examples/demo-1.json'
 import demo2 from '../data/examples/demo-2.json'
 import demo3 from '../data/examples/demo-3.json'
-import type { FaceVariant } from '../types'
+import type { FaceVariant, PaletteId } from '../types'
 import { FACE_ORDER } from './accents'
+import { knownPalette } from './palettes'
 import { normalizeTemplate } from './codec'
 import { normalizeFill } from './fill'
 import type { FillState, Template } from './types'
@@ -16,6 +17,9 @@ import { EMPTY_FILL } from './types'
  *   template — бланк, он печатается и умещается в ссылку;
  *   fill     — заполнение (настроения, проценты, итоги, фото), на бумагу не идёт.
  *
+ * `palette` лежит рядом с ними, а не внутри бланка: тема — оформление постера,
+ * в ссылке её несёт отдельная пометка `p=`.
+ *
  * Месяца в JSON нет: `normalizeTemplate` подставляет его от «сегодня», поэтому шаблон
  * собирается лениво, при открытии примера, а не при загрузке модуля — иначе пример
  * «протух» бы на этапе сборки статических страниц.
@@ -25,6 +29,7 @@ interface RawExample {
   name: string
   summary: string
   note: string
+  palette: unknown
   template: unknown
   fill: unknown
 }
@@ -39,6 +44,8 @@ export interface Example {
   template: () => Template
   fill: FillState
   faces: FaceVariant[]
+  /** Тема, в которой показывается пример; `p=` в адресе её перебивает. */
+  palette: PaletteId
 }
 
 const RAW: Record<string, RawExample> = {
@@ -67,6 +74,7 @@ const EXAMPLES: Record<string, Example> = Object.fromEntries(
       template: () => normalizeTemplate(raw.template),
       fill: normalizeFill(raw.fill),
       faces: facesOf(raw),
+      palette: knownPalette(raw.palette),
     },
   ]),
 )

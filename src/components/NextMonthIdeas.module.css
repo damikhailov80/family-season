@@ -7,7 +7,7 @@
 .star {
   flex: none;
   align-self: center;
-  color: var(--orange);
+  color: var(--accent-goal);
   transform: rotate(-12deg);
 }
 

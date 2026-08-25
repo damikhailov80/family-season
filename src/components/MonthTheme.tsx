@@ -13,7 +13,7 @@ export function MonthTheme() {
   return (
     <section aria-labelledby="theme-label" className={styles.section}>
       <SectionBox
-        accent="purple"
+        accent="theme"
         label={LABELS.theme}
         labelId="theme-label"
         bodyClassName={styles.body}
@@ -70,7 +70,7 @@ export function MonthTheme() {
 
         {/* Итоги месяца: вопрос из шаблона, ответ вписывают руками (слой заполнения). */}
         <div className={styles.answerBox}>
-          <Badge accent="purple" size="sm" className={styles.answerBadge}>
+          <Badge accent="theme" size="sm" className={styles.answerBadge}>
             {LABELS.themeSummary}
           </Badge>
           <EditableText

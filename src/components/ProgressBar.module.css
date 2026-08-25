@@ -3,8 +3,8 @@
   flex: 1;
   min-width: 90px;
   height: 22px;
-  border: 2px solid #1a1a1a;
-  background: #fff;
+  border: 2px solid var(--ink);
+  background: var(--surface);
   padding: 2px;
 }
 
@@ -33,5 +33,5 @@
 }
 
 .tick + .tick {
-  border-left: 1px solid rgb(26 26 26 / 45%);
+  border-left: 1px solid color-mix(in srgb, var(--ink) 45%, transparent);
 }

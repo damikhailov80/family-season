@@ -1,4 +1,3 @@
-import { ACCENT_BY_FACE } from '../../model/accents'
 import { EXAMPLE_LIST } from '../../model/examples'
 import { exampleHref, ROUTES } from '../../model/site'
 import { AvatarFace } from '../AvatarFace'
@@ -7,17 +6,17 @@ import styles from './Examples.module.css'
 
 export function Examples() {
   return (
-    <SectionBox accent="orange" label="Примеры" note="три сезона, все разные">
+    <SectionBox accent="goal" label="Примеры" note="три сезона, все разные">
       <div className={styles.grid}>
         {/* Обычная <a>, а не next/link: лист ведёт историю сам, см. комментарий в Hero. */}
         {EXAMPLE_LIST.map((example) => (
-          <a className={styles.card} key={example.id} href={exampleHref(example.id)}>
+          <a className={styles.card} key={example.id} href={exampleHref(example.id, example.palette)}>
             <div className={styles.faces}>
               {example.faces.map((face, index) => (
                 <span
                   className={styles.face}
                   key={`${face}-${index}`}
-                  style={{ color: `var(--${ACCENT_BY_FACE[face]})` }}
+                  style={{ color: `var(--person-${face})` }}
                 >
                   <AvatarFace variant={face} size={26} />
                 </span>

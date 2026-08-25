@@ -1,5 +1,7 @@
 import { FACE_ORDER } from './accents'
 import { pickTargetMonth } from './calendar'
+import { paletteOrNull } from './palettes'
+import type { PaletteId } from '../types'
 import type { Person, Template } from './types'
 import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
 
@@ -9,22 +11,29 @@ import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
  * Порядок: компактный позиционный массив -> JSON -> deflate-raw -> base64url.
  * Имена полей в ссылку не едут, поэтому пример укладывается примерно в 700 байт.
  *
+ * В блоб едет только бланк. Тема оформления — отдельная пометка `p=` рядом с ним
+ * (см. `readPaletteId`): её меняют чаще всего и хотят видеть в адресе. Дублировать
+ * её ещё и внутри `d=` нельзя — две копии одного значения обязательно разойдутся.
+ *
  *   2z — сжато (CompressionStream есть в браузере)
  *   2p — тот же JSON без сжатия (запасной путь для старых браузеров)
  *
  * Формат 1 читается тоже: в нём у темы месяца был собственный ответ, а у итогов
  * отдельный вопрос. Оба поля ушли — ответ стал слоем заполнения, а последняя
- * секция превратилась в «Идеи на следующий месяц» без вопроса.
+ * секция превратилась в «Идеи на следующий месяц» без вопроса. Формат 3 недолго
+ * возил тему хвостом; такие ссылки читаются, лишний хвост просто игнорируется.
  */
 
 const HASH_PARAM = 'd'
 const DATA_PARAM = 'data'
+const PALETTE_PARAM = 'p'
 const EDIT_PARAM = 'edit'
 const NEW_PARAM = 'new'
 const PACKED = '2z'
 const PLAIN = '2p'
-const PACKED_V1 = '1z'
-const PLAIN_V1 = '1p'
+/** Читаемые форматы прошлых версий: ссылку могли отправить давно. */
+const LEGACY = ['3z', '3p', '1z', '1p']
+const COMPRESSED = [PACKED, '3z', '1z']
 
 const MAX_TEXT = 400
 
@@ -62,7 +71,7 @@ function pack(template: Template): Packed {
   ]
 }
 
-/** Позиции полей совпадают у обоих форматов — лишние хвосты просто игнорируются. */
+/** Позиции полей совпадают у всех форматов — лишние хвосты просто игнорируются. */
 function unpack(packed: Packed): Template {
   const [, header, theme, weeksNote, weeks, projectsNote, goal, people] = packed
   return normalizeTemplate({
@@ -189,15 +198,16 @@ export async function decodeTemplate(payload: string): Promise<Template | null> 
   try {
     const version = payload.slice(0, 2)
     const body = payload.slice(2)
-    const known = [PACKED, PLAIN, PACKED_V1, PLAIN_V1]
-    if (!known.includes(version)) return null
+    if (version !== PACKED && version !== PLAIN && !LEGACY.includes(version)) return null
 
     let bytes = fromBase64Url(body)
-    if (version === PACKED || version === PACKED_V1) {
+    if (COMPRESSED.includes(version)) {
       bytes = await through(bytes, new DecompressionStream('deflate-raw'))
     }
     const parsed = JSON.parse(new TextDecoder().decode(bytes)) as Packed
-    if (!Array.isArray(parsed) || (parsed[0] !== 2 && (parsed[0] as number) !== 1)) return null
+    if (!Array.isArray(parsed)) return null
+    const format = parsed[0] as number
+    if (!(format >= 1 && format <= 3)) return null
     return unpack(parsed)
   } catch {
     // Битую ссылку не чиним и не роняем приложение — показываем демо.
@@ -237,6 +247,26 @@ export function readNewFlag(hash: string = location.hash): boolean {
   return new URLSearchParams(hash.replace(/^#/, '')).get(NEW_PARAM) === '1'
 }
 
-export function hashFor(payload: string, fillId: string | null = null): string {
-  return `#${HASH_PARAM}=${payload}${fillId ? `&${DATA_PARAM}=${fillId}` : ''}`
+/**
+ * `p=<id>` — тема оформления, единственное хранилище темы: `#d=…&p=jungle`.
+ * Список id — `src/model/palettes.ts`. Пометки нет или id неизвестен — тема
+ * по умолчанию, поэтому ссылки, разосланные до появления тем, открываются
+ * «Классикой», ровно такими, какими их отправляли.
+ */
+export function readPaletteId(hash: string = location.hash): PaletteId | null {
+  return paletteOrNull(new URLSearchParams(hash.replace(/^#/, '')).get(PALETTE_PARAM))
+}
+
+/**
+ * Тему пишем всегда, даже когда она по умолчанию: её для того и вынесли из блоба,
+ * чтобы она была видна в адресе и правилась руками. Читается и без неё — см.
+ * `readPaletteId`, поэтому старые ссылки без `p=` открываются как прежде.
+ */
+export function hashFor(
+  payload: string,
+  palette: PaletteId,
+  fillId: string | null = null,
+): string {
+  const data = fillId ? `&${DATA_PARAM}=${fillId}` : ''
+  return `#${HASH_PARAM}=${payload}&${PALETTE_PARAM}=${palette}${data}`
 }

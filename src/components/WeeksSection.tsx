@@ -11,7 +11,7 @@ export function WeeksSection() {
   return (
     <section aria-labelledby="weeks-label" className={styles.section}>
       <SectionBox
-        accent="green"
+        accent="weeks"
         label={LABELS.weeks}
         labelId="weeks-label"
         note={

@@ -1,7 +1,7 @@
 .badge {
   display: inline-block;
   background: var(--badge-color);
-  color: #fff;
+  color: var(--on-accent);
   font-family: var(--font-ui);
   font-weight: 800;
   text-transform: uppercase;

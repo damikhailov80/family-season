@@ -16,7 +16,7 @@ export function NextMonthIdeas() {
       <SparkStar className={styles.star} size={44} />
 
       <SectionBox
-        accent="purple"
+        accent="theme"
         label={LABELS.nextIdeas}
         labelId="ideas-label"
         className={styles.box}

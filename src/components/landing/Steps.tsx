@@ -31,7 +31,7 @@ const STEPS = [
 
 export function Steps() {
   return (
-    <SectionBox accent="green" label="Как собрать сезон" note="четыре шага" className={styles.section}>
+    <SectionBox accent="weeks" label="Как собрать сезон" note="четыре шага" className={styles.section}>
       <ol className={styles.grid}>
         {STEPS.map(({ Doodle, size, title, text }, index) => (
           <li className={styles.step} key={title}>

@@ -8,7 +8,7 @@
 .card {
   display: flex;
   flex-direction: column;
-  border: 1.5px solid var(--green);
+  border: 1.5px solid var(--accent-weeks);
   border-radius: 8px;
   background: var(--paper);
   overflow: hidden;
@@ -16,9 +16,9 @@
 }
 
 .cardTitle {
-  background: #e6efdb;
-  border-bottom: 1.5px solid var(--green);
-  color: var(--green);
+  background: color-mix(in srgb, var(--accent-weeks) 18%, var(--paper));
+  border-bottom: 1.5px solid var(--accent-weeks);
+  color: var(--accent-weeks);
   font-family: var(--font-ui);
   font-weight: 800;
   font-size: 14px;

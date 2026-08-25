@@ -8,11 +8,14 @@ import {
   readFillId,
   readHashPayload,
   readNewFlag,
+  readPaletteId,
 } from '../model/codec'
 import { templateDays } from '../model/fill'
 import { DEFAULT_EXAMPLE_ID, exampleById, fillOf, knownExampleId } from '../model/examples'
 import { modeFromPath, pathForMode, ROUTES } from '../model/site'
+import { DEFAULT_PALETTE } from '../model/palettes'
 import { createEmptyTemplate, createPerson, nextPersonId } from '../model/templates'
+import type { PaletteId } from '../types'
 import type { Template } from '../model/types'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
 import type { DocMode, DocSource, DocValue } from './docContext'
@@ -22,6 +25,8 @@ export interface Boot {
   template: Template
   /** id набора заполнения из `data=`; null — свой лист, слой заполнения пуст. */
   fillId: string | null
+  /** Тема из `p=`; пометки нет — тема по умолчанию. Частью бланка она не является. */
+  palette: PaletteId
   mode: DocMode
 }
 
@@ -98,6 +103,7 @@ function getByPath(template: Template, path: string): string {
 export function DocProvider({ boot, children }: { boot: Boot; children: React.ReactNode }) {
   const [template, setTemplate] = useState<Template>(boot.template)
   const [fillId, setFillId] = useState<string | null>(boot.fillId)
+  const [palette, setPalette] = useState<PaletteId>(boot.palette)
   const [mode, setMode] = useState<DocMode>(boot.mode)
 
   /**
@@ -114,7 +120,10 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
   const editSession = useRef<number | null>(null)
 
   const showExample = useCallback((id: string) => {
-    setTemplate(exampleById(id)!.template())
+    const example = exampleById(id)!
+    setTemplate(example.template())
+    // Тема примера — его собственная, но `p=` в адресе сильнее.
+    setPalette(readPaletteId() ?? example.palette)
     setFillId(id)
     setMode('view')
     syncPath('view', id)
@@ -157,6 +166,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         // Голый /sheet/edit — пустой бланк; `new=1` тот же адрес в легаси-виде.
         if (modeFromPath() === 'edit' || readNewFlag()) {
           setTemplate(createEmptyTemplate())
+          setPalette(readPaletteId() ?? DEFAULT_PALETTE)
           setFillId(null)
           setMode('edit')
           syncPath('edit', null)
@@ -175,6 +185,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         // Пример не правится: `data=` перебивает путь и оставляет просмотр.
         const nextMode: DocMode = id ? 'view' : modeFromPath()
         setTemplate(next)
+        setPalette(readPaletteId() ?? (id ? exampleById(id)!.palette : DEFAULT_PALETTE))
         setFillId(id)
         setMode(nextMode)
         syncPath(nextMode, id)
@@ -210,8 +221,8 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       () => {
         void encodeTemplate(template).then((payload) => {
           if (cancelled || navSeq.current !== seq) return
-          if (fillId) setForkLink(ROUTES.sheetEdit + hashFor(payload))
-          const hash = hashFor(payload, fillId)
+          if (fillId) setForkLink(ROUTES.sheetEdit + hashFor(payload, palette))
+          const hash = hashFor(payload, palette, fillId)
           if (hash === location.hash) return
           // history.state обязателен: null затёр бы пометки своей записи.
           history.replaceState(history.state, '', hash)
@@ -224,7 +235,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       cancelled = true
       clearTimeout(timer)
     }
-  }, [template, fillId, mode])
+  }, [template, fillId, palette, mode])
 
   const source: DocSource = fillId ? 'demo' : 'custom'
   const fill = fillOf(fillId)
@@ -244,11 +255,15 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
 
   // Форк — единственный переход, добавляющий запись «свой лист»: «назад» из него
   // возвращает к примеру.
-  const startCustom = useCallback(async (next: Template) => {
+  const startCustom = useCallback(async (next: Template, nextPalette: PaletteId) => {
     const payload = await encodeTemplate(next)
     navSeq.current += 1
     editSession.current = null
-    history.pushState(entryState({ own: true }), '', ROUTES.sheetEdit + hashFor(payload))
+    history.pushState(
+      entryState({ own: true }),
+      '',
+      ROUTES.sheetEdit + hashFor(payload, nextPalette),
+    )
     setTemplate(next)
     setFillId(null)
     setMode('edit')
@@ -283,13 +298,14 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     const payload = await encodeTemplate(template)
     navSeq.current += 1
     editSession.current = null
-    history.pushState(entryState({}), '', ROUTES.sheet + hashFor(payload))
+    history.pushState(entryState({}), '', ROUTES.sheet + hashFor(payload, palette))
     setMode('view')
-  }, [template])
+  }, [template, palette])
 
   const value = useMemo<DocValue>(
     () => ({
       template,
+      palette,
       fill,
       mode,
       source,
@@ -302,7 +318,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         if (next === 'edit') enterEdit()
         else void leaveEdit()
       },
-      fork: () => void startCustom(structuredClone(template)),
+      fork: () => void startCustom(structuredClone(template), palette),
       openDemo: () => {
         // Свой лист остаётся в истории впереди: «вперёд» вернёт его целиком.
         if (isOwnEntry()) {
@@ -344,14 +360,16 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
           ...current,
           theme: { ...current.theme, ...shiftMonth(current.theme, delta) },
         })),
+      setPalette,
       buildShareUrl: async () => {
         const payload = await encodeTemplate(template)
         // Присланная ссылка всегда открывается в просмотре и без набора заполнения.
-        return `${location.origin}${ROUTES.sheet}${hashFor(payload)}`
+        return `${location.origin}${ROUTES.sheet}${hashFor(payload, palette)}`
       },
     }),
     [
       template,
+      palette,
       fill,
       mode,
       source,

@@ -1,9 +1,9 @@
-import type { AccentColor } from '../types'
+import type { AccentSlot } from '../types'
 import { Badge } from './Badge'
 import styles from './SectionBox.module.css'
 
 interface SectionBoxProps {
-  accent: AccentColor
+  accent: AccentSlot
   label?: string
   /** Подпись справа от плашки (курсивом, как на макете). */
   note?: React.ReactNode
@@ -29,7 +29,7 @@ export function SectionBox({
   return (
     <div
       className={[styles.box, className].filter(Boolean).join(' ')}
-      style={{ '--accent': `var(--${accent})` } as React.CSSProperties}
+      style={{ '--accent': `var(--accent-${accent})` } as React.CSSProperties}
     >
       {(label || note) && (
         <div className={styles.head}>

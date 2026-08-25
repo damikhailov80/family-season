@@ -22,11 +22,11 @@
   gap: 8px;
   margin-right: auto;
   text-decoration: none;
-  color: var(--navy);
+  color: var(--accent-deep);
 }
 
 .brandHeart {
-  color: var(--pink);
+  color: var(--person-mom);
   transform: rotate(-8deg);
 }
 
@@ -51,18 +51,18 @@
   font-weight: 700;
   font-size: 13px;
   line-height: 1;
-  color: var(--navy);
+  color: var(--accent-deep);
   text-decoration: none;
   transition: background-color 0.12s ease;
 }
 
 .link:hover {
-  background: color-mix(in srgb, var(--navy) 10%, transparent);
+  background: color-mix(in srgb, var(--accent-deep) 10%, transparent);
 }
 
 .link:focus-visible,
 .action:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--purple) 60%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
 }
 
@@ -73,18 +73,18 @@
   align-items: center;
   margin-left: 4px;
   padding: 7px 13px;
-  border: 1.5px dashed var(--navy);
+  border: 1.5px dashed var(--accent-deep);
   border-radius: 8px;
   font-weight: 700;
   font-size: 13px;
   line-height: 1;
-  color: var(--navy);
+  color: var(--accent-deep);
   text-decoration: none;
   transition: background-color 0.12s ease;
 }
 
 .action:hover {
-  background: color-mix(in srgb, var(--navy) 8%, transparent);
+  background: color-mix(in srgb, var(--accent-deep) 8%, transparent);
 }
 
 @media (max-width: 560px) {

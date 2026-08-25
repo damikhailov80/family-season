@@ -1,4 +1,4 @@
-import { ACCENT_BY_FACE, FACE_LABELS } from '../model/accents'
+import { FACE_LABELS } from '../model/accents'
 import { percentFor } from '../model/fill'
 import { LABELS, PLACEHOLDERS } from '../model/labels'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
@@ -17,7 +17,7 @@ export function ProjectsSection() {
   return (
     <section aria-labelledby="projects-label" className={styles.section}>
       <div className={styles.head}>
-        <Badge accent="blue">
+        <Badge accent="projects">
           <span id="projects-label">{LABELS.projects}</span>
         </Badge>
         <EditableText
@@ -35,7 +35,7 @@ export function ProjectsSection() {
             <article
               key={person.id}
               className={styles.row}
-              style={{ '--accent': `var(--${ACCENT_BY_FACE[person.face]})` } as React.CSSProperties}
+              style={{ '--accent': `var(--person-${person.face})` } as React.CSSProperties}
             >
               <div className={styles.avatarBlock}>
                 {editing ? (
