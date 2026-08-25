@@ -1,3 +1,4 @@
+import { QR_URL } from './qr.data'
 import type { PaletteId } from '../types'
 
 /**
@@ -6,6 +7,16 @@ import type { PaletteId } from '../types'
  */
 
 export const CONTACT_EMAIL = 'smart.scriptorium+familyseason.online@gmail.com'
+
+/**
+ * Адрес сайта — там, где ссылка должна быть абсолютной и не зависеть от того,
+ * откуда открыт лист: сейчас это QR на постере, распечатку читают вне браузера.
+ *
+ * Значение приходит из `tools/qr/source.json` через собранный `qr.data.ts`, а не
+ * объявлено здесь: код собран ровно из этой строки, и вторая копия адреса рано
+ * или поздно разойдётся с ней — QR молча поведёт не туда.
+ */
+export const SITE_URL = QR_URL
 
 export const ROUTES = {
   home: '/',

@@ -1,0 +1,17 @@
+/**
+ * QR-код постера. Файл собирается: tools/qr/build.mjs (npm run qr), руками его
+ * не правят — правят tools/qr/source.json и пересобирают.
+ *
+ * Собран для адреса ниже с коррекцией M и тихой зоной 4 модуля.
+ * Рисует его src/components/QrCode.tsx, ставит на лист MonthGoal.tsx.
+ */
+
+/** Адрес, зашитый в код. Он же единственный источник `SITE_URL` (см. site.ts). */
+export const QR_URL = 'https://www.familyseason.online/'
+
+/** Сторона `viewBox`: 29 модулей кода плюс тихая зона с обеих сторон. */
+export const QR_SIZE = 37
+
+/** Тёмные модули одним путём; соседние в строке склеены в прямоугольники. */
+export const QR_PATH =
+  'M4 4h7v1h-7zM19 4h2v1h-2zM22 4h1v1h-1zM26 4h7v1h-7zM4 5h1v1h-1zM10 5h1v1h-1zM12 5h1v1h-1zM14 5h2v1h-2zM17 5h2v1h-2zM20 5h2v1h-2zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM4 6h1v1h-1zM6 6h3v1h-3zM10 6h1v1h-1zM12 6h6v1h-6zM19 6h1v1h-1zM23 6h1v1h-1zM26 6h1v1h-1zM28 6h3v1h-3zM32 6h1v1h-1zM4 7h1v1h-1zM6 7h3v1h-3zM10 7h1v1h-1zM12 7h2v1h-2zM20 7h2v1h-2zM26 7h1v1h-1zM28 7h3v1h-3zM32 7h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM10 8h1v1h-1zM15 8h1v1h-1zM19 8h6v1h-6zM26 8h1v1h-1zM28 8h3v1h-3zM32 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM13 9h1v1h-1zM15 9h2v1h-2zM19 9h1v1h-1zM21 9h1v1h-1zM24 9h1v1h-1zM26 9h1v1h-1zM32 9h1v1h-1zM4 10h7v1h-7zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h7v1h-7zM12 11h1v1h-1zM18 11h3v1h-3zM22 11h1v1h-1zM4 12h1v1h-1zM10 12h1v1h-1zM12 12h1v1h-1zM20 12h3v1h-3zM25 12h2v1h-2zM29 12h3v1h-3zM7 13h2v1h-2zM11 13h1v1h-1zM13 13h1v1h-1zM15 13h3v1h-3zM20 13h4v1h-4zM27 13h2v1h-2zM30 13h2v1h-2zM4 14h1v1h-1zM9 14h2v1h-2zM12 14h1v1h-1zM14 14h2v1h-2zM17 14h5v1h-5zM24 14h1v1h-1zM4 15h3v1h-3zM8 15h1v1h-1zM11 15h2v1h-2zM16 15h2v1h-2zM22 15h1v1h-1zM24 15h1v1h-1zM26 15h2v1h-2zM29 15h1v1h-1zM5 16h1v1h-1zM8 16h1v1h-1zM10 16h1v1h-1zM12 16h4v1h-4zM17 16h1v1h-1zM19 16h2v1h-2zM23 16h2v1h-2zM26 16h2v1h-2zM32 16h1v1h-1zM4 17h1v1h-1zM7 17h1v1h-1zM9 17h1v1h-1zM12 17h3v1h-3zM16 17h1v1h-1zM20 17h5v1h-5zM26 17h1v1h-1zM28 17h1v1h-1zM31 17h2v1h-2zM5 18h1v1h-1zM7 18h2v1h-2zM10 18h1v1h-1zM12 18h2v1h-2zM21 18h1v1h-1zM24 18h2v1h-2zM27 18h1v1h-1zM29 18h2v1h-2zM4 19h1v1h-1zM6 19h1v1h-1zM14 19h1v1h-1zM16 19h1v1h-1zM19 19h1v1h-1zM23 19h6v1h-6zM30 19h1v1h-1zM32 19h1v1h-1zM4 20h1v1h-1zM6 20h2v1h-2zM10 20h1v1h-1zM12 20h3v1h-3zM21 20h1v1h-1zM24 20h1v1h-1zM27 20h1v1h-1zM29 20h2v1h-2zM4 21h1v1h-1zM6 21h2v1h-2zM9 21h1v1h-1zM13 21h3v1h-3zM17 21h2v1h-2zM21 21h4v1h-4zM26 21h3v1h-3zM30 21h3v1h-3zM4 22h3v1h-3zM9 22h2v1h-2zM12 22h1v1h-1zM19 22h1v1h-1zM23 22h1v1h-1zM29 22h1v1h-1zM32 22h1v1h-1zM4 23h1v1h-1zM6 23h1v1h-1zM8 23h1v1h-1zM17 23h1v1h-1zM19 23h2v1h-2zM22 23h1v1h-1zM25 23h1v1h-1zM27 23h2v1h-2zM4 24h1v1h-1zM7 24h1v1h-1zM9 24h2v1h-2zM12 24h1v1h-1zM14 24h1v1h-1zM18 24h1v1h-1zM21 24h1v1h-1zM23 24h6v1h-6zM30 24h3v1h-3zM12 25h2v1h-2zM16 25h1v1h-1zM18 25h7v1h-7zM28 25h2v1h-2zM4 26h7v1h-7zM16 26h1v1h-1zM19 26h2v1h-2zM23 26h2v1h-2zM26 26h1v1h-1zM28 26h3v1h-3zM4 27h1v1h-1zM10 27h1v1h-1zM13 27h4v1h-4zM18 27h1v1h-1zM20 27h1v1h-1zM22 27h3v1h-3zM28 27h1v1h-1zM4 28h1v1h-1zM6 28h3v1h-3zM10 28h1v1h-1zM13 28h1v1h-1zM17 28h4v1h-4zM23 28h7v1h-7zM31 28h2v1h-2zM4 29h1v1h-1zM6 29h3v1h-3zM10 29h1v1h-1zM13 29h2v1h-2zM16 29h7v1h-7zM25 29h1v1h-1zM27 29h1v1h-1zM29 29h2v1h-2zM32 29h1v1h-1zM4 30h1v1h-1zM6 30h3v1h-3zM10 30h1v1h-1zM13 30h3v1h-3zM19 30h1v1h-1zM22 30h10v1h-10zM4 31h1v1h-1zM10 31h1v1h-1zM13 31h3v1h-3zM18 31h2v1h-2zM27 31h1v1h-1zM29 31h2v1h-2zM32 31h1v1h-1zM4 32h7v1h-7zM12 32h1v1h-1zM17 32h2v1h-2zM21 32h1v1h-1zM23 32h1v1h-1zM27 32h4v1h-4z'
