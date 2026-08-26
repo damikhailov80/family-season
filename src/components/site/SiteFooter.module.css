@@ -45,6 +45,22 @@
   outline-offset: 2px;
 }
 
+.link {
+  color: var(--ink-muted);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink-muted) 35%, transparent);
+}
+
+.link:hover {
+  color: var(--ink-soft);
+  border-bottom-color: var(--ink-soft);
+}
+
+.link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
 @media print {
   .footer {
     display: none;

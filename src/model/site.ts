@@ -25,6 +25,8 @@ export const ROUTES = {
   /** Тот же лист в правке. Без `#d=…` — пустой бланк «с нуля». */
   sheetEdit: '/sheet/edit',
   seasons: '/seasons',
+  /** Политика приватности: её адрес требует Google для публикации входа. */
+  privacy: '/privacy',
 } as const
 
 /**

@@ -1,9 +1,8 @@
-'use client'
-
-import { useState } from 'react'
+import { auth } from '../../server/auth'
+import { loginWithGoogle, logout } from '../../server/actions'
 import styles from './LoginButtons.module.css'
 
-/** Значки провайдеров — inline SVG: растровых картинок в проекте нет. */
+/** Значок провайдера — inline SVG: растровых картинок в проекте нет. */
 function GoogleMark() {
   return (
     <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
@@ -27,39 +26,52 @@ function GoogleMark() {
   )
 }
 
-function FacebookMark() {
+/**
+ * Голая кнопка входа — без чтения сессии. Её зовёт и шапка, и «Мои сезоны»:
+ * страница сессию уже прочитала, и заставлять её читать второй раз незачем.
+ *
+ * Это `<form>` с серверным действием, а не `onClick`: в браузер не уезжает ни
+ * строчки Auth.js, и вход работает даже без JS.
+ */
+export function GoogleLoginButton() {
   return (
-    <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
-      <path
-        fill="#1877f2"
-        d="M18 9a9 9 0 1 0-10.4 8.9v-6.3H5.3V9h2.3V7c0-2.3 1.36-3.56 3.45-3.56 1 0 2.05.18 2.05.18v2.25h-1.16c-1.14 0-1.5.71-1.5 1.43V9h2.55l-.4 2.6h-2.15v6.3A9 9 0 0 0 18 9Z"
-      />
-    </svg>
+    <form className={styles.form} action={loginWithGoogle}>
+      <button type="submit" className={styles.button}>
+        <GoogleMark />
+        Войти через Google
+      </button>
+    </form>
   )
 }
 
 /**
- * Заглушка входа. Личный кабинет ещё не сделан, поэтому кнопки честно говорят
- * «скоро», а не притворяются рабочими: настоящий OAuth появится вместе с бэкендом.
+ * Правый угол шапки: кнопка входа либо имя вошедшего и «Выйти».
+ *
+ * Ссылки на «Мои сезоны» здесь нет намеренно — она уже есть в соседней
+ * навигации, а два одинаковых перехода рядом только сбивают.
  */
-export function LoginButtons() {
-  const [soon, setSoon] = useState(false)
+export async function LoginButtons() {
+  const session = await auth()
+  const who = session?.user?.name || session?.user?.email
+
+  if (!who) {
+    return (
+      <div className={styles.wrap}>
+        <GoogleLoginButton />
+      </div>
+    )
+  }
 
   return (
     <div className={styles.wrap}>
-      <button type="button" className={styles.button} onClick={() => setSoon(true)}>
-        <GoogleMark />
-        Google
-      </button>
-      <button type="button" className={styles.button} onClick={() => setSoon(true)}>
-        <FacebookMark />
-        Facebook
-      </button>
-      {soon && (
-        <p className={styles.soon} role="status">
-          Скоро! Пока лист живёт в ссылке — сохраните её в закладки
-        </p>
-      )}
+      <span className={styles.who} title={who}>
+        {who}
+      </span>
+      <form className={styles.form} action={logout}>
+        <button type="submit" className={styles.button}>
+          Выйти
+        </button>
+      </form>
     </div>
   )
 }

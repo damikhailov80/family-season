@@ -5,6 +5,12 @@
   gap: 8px;
 }
 
+/* Форма нужна ради серверного действия, а не ради раскладки: пусть кнопка
+   остаётся обычным элементом строки. */
+.form {
+  display: inline-flex;
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -34,16 +40,24 @@
   outline-offset: 2px;
 }
 
-.soon {
-  font-family: var(--font-hand);
-  font-size: 19px;
-  line-height: 1.15;
-  color: var(--accent-theme);
+/* Имя вошедшего. Длинное имя или почта режутся многоточием: шапка не должна
+   переноситься на вторую строку из-за чужого адреса. */
+.who {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
 }
 
 @media (max-width: 560px) {
-  .soon {
-    width: 100%;
+  /* На узком экране остаётся одна кнопка «Выйти» — как у плавающих кнопок
+     постера, где прячется подпись, а образец остаётся. */
+  .who {
+    display: none;
   }
 }
 

@@ -2,12 +2,6 @@
   position: relative;
 }
 
-.rocket {
-  color: var(--accent-goal);
-  transform: rotate(8deg);
-  margin-bottom: 10px;
-}
-
 .title {
   font-family: var(--font-hand);
   font-weight: 700;
@@ -16,21 +10,47 @@
   color: var(--accent-deep);
 }
 
-.text {
-  max-width: 560px;
+/* Первый абзац крупнее остальных: он и есть вся политика, дальше подробности. */
+.lead {
+  max-width: 620px;
   margin-top: 10px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.head {
+  margin-top: 24px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent-deep);
+}
+
+.text {
+  max-width: 620px;
+  margin-top: 8px;
   font-size: 16px;
   line-height: 1.5;
   color: var(--ink-soft);
 }
 
-.hand {
-  max-width: 560px;
-  margin-top: 12px;
-  font-family: var(--font-hand);
-  font-size: 21px;
-  line-height: 1.25;
-  color: var(--accent-theme);
+.mail {
+  color: var(--accent-deep);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--accent-deep) 40%, transparent);
+  overflow-wrap: anywhere;
+}
+
+.mail:hover {
+  border-bottom-color: var(--accent-deep);
+}
+
+.updated {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--ink-muted);
 }
 
 .primary {
@@ -53,21 +73,8 @@
   background: color-mix(in srgb, var(--accent-deep) 85%, #000);
 }
 
-.primary:focus-visible {
+.primary:focus-visible,
+.mail:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
-}
-
-.login {
-  margin-top: 20px;
-}
-
-/* Приписка про приватность — мелким и приглушённым: это сноска к странице,
-   а не её содержание. */
-.note {
-  max-width: 560px;
-  margin-top: 24px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-soft);
 }

@@ -31,3 +31,8 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# env: секреты входа лежат в .env.local, в репозиторий едет только образец
+.env
+.env*.local
+!.env.example
