@@ -1,6 +1,7 @@
 import { FACE_ORDER } from './accents'
 import { pickTargetMonth } from './calendar'
 import { iconSetOrNull } from './icons'
+import { limitFor } from './limits'
 import { paletteOrNull } from './palettes'
 import type { IconSetId, PaletteId } from '../types'
 import type { Person, Template } from './types'
@@ -37,7 +38,8 @@ const PLAIN = '2p'
 const LEGACY = ['3z', '3p', '1z', '1p']
 const COMPRESSED = [PACKED, '3z', '1z']
 
-const MAX_TEXT = 400
+/** id человека не печатается: его длину диктует не макет, а компактность ссылки. */
+const ID_LIMIT = 8
 
 type PackedPerson = [id: string, name: string, face: number, project: string, description: string, goal: string]
 
@@ -99,11 +101,16 @@ function unpack(packed: Packed): Template {
   })
 }
 
-function text(value: unknown, fallback = ''): string {
+/**
+ * Предел у каждого поля свой (`src/model/limits.ts`) и здесь обязателен: ссылку мог
+ * поправить кто угодно, а руками вписанные три сотни символов в поле на 16 разносят
+ * вёрстку ровно так же, как набранные в правке.
+ */
+function text(value: unknown, limit: number, fallback = ''): string {
   if (typeof value !== 'string') return fallback
   // Поля бланка однострочные: правленая руками ссылка не должна приносить
   // переводы строк, которыми лист растягивается на лишние печатные страницы.
-  return value.replace(/\s*\n+\s*/g, ' ').slice(0, MAX_TEXT)
+  return value.replace(/\s*\n+\s*/g, ' ').slice(0, limit)
 }
 
 function int(value: unknown, fallback: number, min: number, max: number): number {
@@ -127,12 +134,12 @@ export function normalizeTemplate(input: unknown): Template {
       ? (person.face as Person['face'])
       : FACE_ORDER[index % FACE_ORDER.length]
     return {
-      id: text(person.id, `p${index + 1}`).slice(0, 8) || `p${index + 1}`,
-      name: text(person.name),
+      id: text(person.id, ID_LIMIT, `p${index + 1}`) || `p${index + 1}`,
+      name: text(person.name, limitFor('people.*.name')),
       face,
-      project: text(person.project),
-      description: text(person.description),
-      goal: text(person.goal),
+      project: text(person.project, limitFor('people.*.project')),
+      description: text(person.description, limitFor('people.*.description')),
+      goal: text(person.goal, limitFor('people.*.goal')),
     }
   })
 
@@ -150,22 +157,25 @@ export function normalizeTemplate(input: unknown): Template {
 
   return {
     header: {
-      title: text(header.title),
-      ribbon: text(header.ribbon),
+      title: text(header.title, limitFor('header.title')),
+      ribbon: text(header.ribbon, limitFor('header.ribbon')),
     },
     theme: {
       year: int(theme.year, fallbackMonth.year, 1970, 3000),
       monthIndex: int(theme.monthIndex, fallbackMonth.monthIndex, 0, 11),
-      subtitle: text(theme.subtitle),
-      question: text(theme.question),
+      subtitle: text(theme.subtitle, limitFor('theme.subtitle')),
+      question: text(theme.question, limitFor('theme.question')),
     },
-    weeksNote: text(raw.weeksNote),
+    weeksNote: text(raw.weeksNote, limitFor('weeksNote')),
     weeks: Array.from({ length: WEEKS_COUNT }, (_, index) => {
       const week = (weeks[index] ?? {}) as Record<string, unknown>
-      return { title: text(week.title), text: text(week.text) }
+      return {
+        title: text(week.title, limitFor('weeks.*.title')),
+        text: text(week.text, limitFor('weeks.*.text')),
+      }
     }),
-    projectsNote: text(raw.projectsNote),
-    goal: text(raw.goal),
+    projectsNote: text(raw.projectsNote, limitFor('projectsNote')),
+    goal: text(raw.goal, limitFor('goal')),
     people: normalizedPeople,
   }
 }

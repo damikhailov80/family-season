@@ -10,6 +10,8 @@ export type DocSource = 'demo' | 'custom'
 export interface FieldBinding {
   value: string
   onChange: (value: string) => void
+  /** Предел длины поля — место на бумаге (`src/model/limits.ts`). */
+  maxLength: number
 }
 
 export interface DocValue {

@@ -12,6 +12,7 @@ import {
   readPaletteId,
 } from '../model/codec'
 import { templateDays } from '../model/fill'
+import { limitFor } from '../model/limits'
 import { DEFAULT_EXAMPLE_ID, exampleById, fillOf, knownExampleId } from '../model/examples'
 import { modeFromPath, pathForMode, ROUTES } from '../model/site'
 import { DEFAULT_ICON_SET } from '../model/icons'
@@ -20,7 +21,7 @@ import { createEmptyTemplate, createPerson, nextPersonId } from '../model/templa
 import type { IconSetId, PaletteId } from '../types'
 import type { Template } from '../model/types'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
-import type { DocMode, DocSource, DocValue } from './docContext'
+import type { DocMode, DocSource, DocValue, FieldBinding } from './docContext'
 import { DocContext } from './docContext'
 
 export interface Boot {
@@ -246,11 +247,21 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     setTemplate((current) => recipe(current))
   }, [])
 
+  /*
+   * Предел едет вместе с привязкой, поэтому секциям про него знать нечего: они и так
+   * разворачивают `field(...)` в пропы. Обрезка здесь — сеть под саму модель: ввод
+   * останавливает `EditableText`, но добраться до `onChange` можно и мимо него.
+   */
   const field = useCallback(
-    (path: string) => ({
-      value: getByPath(template, path),
-      onChange: (value: string) => setTemplate((current) => setByPath(current, path, value)),
-    }),
+    (path: string): FieldBinding => {
+      const maxLength = limitFor(path)
+      return {
+        value: getByPath(template, path),
+        maxLength,
+        onChange: (value: string) =>
+          setTemplate((current) => setByPath(current, path, value.slice(0, maxLength))),
+      }
+    },
     [template],
   )
 
