@@ -50,9 +50,12 @@ export function GoogleLoginButton() {
         startTransition(() => loginWithGoogle(back))
       }}
     >
-      <button type="submit" className={styles.button}>
+      {/* На телефоне от подписи остаётся «Войти» (`.provider` скрыт): рядом с
+          брендом и навигацией полное название провайдера не помещается. Значок
+          его и так называет, а `aria-label` держит полное имя для читалки. */}
+      <button type="submit" className={styles.button} aria-label="Войти через Google">
         <GoogleMark />
-        Войти через Google
+        Войти<span className={styles.provider}>&nbsp;через Google</span>
       </button>
     </form>
   )

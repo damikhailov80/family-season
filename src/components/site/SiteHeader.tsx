@@ -4,6 +4,7 @@ import { encodeTemplate, hashFor } from '../../model/codec'
 import { templateForFamily } from '../../model/family'
 import { DEFAULT_PALETTE } from '../../model/palettes'
 import { DEFAULT_ICON_SET } from '../../model/icons'
+import { logger } from '../../server/logger'
 import { readFamily } from '../../server/settings'
 import { HeartDoodle } from '../doodles'
 import { LoginButtons } from './LoginButtons'
@@ -33,7 +34,7 @@ async function newSeasonHref(): Promise<string> {
     return ROUTES.sheetEdit + hashFor(payload, DEFAULT_PALETTE, DEFAULT_ICON_SET)
   } catch (error) {
     // Кодирование — единственное, что тут может сломаться по-настоящему.
-    console.error('[header] не собрал ссылку на новый сезон:', error)
+    logger.error('new season link not built', { err: error })
     return ROUTES.sheetEdit
   }
 }

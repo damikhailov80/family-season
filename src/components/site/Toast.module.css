@@ -1,0 +1,57 @@
+/*
+ * Внизу по центру и поверх всего: `z-index` выше плавающих кнопок постера (30),
+ * иначе на листе тост окажется под переключателем темы.
+ */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: max-content;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 12px 12px 16px;
+  transform: translateX(-50%);
+  border: var(--border-w) solid var(--accent-deep);
+  border-radius: var(--radius-box);
+  background: var(--surface);
+}
+
+.text {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.close {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: color-mix(in srgb, var(--accent-deep) 10%, transparent);
+  color: var(--accent-deep);
+}
+
+.close:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* Экранный контрол на бумагу не идёт — общее правило обвязки сайта. */
+@media print {
+  .toast {
+    display: none;
+  }
+}

@@ -7,17 +7,18 @@ import { NAME_LIMIT, type FamilyPreset } from '../../model/family'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../model/types'
 import { saveFamily } from '../../server/actions'
 import type { FamilyStatus } from '../../server/settings'
+import { Toast } from '../../components/site/Toast'
 import styles from './page.module.css'
 
 /**
- * Что сказать, когда сохранить не вышло. Здесь только причины **про сессию**:
- * отказ хранилища сюда не приходит — он бросает и уводит на `error.tsx`.
- * Успеха тут тоже нет: он уводит редиректом и показывается уже страницей.
+ * Что сказать, когда сохранить не вышло. Успеха здесь нет: он уводит редиректом
+ * и показывается уже страницей.
  */
 const FAILURE_TEXT: Record<Exclude<FamilyStatus, 'ok'>, string> = {
+  error: 'Не удалось сохранить настройки — ошибка на сервере. Попробуйте ещё раз.',
   stale:
-    'Не сохранилось — вход был выполнен до того, как появились настройки. Обновите страницу и войдите заново.',
-  anonymous: 'Не сохранилось — сеанс закончился. Обновите страницу и войдите снова.',
+    'Не удалось сохранить: вход был выполнен до того, как появились настройки. Обновите страницу и войдите заново.',
+  anonymous: 'Не удалось сохранить: сеанс закончился. Обновите страницу и войдите снова.',
 }
 
 /**
@@ -36,17 +37,25 @@ const FAILURE_TEXT: Record<Exclude<FamilyStatus, 'ok'>, string> = {
  * Логику `ProjectsSection` переиспользовать нельзя: она завязана на `useDoc`,
  * то есть на документ постера, которого здесь нет.
  */
+interface Failure {
+  status: Exclude<FamilyStatus, 'ok'>
+  at: number
+}
+
 export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
   const [people, setPeople] = useState<FamilyPreset>(initial)
 
   /*
    * `useActionState`, а не `useTransition`: действие возвращает статус неудачи
    * вместо редиректа, и его надо куда-то положить. Успех сюда не приходит —
-   * `saveFamily` уводит на `?ok=1`, и компонент размонтируется. Отказ базы тоже
-   * не приходит: он бросает, и его ловит `error.tsx` этого сегмента.
+   * `saveFamily` уводит на `?ok=1`, и компонент размонтируется.
+   *
+   * Рядом со статусом едет отметка времени: сама по себе строка `error` при
+   * второй неудаче подряд не меняется, тост не перемонтировался бы и повторный
+   * отказ прошёл бы незамеченным. По ней и ставится `key`.
    */
-  const [failure, save, saving] = useActionState<Exclude<FamilyStatus, 'ok'> | null, FormData>(
-    () => saveFamily(people),
+  const [failure, save, saving] = useActionState<Failure | null, FormData>(
+    async () => ({ status: await saveFamily(people), at: Date.now() }),
     null,
   )
 
@@ -134,13 +143,9 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
         </button>
       </div>
 
-      {/* Отказ живёт рядом с кнопкой, а не наверху страницы: повторяют его
-          отсюда же, не сходя с формы и не теряя набранного. */}
-      {failure && (
-        <p className={styles.warn} role="status">
-          {FAILURE_TEXT[failure]}
-        </p>
-      )}
+      {/* Ошибка сервера — тост, набранный состав остаётся в форме нетронутым:
+          повторяют отсюда же, не сходя со страницы. */}
+      {failure && <Toast key={failure.at} message={FAILURE_TEXT[failure.status]} />}
     </form>
   )
 }

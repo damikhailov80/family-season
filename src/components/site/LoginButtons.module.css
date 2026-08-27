@@ -54,8 +54,6 @@
   border-radius: 8px;
   border: 1.5px solid var(--sheet-border);
   background: var(--surface);
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 700;
@@ -64,6 +62,13 @@
   transition:
     border-color 0.12s ease,
     background-color 0.12s ease;
+}
+
+.whoText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .who:hover {
@@ -78,9 +83,26 @@
 
 @media (max-width: 560px) {
   /* Прятать имя больше нельзя: это единственный вход в кабинет. Вместо этого
-     ужимаем — от имени остаётся столько, сколько влезает. */
+     ужимаем — от имени остаётся столько, сколько влезает.
+
+     Ширину задаёт остаток строки, а не число символов: `flex-basis: 0` значит
+     «сама плашка места не требует», поэтому шапка из-за неё не уходит в перенос,
+     а `min-width: 0` разрешает многоточие. Прежние `12ch` были подобраны под
+     один экран и на 360px роняли бренд и имя на разные строки. */
+  .wrap {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
   .who {
-    max-width: 12ch;
+    max-width: 100%;
+  }
+
+  /* Шапка на телефоне — две строки, и первая это «бренд и вход». Полное
+     «Войти через Google» её ломает: на 360px она уезжает в перенос. */
+  .provider {
+    display: none;
   }
 }
 

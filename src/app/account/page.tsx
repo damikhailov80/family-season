@@ -8,6 +8,7 @@ import { ROUTES } from '../../model/site'
 import { auth } from '../../server/auth'
 import { loginWithGoogle, logout } from '../../server/actions'
 import { familyState } from '../../server/settings'
+import { Toast } from '../../components/site/Toast'
 import { FamilyEditor } from './FamilyEditor'
 import styles from './page.module.css'
 
@@ -101,9 +102,9 @@ export default async function AccountPage({
           каждый месяц. На готовые постеры настройка не влияет: их состав уже вписан в ссылку.
         </p>
 
-        {/* Редактор — только когда состав прочитан. Недоступная база сюда не
-            доходит (`familyState` бросает, ловит `error.tsx`), остаётся
-            устаревшая сессия: привязывать настройки не к чему, и править нечего.
+        {/* Редактор — только когда состав прочитан. Не прочитан — здесь пусто:
+            умолчание выдало бы себя за настоящие настройки, а «Сохранить» —
+            это `upsert`, он затёр бы то, чего мы не видели.
             Ключ по составу: после сохранения сервер отдаёт новые данные, и
             редактор должен начать с них, а не держать своё прежнее состояние. */}
         {state.status === 'ok' && (
@@ -118,6 +119,12 @@ export default async function AccountPage({
               человек; имена можно не заполнять, их всегда можно вписать прямо на постере.
             </p>
           </>
+        )}
+
+        {/* Об ошибке сервера говорит тост, и только он: отдельной страницы-
+            заглушки под отказ базы нет — механизм на весь сайт один. */}
+        {state.status === 'error' && (
+          <Toast message="Не удалось загрузить настройки — ошибка на сервере." />
         )}
 
         <h2 className={styles.head}>Выход</h2>

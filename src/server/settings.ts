@@ -1,21 +1,19 @@
 import { cache } from 'react'
 import { auth } from './auth'
-import { query, type QueryResult } from './db'
+import { query } from './db'
+import { logger } from './logger'
 import { normalizeFamily, type FamilyPreset } from '../model/family'
 
 /**
  * Настройки аккаунта. Сегодня она одна — состав семьи для новых постеров.
  *
- * Здесь два разных отношения к мёртвой базе, и путать их нельзя.
+ * Ни одна страница не имеет права сломаться из-за настроек: `readFamily`
+ * возвращает `null` и когда человек не вошёл, и когда база не ответила.
  *
- * `readFamily` — **мягкий**: возвращает `null` и когда человек не вошёл, и когда
- * база не ответила. Его зовут шапка и `/api/family`, то есть весь сайт; уронить
- * его значит уронить лендинг и постер, которым база не нужна вовсе.
- *
- * `familyState` и `writeFamily` — **жёсткие**: обслуживают только кабинет и при
- * недоступной базе **бросают**. Кабинет без хранилища не кабинет: показывать там
- * умолчание вместо настоящих настроек — значит врать, а «попробуйте попозже» на
- * месте настоящей аварии прячет её и от человека, и от нас.
+ * Кабинету одного `null` мало — ему нужна причина, и `familyState` её даёт.
+ * Отказ базы приезжает статусом `error`: страница показывает тост и **пустоту
+ * на месте данных**. Умолчание вместо настоящих настроек показывать нельзя —
+ * это враньё, а «Сохранить» поверх него затёр бы то, чего мы не прочитали.
  */
 
 interface Row {
@@ -41,52 +39,37 @@ export const readFamily = cache(async (): Promise<FamilyPreset | null> => {
 })
 
 /**
- * Разворачивает ответ базы или бросает. Отказ хранилища — это авария, а не
- * состояние настроек: у неё нет пометки в этом союзе, она уходит исключением.
- *
- * Причина уже в логе `db.ts` вместе с кодом Postgres и стеком, поэтому здесь
- * достаточно короткого текста: он попадёт в лог Next рядом с `digest`, по
- * которому строку и находят из страницы ошибки.
- */
-function rowsOrThrow<Row>(result: QueryResult<Row>): Row[] {
-  if (result.status === 'ok') return result.rows
-  throw new Error(
-    result.status === 'unconfigured'
-      ? 'Хранилище настроек не подключено: DATABASE_URL не задан'
-      : 'Хранилище настроек не ответило',
-  )
-}
-
-/**
- * Почему настроек может не быть. Обе причины — про **сессию**, а не про базу:
- * недоступная база сюда не доходит, она бросает.
+ * Почему настроек может не быть.
  *
  * `stale` — человек вошёл, но в его токене нет `accountKey`: сессия выпущена
  * до того, как ключ появился. Привязать настройки не к чему, лечится входом
  * заново (см. комментарий в `auth.ts`).
+ *
+ * `error` — сервер не смог. Причин у этого две (`DATABASE_URL` не задан и база
+ * не ответила), но **наружу они не разводятся**: человеку от разницы никакой
+ * пользы, а разбираться в ней по строке `db.ts` в логе, где лежит и код
+ * Postgres, и стек. Наружу — один статус и один тост.
  */
-export type FamilyStatus = 'anonymous' | 'stale' | 'ok'
+export type FamilyStatus = 'anonymous' | 'stale' | 'error' | 'ok'
 
 export type FamilyState =
-  | { status: 'anonymous' | 'stale' }
+  | { status: 'anonymous' | 'stale' | 'error' }
   | { status: 'ok'; family: FamilyPreset | null }
 
-/** То же чтение, но для кабинета: с причиной пустоты и **с падением** при аварии. */
+/** То же чтение, но с причиной пустоты — для кабинета. */
 export async function familyState(): Promise<FamilyState> {
   const session = await auth()
   if (!session?.user) return { status: 'anonymous' }
   if (!session.accountKey) return { status: 'stale' }
 
-  // Метка своя: `readFamily` тем же запросом ходит мягко, и в логе их надо
-  // различать — одна строка ничего не роняет, вторая уводит на страницу ошибки.
-  const rows = rowsOrThrow(await query<Row>('settings:read:account', SELECT, [session.accountKey]))
-  return { status: 'ok', family: rows.length ? normalizeFamily(rows[0].family) : null }
+  // Метка своя: тем же запросом ходит `readFamily`, и в логе их надо различать —
+  // одну строку никто не заметит, вторая оборачивается тостом у человека.
+  const result = await query<Row>('settings:read:account', SELECT, [session.accountKey])
+  if (result.status !== 'ok') return { status: 'error' }
+  return { status: 'ok', family: result.rows.length ? normalizeFamily(result.rows[0].family) : null }
 }
 
-/**
- * Записывает состав. Возвращает только то, что решается сессией; отказ базы —
- * исключение: молча потерянное сохранение хуже страницы ошибки.
- */
+/** Записывает состав и возвращает, что из этого вышло. */
 export async function writeFamily(family: FamilyPreset): Promise<FamilyStatus> {
   const session = await auth()
   if (!session?.user) return 'anonymous'
@@ -99,12 +82,13 @@ export async function writeFamily(family: FamilyPreset): Promise<FamilyStatus> {
      on conflict (account_key) do update set family = excluded.family, updated_at = now()`,
     [session.accountKey, JSON.stringify(normalizeFamily(family))],
   )
-  if (result.status !== 'ok') {
-    // Чьё сохранение пропало, из строки `db.ts` не видно — а без этого не
-    // отличить «не повезло одному» от «база не отвечает никому». Ключ
-    // непрозрачный, тот же, что лежит в базе: ни имени, ни почты в лог не идёт.
-    console.error(`[settings] состав не сохранён (${session.accountKey}): ${result.status}`)
-  }
-  rowsOrThrow(result)
-  return 'ok'
+  if (result.status === 'ok') return 'ok'
+
+  // Чей именно состав пропал, из лога `db.ts` не видно: там операция, но не
+  // владелец. Ключ непрозрачный, тот же, что лежит в базе, — ни имени, ни почты.
+  logger.error('family settings not saved', {
+    accountKey: session.accountKey,
+    reason: result.status,
+  })
+  return 'error'
 }

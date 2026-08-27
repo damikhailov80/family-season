@@ -22,7 +22,9 @@ export async function LoginButtons() {
     <div className={styles.wrap}>
       {who ? (
         <Link className={styles.who} href={ROUTES.account} title={`${who} — кабинет и настройки`}>
-          {who}
+          {/* Обёртка не лишняя: `text-overflow` не действует на flex-контейнер,
+              и без неё длинное имя обрезалось бы по рамке без многоточия. */}
+          <span className={styles.whoText}>{who}</span>
         </Link>
       ) : (
         <GoogleLoginButton />
