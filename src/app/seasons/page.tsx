@@ -243,7 +243,11 @@ export default async function SeasonsPage({
         <p className={styles.note}>
           Имя и почта лежат только в куке вашего браузера — на сервере их нет. В базе у нас
           настройки кабинета и адреса ваших постеров, до {LIBRARY_LIMIT} сохранённых сезонов и
-          столько же закладок; подробности — на странице «Приватность».
+          столько же закладок; подробности — на странице{' '}
+          <Link className={styles.noteLink} href={ROUTES.privacy}>
+            «Приватность»
+          </Link>
+          .
         </p>
 
         {state.status === 'error' && (
