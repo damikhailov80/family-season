@@ -1,5 +1,7 @@
+import Link from 'next/link'
 import { auth } from '../../server/auth'
-import { loginWithGoogle, logout } from '../../server/actions'
+import { loginWithGoogle } from '../../server/actions'
+import { ROUTES } from '../../model/site'
 import styles from './LoginButtons.module.css'
 
 /** Значок провайдера — inline SVG: растровых картинок в проекте нет. */
@@ -27,8 +29,8 @@ function GoogleMark() {
 }
 
 /**
- * Голая кнопка входа — без чтения сессии. Её зовёт и шапка, и «Мои сезоны»:
- * страница сессию уже прочитала, и заставлять её читать второй раз незачем.
+ * Голая кнопка входа — без чтения сессии. Её зовёт и шапка, и страницы, которые
+ * сессию уже прочитали: заставлять их читать второй раз незачем.
  *
  * Это `<form>` с серверным действием, а не `onClick`: в браузер не уезжает ни
  * строчки Auth.js, и вход работает даже без JS.
@@ -45,7 +47,11 @@ export function GoogleLoginButton() {
 }
 
 /**
- * Правый угол шапки: кнопка входа либо имя вошедшего и «Выйти».
+ * Правый угол шапки: кнопка входа либо имя вошедшего.
+ *
+ * Имя — **одна ссылка в кабинет**, а не имя плюс «Выйти» рядом: выход это не
+ * раздел сайта, а действие над аккаунтом, и место ему среди настроек. Заодно
+ * в шапке остаётся один пункт вместо двух.
  *
  * Ссылки на «Мои сезоны» здесь нет намеренно — она уже есть в соседней
  * навигации, а два одинаковых перехода рядом только сбивают.
@@ -54,24 +60,15 @@ export async function LoginButtons() {
   const session = await auth()
   const who = session?.user?.name || session?.user?.email
 
-  if (!who) {
-    return (
-      <div className={styles.wrap}>
-        <GoogleLoginButton />
-      </div>
-    )
-  }
-
   return (
     <div className={styles.wrap}>
-      <span className={styles.who} title={who}>
-        {who}
-      </span>
-      <form className={styles.form} action={logout}>
-        <button type="submit" className={styles.button}>
-          Выйти
-        </button>
-      </form>
+      {who ? (
+        <Link className={styles.who} href={ROUTES.account} title={`${who} — кабинет и настройки`}>
+          {who}
+        </Link>
+      ) : (
+        <GoogleLoginButton />
+      )}
     </div>
   )
 }

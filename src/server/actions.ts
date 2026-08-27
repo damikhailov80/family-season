@@ -1,6 +1,9 @@
 'use server'
 
+import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
+import { writeFamily } from './settings'
+import { normalizeFamily } from '../model/family'
 import { ROUTES } from '../model/site'
 
 /**
@@ -19,4 +22,24 @@ export async function loginWithGoogle() {
 export async function logout() {
   // А после выхода — на лендинг: кабинет уже закрыт, показывать нечего.
   await signOut({ redirectTo: ROUTES.home })
+}
+
+/**
+ * Сохранение состава семьи из кабинета.
+ *
+ * Состав приходит **аргументом, а не `FormData`**, и это не вкусовщина.
+ * Действие зовёт клиентский компонент, а React в таком случае кодирует поля
+ * формы под своими именами (`_1_name`, `_1_face`, …) — разбор по `getAll('name')`
+ * молча возвращал бы пустоту. Аргумент React сериализует сам, и имя поля тут
+ * ни при чём.
+ *
+ * Пришедшему не доверяем: `normalizeFamily` режет по границам 2..5, выкидывает
+ * неизвестные лица и обрезает длину имени.
+ *
+ * Результат сообщаем пометкой в адресе, а не возвращаемым значением: так
+ * «Сохранено» переживает перезагрузку и не требует `useActionState`.
+ */
+export async function saveFamily(family: unknown) {
+  const outcome = await writeFamily(normalizeFamily(family))
+  redirect(`${ROUTES.account}?${outcome}=1`)
 }

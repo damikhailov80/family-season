@@ -40,24 +40,47 @@
   outline-offset: 2px;
 }
 
-/* Имя вошедшего. Длинное имя или почта режутся многоточием: шапка не должна
-   переноситься на вторую строку из-за чужого адреса. */
+/* Имя вошедшего — ссылка в кабинет. Выглядит плашкой, а не пунктом меню:
+   это вход в аккаунт, а не ещё один раздел сайта.
+
+   Длинное имя или почта режутся многоточием — шапка не должна переноситься
+   на вторую строку из-за чужого адреса. */
 .who {
+  display: inline-flex;
+  align-items: center;
   max-width: 22ch;
   overflow: hidden;
+  padding: 8px 13px;
+  border-radius: 8px;
+  border: 1.5px solid var(--sheet-border);
+  background: var(--surface);
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 700;
   color: var(--ink-soft);
+  text-decoration: none;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.who:hover {
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
+}
+
+.who:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
 }
 
 @media (max-width: 560px) {
-  /* На узком экране остаётся одна кнопка «Выйти» — как у плавающих кнопок
-     постера, где прячется подпись, а образец остаётся. */
+  /* Прятать имя больше нельзя: это единственный вход в кабинет. Вместо этого
+     ужимаем — от имени остаётся столько, сколько влезает. */
   .who {
-    display: none;
+    max-width: 12ch;
   }
 }
 

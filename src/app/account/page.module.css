@@ -1,0 +1,241 @@
+.section {
+  position: relative;
+}
+
+.title {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 1.05;
+  color: var(--accent-deep);
+}
+
+.sub {
+  margin-top: 4px;
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+
+.head {
+  margin-top: 26px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent-deep);
+}
+
+.text {
+  max-width: 620px;
+  margin-top: 8px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.hint {
+  max-width: 620px;
+  margin-top: 10px;
+  font-family: var(--font-hand);
+  font-size: 19px;
+  line-height: 1.2;
+  color: var(--accent-theme);
+}
+
+.saved {
+  margin-top: 14px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent-deep);
+}
+
+/* Про отказ хранилища говорим спокойно и цветом темы, а не «ошибкой»: сайт
+   продолжает работать, недоступна одна настройка. */
+.warn {
+  max-width: 620px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--accent-theme);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.login {
+  margin-top: 20px;
+}
+
+.family {
+  margin-top: 16px;
+}
+
+.people {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+}
+
+/* Строка человека повторяет карточку постера: рисунок слева, имя рядом,
+   «убрать» — приглушённым крестиком у правого края. */
+.person {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 420px;
+  padding: 8px 36px 8px 10px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.avatarButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.avatarButton:hover {
+  background: color-mix(in srgb, currentColor 10%, var(--surface));
+}
+
+.nameInput {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-hand);
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.nameInput:hover {
+  border-color: var(--sheet-border);
+}
+
+.nameInput:focus {
+  outline: none;
+  border-color: var(--accent-deep);
+}
+
+.remove {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.remove:hover {
+  background: color-mix(in srgb, var(--accent-deep) 10%, transparent);
+  color: var(--accent-deep);
+}
+
+.familyActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* Пунктирная рамка — принятый в макете знак «добавить новое»
+   (та же, что у кнопки добавления человека на постере). */
+.add {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  border: 1.5px dashed var(--accent-deep);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent-deep);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.add:hover {
+  background: color-mix(in srgb, var(--accent-deep) 8%, transparent);
+}
+
+.avatarButton:focus-visible,
+.remove:focus-visible,
+.add:focus-visible,
+.nameInput:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 12px 20px;
+  border: 1.5px solid var(--accent-deep);
+  border-radius: 8px;
+  background: var(--accent-deep);
+  color: var(--on-accent);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
+}
+
+/* «Сохранить» стоит в одной строке с «Добавить человека», а не под ней. */
+.familyActions .primary {
+  margin-top: 0;
+  padding: 10px 18px;
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 10px;
+  padding: 10px 18px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.ghost:hover {
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
+}
