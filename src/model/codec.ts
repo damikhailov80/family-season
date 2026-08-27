@@ -30,6 +30,7 @@ const HASH_PARAM = 'd'
 const DATA_PARAM = 'data'
 const PALETTE_PARAM = 'p'
 const ICONS_PARAM = 'i'
+const SEASON_PARAM = 's'
 const EDIT_PARAM = 'edit'
 const NEW_PARAM = 'new'
 const PACKED = '2z'
@@ -260,6 +261,20 @@ export function readNewFlag(hash: string = location.hash): boolean {
 }
 
 /**
+ * `s=<uuid>` — какой из **своих сохранённых** сезонов сейчас открыт
+ * (`src/server/library.ts`). Устроена пометка как `data=`: это указатель в реестр,
+ * а не часть бланка, — только реестр не в репозитории, а в базе самого человека.
+ *
+ * Без неё «Сохранить» не смог бы отличить перезапись от нового сезона. В
+ * присланную ссылку (`buildShareUrl`) и в форк она не едет: делятся постером, а не
+ * строкой чужого кабинета. Чужой или выдуманный id безвреден — строка ищется
+ * вместе с владельцем, не нашлась, и лист стирает пометку.
+ */
+export function readSeasonId(hash: string = location.hash): string | null {
+  return new URLSearchParams(hash.replace(/^#/, '')).get(SEASON_PARAM)
+}
+
+/**
  * `p=<id>` — тема оформления, единственное хранилище темы: `#d=…&p=greece`.
  * Список id — `src/model/palettes.ts` (сто наборов). Пометки нет или id неизвестен —
  * тема по умолчанию, поэтому ссылки, разосланные до появления тем, открываются
@@ -290,7 +305,12 @@ export function hashFor(
   palette: PaletteId,
   iconSet: IconSetId,
   fillId: string | null = null,
+  seasonId: string | null = null,
 ): string {
   const data = fillId ? `&${DATA_PARAM}=${fillId}` : ''
-  return `#${HASH_PARAM}=${payload}&${PALETTE_PARAM}=${palette}&${ICONS_PARAM}=${iconSet}${data}`
+  // Хэш собирается с нуля, и другого писателя у него нет: не передашь пометку
+  // сюда — её сотрёт ближайшая отложенная запись адреса. Так же уходят легаси
+  // `edit=1` и `new=1`.
+  const season = seasonId ? `&${SEASON_PARAM}=${seasonId}` : ''
+  return `#${HASH_PARAM}=${payload}&${PALETTE_PARAM}=${palette}&${ICONS_PARAM}=${iconSet}${data}${season}`
 }

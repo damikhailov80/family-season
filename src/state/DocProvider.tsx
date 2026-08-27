@@ -10,6 +10,7 @@ import {
   readNewFlag,
   readIconSetId,
   readPaletteId,
+  readSeasonId,
 } from '../model/codec'
 import { templateDays } from '../model/fill'
 import { limitFor } from '../model/limits'
@@ -33,6 +34,8 @@ export interface Boot {
   palette: PaletteId
   /** Набор рисунков из `i=`; устроен как тема и в бланк тоже не входит. */
   iconSet: IconSetId
+  /** id своей сохранённой строки из `s=`; частью бланка не является. */
+  seasonId: string | null
   mode: DocMode
 }
 
@@ -104,6 +107,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
   const [fillId, setFillId] = useState<string | null>(boot.fillId)
   const [palette, setPalette] = useState<PaletteId>(boot.palette)
   const [iconSet, setIconSet] = useState<IconSetId>(boot.iconSet)
+  const [seasonId, setSeasonId] = useState<string | null>(boot.seasonId)
   const [mode, setMode] = useState<DocMode>(boot.mode)
 
   /**
@@ -126,6 +130,8 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     setPalette(readPaletteId() ?? example.palette)
     setIconSet(readIconSetId() ?? example.iconSet)
     setFillId(id)
+    // Пример не бывает сохранённым сезоном: его не сохраняют, а форкают.
+    setSeasonId(null)
     setMode('view')
     syncPath('view', id)
   }, [])
@@ -170,6 +176,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
           setPalette(readPaletteId() ?? DEFAULT_PALETTE)
           setIconSet(readIconSetId() ?? DEFAULT_ICON_SET)
           setFillId(null)
+          setSeasonId(null)
           setMode('edit')
           syncPath('edit', null)
           return
@@ -190,6 +197,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         setPalette(readPaletteId() ?? (id ? exampleById(id)!.palette : DEFAULT_PALETTE))
         setIconSet(readIconSetId() ?? (id ? exampleById(id)!.iconSet : DEFAULT_ICON_SET))
         setFillId(id)
+        setSeasonId(id ? null : readSeasonId())
         setMode(nextMode)
         syncPath(nextMode, id)
       })
@@ -224,8 +232,9 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       () => {
         void encodeTemplate(template).then((payload) => {
           if (cancelled || navSeq.current !== seq) return
+          // Форк начинает свой сезон: ни набора заполнения, ни пометки сохранения.
           if (fillId) setForkLink(ROUTES.sheetEdit + hashFor(payload, palette, iconSet))
-          const hash = hashFor(payload, palette, iconSet, fillId)
+          const hash = hashFor(payload, palette, iconSet, fillId, seasonId)
           if (hash === location.hash) return
           // history.state обязателен: null затёр бы пометки своей записи.
           history.replaceState(history.state, '', hash)
@@ -238,7 +247,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       cancelled = true
       clearTimeout(timer)
     }
-  }, [template, fillId, palette, iconSet, mode])
+  }, [template, fillId, palette, iconSet, seasonId, mode])
 
   const source: DocSource = fillId ? 'demo' : 'custom'
   const fill = fillOf(fillId)
@@ -280,6 +289,8 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       )
       setTemplate(next)
       setFillId(null)
+      // Форкнутый сезон — новый: перезаписывать им чужую (да и свою) строку нельзя.
+      setSeasonId(null)
       setMode('edit')
       // Мгновенно, а не smooth: плавная прокрутка сбивается перерисовкой листа.
       scrollTo(0, 0)
@@ -314,9 +325,25 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
     const payload = await encodeTemplate(template)
     navSeq.current += 1
     editSession.current = null
-    history.pushState(entryState({}), '', ROUTES.sheet + hashFor(payload, palette, iconSet))
+    history.pushState(
+      entryState({}),
+      '',
+      ROUTES.sheet + hashFor(payload, palette, iconSet, null, seasonId),
+    )
     setMode('view')
-  }, [template, palette, iconSet])
+  }, [template, palette, iconSet, seasonId])
+
+  /*
+   * Адрес постера собирается здесь, а не читается из `location.hash`: хэш
+   * отстаёт на дебаунс до 400 мс, и «Сохранить» сразу после правки положил бы
+   * в базу допоследнюю версию.
+   */
+  const buildSeasonUrl = useCallback(async () => {
+    const payload = await encodeTemplate(template)
+    // Делимся тем, что на экране: у примера уезжает и его набор заполнения.
+    // Форк, наоборот, `data=` сбрасывает — там начинается свой сезон.
+    return ROUTES.sheet + hashFor(payload, palette, iconSet, fillId)
+  }, [template, palette, iconSet, fillId])
 
   const value = useMemo<DocValue>(
     () => ({
@@ -324,6 +351,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       palette,
       iconSet,
       fill,
+      seasonId,
       mode,
       source,
       days,
@@ -402,19 +430,18 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
         })),
       setPalette,
       setIconSet,
-      buildShareUrl: async () => {
-        const payload = await encodeTemplate(template)
-        // Делимся тем, что на экране: у примера уезжает и его набор заполнения.
-        // Форк, наоборот, `data=` сбрасывает — там начинается свой сезон.
-        return `${location.origin}${ROUTES.sheet}${hashFor(payload, palette, iconSet, fillId)}`
-      },
+      setSeasonId,
+      // Единственное место, где собирается адрес постера. Пометки `s=` в нём нет:
+      // и в базу, и в присланную ссылку едет постер, а не ссылка на кабинет.
+      buildSeasonUrl,
+      buildShareUrl: async () => `${location.origin}${await buildSeasonUrl()}`,
     }),
     [
       template,
       palette,
       iconSet,
       fill,
-      fillId,
+      seasonId,
       mode,
       source,
       days,
@@ -424,6 +451,7 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
       startCustom,
       enterEdit,
       leaveEdit,
+      buildSeasonUrl,
     ],
   )
 

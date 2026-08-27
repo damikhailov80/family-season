@@ -5,6 +5,12 @@ interface IconProps {
   name: IconName
   size?: number
   className?: string
+  /**
+   * Перебивает заливку рисунка. Нужен там, где одна и та же форма показывает два
+   * состояния — залитая звезда «в избранном» и её же контур «ещё нет». Заводить
+   * ради этого второй рисунок нельзя: геометрия в проекте живёт в одном месте.
+   */
+  filled?: boolean
 }
 
 /**
@@ -15,7 +21,7 @@ interface IconProps {
  * Цвет — только `currentColor`, как у доодлов: краску даёт `color` у класса
  * снаружи, поэтому рисунок сам собой попадает в тему постера.
  */
-export function Icon({ name, size = 48, className }: IconProps) {
+export function Icon({ name, size = 48, className, filled }: IconProps) {
   const shape: IconShape = ICONS[name]
 
   return (
@@ -24,7 +30,7 @@ export function Icon({ name, size = 48, className }: IconProps) {
       width={size}
       height={size}
       viewBox={`0 0 ${ICON_VIEWBOX} ${ICON_VIEWBOX}`}
-      fill={shape.fill ? 'currentColor' : 'none'}
+      fill={(filled ?? shape.fill) ? 'currentColor' : 'none'}
       stroke="currentColor"
       strokeWidth={shape.stroke ?? ICON_STROKE}
       strokeLinecap="round"

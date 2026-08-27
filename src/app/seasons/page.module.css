@@ -71,3 +71,276 @@
   line-height: 1.5;
   color: var(--ink-soft);
 }
+
+/* Вкладки: два списка на одной странице — свои сезоны и отложенное чужое.
+   Обычные ссылки, а не кнопки: у каждой вкладки свой адрес, и его можно
+   переслать, положить в закладки и перезагрузить. */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.tab,
+.tabActive {
+  padding: 8px 16px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.tab {
+  background: var(--surface);
+  color: var(--ink-soft);
+}
+
+.tab:hover {
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
+}
+
+.tabActive {
+  border-color: var(--accent-deep);
+  background: var(--accent-deep);
+  color: var(--on-accent);
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.search {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1;
+}
+
+.search:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 1px;
+  border-color: var(--accent-deep);
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.ghost:hover {
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
+}
+
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  font-size: 13px;
+}
+
+.sortLink,
+.sortActive {
+  text-decoration: none;
+}
+
+.sortLink {
+  color: var(--ink-muted);
+}
+
+.sortLink:hover {
+  color: var(--accent-deep);
+}
+
+.sortActive {
+  font-weight: 700;
+  color: var(--accent-deep);
+  text-decoration: underline;
+}
+
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 16px;
+  /* Отступ у <ul> браузерный: без сброса список съезжает вправо от заголовка. */
+  padding-left: 0;
+  list-style: none;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--sheet-border);
+}
+
+/* Четыре сектора темы — тот же образец, что на кнопке переключателя тем:
+   по одной краске набор не узнать, а красок в теме ровно четыре. */
+.ink {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--sheet-border);
+  background: linear-gradient(
+    135deg,
+    var(--c1) 0 25%,
+    var(--c2) 0 50%,
+    var(--c3) 0 75%,
+    var(--c4) 0
+  );
+}
+
+.entryText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* min-width: 0 — иначе длинное название растянет строку и вытолкнет «×». */
+  min-width: 0;
+  flex: 1;
+}
+
+.entryTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-hand);
+  font-size: 21px;
+  line-height: 1.2;
+  color: var(--accent-deep);
+  text-decoration: none;
+}
+
+.entryTitle:hover {
+  text-decoration: underline;
+}
+
+.entryMeta {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.remove {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink-muted);
+  font-family: var(--font-ui);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.remove:hover {
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+.remove:focus-visible,
+.tab:focus-visible,
+.tabActive:focus-visible,
+.ghost:focus-visible,
+.danger:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* Окно подтверждения. Обвязка повторяет диалоги постера, но модуль свой:
+   те живут в `components/edit`, и тянуть их стили на страницу сайта незачем. */
+.dialog {
+  max-width: 460px;
+  padding: 22px 24px;
+  border: var(--border-w) solid var(--accent-deep);
+  border-radius: var(--radius-box);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-ui);
+}
+
+.dialog::backdrop {
+  background: rgb(0 0 0 / 35%);
+}
+
+.dialogTitle {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 1.1;
+  color: var(--accent-deep);
+}
+
+.dialogText {
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Удаление необратимо, поэтому кнопка не «главная», а именно опасная: цвет
+   «плохого» настроения — единственный красный в проекте, и он вне тем. */
+.danger {
+  padding: 10px 18px;
+  border: 1.5px solid var(--mood-bad);
+  border-radius: 8px;
+  background: var(--mood-bad);
+  color: #fff;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.danger:hover {
+  background: color-mix(in srgb, var(--mood-bad) 85%, #000);
+}
+
+@media print {
+  .dialog {
+    display: none;
+  }
+}

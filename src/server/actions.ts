@@ -2,8 +2,15 @@
 
 import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
+import { addFavorite, removeEntry, saveSeason, seasonIdOrNull } from './library'
 import { writeFamily, type FamilyStatus } from './settings'
 import { normalizeFamily } from '../model/family'
+import {
+  normalizeTitle,
+  safeSeasonUrl,
+  type LibraryKind,
+  type LibraryStatus,
+} from '../model/library'
 import { ROUTES } from '../model/site'
 
 /**
@@ -64,4 +71,51 @@ export async function saveFamily(family: unknown): Promise<Exclude<FamilyStatus,
   const outcome = await writeFamily(normalizeFamily(family))
   if (outcome === 'ok') redirect(`${ROUTES.account}?ok=1`)
   return outcome
+}
+
+/**
+ * Библиотека сезонов. Правила у этих действий те же, что у `saveFamily`:
+ * данные едут **аргументом, а не `FormData`** (форму из клиентского компонента
+ * React кодирует под своими именами), а пришедшему не доверяем — адрес и
+ * название проверяются здесь, у самой записи.
+ *
+ * Успех и неудача расходятся так же: листу статус нужен **значением** (постер
+ * никуда не уходит и терять набранное нельзя), а страница «Мои сезоны»
+ * заканчивается редиректом — удаление обязано пережить перезагрузку.
+ */
+export async function toggleFavorite(
+  url: unknown,
+  title: unknown,
+  existingId: unknown,
+): Promise<{ status: LibraryStatus; id?: string }> {
+  const id = seasonIdOrNull(existingId)
+  if (id) return { status: await removeEntry('favorites', id) }
+
+  const address = safeSeasonUrl(url)
+  if (!address) return { status: 'error' }
+  return addFavorite(address, normalizeTitle(title))
+}
+
+export async function storeSeason(input: unknown): Promise<{ status: LibraryStatus; id?: string }> {
+  const raw = (input ?? {}) as { id?: unknown; url?: unknown; title?: unknown }
+  const address = safeSeasonUrl(raw.url)
+  if (!address) return { status: 'error' }
+  return saveSeason({
+    id: seasonIdOrNull(raw.id),
+    url: address,
+    title: normalizeTitle(raw.title),
+  })
+}
+
+/**
+ * Удаление со страницы. Вид списка и id привязаны к действию в серверном
+ * компоненте, но привязанные аргументы уезжают в браузер и возвращаются оттуда —
+ * поэтому проверяются наравне со всем остальным, включая адрес возврата.
+ */
+export async function dropEntry(kind: unknown, id: unknown, back: unknown) {
+  const list: LibraryKind | null =
+    kind === 'seasons' || kind === 'favorites' ? kind : null
+  const key = seasonIdOrNull(id)
+  if (list && key) await removeEntry(list, key)
+  redirect(safeReturnTo(back) ?? ROUTES.seasons)
 }

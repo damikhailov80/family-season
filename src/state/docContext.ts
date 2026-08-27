@@ -22,6 +22,8 @@ export interface DocValue {
   /** Набор рисунков. Тоже не бланк: его несёт пометка `i=` в адресе. */
   iconSet: IconSetId
   fill: FillState
+  /** id своей сохранённой строки из `s=`; null — сезон ещё нигде не сохранён. */
+  seasonId: string | null
   mode: DocMode
   source: DocSource
   /** Число дней месяца — считается из темы, отдельного поля в модели нет. */
@@ -51,6 +53,13 @@ export interface DocValue {
   stepMonth: (delta: number) => void
   setPalette: (palette: PaletteId) => void
   setIconSet: (iconSet: IconSetId) => void
+  /** Ставится после сохранения; `null` стирает чужую или устаревшую пометку `s=`. */
+  setSeasonId: (id: string | null) => void
+  /**
+   * Относительный адрес просмотра — то, что уезжает в базу. Без `s=`: в строке
+   * лежит постер, готовый к пересылке, а не ссылка на чужой кабинет.
+   */
+  buildSeasonUrl: () => Promise<string>
   /** Актуальная ссылка на лист (дожидается кодирования, а не читает location). */
   buildShareUrl: () => Promise<string>
 }

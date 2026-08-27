@@ -10,6 +10,7 @@ import {
   readIconSetId,
   readNewFlag,
   readPaletteId,
+  readSeasonId,
 } from '../../model/codec'
 import { DEFAULT_EXAMPLE_ID, exampleById, knownExampleId } from '../../model/examples'
 import { modeFromPath } from '../../model/site'
@@ -26,6 +27,8 @@ function exampleBoot(id: string): Boot {
     fillId: id,
     palette: readPaletteId() ?? example.palette,
     iconSet: readIconSetId() ?? example.iconSet,
+    // Пример не бывает сохранённым сезоном: его не сохраняют, а форкают.
+    seasonId: null,
     mode: 'view',
   }
 }
@@ -40,6 +43,9 @@ function exampleBoot(id: string): Boot {
  *   /sheet#d=…            — свой лист в просмотре
  *   /sheet/edit#d=…       — он же в правке
  *   /sheet/edit           — пустой бланк «с нуля»
+ *
+ * К своему листу может быть дописана пометка `&s=<uuid>` — «это мой сохранённый
+ * сезон» (см. `readSeasonId`). Она не про содержимое бланка, а про строку в базе.
  *
  * К любому из них можно дописать `&p=<тема>` и `&i=<набор рисунков>` — они
  * перебивают тему и рисунки примера. Пометки нет — значение по умолчанию.
@@ -59,6 +65,7 @@ function initialBoot(): Boot | null {
       fillId: null,
       palette: readPaletteId() ?? DEFAULT_PALETTE,
       iconSet: readIconSetId() ?? DEFAULT_ICON_SET,
+      seasonId: null,
       mode: 'edit',
     }
   }
@@ -87,6 +94,8 @@ export default function Sheet() {
         fillId,
         palette: readPaletteId() ?? (fillId ? exampleById(fillId)!.palette : DEFAULT_PALETTE),
         iconSet: readIconSetId() ?? (fillId ? exampleById(fillId)!.iconSet : DEFAULT_ICON_SET),
+        // `s=` — своя сохранённая строка; у примера её быть не может.
+        seasonId: fillId ? null : readSeasonId(),
         // `edit=1` — легаси-пометка ссылок форка; сегодня режим несёт путь.
         mode: fillId ? 'view' : readEditFlag() ? 'edit' : modeFromPath(),
       })

@@ -3,6 +3,8 @@ import { Icon } from './Icon'
 interface DoodleProps {
   size?: number
   className?: string
+  /** Залитая звезда или её контур — два состояния кнопки «В избранное». */
+  filled?: boolean
 }
 
 /**
@@ -12,6 +14,6 @@ interface DoodleProps {
  * а это имя осталось для сайта: у лендинга, шапки и подвала рисунки свои и
  * от набора постера не зависят.
  */
-export function SparkStar({ size = 24, className }: DoodleProps) {
-  return <Icon name="star" size={size} className={className} />
+export function SparkStar({ size = 24, className, filled }: DoodleProps) {
+  return <Icon name="star" size={size} className={className} filled={filled} />
 }

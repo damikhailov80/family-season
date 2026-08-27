@@ -1,0 +1,129 @@
+/* Общая обвязка модальных окон постера: рамка, подложка, заголовок и ряд кнопок.
+   Модуль один на два окна — входа и сохранения: копия этих правил в каждом файле
+   разошлась бы при первой же правке оформления. */
+
+/* 560px — ширина под три кнопки в один ряд: у сохранённого сезона их именно
+   три («Не сохранять», «Сохранить как новый», «Перезаписать»), и перенос
+   последней на свою строку читается как «эта кнопка другая». */
+.dialog {
+  max-width: 560px;
+  padding: 22px 24px;
+  border: var(--border-w) solid var(--accent-deep);
+  border-radius: var(--radius-box);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-ui);
+}
+
+.dialog::backdrop {
+  background: rgb(0 0 0 / 35%);
+}
+
+.title {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.1;
+  color: var(--accent-deep);
+}
+
+.text {
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+
+.label {
+  display: block;
+  margin-top: 18px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+}
+
+.input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-hand);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 1px;
+  border-color: var(--accent-deep);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.ghost,
+.primary {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  padding: 11px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.ghost:focus-visible,
+.primary:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.ghost {
+  border: 1.5px solid var(--sheet-border);
+  background: var(--surface);
+  color: var(--ink-soft);
+}
+
+.ghost:hover {
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
+}
+
+.primary {
+  border: 1.5px solid var(--accent-deep);
+  background: var(--accent-deep);
+  color: var(--on-accent);
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
+}
+
+.ghost:disabled,
+.primary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* Вход внутри окна: форма кнопки живёт в своём модуле, здесь только отступ. */
+.login {
+  margin-top: 18px;
+}
+
+/* Экранный контрол на бумагу не идёт. Закрытый <dialog> и так не рисуется,
+   но правило нужно на случай печати с открытым окном. */
+@media print {
+  .dialog {
+    display: none;
+  }
+}
