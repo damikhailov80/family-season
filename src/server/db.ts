@@ -42,6 +42,21 @@ function getPool(): Pool | null {
  * булеву дискриминанту TypeScript такой союз не сужает — `rows` и `reason`
  * оказываются недоступны в обеих ветках.
  */
+/**
+ * Упавшее соединение приезжает `AggregateError`-ом: у него пустой `message` и
+ * бесполезный стек, а настоящие причины лежат в `errors` — по одной на каждый
+ * адрес, куда резолвится хост. Без разворачивания в логе остаётся строка
+ * «AggregateError:» и больше ничего, то есть ровно то, от чего мы уходим.
+ */
+function describe(error: unknown): string {
+  if (!(error instanceof Error)) return String(error)
+  const nested = (error as { errors?: unknown }).errors
+  if (Array.isArray(nested) && nested.length > 0) {
+    return `${error.name}: ${nested.map((item) => (item as Error)?.message ?? item).join('; ')}`
+  }
+  return error.stack ?? error.message
+}
+
 export type QueryResult<Row> =
   | { status: 'ok'; rows: Row[] }
   | { status: 'unconfigured' }
@@ -83,7 +98,7 @@ export async function query<Row>(
     const code = (error as { code?: unknown })?.code
     console.error(
       `[db] запрос не прошёл (${label}${typeof code === 'string' ? `, код ${code}` : ''}):`,
-      error instanceof Error ? (error.stack ?? error.message) : error,
+      describe(error),
     )
     return { status: 'failed' }
   }
