@@ -1,6 +1,6 @@
 import { cache } from 'react'
 import { auth } from './auth'
-import { hasDatabase, query } from './db'
+import { query } from './db'
 import { normalizeFamily, type FamilyPreset } from '../model/family'
 
 /**
@@ -16,6 +16,8 @@ interface Row {
   family: unknown
 }
 
+const SELECT = 'select family from user_settings where account_key = $1'
+
 /**
  * `cache` из React, а не наша память: за один запрос состав спрашивают и шапка
  * (ей строить ссылку «Новый сезон»), и страница кабинета — а запрос в базу
@@ -27,9 +29,9 @@ export const readFamily = cache(async (): Promise<FamilyPreset | null> => {
   const key = session?.accountKey
   if (!key) return null
 
-  const rows = await query<Row>('select family from user_settings where account_key = $1', [key])
-  if (!rows || rows.length === 0) return null
-  return normalizeFamily(rows[0].family)
+  const result = await query<Row>('settings:read', SELECT, [key])
+  if (result.status !== 'ok' || result.rows.length === 0) return null
+  return normalizeFamily(result.rows[0].family)
 })
 
 /**
@@ -39,11 +41,16 @@ export const readFamily = cache(async (): Promise<FamilyPreset | null> => {
  * `stale` — человек вошёл, но в его токене нет `accountKey`: сессия выпущена
  * до того, как ключ появился. Привязать настройки не к чему, лечится входом
  * заново (см. комментарий в `auth.ts`).
+ *
+ * `unconfigured` и `offline` разведены намеренно: первое — не задан
+ * `DATABASE_URL`, второе — база не ответила. Для человека это одинаково
+ * «сейчас недоступно», но обещать ему «попробуйте попозже» там, где хранилище
+ * вообще не подключено, значит врать.
  */
-export type FamilyStatus = 'anonymous' | 'stale' | 'offline' | 'ok'
+export type FamilyStatus = 'anonymous' | 'stale' | 'unconfigured' | 'offline' | 'ok'
 
 export type FamilyState =
-  | { status: 'anonymous' | 'stale' | 'offline' }
+  | { status: 'anonymous' | 'stale' | 'unconfigured' | 'offline' }
   | { status: 'ok'; family: FamilyPreset | null }
 
 /** То же чтение, но с причиной пустоты — для кабинета. */
@@ -51,13 +58,15 @@ export async function familyState(): Promise<FamilyState> {
   const session = await auth()
   if (!session?.user) return { status: 'anonymous' }
   if (!session.accountKey) return { status: 'stale' }
-  if (!hasDatabase()) return { status: 'offline' }
 
-  const rows = await query<Row>('select family from user_settings where account_key = $1', [
-    session.accountKey,
-  ])
-  if (!rows) return { status: 'offline' }
-  return { status: 'ok', family: rows.length ? normalizeFamily(rows[0].family) : null }
+  const result = await query<Row>('settings:read', SELECT, [session.accountKey])
+  if (result.status !== 'ok') {
+    return { status: result.status === 'unconfigured' ? 'unconfigured' : 'offline' }
+  }
+  return {
+    status: 'ok',
+    family: result.rows.length ? normalizeFamily(result.rows[0].family) : null,
+  }
 }
 
 /** Записывает состав и возвращает, что из этого вышло. */
@@ -66,11 +75,18 @@ export async function writeFamily(family: FamilyPreset): Promise<FamilyStatus> {
   if (!session?.user) return 'anonymous'
   if (!session.accountKey) return 'stale'
 
-  const rows = await query(
+  const result = await query(
+    'settings:write',
     `insert into user_settings (account_key, family, updated_at)
      values ($1, $2::jsonb, now())
      on conflict (account_key) do update set family = excluded.family, updated_at = now()`,
     [session.accountKey, JSON.stringify(normalizeFamily(family))],
   )
-  return rows === null ? 'offline' : 'ok'
+  if (result.status === 'ok') return 'ok'
+
+  // Чьё сохранение пропало, из строки `db.ts` не видно — а без этого не отличить
+  // «не повезло одному» от «база не отвечает никому». Ключ здесь непрозрачный,
+  // тот же, что лежит в базе: ни имени, ни почты в лог не уходит.
+  console.error(`[settings] состав не сохранён (${session.accountKey}): ${result.status}`)
+  return result.status === 'unconfigured' ? 'unconfigured' : 'offline'
 }

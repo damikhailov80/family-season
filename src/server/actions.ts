@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
-import { writeFamily } from './settings'
+import { writeFamily, type FamilyStatus } from './settings'
 import { normalizeFamily } from '../model/family'
 import { ROUTES } from '../model/site'
 
@@ -54,10 +54,14 @@ export async function logout() {
  * Пришедшему не доверяем: `normalizeFamily` режет по границам 2..5, выкидывает
  * неизвестные лица и обрезает длину имени.
  *
- * Результат сообщаем пометкой в адресе, а не возвращаемым значением: так
- * «Сохранено» переживает перезагрузку и не требует `useActionState`.
+ * Успех и неудача расходятся намеренно. Успех уезжает пометкой в адрес — ему
+ * надо пережить перезагрузку, и страница всё равно перерисовывается новыми
+ * данными. Неудаче переживать нечего: редирект перерисовал бы кабинет с нуля,
+ * а набранного состава у сервера нет — он молча пропал бы, и повторять было бы
+ * нечего. Поэтому статус возвращаем, и форма показывает его, не теряя ввод.
  */
-export async function saveFamily(family: unknown) {
+export async function saveFamily(family: unknown): Promise<Exclude<FamilyStatus, 'ok'>> {
   const outcome = await writeFamily(normalizeFamily(family))
-  redirect(`${ROUTES.account}?${outcome}=1`)
+  if (outcome === 'ok') redirect(`${ROUTES.account}?ok=1`)
+  return outcome
 }

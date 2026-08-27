@@ -27,8 +27,12 @@ export const metadata: Metadata = {
 export default async function AccountPage({
   searchParams,
 }: {
-  // Пометки те же, что возвращает `writeFamily`: ok / offline / stale.
-  searchParams: Promise<{ ok?: string; offline?: string; stale?: string }>
+  /*
+   * В адрес уезжает только успех: неудача остаётся в форме вместе с набранным
+   * составом (см. `saveFamily`). Причины пустоты приходят из `familyState`,
+   * а не пометкой — иначе перезагрузка показывала бы отказ уже починенной базы.
+   */
+  searchParams: Promise<{ ok?: string }>
 }) {
   const session = await auth()
   const who = session?.user?.name || session?.user?.email
@@ -55,9 +59,6 @@ export default async function AccountPage({
 
   const flags = await searchParams
   const state = await familyState()
-  const family = state.status === 'ok' ? (state.family ?? DEFAULT_FAMILY) : DEFAULT_FAMILY
-  const offline = state.status === 'offline' || Boolean(flags.offline)
-  const stale = state.status === 'stale' || Boolean(flags.stale)
 
   return (
     <PaperSheet>
@@ -67,13 +68,14 @@ export default async function AccountPage({
           <p className={styles.sub}>{session.user.email}</p>
         )}
 
-        {/* При устаревшей сессии сохранения быть не могло — не показываем оба сразу. */}
-        {flags.ok && !stale && (
+        {/* «Сохранено» показываем только когда состав и правда прочитан:
+            пометка в адресе переживает перезагрузку, а состояние базы — нет. */}
+        {flags.ok && state.status === 'ok' && (
           <p className={styles.saved} role="status">
             Сохранено ✓
           </p>
         )}
-        {stale && (
+        {state.status === 'stale' && (
           <div className={styles.warn} role="status">
             <p>
               Вход был выполнен до того, как появились настройки, поэтому привязать их не к чему.
@@ -87,10 +89,16 @@ export default async function AccountPage({
             </form>
           </div>
         )}
-        {offline && !stale && (
+        {state.status === 'offline' && (
           <p className={styles.warn} role="status">
             Настройки сейчас недоступны — не отвечает хранилище. Постеры, примеры и печать
-            работают как обычно, а состав семьи попробуйте сохранить попозже.
+            работают как обычно, а состав семьи попробуйте посмотреть попозже.
+          </p>
+        )}
+        {state.status === 'unconfigured' && (
+          <p className={styles.warn} role="status">
+            Настройки сейчас недоступны — хранилище не подключено. Постеры, примеры и печать
+            работают как обычно, а состав семьи здесь появится, когда хранилище заработает.
           </p>
         )}
 
@@ -105,14 +113,24 @@ export default async function AccountPage({
           каждый месяц. На готовые постеры настройка не влияет: их состав уже вписан в ссылку.
         </p>
 
-        {/* Ключ по составу: после сохранения сервер отдаёт новые данные, и редактор
-            должен начать с них, а не держать своё прежнее состояние. */}
-        <FamilyEditor initial={family} key={JSON.stringify(family)} />
+        {/* Редактор — только когда состав действительно прочитан. Иначе он
+            показал бы умолчание вместо настоящих настроек, а «Сохранить» —
+            это `upsert`: он затёр бы то, чего мы не видели.
+            Ключ по составу: после сохранения сервер отдаёт новые данные, и
+            редактор должен начать с них, а не держать своё прежнее состояние. */}
+        {state.status === 'ok' && (
+          <>
+            <FamilyEditor
+              initial={state.family ?? DEFAULT_FAMILY}
+              key={JSON.stringify(state.family)}
+            />
 
-        <p className={styles.hint}>
-          Клик по рисунку меняет героя — как на постере. От {MIN_PEOPLE} до {MAX_PEOPLE} человек;
-          имена можно не заполнять, их всегда можно вписать прямо на постере.
-        </p>
+            <p className={styles.hint}>
+              Клик по рисунку меняет героя — как на постере. От {MIN_PEOPLE} до {MAX_PEOPLE}{' '}
+              человек; имена можно не заполнять, их всегда можно вписать прямо на постере.
+            </p>
+          </>
+        )}
 
         <h2 className={styles.head}>Выход</h2>
         <form action={logout}>

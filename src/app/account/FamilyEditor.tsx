@@ -1,12 +1,28 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { AvatarFace } from '../../components/AvatarFace'
 import { FACE_LABELS, nextFace } from '../../model/accents'
 import { NAME_LIMIT, type FamilyPreset } from '../../model/family'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../model/types'
 import { saveFamily } from '../../server/actions'
+import type { FamilyStatus } from '../../server/settings'
 import styles from './page.module.css'
+
+/**
+ * Что сказать, когда сохранить не вышло. Успеха здесь нет: он уводит редиректом
+ * и показывается уже страницей. Тексты обещают ровно то, что правда: «попозже»
+ * только там, где повтор может помочь.
+ */
+const FAILURE_TEXT: Record<Exclude<FamilyStatus, 'ok'>, string> = {
+  offline:
+    'Не сохранилось — хранилище не отвечает. Состав остался на месте: нажмите «Сохранить» ещё раз через минуту.',
+  unconfigured:
+    'Не сохранилось — хранилище настроек не подключено. Состав остался на месте, но сохранить его сейчас не выйдет.',
+  stale:
+    'Не сохранилось — вход был выполнен до того, как появились настройки. Обновите страницу и войдите заново.',
+  anonymous: 'Не сохранилось — сеанс закончился. Обновите страницу и войдите снова.',
+}
 
 /**
  * Редактор состава семьи. Повадка намеренно та же, что у секции «Личные проекты»
@@ -26,7 +42,29 @@ import styles from './page.module.css'
  */
 export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
   const [people, setPeople] = useState<FamilyPreset>(initial)
-  const [saving, startSaving] = useTransition()
+
+  /*
+   * `useActionState`, а не `useTransition`: действие теперь возвращает статус
+   * неудачи вместо редиректа, и его надо куда-то положить. Успех сюда не
+   * приходит — `saveFamily` уводит на `?ok=1`, и компонент размонтируется.
+   */
+  const [failure, save, saving] = useActionState<Exclude<FamilyStatus, 'ok'> | null, FormData>(
+    () => saveFamily(people),
+    null,
+  )
+
+  /*
+   * `?ok=1` нужен ровно на один рендер: он донёс «Сохранено ✓» через редирект.
+   * Дальше он врёт — перезагрузка показывала бы «Сохранено» и через час. Плашку
+   * это не гасит: она уже нарисована сервером, а React перерисовки не делает.
+   * `history.state` передаём целиком: `null` затёр бы служебные поля Next.
+   */
+  useEffect(() => {
+    const url = new URL(location.href)
+    if (!url.searchParams.has('ok')) return
+    url.searchParams.delete('ok')
+    history.replaceState(history.state, '', `${url.pathname}${url.search}${url.hash}`)
+  }, [])
 
   const cycle = (index: number) =>
     setPeople((current) =>
@@ -47,13 +85,7 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
     )
 
   return (
-    <form
-      className={styles.family}
-      onSubmit={(event) => {
-        event.preventDefault()
-        startSaving(() => saveFamily(people))
-      }}
-    >
+    <form className={styles.family} action={save}>
       <ul className={styles.people}>
         {people.map((person, index) => (
           <li className={styles.person} key={index}>
@@ -104,6 +136,14 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
           {saving ? 'Сохраняем…' : 'Сохранить'}
         </button>
       </div>
+
+      {/* Отказ живёт рядом с кнопкой, а не наверху страницы: повторяют его
+          отсюда же, не сходя с формы и не теряя набранного. */}
+      {failure && (
+        <p className={styles.warn} role="status">
+          {FAILURE_TEXT[failure]}
+        </p>
+      )}
     </form>
   )
 }
