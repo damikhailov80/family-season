@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react'
 import type { IconSetId, PaletteId } from '../types'
 import type { FillState, Template } from '../model/types'
+import type { FamilyPreset } from '../model/family'
 
 export type DocMode = 'view' | 'edit'
 
@@ -41,6 +42,12 @@ export interface DocValue {
   addPerson: () => void
   removePerson: (id: string) => void
   cycleFace: (id: string) => void
+  /**
+   * Подставляет состав семьи из кабинета: меняются только рисунок и имя,
+   * содержимое карточек остаётся на своих местах (см. `replacePeople`
+   * в `DocProvider`).
+   */
+  replacePeople: (members: FamilyPreset) => void
   stepMonth: (delta: number) => void
   setPalette: (palette: PaletteId) => void
   setIconSet: (iconSet: IconSetId) => void

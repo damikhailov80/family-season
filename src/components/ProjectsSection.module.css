@@ -99,8 +99,18 @@
   background: color-mix(in srgb, var(--accent) 14%, var(--surface));
 }
 
-.add {
+/* Ряд кнопок состава. Нужен потому, что `.list` — колонка: без обёртки вторая
+   кнопка встала бы отдельной строкой под первой. */
+.actions {
+  display: flex;
   align-self: center;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.add {
   font-family: var(--font-ui);
   font-weight: 700;
   font-size: 14px;
@@ -219,7 +229,8 @@
 
 @media print {
   .remove,
-  .add {
+  .add,
+  .actions {
     display: none;
   }
 

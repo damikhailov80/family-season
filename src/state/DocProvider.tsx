@@ -17,6 +17,7 @@ import { DEFAULT_EXAMPLE_ID, exampleById, fillOf, knownExampleId } from '../mode
 import { modeFromPath, pathForMode, ROUTES } from '../model/site'
 import { DEFAULT_ICON_SET } from '../model/icons'
 import { DEFAULT_PALETTE } from '../model/palettes'
+import { normalizeFamily, type FamilyPreset } from '../model/family'
 import { createEmptyTemplate, createPerson, nextPersonId } from '../model/templates'
 import type { IconSetId, PaletteId } from '../types'
 import type { Template } from '../model/types'
@@ -370,6 +371,29 @@ export function DocProvider({ boot, children }: { boot: Boot; children: React.Re
           people: current.people.map((person) =>
             person.id === id ? { ...person, face: nextFace(person.face) } : person,
           ),
+        })),
+      /*
+       * Замена состава на свой. Карточка на каждом месте берётся прежняя, и в
+       * ней меняются ровно два поля — рисунок и имя. Проект, описание и цель
+       * остаются: форкают ради идей, а меняют актёрский состав.
+       *
+       * Место, на котором карточки не было, заполняется пустой. Лишние
+       * отбрасываются сами — длину задаёт `normalizeFamily`, она же держит
+       * границы 2..5 и режет имена.
+       *
+       * Id пересобираем `p1..pN`: старый список выбрасывается целиком, поэтому
+       * `nextPersonId` здесь не нужен. `templateForFamily` не годится — она
+       * возвращает весь пустой бланк и затёрла бы тему, недели и цель месяца.
+       */
+      replacePeople: (members: FamilyPreset) =>
+        update((current) => ({
+          ...current,
+          people: normalizeFamily(members).map((member, index) => ({
+            ...(current.people[index] ?? createPerson('', 'son')),
+            id: `p${index + 1}`,
+            face: member.face,
+            name: member.name,
+          })),
         })),
       stepMonth: (delta: number) =>
         update((current) => ({

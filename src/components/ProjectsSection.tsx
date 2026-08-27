@@ -7,6 +7,7 @@ import { AvatarFace } from './AvatarFace'
 import { Badge } from './Badge'
 import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
+import { FamilySwap } from './edit/FamilySwap'
 import { ProgressBar } from './ProgressBar'
 import styles from './ProjectsSection.module.css'
 
@@ -113,10 +114,16 @@ export function ProjectsSection() {
           )
         })}
 
-        {editing && people.length < MAX_PEOPLE && (
-          <button type="button" className={styles.add} onClick={addPerson}>
-            + Добавить человека
-          </button>
+        {editing && (
+          <div className={styles.actions}>
+            {people.length < MAX_PEOPLE && (
+              <button type="button" className={styles.add} onClick={addPerson}>
+                + Добавить человека
+              </button>
+            )}
+            {/* Кнопки нет, пока состав семьи не задан в кабинете, — см. FamilySwap. */}
+            <FamilySwap />
+          </div>
         )}
       </div>
     </section>

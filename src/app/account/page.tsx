@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
-import { GoogleLoginButton } from '../../components/site/LoginButtons'
+import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
 import { DEFAULT_FAMILY } from '../../model/family'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../model/types'
 import { ROUTES } from '../../model/site'

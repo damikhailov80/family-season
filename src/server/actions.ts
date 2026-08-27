@@ -14,9 +14,27 @@ import { ROUTES } from '../model/site'
  * «Моих сезонах».
  */
 
-export async function loginWithGoogle() {
-  // После входа — сразу в кабинет: ради него в него и заходят.
-  await signIn('google', { redirectTo: ROUTES.seasons })
+/**
+ * Адрес возврата после входа. Приходит из браузера, поэтому проверяем:
+ * пускаем только свой относительный путь. `//host` — это протокол-относительный
+ * адрес, то есть чужой сайт, и он бы превратил вход в открытый редирект.
+ */
+function safeReturnTo(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  if (!value.startsWith('/') || value.startsWith('//')) return null
+  return value
+}
+
+/**
+ * Вход. `returnTo` собирает клиент (`GoogleLoginButton`), и это не прихоть:
+ * сезон живёт в хэше, а хэш до сервера не доходит — отсюда мы вернули бы
+ * человека на пустой бланк вместо листа, который он правил.
+ *
+ * Не назвали адрес — значит, входили из места без своего состояния, и разумное
+ * умолчание тут кабинет: ради него в основном и заходят.
+ */
+export async function loginWithGoogle(returnTo?: unknown) {
+  await signIn('google', { redirectTo: safeReturnTo(returnTo) ?? ROUTES.seasons })
 }
 
 export async function logout() {
