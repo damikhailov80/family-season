@@ -72,6 +72,19 @@
   color: var(--ink-soft);
 }
 
+/* Ссылка внутри сноски: подчёркивание рисуем рамкой, а не text-decoration —
+   у мелкого кегля стандартная линия садится прямо на выносные элементы. */
+.noteLink {
+  color: var(--accent-deep);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--accent-deep) 40%, transparent);
+}
+
+.noteLink:hover {
+  border-bottom-color: var(--accent-deep);
+}
+
 /* Вкладки: два списка на одной странице — свои сезоны и отложенное чужое.
    Обычные ссылки, а не кнопки: у каждой вкладки свой адрес, и его можно
    переслать, положить в закладки и перезагрузить. */
