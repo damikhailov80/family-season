@@ -242,6 +242,32 @@ export async function saveSeason(input: {
   return added ? { status: 'ok', id: added } : { status: 'limit' }
 }
 
+/**
+ * Переименование своей строки.
+ *
+ * `updated_at` намеренно не трогаем: это дата **сохранения**, по ней список
+ * сортируется по умолчанию, и правка имени не должна поднимать сезон наверх —
+ * сам сезон от неё не поменялся.
+ */
+export async function setTitle(
+  kind: LibraryKind,
+  id: string,
+  title: string,
+): Promise<LibraryStatus> {
+  const session = await auth()
+  if (!session?.user) return 'anonymous'
+  if (!session.accountKey) return 'stale'
+  if (!seasonIdOrNull(id)) return 'error'
+
+  const result = await query(
+    `${kind}:rename`,
+    `update ${kind} set title = $3 where id = $1 and account_key = $2`,
+    [id, session.accountKey, normalizeTitle(title)],
+  )
+  if (result.status === 'ok') return 'ok'
+  return failed(`${kind} entry not renamed`, session.accountKey, result.status)
+}
+
 /** Удаление своей строки. Не нашлась — тоже `ok`: повторное удаление не беда. */
 export async function removeEntry(kind: LibraryKind, id: string): Promise<LibraryStatus> {
   const session = await auth()

@@ -18,6 +18,7 @@ import { ROUTES } from '../../model/site'
 import { auth } from '../../server/auth'
 import { libraryState, type Entry } from '../../server/library'
 import { DeleteEntry } from './DeleteEntry'
+import { RenameEntry } from './RenameEntry'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
@@ -93,7 +94,10 @@ function Row({ entry, kind, back }: { entry: Entry; kind: LibraryKind; back: str
           {entry.month ? ` · ${entry.month}` : ''}
         </span>
       </span>
-      <DeleteEntry kind={kind} id={entry.id} title={entry.title} back={back} />
+      <span className={styles.rowTools}>
+        <RenameEntry kind={kind} id={entry.id} title={entry.title} back={back} />
+        <DeleteEntry kind={kind} id={entry.id} title={entry.title} back={back} />
+      </span>
     </li>
   )
 }
@@ -233,7 +237,7 @@ export default async function SeasonsPage({
         )}
 
         <a className={styles.primary} href={ROUTES.sheetEdit}>
-          Собрать свой сезон
+          Собрать новый сезон
         </a>
 
         <p className={styles.note}>

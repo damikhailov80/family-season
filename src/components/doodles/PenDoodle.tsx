@@ -1,9 +1,11 @@
 interface DoodleProps {
   size?: number
   className?: string
+  /** Своя толщина для мелкого размера — см. `PrinterDoodle`, причина та же. */
+  strokeWidth?: number
 }
 
-export function PenDoodle({ size = 56, className }: DoodleProps) {
+export function PenDoodle({ size = 56, className, strokeWidth = 2.3 }: DoodleProps) {
   return (
     <svg
       className={className}
@@ -12,7 +14,7 @@ export function PenDoodle({ size = 56, className }: DoodleProps) {
       viewBox="0 0 56 56"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.3"
+      strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"

@@ -32,7 +32,7 @@ export function DeleteEntry({
     <>
       <button
         type="button"
-        className={styles.remove}
+        className={styles.rowButton}
         onClick={() => dialog.current?.showModal()}
         aria-label={`Удалить «${title}»`}
       >

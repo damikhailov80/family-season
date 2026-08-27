@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
-import { addFavorite, removeEntry, saveSeason, seasonIdOrNull } from './library'
+import { addFavorite, removeEntry, saveSeason, seasonIdOrNull, setTitle } from './library'
 import { writeFamily, type FamilyStatus } from './settings'
 import { normalizeFamily } from '../model/family'
 import {
@@ -112,10 +112,20 @@ export async function storeSeason(input: unknown): Promise<{ status: LibraryStat
  * компоненте, но привязанные аргументы уезжают в браузер и возвращаются оттуда —
  * поэтому проверяются наравне со всем остальным, включая адрес возврата.
  */
+export async function renameEntry(kind: unknown, id: unknown, back: unknown, title: unknown) {
+  const list = listOrNull(kind)
+  const key = seasonIdOrNull(id)
+  if (list && key) await setTitle(list, key, normalizeTitle(title))
+  redirect(safeReturnTo(back) ?? ROUTES.seasons)
+}
+
 export async function dropEntry(kind: unknown, id: unknown, back: unknown) {
-  const list: LibraryKind | null =
-    kind === 'seasons' || kind === 'favorites' ? kind : null
+  const list = listOrNull(kind)
   const key = seasonIdOrNull(id)
   if (list && key) await removeEntry(list, key)
   redirect(safeReturnTo(back) ?? ROUTES.seasons)
+}
+
+function listOrNull(kind: unknown): LibraryKind | null {
+  return kind === 'seasons' || kind === 'favorites' ? kind : null
 }
