@@ -2,8 +2,10 @@
 
 import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
+import { addReport, publish, setLike, unpublish } from './community'
 import { addFavorite, removeEntry, saveSeason, seasonIdOrNull, setTitle } from './library'
 import { writeFamily, type FamilyStatus } from './settings'
+import { normalizeComment, type CommunityStatus } from '../model/community'
 import { normalizeFamily } from '../model/family'
 import {
   normalizeTitle,
@@ -108,6 +110,45 @@ export async function storeSeason(input: unknown): Promise<{ status: LibraryStat
 }
 
 /**
+ * Витрина «Идеи сообщества». Правила те же, что у библиотеки: данные едут
+ * аргументом, пришедшему не доверяем, статус возвращается **значением** —
+ * постер под кнопкой никуда не уходит.
+ *
+ * Публикуется не адрес, а **строка** сохранённого сезона: название и адрес
+ * витрина берёт из неё, второй копии постера не заводим.
+ */
+export async function togglePublish(
+  seasonId: unknown,
+  on: unknown,
+): Promise<{ status: CommunityStatus; id?: string }> {
+  const key = seasonIdOrNull(seasonId)
+  if (!key) return { status: 'error' }
+  if (!on) return { status: await unpublish(key) }
+  return publish(key)
+}
+
+/**
+ * Лайк. Желаемое состояние приходит от клиента — так запрос к базе один и
+ * идемпотентен (см. `setLike`), а не «прочитать и переключить».
+ */
+export async function likeSeason(sharedId: unknown, on: unknown): Promise<CommunityStatus> {
+  const key = seasonIdOrNull(sharedId)
+  if (!key) return 'error'
+  return setLike(key, Boolean(on))
+}
+
+/**
+ * Жалоба. Без комментария не принимаем: жалоба без слов бесполезна тому, кто
+ * будет в ней разбираться. Окно пустую и не отправит — это проверка у записи.
+ */
+export async function reportSeason(sharedId: unknown, comment: unknown): Promise<CommunityStatus> {
+  const key = seasonIdOrNull(sharedId)
+  const text = normalizeComment(comment)
+  if (!key || !text) return 'error'
+  return addReport(key, text)
+}
+
+/**
  * Удаление со страницы. Вид списка и id привязаны к действию в серверном
  * компоненте, но привязанные аргументы уезжают в браузер и возвращаются оттуда —
  * поэтому проверяются наравне со всем остальным, включая адрес возврата.
@@ -116,6 +157,18 @@ export async function renameEntry(kind: unknown, id: unknown, back: unknown, tit
   const list = listOrNull(kind)
   const key = seasonIdOrNull(id)
   if (list && key) await setTitle(list, key, normalizeTitle(title))
+  redirect(safeReturnTo(back) ?? ROUTES.seasons)
+}
+
+/**
+ * Снятие с витрины со страницы «Мои сезоны». Отдельно от `togglePublish` ровно
+ * потому, что кончается **редиректом**, а не значением: постеру статус нужен на
+ * месте, а списку — перерисоваться без выложенной строки, и пережить это должна
+ * перезагрузка. То же различие, что у `storeSeason` и `dropEntry`.
+ */
+export async function unpublishEntry(seasonId: unknown, back: unknown) {
+  const key = seasonIdOrNull(seasonId)
+  if (key) await unpublish(key)
   redirect(safeReturnTo(back) ?? ROUTES.seasons)
 }
 

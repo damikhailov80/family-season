@@ -20,6 +20,20 @@ export interface SavedSeason {
   url: string
 }
 
+/**
+ * Публикация этого постера на витрине. В отличие от двух других ответов, этот
+ * **не про вошедшего**: выложен ли сезон, видно и анониму — иначе кнопку лайка
+ * ему нечего было бы показать.
+ */
+export interface SharedSeason {
+  id: string
+  likes: number
+  liked: boolean
+  reported: boolean
+  /** Своё: у своего сезона кнопок лайка и жалобы нет. */
+  mine: boolean
+}
+
 export interface Lookup {
   /** id строки избранного с этим адресом; `null` — нет или ещё не знаем. */
   favoriteId: string | null
@@ -30,9 +44,11 @@ export interface Lookup {
    * эту щель успевает попасть клик и заводит вторую такую же строку.
    */
   season: SavedSeason | null | undefined
+  /** Строка витрины с этим адресом; `null` — не выложен или ещё не знаем. */
+  shared: SharedSeason | null
 }
 
-const EMPTY: Lookup = { favoriteId: null, season: undefined }
+const EMPTY: Lookup = { favoriteId: null, season: undefined, shared: null }
 
 /**
  * Адрес постера для библиотеки: он собирается кодированием, а кодирование
@@ -101,10 +117,11 @@ export function useLibrary(
           favoriteId: typeof data?.favoriteId === 'string' ? data.favoriteId : null,
           // Пришло из сети — доверять нельзя: строка без названия для нас не строка.
           season: data?.season && typeof data.season.id === 'string' ? data.season : null,
+          shared: data?.shared && typeof data.shared.id === 'string' ? data.shared : null,
         })
       } catch {
         // Молчание сервера — не ошибка: кнопки просто останутся в исходном виде.
-        if (!cancelled) setAnswer({ key, favoriteId: null, season: null })
+        if (!cancelled) setAnswer({ key, favoriteId: null, season: null, shared: null })
       }
     })()
 

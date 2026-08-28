@@ -1,0 +1,105 @@
+/* Миниатюра постера. Подложка белая, как у настоящего листа, цвет несут рамка,
+   плашка месяца и чернила заголовка — те же роли, что на бумаге (см. принцип 3
+   в CLAUDE.md). Ни градиентов, ни теней вместо рамок: превью обязано быть
+   похоже на то, что напечатается. */
+.paper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: 14px 16px 16px;
+  border: var(--border-w) solid var(--accent-deep);
+  border-radius: var(--radius-box);
+  background: var(--paper);
+  color: var(--ink);
+  text-decoration: none;
+  transition: transform 0.12s ease;
+}
+
+.paper:hover {
+  transform: translateY(-2px);
+}
+
+.paper:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* Плашка месяца — тот же приём, что у `Badge` на постере: краска как есть,
+   а цвет текста на ней посчитан по контрасту (`--on-*`). */
+.month {
+  align-self: flex-start;
+  padding: 3px 10px;
+  border: 1px solid var(--accent-theme);
+  border-radius: 999px;
+  background: var(--badge-theme);
+  color: var(--on-theme);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.headline {
+  font-family: var(--font-hand);
+  font-size: 24px;
+  line-height: 1.1;
+  color: var(--accent-deep);
+}
+
+.question {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+/* Недели — четыре строчки, а не сетка карточек: в 280 px сетка нечитаема, а
+   узнаётся сезон всё равно по тексту недель. */
+.weeks {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--sheet-border);
+}
+
+.week {
+  display: flex;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.weekTitle {
+  flex: none;
+  max-width: 40%;
+  color: var(--accent-weeks);
+  font-weight: 700;
+}
+
+/* Длинный текст недели обрывается многоточием: карточки в ряду обязаны быть
+   одной высоты, иначе сетка идёт лесенкой. */
+.weekText {
+  overflow: hidden;
+  color: var(--ink-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.goal {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--sheet-border);
+  font-family: var(--font-hand);
+  font-size: 17px;
+  line-height: 1.15;
+  color: var(--accent-goal);
+}
+
+/* Витрина на бумагу не идёт — как и вся обвязка сайта. */
+@media print {
+  .paper {
+    display: none;
+  }
+}

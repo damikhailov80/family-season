@@ -86,3 +86,109 @@
   outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
 }
+
+/* Сетка карточек. `auto-fill` с минимумом в 260px, а не подобранное число
+   колонок: набор превью один и тот же на любой ширине, и брейкпоинтам тут
+   делать нечего. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+  list-style: none;
+}
+
+/* Карточка — само превью плюс строка под ним. Строка **вне** превью: превью
+   носит тему постера, а название, счёт лайков и кнопка жалобы — часть сайта
+   и красятся его цветами. */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.name {
+  flex: 1 1 auto;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.likes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Кнопка жалобы — приглушённая: она нужна редко, и рядом с названием сезона
+   яркая кнопка читалась бы как основное действие карточки. */
+.report {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  padding: 0;
+  border: 1px solid var(--sheet-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.report:hover {
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+.report:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.report[aria-pressed='true'] {
+  border-color: var(--accent-deep);
+  background: var(--accent-deep);
+  color: var(--on-accent);
+}
+
+.report:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.note {
+  max-width: 620px;
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+/* Витрина на бумагу не идёт — как и вся обвязка сайта. */
+@media print {
+  .grid,
+  .actions,
+  .note {
+    display: none;
+  }
+}

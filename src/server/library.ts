@@ -36,6 +36,13 @@ export interface Entry {
   palette: PaletteId
   /** Месяц бланка: адрес и есть постер, второго источника не заводим. */
   month: string | null
+  /**
+   * id строки витрины, если сезон на неё выложен. У избранного всегда `null`:
+   * выкладывают своё, а отложенное чужое — не своё.
+   */
+  sharedId: string | null
+  /** Сколько лайков собрала публикация. Без публикации — ноль. */
+  likes: number
 }
 
 export type LibraryState =
@@ -47,6 +54,9 @@ interface Row {
   title: string
   url: string
   saved_at: Date
+  /** Приходят только у своих сезонов — у избранного публикации не бывает. */
+  shared_id?: string | null
+  likes?: number
 }
 
 /** Пометка `s=` приходит из адреса — до базы её пускать нельзя: uuid там строгий. */
@@ -64,11 +74,20 @@ export function seasonIdOrNull(value: unknown): string | null {
  */
 function listSql(kind: LibraryKind, sort: LibrarySort): string {
   const stamp = kind === 'seasons' ? 'updated_at' : 'created_at'
-  const order = sort === 'name' ? `lower(title) asc, ${stamp} desc` : `${stamp} desc`
-  return `select id, title, url, ${stamp} as saved_at
-            from ${kind}
-           where account_key = $1
-             and ($2 = '' or position(lower($2) in lower(title)) > 0)
+  const order = sort === 'name' ? `lower(e.title) asc, e.${stamp} desc` : `e.${stamp} desc`
+  // Публикация бывает только у своего сезона: в избранном лежит чужое, а чужое
+  // не выкладывают. Поэтому у избранного нет ни join'а, ни лишних колонок —
+  // подставлять их константами значило бы врать в самом запросе.
+  const shared =
+    kind === 'seasons'
+      ? `, p.id as shared_id,
+           (select count(*) from shared_likes l where l.shared_id = p.id)::int as likes
+         from seasons e left join shared_seasons p on p.season_id = e.id`
+      : ' from favorites e'
+
+  return `select e.id, e.title, e.url, e.${stamp} as saved_at${shared}
+           where e.account_key = $1
+             and ($2 = '' or position(lower($2) in lower(e.title)) > 0)
            order by ${order}
            limit ${LIBRARY_LIMIT}`
 }
@@ -90,6 +109,8 @@ async function toEntry(row: Row): Promise<Entry> {
     savedAt: row.saved_at,
     palette: readPaletteId(hash) ?? DEFAULT_PALETTE,
     month: template ? `${monthName(template.theme).toLowerCase()} ${template.theme.year}` : null,
+    sharedId: row.shared_id ?? null,
+    likes: row.likes ?? 0,
   }
 }
 

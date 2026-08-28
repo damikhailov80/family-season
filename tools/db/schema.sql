@@ -44,3 +44,47 @@ create table if not exists seasons (
 );
 
 create index if not exists seasons_owner on seasons (account_key, updated_at desc);
+
+-- Витрина «Идеи сообщества»: какие из своих сохранённых сезонов человек выложил.
+--
+-- Ни адреса, ни названия здесь нет, и это главное в таблице: публикация — не
+-- копия сезона, а **указатель на строку `seasons`**. Адрес и имя берутся оттуда,
+-- поэтому переименование в кабинете видно на витрине сразу, а удаление сезона
+-- уносит публикацию каскадом. Колонки `url`/`title` рядом были бы той самой
+-- второй копией, которая однажды разойдётся с постером.
+--
+-- Первые внешние ключи в проекте, и это осознанно: лайк и жалоба без публикации
+-- бессмысленны, а публикация без сезона — тем более.
+create table if not exists shared_seasons (
+  id          uuid        primary key default gen_random_uuid(),
+  season_id   uuid        not null unique references seasons (id) on delete cascade,
+  -- Владелец продублирован из `seasons` ради предела в сто строк и проверки
+  -- «своё или чужое»: это ключ, а не содержимое, и расходиться ему не с чем.
+  account_key text        not null,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists shared_owner on shared_seasons (account_key, created_at desc);
+
+-- Лайк: строка на пару «публикация + аккаунт». Счётчика рядом не держим —
+-- число выводится через count(), а вторая копия числа разошлась бы с рядами.
+-- Первичный ключ по паре и есть правило «один человек — один лайк».
+create table if not exists shared_likes (
+  shared_id   uuid        not null references shared_seasons (id) on delete cascade,
+  account_key text        not null,
+  created_at  timestamptz not null default now(),
+  primary key (shared_id, account_key)
+);
+
+-- Жалоба: одна на пару «публикация + аккаунт», с обязательным комментарием —
+-- без слов она бесполезна тому, кто будет разбираться.
+create table if not exists shared_reports (
+  shared_id   uuid        not null references shared_seasons (id) on delete cascade,
+  account_key text        not null,
+  comment     text        not null,
+  created_at  timestamptz not null default now(),
+  primary key (shared_id, account_key)
+);
+
+-- Предел «сто жалоб на аккаунт» считается по автору, а не по публикации.
+create index if not exists shared_reports_author on shared_reports (account_key);

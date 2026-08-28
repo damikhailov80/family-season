@@ -424,3 +424,13 @@
     display: none;
   }
 }
+
+/* Пометка «на витрине» в строке метаданных. Цветом, а не рамкой: это состояние
+   строки, а рамка сделала бы из неё кнопку, которой она не является. */
+.onStage {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--accent-theme);
+  font-weight: 700;
+}

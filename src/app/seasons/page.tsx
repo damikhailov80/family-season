@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
-import { RocketDoodle } from '../../components/doodles'
+import { HeartDoodle, RocketDoodle } from '../../components/doodles'
 import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
 import { Toast } from '../../components/site/Toast'
 import { loginWithGoogle } from '../../server/actions'
@@ -19,6 +19,7 @@ import { auth } from '../../server/auth'
 import { libraryState, type Entry } from '../../server/library'
 import { DeleteEntry } from './DeleteEntry'
 import { RenameEntry } from './RenameEntry'
+import { UnpublishEntry } from './UnpublishEntry'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
@@ -92,9 +93,31 @@ function Row({ entry, kind, back }: { entry: Entry; kind: LibraryKind; back: str
         <span className={styles.entryMeta}>
           сохранён {savedOn(entry.savedAt)}
           {entry.month ? ` · ${entry.month}` : ''}
+          {/* «На витрине» — состояние строки, а не действие над ней, поэтому это
+              пометка в той же серой строке, что дата и месяц, а не ещё одна
+              кнопка. Лайки показываем только когда они есть: ноль рядом со
+              свежей публикацией читался бы как упрёк. */}
+          {entry.sharedId && (
+            <span className={styles.onStage}>
+              · на витрине
+              {entry.likes > 0 && (
+                <>
+                  {' · '}
+                  <HeartDoodle size={12} filled strokeWidth={4} />
+                  {entry.likes}
+                </>
+              )}
+            </span>
+          )}
         </span>
       </span>
       <span className={styles.rowTools}>
+        {/* Снять с витрины можно только выложенное — кнопки у остальных строк
+            нет вовсе. Выложить отсюда, наоборот, нельзя: делятся тем, что видят
+            на постере, и кнопка живёт там. */}
+        {entry.sharedId && (
+          <UnpublishEntry id={entry.id} title={entry.title} likes={entry.likes} back={back} />
+        )}
         <RenameEntry kind={kind} id={entry.id} title={entry.title} back={back} />
         <DeleteEntry kind={kind} id={entry.id} title={entry.title} back={back} />
       </span>
@@ -243,7 +266,8 @@ export default async function SeasonsPage({
         <p className={styles.note}>
           Имя и почта лежат только в куке вашего браузера — на сервере их нет. В базе у нас
           настройки кабинета и адреса ваших постеров, до {LIBRARY_LIMIT} сохранённых сезонов и
-          столько же закладок; подробности — на странице{' '}
+          столько же закладок, а ещё отметки о том, что вы выложили на витрину, лайкнули или
+          на что пожаловались; подробности — на странице{' '}
           <Link className={styles.noteLink} href={ROUTES.privacy}>
             «Приватность»
           </Link>

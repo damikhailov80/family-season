@@ -115,6 +115,29 @@
   cursor: default;
 }
 
+/* Комментарий к жалобе. Рамка и фокус те же, что у `.input`, но шрифт
+   интерфейсный, а не рукописный: это записка модератору, а не строка постера.
+   Растягивать по горизонтали нечему — ширину держит само окно. */
+.textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 1px;
+  border-color: var(--accent-deep);
+}
+
 /* Вход внутри окна: форма кнопки живёт в своём модуле, здесь только отступ. */
 .login {
   margin-top: 18px;

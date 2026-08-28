@@ -1,18 +1,36 @@
 import { useEffect, useState } from 'react'
+import { COMMUNITY_TEXT, type CommunityStatus } from '../../model/community'
 import {
   defaultSeasonTitle,
   LIBRARY_LIMIT,
   normalizeTitle,
   type LibraryStatus,
 } from '../../model/library'
-import { storeSeason, toggleFavorite } from '../../server/actions'
+import {
+  likeSeason,
+  reportSeason,
+  storeSeason,
+  toggleFavorite,
+  togglePublish,
+} from '../../server/actions'
 import { useDoc } from '../../state/docContext'
 import { useLibrary, useSeasonUrl } from '../../state/useLibrary'
-import { LinkDoodle, PrinterDoodle, SparkStar } from '../doodles'
+import {
+  FlagDoodle,
+  HeartDoodle,
+  LinkDoodle,
+  MegaphoneDoodle,
+  PrinterDoodle,
+  SparkStar,
+} from '../doodles'
 import { Toast } from '../site/Toast'
 import { LoginDialog } from './LoginDialog'
+import { ReportDialog } from './ReportDialog'
 import { SaveSeasonDialog, type SaveVariant } from './SaveSeasonDialog'
 import styles from './Toolbar.module.css'
+
+/** Толщина обводки рисунков из библиотеки в размере кнопки — см. `Icon`. */
+const ICON_STROKE = 4
 
 /**
  * Переходы между примером и своим листом — настоящие ссылки: клик с модификатором
@@ -71,9 +89,10 @@ export function Toolbar() {
    * набранный символ спасает дебаунс внутри хука.
    */
   const seasonUrl = useSeasonUrl(buildSeasonUrl)
-  const [{ favoriteId, season: stored }, remember] = useLibrary(seasonUrl, seasonId)
+  const [{ favoriteId, season: stored, shared }, remember] = useLibrary(seasonUrl, seasonId)
   const [saveOpen, setSaveOpen] = useState<SaveVariant | null>(null)
   const [loginOpen, setLoginOpen] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   /**
    * Всё, что тулбар сообщает человеку, идёт одним тостом — и удача, и отказ
@@ -107,10 +126,14 @@ export function Toolbar() {
     }
   }
 
-  const report = (status: LibraryStatus) => {
+  /**
+   * Полнота таблиц проверяется там, где они объявлены, поэтому здесь достаточно
+   * знать, что это таблица: у библиотеки и у витрины наборы бед разные.
+   */
+  const report = (status: LibraryStatus | CommunityStatus, texts: Record<string, string>) => {
     // «Войдите» — не отказ сервера, а предложение: его показывает окно, не тост.
     if (status === 'anonymous') setLoginOpen(true)
-    else if (status !== 'ok') say(FAILURE_TEXT[status])
+    else if (status !== 'ok') say(texts[status])
   }
 
   const switchFavorite = async () => {
@@ -121,8 +144,70 @@ export function Toolbar() {
     const url = await buildSeasonUrl()
     const result = await toggleFavorite(url, defaultSeasonTitle(template), favoriteId)
     setBusy(false)
-    if (result.status !== 'ok') report(result.status)
+    if (result.status !== 'ok') report(result.status, FAILURE_TEXT)
     else remember({ favoriteId: result.id ?? null })
+  }
+
+  /**
+   * Выложить сезон на витрину или убрать его оттуда.
+   *
+   * Публикуется **строка** сохранённого сезона, а не адрес постера: название и
+   * адрес витрина берёт из неё, поэтому переименование в кабинете видно сразу,
+   * а удаление сезона уносит публикацию следом. Отсюда и условие доступности:
+   * пока сезон не сохранён, публиковать нечего.
+   */
+  const switchPublish = async () => {
+    if (busy || !stored) return
+    const on = !shared?.mine
+    setBusy(true)
+    const result = await togglePublish(stored.id, on)
+    setBusy(false)
+    if (result.status !== 'ok') {
+      report(result.status, COMMUNITY_TEXT)
+      return
+    }
+    // Ответ известен из самого действия — переспрашивать сервер незачем.
+    remember({
+      shared: on
+        ? { id: result.id, likes: 0, liked: false, reported: false, mine: true }
+        : null,
+    })
+    say(on ? 'Сезон на витрине — он появился в «Идеях сообщества»' : 'Сезон убран с витрины')
+  }
+
+  /**
+   * Лайк. Желаемое состояние уезжает на сервер целиком, а не «переключи там сам»:
+   * так запрос идемпотентен и повторное нажатие в соседней вкладке не ломается.
+   */
+  const switchLike = async () => {
+    if (busy || !shared) return
+    const on = !shared.liked
+    setBusy(true)
+    const status = await likeSeason(shared.id, on)
+    setBusy(false)
+    if (status !== 'ok') {
+      report(status, COMMUNITY_TEXT)
+      return
+    }
+    remember({ shared: { ...shared, liked: on, likes: shared.likes + (on ? 1 : -1) } })
+  }
+
+  /**
+   * Жалоба. Окно закрываем при любом исходе: на `anonymous` его место занимает
+   * окно входа, а два модальных окна друг на друге — это уже не разговор.
+   */
+  const sendReport = async (comment: string) => {
+    if (!shared) return
+    setBusy(true)
+    const status = await reportSeason(shared.id, comment)
+    setBusy(false)
+    setReportOpen(false)
+    if (status !== 'ok') {
+      report(status, COMMUNITY_TEXT)
+      return
+    }
+    remember({ shared: { ...shared, reported: true } })
+    say('Жалоба отправлена — спасибо, мы разберёмся')
   }
 
   /**
@@ -137,7 +222,7 @@ export function Toolbar() {
     setBusy(false)
     setSaveOpen(null)
     if (result.status !== 'ok') {
-      report(result.status)
+      report(result.status, FAILURE_TEXT)
       return
     }
     const id = result.id ?? null
@@ -174,12 +259,19 @@ export function Toolbar() {
    */
   const savedNow = Boolean(stored && seasonUrl && seasonUrl === stored.url)
 
+  /**
+   * Подсказка говорит про **лист**, а не про того, кто его открыл. «Ваш сезон»
+   * здесь стояло с тех пор, когда постер попадал к человеку только из его же
+   * рук; теперь ссылку раздаёт витрина, и слово заявляло бы авторство, которого
+   * нет. Различать своё и чужое подсказка не может и не должна: ответ сервера
+   * приходит позже первого рендера, и строка на глазах менялась бы.
+   */
   const hint =
     source === 'demo'
       ? 'Это пример сезона — форкните его и перепишите под свою семью'
       : editing
         ? 'Правьте текст прямо на постере'
-        : 'Ваш сезон — ссылка хранит его целиком'
+        : 'Этот сезон целиком лежит в ссылке'
 
   return (
     <>
@@ -203,6 +295,63 @@ export function Toolbar() {
         >
           <SparkStar size={18} filled={!!favoriteId} />
         </button>
+
+        {/* Свой выложенный сезон: счёт лайков видно, а нажать нечего. Это
+            **читалка, а не погашенная кнопка**: погашенная обещала бы, что
+            когда-нибудь станет доступной, — а она не станет никогда. Ноль
+            показываем и здесь: для автора это его собственные данные и заодно
+            признак, что сезон на витрине. */}
+        {shared?.mine && (
+          <span className={styles.score} role="img" aria-label={`Лайков на витрине: ${shared.likes}`}>
+            <HeartDoodle size={18} filled strokeWidth={ICON_STROKE} />
+            {shared.likes}
+          </span>
+        )}
+
+        {/* Лайк и жалоба — только у **чужого** выложенного сезона: своё не
+            лайкают и на своё не жалуются. Стоят рядом со звёздочкой, в том же
+            ведущем ряду: они про этот постер и никуда его не уносят, в отличие
+            от ссылки и печати. Кнопок нет и у невыложенного постера — жаловаться
+            там некому и не на что. */}
+        {shared && !shared.mine && (
+          <>
+            {/* Число живёт **внутри** кнопки, в её же рамке: за рамкой оно
+                читалось как подпись неизвестно к чему. Ноль не показываем —
+                пустой счёт у свежего сезона выглядел бы упрёком автору, — и
+                кнопка тогда остаётся обычным квадратом. */}
+            <button
+              type="button"
+              className={shared.likes > 0 ? `${styles.icon} ${styles.withCount}` : styles.icon}
+              onClick={() => void switchLike()}
+              disabled={busy}
+              aria-pressed={shared.liked}
+              title={shared.liked ? 'Убрать лайк' : 'Поставить лайк'}
+              aria-label={`${shared.liked ? 'Убрать лайк' : 'Поставить лайк'}${
+                shared.likes > 0 ? `, сейчас лайков: ${shared.likes}` : ''
+              }`}
+            >
+              <HeartDoodle size={18} filled={shared.liked} strokeWidth={ICON_STROKE} />
+              {/* Счёт уже назван в `aria-label` кнопки — читалке он второй раз
+                  не нужен. */}
+              {shared.likes > 0 && (
+                <span className={styles.count} aria-hidden="true">
+                  {shared.likes}
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              className={styles.icon}
+              onClick={() => setReportOpen(true)}
+              disabled={busy}
+              aria-pressed={shared.reported}
+              title={shared.reported ? 'Жалоба отправлена — можно уточнить' : 'Пожаловаться'}
+              aria-label={shared.reported ? 'Жалоба отправлена — можно уточнить' : 'Пожаловаться'}
+            >
+              <FlagDoodle size={18} filled={shared.reported} strokeWidth={ICON_STROKE} />
+            </button>
+          </>
+        )}
         <span className={styles.hint}>{hint}</span>
 
         {/* Все действия над листом — один флекс-элемент, и это главное в раскладке
@@ -268,6 +417,30 @@ export function Toolbar() {
         */}
         {!editing && (
           <span className={styles.group}>
+            {/* «Поделиться с сообществом» — самое «наружу» из всего ряда, поэтому
+                стоит в этой группе и, как её соседи, пропадает в правке.
+
+                Рисуется всегда, а не появляется: пока сезон не сохранён, кнопка
+                погашена и объясняет себя подсказкой. Так ширина группы не зависит
+                от состояния — а группа вынута из потока, и её скачки двигали бы
+                весь верхний ряд. */}
+            <button
+              type="button"
+              className={styles.icon}
+              onClick={() => void switchPublish()}
+              disabled={busy || !stored}
+              aria-pressed={Boolean(shared?.mine)}
+              title={
+                !stored
+                  ? 'Сначала сохраните сезон в «Мои» — витрина показывает сохранённое'
+                  : shared?.mine
+                    ? 'Убрать с витрины сообщества'
+                    : 'Поделиться с сообществом'
+              }
+              aria-label={shared?.mine ? 'Убрать с витрины сообщества' : 'Поделиться с сообществом'}
+            >
+              <MegaphoneDoodle size={19} strokeWidth={ICON_STROKE} />
+            </button>
             <button
               type="button"
               className={styles.icon}
@@ -304,6 +477,14 @@ export function Toolbar() {
           busy={busy}
           onDismiss={() => setSaveOpen(null)}
           onSubmit={(title, overwrite) => void store(title, overwrite)}
+        />
+      )}
+      {reportOpen && shared && (
+        <ReportDialog
+          busy={busy}
+          sent={shared.reported}
+          onDismiss={() => setReportOpen(false)}
+          onSubmit={(comment) => void sendReport(comment)}
         />
       )}
       <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />

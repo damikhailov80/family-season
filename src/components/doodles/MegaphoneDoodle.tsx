@@ -3,6 +3,8 @@ import { Icon } from './Icon'
 interface DoodleProps {
   size?: number
   className?: string
+  /** Своя толщина для мелкого размера — см. `Icon`, причина там же. */
+  strokeWidth?: number
 }
 
 /**
@@ -12,6 +14,6 @@ interface DoodleProps {
  * а это имя осталось для сайта: у лендинга, шапки и подвала рисунки свои и
  * от набора постера не зависят.
  */
-export function MegaphoneDoodle({ size = 74, className }: DoodleProps) {
-  return <Icon name="megaphone" size={size} className={className} />
+export function MegaphoneDoodle({ size = 74, className, strokeWidth }: DoodleProps) {
+  return <Icon name="megaphone" size={size} className={className} strokeWidth={strokeWidth} />
 }
