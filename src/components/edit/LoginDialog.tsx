@@ -34,13 +34,10 @@ export function LoginDialog({ open, onClose }: { open: boolean; onClose: () => v
         Нужен вход
       </h2>
       <p className={styles.text}>
-        Сезоны и избранное лежат в вашем кабинете, поэтому их надо к чему-то привязать. После
-        входа вы вернётесь на этот же постер — ничего из набранного не потеряется.
+        Чтобы добавлять сезоны в избранное нужен пожалуйста залогиньтесь.
       </p>
-      <div className={styles.login}>
-        <GoogleLoginButton />
-      </div>
       <div className={styles.actions}>
+         <GoogleLoginButton />
         <button type="button" className={styles.ghost} onClick={onClose}>
           Не сейчас
         </button>
