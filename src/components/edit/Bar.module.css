@@ -39,6 +39,38 @@
   color: var(--ink-muted);
 }
 
+/* Название своего сезона в правке: та же подсказка, но по ней нажимают —
+   открывается окно переименования. Кнопкой она и сделана (клавиатура, роль),
+   но выглядеть кнопкой не должна: в ряду они все справа, а слева стоит
+   надпись. Что по ней нажимают, показывает пунктир и подсветка под курсором.
+
+   Поля правки прямо в ряду тут стояло и не прижилось: ширина у него шла по
+   набранному, и соседние кнопки дёргались на каждом знаке. */
+.rename {
+  border: 0;
+  padding: 2px 4px;
+  margin-left: -4px;
+  border-radius: 6px;
+  background: transparent;
+  /* Размер и цвет берутся у `.hint` на том же элементе; своя тут только
+     гарнитура — её кнопке браузер назначает сам. */
+  font-family: var(--font-ui);
+  text-align: left;
+  text-decoration: underline dashed color-mix(in srgb, var(--ink-muted) 60%, transparent);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.rename:hover {
+  background: color-mix(in srgb, var(--accent-deep) 8%, transparent);
+  color: var(--ink);
+}
+
+.rename:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 1px;
+}
+
 /* Залитая кнопка в ряду ровно одна, и она **не меняется вместе с режимом**:
    у своего сезона и черновика её носит переключатель «Править»/«Готово», у
    чужого постера — «Форкнуть» (`ForkButton`). Отдавать заливку «главному

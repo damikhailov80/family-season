@@ -14,7 +14,12 @@ import { OwnBar } from './OwnBar'
 export function OwnSeason({ season, editing }: { season: UserSeason; editing: boolean }) {
   return (
     <SeasonProvider boot={{ ...season, fillId: null }} mode={editing ? 'edit' : 'view'}>
-      <OwnBar code={season.code} editing={editing} token={season.shareToken} />
+      <OwnBar
+        code={season.code}
+        editing={editing}
+        title={season.title}
+        token={season.shareToken}
+      />
       <FloatingControls />
       <Poster />
       <Autosave code={season.code} />

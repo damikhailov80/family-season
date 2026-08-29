@@ -186,6 +186,16 @@ export async function saveSeason(
 }
 
 /**
+ * Переименование своего сезона **с самого постера**. Отдельно от `renameEntry`
+ * ровно потому, что кончается значением, а не редиректом: название правят прямо
+ * в панели, постер под ней никуда не уходит и перерисовывать страницу незачем.
+ */
+export async function renameSeason(code: unknown, title: unknown): Promise<LibraryStatus> {
+  if (typeof code !== 'string') return 'error'
+  return renameUserSeason(code, normalizeTitle(title))
+}
+
+/**
  * Выложить свой сезон на витрину.
  *
  * Уезжает **код своего сезона**, а не бланк: копию с него сервер снимет сам,

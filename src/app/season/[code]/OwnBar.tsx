@@ -5,12 +5,13 @@ import { useState } from 'react'
 import { LinkDoodle, MegaphoneDoodle, PrinterDoodle } from '../../../components/doodles'
 import { NewSeasonDialog } from '../../../components/edit/NewSeasonDialog'
 import { PublishDialog } from '../../../components/edit/PublishDialog'
+import { RenameDialog } from '../../../components/edit/RenameDialog'
 import { ShareLinkDialog } from '../../../components/edit/ShareLinkDialog'
 import { Toast } from '../../../components/site/Toast'
 import { PUBLISH_TEXT } from '../../../model/community'
-import { defaultSeasonTitle, ideaTitle, LIBRARY_TEXT } from '../../../model/library'
+import { defaultSeasonTitle, LIBRARY_TEXT, normalizeTitle } from '../../../model/library'
 import { publicSeasonHref, seasonHref } from '../../../model/site'
-import { revokeLink, shareLink, shareSeason, storeSeason } from '../../../server/actions'
+import { renameSeason, revokeLink, shareLink, shareSeason, storeSeason } from '../../../server/actions'
 import { useDoc } from '../../../state/docContext'
 import styles from '../../../components/edit/Bar.module.css'
 
@@ -34,10 +35,13 @@ import styles from '../../../components/edit/Bar.module.css'
 export function OwnBar({
   code,
   editing,
+  title,
   token,
 }: {
   code: string
   editing: boolean
+  /** Название строки — то же, что в списке «Мои сезоны». */
+  title: string
   /** Токен приватной ссылки; `null` — её не выдавали. */
   token: string | null
 }) {
@@ -49,6 +53,23 @@ export function OwnBar({
   const [link, setLink] = useState(token)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
+  // Ответ известен из самого действия: страница не перерисовывается, имя в ряду
+  // меняем сами. На неудаче остаётся прежнее.
+  const [name, setName] = useState(title)
+  const [renameOpen, setRenameOpen] = useState(false)
+
+  const rename = async (next: string) => {
+    const clean = normalizeTitle(next, name)
+    setBusy(true)
+    const status = clean === name ? 'ok' : await renameSeason(code, clean)
+    setBusy(false)
+    setRenameOpen(false)
+    if (status === 'ok') {
+      setName(clean)
+      return
+    }
+    setNotice({ text: LIBRARY_TEXT[status as 'limit' | 'stale' | 'error'], at: Date.now() })
+  }
 
   const fork = async (title: string) => {
     setBusy(true)
@@ -109,12 +130,21 @@ export function OwnBar({
   return (
     <>
       <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
-        {/* Название — из содержимого, а не из колонки `title`: в панели оно
-            обязано меняться вместе с темой месяца, которую тут же и правят.
-            В правке на его месте стоит слово о записи: она важнее. */}
-        <span className={styles.hint}>
-          {editing ? 'Сохраняется само' : `Ваш сезон: ${ideaTitle(template)}`}
-        </span>
+        {/* Название — то самое, что стоит в списке: колонка `title`. В правке
+            по нему нажимают и переименовывают окном; поле прямо в ряду росло
+            вместе с набранным и дёргало кнопки на каждом знаке. */}
+        {editing ? (
+          <button
+            type="button"
+            className={`${styles.hint} ${styles.rename}`}
+            onClick={() => setRenameOpen(true)}
+            title="Переименовать сезон"
+          >
+            Ваш сезон: {name}
+          </button>
+        ) : (
+          <span className={styles.hint}>Ваш сезон: {name}</span>
+        )}
         <span className={styles.actions}>
           {/* Заливка — на переключателе режима, и в просмотре тоже: в ряду она
               одна и с кнопки на кнопку не переезжает (см. `Bar.module.css`). */}
@@ -189,6 +219,14 @@ export function OwnBar({
           onIssue={() => void issueLink()}
           onRevoke={() => void dropLink()}
           onCopy={(url) => void copyLink(url)}
+        />
+      )}
+      {renameOpen && (
+        <RenameDialog
+          title={name}
+          busy={busy}
+          onDismiss={() => setRenameOpen(false)}
+          onSubmit={(next) => void rename(next)}
         />
       )}
       {publishOpen && (
