@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
 import { SeasonPreview } from '../../components/community/SeasonPreview'
-import { HeartDoodle, MegaphoneDoodle } from '../../components/doodles'
+import { HeartDoodle } from '../../components/doodles'
 import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import { Toast } from '../../components/site/Toast'
 import { ROUTES } from '../../model/site'
@@ -45,8 +45,6 @@ export default async function IdeasPage({
   return (
     <PaperSheet>
       <SectionBox accent="theme" label="Идеи сообщества" className={styles.section}>
-        <MegaphoneDoodle className={styles.mark} size={54} />
-        <h1 className={styles.title}>Чужие сезоны</h1>
         <p className={styles.text}>
           Самое трудное в постере — придумать, чем занять месяц. Проще, когда видишь, как это
           сделали другие: чей-то «Месяц воды», чей-то «Месяц без экранов», чьи-то сюжетные линии

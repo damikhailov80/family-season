@@ -2,22 +2,7 @@
   position: relative;
 }
 
-.mark {
-  color: var(--accent-theme);
-  transform: rotate(-6deg);
-  margin-bottom: 10px;
-}
-
-.title {
-  font-family: var(--font-hand);
-  font-weight: 700;
-  font-size: clamp(28px, 5vw, 40px);
-  line-height: 1.05;
-  color: var(--accent-deep);
-}
-
 .text {
-  max-width: 620px;
   margin-top: 10px;
   font-size: 16px;
   line-height: 1.5;
@@ -25,7 +10,6 @@
 }
 
 .hand {
-  max-width: 620px;
   margin-top: 14px;
   font-family: var(--font-hand);
   font-size: 21px;
@@ -100,6 +84,7 @@
   gap: 16px;
   margin-top: 22px;
   list-style: none;
+  padding-inline-start: 0px;
 }
 
 /* Карточка — само превью плюс строка под ним. Строка **вне** превью: превью
@@ -181,7 +166,6 @@
 }
 
 .note {
-  max-width: 620px;
   margin-top: 18px;
   font-size: 13px;
   line-height: 1.5;

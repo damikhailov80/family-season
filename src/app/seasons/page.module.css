@@ -2,12 +2,6 @@
   position: relative;
 }
 
-.rocket {
-  color: var(--accent-goal);
-  transform: rotate(8deg);
-  margin-bottom: 10px;
-}
-
 .title {
   font-family: var(--font-hand);
   font-weight: 700;
@@ -58,10 +52,6 @@
 .primary:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
-}
-
-.login {
-  margin-top: 20px;
 }
 
 /* Приписка про приватность — мелким и приглушённым: это сноска к странице,

@@ -4,7 +4,7 @@ import { useMemo, useRef, useSyncExternalStore } from 'react'
 import { PenDoodle } from '../../components/doodles'
 import { monthName } from '../../model/calendar'
 import { clearDraft, draftSnapshot, parseDraft, subscribeDraft, writeDraft } from '../../model/draft'
-import { savedOn, TITLE_LIMIT } from '../../model/library'
+import { EMPTY_LIST, savedOn, TITLE_LIMIT } from '../../model/library'
 import { PALETTE_LABELS } from '../../model/palettes'
 import { ROUTES } from '../../model/site'
 import styles from './page.module.css'
@@ -40,11 +40,9 @@ export function DraftEntry() {
   if (raw === undefined) return null
 
   if (!draft) {
-    return (
-      <p className={styles.hand}>
-        Черновика в этом браузере пока нет — он появится, как только вы соберёте сезон.
-      </p>
-    )
+    // Фраза общая со списком вошедшего: пустая коллекция и отсутствие черновика —
+    // для человека одно и то же, «сезонов пока нет».
+    return <p className={styles.hand}>{EMPTY_LIST}</p>
   }
 
   const rename = () => {

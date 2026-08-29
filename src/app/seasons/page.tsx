@@ -2,13 +2,18 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
-import { HeartDoodle, RocketDoodle } from '../../components/doodles'
-import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
+import { HeartDoodle } from '../../components/doodles'
 import { Toast } from '../../components/site/Toast'
 import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import { loginWithGoogle } from '../../server/actions'
 import { PALETTE_LABELS } from '../../model/palettes'
-import { LIBRARY_LIMIT, savedOn, TITLE_LIMIT, type LibrarySort } from '../../model/library'
+import {
+  EMPTY_LIST,
+  LIBRARY_LIMIT,
+  savedOn,
+  TITLE_LIMIT,
+  type LibrarySort,
+} from '../../model/library'
 import { publicSeasonHref, ROUTES, seasonHref } from '../../model/site'
 import { auth } from '../../server/auth'
 import { listFavorites, listPublished } from '../../server/publicSeasons'
@@ -16,7 +21,6 @@ import { listUserSeasons } from '../../server/userSeasons'
 import { UnfavoriteEntry } from './UnfavoriteEntry'
 import { WithdrawEntry } from './WithdrawEntry'
 import type { PaletteId } from '../../types'
-import { ClaimDraft } from './ClaimDraft'
 import { DeleteEntry } from './DeleteEntry'
 import { DraftEntry } from './DraftEntry'
 import { RenameEntry } from './RenameEntry'
@@ -153,7 +157,9 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
  * быть не может.
  *
  * Незалогиненного не уводим редиректом: адрес «Мои сезоны» есть в шапке, и он
- * обязан открываться и объяснять себя. Отдельная страница входа поэтому не нужна.
+ * обязан открываться. Список у него тот же самый, только короткий — черновик в
+ * браузере один; отдельной страницы входа поэтому не нужно, а вход предлагает
+ * окно заведения сезона, когда до него дойдёт дело.
  */
 export default async function SeasonsPage({
   searchParams,
@@ -161,27 +167,26 @@ export default async function SeasonsPage({
   searchParams: Promise<{ tab?: string; q?: string; sort?: string; add?: string }>
 }) {
   const session = await auth()
-  const who = session?.user?.name || session?.user?.email
+  // Имя из сессии больше нигде не нужно: страница здоровается не с человеком,
+  // а показывает его список. Остаётся сам факт входа — от него зависит, где
+  // лежат сезоны: строками в базе или единственным черновиком в браузере.
+  const signedIn = Boolean(session?.user?.name || session?.user?.email)
 
-  if (!who) {
+  if (!signedIn) {
     return (
       <PaperSheet>
         <SectionBox accent="deep" label="Мои сезоны" className={styles.section}>
-          <h1 className={styles.title}>Ваш черновик</h1>
-          <p className={styles.text}>
-            Без входа сезон живёт в этом браузере, и черновик здесь один: новый займёт место
-            прежнего. Войдите — и сезонов станет сколько нужно, они переживут смену устройства,
-            а этот черновик уедет в коллекцию первым.
-          </p>
 
-          {/* Черновик лежит в браузере, поэтому строку рисует клиент. Вкладок
+          {/* Список у невошедшего тот же самый, просто короткий: черновик здесь
+              один. Про вход разговор ведёт окно заведения сезона — оно и так
+              всегда говорит, что без входа сезон живёт только в этом браузере,
+              а вторая проповедь на пустой странице ничего не добавляет.
+
+              Черновик лежит в браузере, поэтому строку рисует клиент. Вкладок
               анониму не показываем: избранного и публикаций без входа не бывает. */}
           <DraftEntry />
 
-          <div className={styles.login}>
-            <GoogleLoginButton />
-          </div>
-          <NewSeasonAction className={styles.primary}>Собрать свой сезон</NewSeasonAction>
+          <NewSeasonAction className={styles.primary}>Собрать новый сезон</NewSeasonAction>
         </SectionBox>
       </PaperSheet>
     )
@@ -206,8 +211,6 @@ export default async function SeasonsPage({
   return (
     <PaperSheet>
       <SectionBox accent="deep" label="Мои сезоны" className={styles.section}>
-        <RocketDoodle className={styles.rocket} size={54} />
-        <h1 className={styles.title}>Здравствуйте, {who}!</h1>
 
         <nav className={styles.tabs} aria-label="Что показать">
           {TABS.map((tab) => (
@@ -269,7 +272,7 @@ export default async function SeasonsPage({
               {search
                 ? 'По этому запросу ничего не нашлось.'
                 : kind === 'seasons'
-                  ? 'Сезонов пока нет. Заведите новый — он появится здесь сразу.'
+                  ? EMPTY_LIST
                   : kind === 'favorites'
                     ? 'В избранном пока пусто. Нажмите ☆ на любом выложенном сезоне — он ляжет сюда.'
                     : 'Вы ещё ничего не выкладывали. Откройте свой сезон и нажмите кнопку с мегафоном.'}
@@ -293,22 +296,6 @@ export default async function SeasonsPage({
         {/* Имя спрашивается окном, и только потом заводится строка: молча
             заведённый сезон слишком похож на промах по кнопке. */}
         <NewSeasonAction className={styles.primary}>Собрать новый сезон</NewSeasonAction>
-
-        <p className={styles.note}>
-          Имя и почта лежат только в куке вашего браузера — на сервере их нет. В базе у нас
-          настройки кабинета и адреса ваших постеров, до {LIBRARY_LIMIT} сохранённых сезонов и
-          столько же закладок, а ещё отметки о том, что вы выложили на витрину, лайкнули или
-          на что пожаловались; подробности — на странице{' '}
-          <Link className={styles.noteLink} href={ROUTES.privacy}>
-            «Приватность»
-          </Link>
-          .
-        </p>
-
-        {/* Черновик, за которым и ходили входить: `?claim=1` ставит окно
-            «черновик будет затёрт», а забирает его отсюда клиент — в браузере он
-            лежит, серверу его негде взять. */}
-        <ClaimDraft />
 
         {state.status === 'error' && (
           <Toast message="Не удалось загрузить список — ошибка на сервере." />

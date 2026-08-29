@@ -1,9 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { GoogleLoginButton } from '../site/GoogleLoginButton'
 import { TITLE_LIMIT } from '../../model/library'
-import { ROUTES } from '../../model/site'
 import styles from './Dialog.module.css'
 
 /**
@@ -32,8 +30,6 @@ export function NewSeasonDialog({
 }: {
   heading: string
   warning?: string
-  /** Показать вход. Он же и уносит черновик в коллекцию — см. `/seasons?claim=1`. */
-  offerLogin?: boolean
   initialTitle: string
   busy: boolean
   onDismiss: () => void

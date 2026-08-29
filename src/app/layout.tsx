@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Caveat, Marck_Script, Nunito } from 'next/font/google'
+import { ClaimDraft } from '../components/site/ClaimDraft'
 import { SiteFooter } from '../components/site/SiteFooter'
 import { SiteHeader } from '../components/site/SiteHeader'
 import '../styles/tokens.css'
@@ -50,6 +51,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {/* main растягивается, чтобы подвал прижимался к низу коротких страниц. */}
           <main>{children}</main>
           <SiteFooter />
+          {/* Черновик, собранный до входа, уезжает в коллекцию сам — где бы
+              человек ни нажал «Войти». Место ему в лейауте по той же причине,
+              по какой вход стоит в шапке: разбор один на весь сайт. Рисует он
+              разве что тост, а на бумагу тост не идёт. */}
+          <ClaimDraft />
         </div>
       </body>
     </html>

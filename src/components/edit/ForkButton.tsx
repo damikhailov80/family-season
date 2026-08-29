@@ -87,13 +87,7 @@ export function ForkButton({
       {asking && (
         <NewSeasonDialog
           heading="Форкнуть сезон"
-          text={
-            signedIn
-              ? 'Копия ляжет в «Мои сезоны» — правьте её как угодно, на исходный сезон это не повлияет. Тема и рисунки уедут те, что сейчас на экране.'
-              : `Копия унесёт тему и рисунки, что сейчас на экране. ${DRAFT_ONLY_HERE}`
-          }
           warning={asking.draft ? draftWillBeLost(asking.draft.title) : undefined}
-          offerLogin={!signedIn}
           initialTitle={defaultSeasonTitle(template)}
           busy={busy}
           onDismiss={() => setAsking(null)}
