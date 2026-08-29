@@ -2,10 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
-import { HeartDoodle } from '../../components/doodles'
+import { LikeCount } from '../../components/community/LikeCount'
 import { Toast } from '../../components/site/Toast'
 import { NewSeasonAction } from '../../components/site/NewSeasonAction'
-import { loginWithGoogle } from '../../server/actions'
+import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
 import { PALETTE_LABELS } from '../../model/palettes'
 import {
   EMPTY_LIST,
@@ -107,8 +107,8 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
           {kind === 'published' && (
             <>
               {' · '}
-              <HeartDoodle size={12} filled strokeWidth={4} />
-              {entry.likes} · в избранном у {entry.favorites} · форкнули {entry.forks}
+              <LikeCount likes={entry.likes} size={12} />
+              {' · '}в избранном у {entry.favorites} · форкнули {entry.forks}
             </>
           )}
           {/* Снятое с витрины остаётся в избранном и открывается по ссылке —
@@ -141,7 +141,6 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
           <WithdrawEntry
             code={entry.code}
             title={entry.title}
-            favorites={entry.favorites ?? 0}
             back={back}
           />
         )}
@@ -186,7 +185,7 @@ export default async function SeasonsPage({
               анониму не показываем: избранного и публикаций без входа не бывает. */}
           <DraftEntry />
 
-          <NewSeasonAction className={styles.primary}>Собрать новый сезон</NewSeasonAction>
+          <NewSeasonAction className={styles.primary}>Создать новый сезон</NewSeasonAction>
         </SectionBox>
       </PaperSheet>
     )
@@ -274,7 +273,7 @@ export default async function SeasonsPage({
                 : kind === 'seasons'
                   ? EMPTY_LIST
                   : kind === 'favorites'
-                    ? 'В избранном пока пусто. Нажмите ☆ на любом выложенном сезоне — он ляжет сюда.'
+                    ? 'В избранном пока пусто. Нажмите ☆ на любом сезоне с витрины.'
                     : 'Вы ещё ничего не выкладывали. Откройте свой сезон и нажмите кнопку с мегафоном.'}
             </p>
           ))}
@@ -285,17 +284,13 @@ export default async function SeasonsPage({
               Вход был выполнен до того, как появился кабинет, и привязать сезоны не к чему.
               Лечится одним повторным входом.
             </p>
-            <form action={loginWithGoogle}>
-              <button type="submit" className={styles.ghost}>
-                Войти заново
-              </button>
-            </form>
+            <GoogleLoginButton label="Войти заново" />
           </div>
         )}
 
         {/* Имя спрашивается окном, и только потом заводится строка: молча
             заведённый сезон слишком похож на промах по кнопке. */}
-        <NewSeasonAction className={styles.primary}>Собрать новый сезон</NewSeasonAction>
+        <NewSeasonAction className={styles.primary}>Создать новый сезон</NewSeasonAction>
 
         {state.status === 'error' && (
           <Toast message="Не удалось загрузить список — ошибка на сервере." />

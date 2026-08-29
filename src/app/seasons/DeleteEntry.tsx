@@ -38,12 +38,9 @@ export function DeleteEntry({
 
       <dialog className={styles.dialog} ref={dialog} aria-labelledby={`drop-${code}`}>
         <h2 className={styles.dialogTitle} id={`drop-${code}`}>
-          Удалить «{title}»?
+          Подтверждение удаления
         </h2>
-        <p className={styles.dialogText}>
-          Другой копии сезона нет ни у вас, ни у нас: постер живёт этой строкой и пропадёт
-          совсем.
-        </p>
+        <p className={styles.dialogText}>Вы уверены, что хотите удалить сезон «{title}»?</p>
         <div className={styles.dialogActions}>
           <button
             type="button"

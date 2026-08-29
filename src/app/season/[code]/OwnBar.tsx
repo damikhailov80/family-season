@@ -82,10 +82,10 @@ export function OwnBar({
     try {
       await navigator.clipboard.writeText(url)
       setLinkOpen(false)
-      setNotice({ text: 'Личная ссылка скопирована — можно отправлять', at: Date.now() })
+      setNotice({ text: 'Ссылка скопирована', at: Date.now() })
     } catch {
       // Без разрешения на буфер поле с ссылкой и так открыто: скопирует руками.
-      setNotice({ text: 'Скопируйте ссылку из поля — буфер браузер не отдал', at: Date.now() })
+      setNotice({ text: 'Скопируйте ссылку из поля', at: Date.now() })
     }
   }
 
@@ -110,9 +110,7 @@ export function OwnBar({
     <>
       <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
         <span className={styles.hint}>
-          {editing
-            ? 'Правьте текст прямо на постере — сохраняется само'
-            : 'Ваш сезон: он лежит в «Моих сезонах» и виден только вам'}
+          {editing ? 'Сохраняется само' : 'Ваш сезон'}
         </span>
         <span className={styles.actions}>
           {/* Заливка — на переключателе режима, и в просмотре тоже: в ряду она

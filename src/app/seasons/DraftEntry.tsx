@@ -107,9 +107,7 @@ export function DraftEntry() {
         <h2 className={styles.dialogTitle} id="rename-draft">
           Новое название
         </h2>
-        <p className={styles.dialogText}>
-          Имя нужно только вам и только в этом списке: на самом постере оно нигде не печатается.
-        </p>
+        <p className={styles.dialogText}>Введите новое имя для сезона.</p>
         <label className={styles.dialogLabel} htmlFor="draft-title">
           Название
         </label>
@@ -140,11 +138,10 @@ export function DraftEntry() {
           черновика нет ни у нас, ни у человека. */}
       <dialog className={styles.dialog} ref={dropDialog} aria-labelledby="drop-draft">
         <h2 className={styles.dialogTitle} id="drop-draft">
-          Удалить «{draft.title}»?
+          Подтверждение удаления
         </h2>
         <p className={styles.dialogText}>
-          Черновик живёт только в этом браузере — другой копии нет ни у вас, ни у нас, и
-          постер пропадёт совсем.
+          Вы уверены, что хотите удалить черновик «{draft.title}»?
         </p>
         <div className={styles.dialogActions}>
           <button

@@ -13,8 +13,8 @@ import styles from '../../../components/edit/Bar.module.css'
  * оценивать и раскладывать по своим полкам тут нечего. Остаётся то, ради чего
  * ссылку и присылают: посмотреть, распечатать, форкнуть себе.
  *
- * Хозяин может отозвать ссылку в любой момент, поэтому подсказка честно говорит,
- * что сезон **прислали**, а не выложили.
+ * Подсказка называет место — «Сезон по ссылке», — и ничего не объясняет: как
+ * этот адрес устроен и кто может его отозвать, человеку тут знать незачем.
  */
 export function SharedBar({ signedIn }: { signedIn: boolean }) {
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
@@ -22,7 +22,7 @@ export function SharedBar({ signedIn }: { signedIn: boolean }) {
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(location.href)
-      setNotice({ text: 'Ссылка скопирована — можно переслать дальше', at: Date.now() })
+      setNotice({ text: 'Ссылка скопирована', at: Date.now() })
     } catch {
       // Без разрешения на буфер — показываем ссылку, скопирует руками.
       prompt('Ссылка на сезон:', location.href)
@@ -33,7 +33,7 @@ export function SharedBar({ signedIn }: { signedIn: boolean }) {
     <>
       <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
         <span className={styles.hint}>
-          Этот сезон прислали вам по личной ссылке — посмотрите и заберите себе
+          Сезон по ссылке
         </span>
         <span className={styles.actions}>
           <ForkButton

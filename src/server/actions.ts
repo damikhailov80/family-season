@@ -32,11 +32,10 @@ import { DEFAULT_PALETTE, knownPalette } from '../model/palettes'
 import { ROUTES, seasonHref } from '../model/site'
 
 /**
- * Вход и выход — серверные действия, а не клиентские обработчики: так в браузер
- * не уезжает ни строчки Auth.js, и кнопка работает даже без JS.
- *
- * Лежат отдельным файлом, потому что нужны в двух местах — в шапке и на
- * «Моих сезонах».
+ * Вход и выход — серверные действия, а не клиентские хуки Auth.js: так в браузер
+ * не уезжает ни строчки библиотеки. Разница между ними в том, куда уводят: выход
+ * возвращает на свою же страницу и уходит редиректом, вход зовёт чужой сайт и
+ * поэтому только отдаёт адрес — см. `googleLoginUrl`.
  */
 
 /**
@@ -51,15 +50,24 @@ function safeReturnTo(value: unknown): string | null {
 }
 
 /**
- * Вход. `returnTo` собирает клиент (`GoogleLoginButton`), и это не прихоть:
- * сезон живёт в хэше, а хэш до сервера не доходит — отсюда мы вернули бы
- * человека на пустой бланк вместо листа, который он правил.
+ * Адрес, куда Google спросит согласие. Действие **отдаёт ссылку, а не уводит
+ * по ней**, и это не стилистика.
  *
- * Не назвали адрес — значит, входили из места без своего состояния, и разумное
- * умолчание тут кабинет: ради него в основном и заходят.
+ * `redirect()` из серверного действия отдаёт адрес роутеру Next, а тот у чужого
+ * origin сперва просит у него RSC-ответ, получает от CORS отказ и только потом
+ * откатывается к обычному переходу. Вход при этом работает, но в консоль каждый
+ * раз падает «Failed to fetch RSC payload for accounts.google.com». Уводит
+ * поэтому браузер (`location.href` в `GoogleLoginButton`) — роутеру тут делать
+ * нечего, дальше всё равно чужой сайт.
+ *
+ * Куки входа (`state` и PKCE) от этого не теряются: их кладёт сам `signIn`
+ * через `cookies()`, а не заголовки редиректа.
  */
-export async function loginWithGoogle(returnTo?: unknown) {
-  await signIn('google', { redirectTo: safeReturnTo(returnTo) ?? ROUTES.seasons })
+export async function googleLoginUrl(returnTo?: unknown): Promise<string> {
+  return signIn('google', {
+    redirect: false,
+    redirectTo: safeReturnTo(returnTo) ?? ROUTES.seasons,
+  })
 }
 
 export async function logout() {

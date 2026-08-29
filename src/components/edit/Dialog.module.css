@@ -19,6 +19,10 @@
 .dialog {
   min-width: min(420px, calc(100vw - 48px));
   max-width: 560px;
+  /* Нижний рост окна: одна фраза вместо абзаца сжимала окно до полоски,
+     и оно читалось как всплывшая подсказка, а не как вопрос, на который надо
+     ответить. Свободное место уходит под ряд кнопок. */
+  min-height: 200px;
   padding: 22px 24px;
   border: var(--border-w) solid var(--accent-deep);
   border-radius: var(--radius-box);

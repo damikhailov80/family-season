@@ -58,7 +58,7 @@ export function ReportEntry({
       return
     }
     setSent(true)
-    setNotice({ text: 'Жалоба отправлена — спасибо, мы разберёмся', at: Date.now() })
+    setNotice({ text: 'Жалоба отправлена', at: Date.now() })
   }
 
   return (

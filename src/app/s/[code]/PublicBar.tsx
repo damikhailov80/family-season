@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react'
 import {
   FlagDoodle,
-  HeartDoodle,
   LinkDoodle,
   MegaphoneDoodle,
   PrinterDoodle,
   SparkStar,
 } from '../../../components/doodles'
+import { LikeCount } from '../../../components/community/LikeCount'
 import { ForkButton } from '../../../components/edit/ForkButton'
 import { LoginDialog } from '../../../components/edit/LoginDialog'
 import { ReportDialog } from '../../../components/edit/ReportDialog'
@@ -126,7 +126,7 @@ export function PublicBar({
     setReportOpen(false)
     if (!react(status, 'report')) return
     setMarks({ ...marks, reported: true })
-    setNotice({ text: 'Жалоба отправлена — спасибо, мы разберёмся', at: Date.now() })
+    setNotice({ text: 'Жалоба отправлена', at: Date.now() })
   }
 
   const copyLink = async () => {
@@ -135,7 +135,7 @@ export function PublicBar({
     const url = location.href
     try {
       await navigator.clipboard.writeText(url)
-      setNotice({ text: 'Ссылка на сезон скопирована — можно отправлять', at: Date.now() })
+      setNotice({ text: 'Ссылка скопирована', at: Date.now() })
     } catch {
       // Без разрешения на буфер — показываем ссылку, скопирует руками.
       prompt('Ссылка на сезон:', url)
@@ -179,8 +179,8 @@ export function PublicBar({
               <SparkStar size={18} filled={marks.favorited} />
             </button>
             {/* Число живёт **внутри** кнопки, в её же рамке: за рамкой оно
-                читалось как подпись неизвестно к чему. Ноль не показываем —
-                пустой счёт у свежего сезона выглядел бы упрёком автору. */}
+                читалось как подпись неизвестно к чему. Само сердце со счётом —
+                общий `LikeCount`, он же прячет ноль. */}
             <button
               type="button"
               className={marks.likes > 0 ? `${styles.icon} ${styles.withCount}` : styles.icon}
@@ -192,13 +192,7 @@ export function PublicBar({
                 marks.likes > 0 ? `, сейчас лайков: ${marks.likes}` : ''
               }`}
             >
-              <HeartDoodle size={18} filled={marks.liked} strokeWidth={ICON_STROKE} />
-              {/* Счёт уже назван в `aria-label` кнопки — читалке он второй раз не нужен. */}
-              {marks.likes > 0 && (
-                <span className={styles.count} aria-hidden="true">
-                  {marks.likes}
-                </span>
-              )}
+              <LikeCount likes={marks.likes} filled={marks.liked} hideZero />
             </button>
             {/* На наши примеры не жалуются: шестеро недовольных иначе убрали бы
                 их с витрины. */}
@@ -209,8 +203,8 @@ export function PublicBar({
                 onClick={() => (signedIn ? setReportOpen(true) : setLogin('report'))}
                 disabled={busy}
                 aria-pressed={marks.reported}
-                title={marks.reported ? 'Жалоба отправлена — можно уточнить' : 'Пожаловаться'}
-                aria-label={marks.reported ? 'Жалоба отправлена — можно уточнить' : 'Пожаловаться'}
+                title={marks.reported ? 'Жалоба отправлена' : 'Пожаловаться'}
+                aria-label={marks.reported ? 'Жалоба отправлена' : 'Пожаловаться'}
               >
                 <FlagDoodle size={18} filled={marks.reported} strokeWidth={ICON_STROKE} />
               </button>
@@ -222,19 +216,18 @@ export function PublicBar({
             **читалка, а не погашенная кнопка**: погашенная обещала бы, что
             когда-нибудь станет доступной, — а она не станет никогда. */}
         {mine && (
-          <span className={styles.score} role="img" aria-label={`Лайков на витрине: ${marks.likes}`}>
-            <HeartDoodle size={18} filled strokeWidth={ICON_STROKE} />
-            {marks.likes}
-          </span>
+          <LikeCount
+            likes={marks.likes}
+            label={`Лайков на витрине: ${marks.likes}`}
+            className={styles.score}
+          />
         )}
 
-        <span className={styles.hint}>
-          {hidden
-            ? 'Сезон снят с витрины — он открывается только по этой ссылке'
-            : demo
-              ? 'Это наш пример — так выглядит прожитый сезон'
-              : 'Этот сезон выложили в «Идеи сообщества»'}
-        </span>
+        {/* Только имя места, без пересказа его устройства: человеку важно, где
+            он оказался, а не как сезон сюда попал. Снятый с витрины молчит —
+            «Идей сообщества» для него больше нет, а пустое место всё равно
+            нужно: оно и разводит кнопки по краям ряда. */}
+        <span className={styles.hint}>{hidden ? '' : demo ? 'Наш пример' : 'Идеи сообщества'}</span>
 
         <span className={styles.actions}>
           <ForkButton
@@ -301,8 +294,8 @@ export function PublicBar({
         <Toast
           message={
             published === 'new'
-              ? 'Сезон на витрине — вот его постоянная ссылка'
-              : 'Такой сезон на витрине уже был — вот он'
+              ? 'Сезон на витрине'
+              : 'Такой сезон уже был на витрине'
           }
         />
       )}

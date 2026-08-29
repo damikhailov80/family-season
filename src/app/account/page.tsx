@@ -6,7 +6,7 @@ import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import { DEFAULT_FAMILY } from '../../model/family'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../model/types'
 import { auth } from '../../server/auth'
-import { loginWithGoogle, logout } from '../../server/actions'
+import { logout } from '../../server/actions'
 import { familyState } from '../../server/settings'
 import { Toast } from '../../components/site/Toast'
 import { FamilyEditor } from './FamilyEditor'
@@ -81,11 +81,7 @@ export default async function AccountPage({
               Достаточно войти заново — это нужно один раз.
             </p>
             {/* Кнопка, а не совет «нажмите Выйти внизу»: чинится одним кликом. */}
-            <form action={loginWithGoogle}>
-              <button type="submit" className={styles.ghost}>
-                Войти заново
-              </button>
-            </form>
+            <GoogleLoginButton label="Войти заново" />
           </div>
         )}
 
@@ -96,8 +92,8 @@ export default async function AccountPage({
 
         <h2 className={styles.head}>Семья для новых постеров</h2>
         <p className={styles.text}>
-          С этими героями будет открываться «Новый сезон» — чтобы не собирать семью заново
-          каждый месяц. На готовые постеры настройка не влияет: их состав уже вписан в ссылку.
+          С этими героями будет открываться «Новый сезон». Уже заведённые сезоны настройка
+          не трогает.
         </p>
 
         {/* Редактор — только когда состав прочитан. Не прочитан — здесь пусто:
@@ -113,8 +109,8 @@ export default async function AccountPage({
             />
 
             <p className={styles.hint}>
-              Клик по рисунку меняет героя — как на постере. От {MIN_PEOPLE} до {MAX_PEOPLE}{' '}
-              человек; имена можно не заполнять, их всегда можно вписать прямо на постере.
+              Клик по рисунку меняет героя. От {MIN_PEOPLE} до {MAX_PEOPLE} человек, имена
+              можно не заполнять.
             </p>
           </>
         )}

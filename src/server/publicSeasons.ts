@@ -4,7 +4,7 @@ import { logger } from './logger'
 import { monthName } from '../model/calendar'
 import { IDEAS_PAGE, type PublishStatus, type ReactionStatus } from '../model/community'
 import { knownIconSet } from '../model/icons'
-import { defaultSeasonTitle, LIBRARY_LIMIT, type LibrarySort } from '../model/library'
+import { defaultSeasonTitle, ideaTitle, LIBRARY_LIMIT, type LibrarySort } from '../model/library'
 import { knownPalette } from '../model/palettes'
 import { anonymousNames, joinSeason, withTargetMonth } from '../model/season'
 import { codeOrNull, shortCode } from '../model/shortcode'
@@ -387,7 +387,8 @@ export async function randomIdeas(): Promise<IdeasState> {
         code: row.code,
         // Название выводится из содержимого, а не хранится колонкой: публикацию
         // не называют руками, и второй копии этой строки быть не должно.
-        title: defaultSeasonTitle(shown),
+        // Месяца с годом в нём нет: идее они цены не добавляют (см. `ideaTitle`).
+        title: ideaTitle(shown),
         palette: knownPalette(row.palette),
         template: shown,
         likes: row.likes,
@@ -395,11 +396,6 @@ export async function randomIdeas(): Promise<IdeasState> {
       }
     }),
   }
-}
-
-/** «Сентябрь 2026» — подпись месяца на превью. Список месяцев в проекте один. */
-export function ideaMonth(template: Template): string {
-  return `${monthName(template.theme)} ${template.theme.year}`
 }
 
 /**

@@ -1,5 +1,5 @@
-/* Миниатюра постера. Подложка белая, как у настоящего листа, цвет несут рамка,
-   плашка месяца и чернила заголовка — те же роли, что на бумаге (см. принцип 3
+/* Миниатюра постера. Подложка белая, как у настоящего листа, цвет несут рамка
+   и чернила заголовка — те же роли, что на бумаге (см. принцип 3
    в CLAUDE.md). Ни градиентов, ни теней вместо рамок: превью обязано быть
    похоже на то, что напечатается. */
 .paper {
@@ -23,21 +23,6 @@
 .paper:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
-}
-
-/* Плашка месяца — тот же приём, что у `Badge` на постере: краска как есть,
-   а цвет текста на ней посчитан по контрасту (`--on-*`). */
-.month {
-  align-self: flex-start;
-  padding: 3px 10px;
-  border: 1px solid var(--accent-theme);
-  border-radius: 999px;
-  background: var(--badge-theme);
-  color: var(--on-theme);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .headline {

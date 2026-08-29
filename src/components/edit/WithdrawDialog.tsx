@@ -30,16 +30,13 @@ export function WithdrawDialog({
   return (
     <dialog className={styles.dialog} ref={dialog} onClose={onDismiss} aria-labelledby="withdraw">
       <h2 className={styles.title} id="withdraw">
-        Убрать с витрины?
+        Убрать с витрины
       </h2>
 
-      <p className={styles.text}>
-        Сезон пропадёт из «Идей сообщества». Если его кто-то отложил в избранное или на
-        него была жалоба, он останется открываться по прямой ссылке — забирать отложенное
-        у людей мы не будем, а жалоба должна указывать на то, на что подана. Если ничего
-        этого не было, публикация исчезнет совсем вместе с лайками. Ваш собственный сезон
-        в кабинете это не тронет: на витрине лежала его копия.
-      </p>
+      {/* Один вопрос про то, что человек нажал. Почему публикация иногда
+          остаётся жить по ссылке, а иногда исчезает совсем, — устройство
+          витрины, а не его забота (см. «Витрина» в CLAUDE.md). */}
+      <p className={styles.text}>Вы уверены, что хотите убрать сезон из «Идей сообщества»?</p>
 
       <div className={styles.actions}>
         <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>

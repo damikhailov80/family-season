@@ -25,6 +25,8 @@
 
 .dialog {
   max-width: 560px;
+  /* Та же нижняя граница, что у окон постера (`Dialog.module.css`). */
+  min-height: 200px;
   padding: 22px 24px;
   border: var(--border-w) solid var(--accent-deep);
   border-radius: var(--radius-box);

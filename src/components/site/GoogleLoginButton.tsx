@@ -1,7 +1,7 @@
 'use client'
 
 import { startTransition } from 'react'
-import { loginWithGoogle } from '../../server/actions'
+import { googleLoginUrl } from '../../server/actions'
 import styles from './LoginButtons.module.css'
 
 /** Значок провайдера — inline SVG: растровых картинок в проекте нет. */
@@ -29,38 +29,46 @@ function GoogleMark() {
 }
 
 /**
- * Кнопка входа. Клиентская ровно по одной причине: **вернуть человека туда, где
- * он был, может только браузер**.
+ * Кнопка входа — одна на весь сайт: и в шапке, и в окне «Нужен вход», и там,
+ * где старую сессию просят перевыпустить. Подпись у неё разная, разговор один.
  *
- * Сезон живёт в хэше адреса, а хэш до сервера не доходит — серверное действие
- * само по себе знает лишь путь и вернуло бы на голый адрес без пометок, то есть
- * на пустой бланк вместо сезона, который правили. Поэтому адрес возврата
- * собирается здесь и уезжает аргументом действия.
+ * Клиентская она по двум причинам, и обе про браузер.
  *
- * Больше этот компонент ничего не делает: сам вход, как и прежде, серверный —
- * в браузер не уезжает ни строчки Auth.js.
+ * Первая — **адрес возврата**: примеренное оформление живёт в `?p=` и `?i=`, и
+ * вернуться человек должен на тот же постер, а не на голый адрес. Собрать
+ * `pathname + search + hash` может только браузер, серверу это неоткуда взять.
  *
- * Перебивки адреса возврата у него нет и не нужно: раньше вход из окна
- * «черновик будет затёрт» уводил в кабинет с пометкой `?claim=1`, потому что
- * черновик забирали только там. Теперь его забирают после любого входа и на
- * любой странице (`ClaimDraft`), и уводить человека с места незачем.
+ * Вторая — **сам переход**. Действие отдаёт ссылку, а уводит по ней
+ * `location.href`: если отдать её роутеру Next (то есть сделать `redirect()` на
+ * сервере), тот у чужого origin сперва попросит RSC-ответ и уронит в консоль
+ * «Failed to fetch RSC payload for accounts.google.com», прежде чем откатиться
+ * к обычному переходу. Дальше всё равно чужой сайт — роутеру тут делать нечего.
+ *
+ * Auth.js в браузер при этом по-прежнему не уезжает: на клиенте остаётся одна
+ * строчка `location.href`.
  */
-export function GoogleLoginButton() {
+export function GoogleLoginButton({ label }: { label?: string }) {
   return (
     <form
       className={styles.form}
       onSubmit={(event) => {
         event.preventDefault()
         const back = location.pathname + location.search + location.hash
-        startTransition(() => loginWithGoogle(back))
+        startTransition(async () => {
+          location.href = await googleLoginUrl(back)
+        })
       }}
     >
       {/* На телефоне от подписи остаётся «Войти» (`.provider` скрыт): рядом с
           брендом и навигацией полное название провайдера не помещается. Значок
           его и так называет, а `aria-label` держит полное имя для читалки. */}
-      <button type="submit" className={styles.button} aria-label="Войти через Google">
+      <button type="submit" className={styles.button} aria-label={label ?? 'Войти через Google'}>
         <GoogleMark />
-        Войти<span className={styles.provider}>&nbsp;через Google</span>
+        {label ?? (
+          <>
+            Войти<span className={styles.provider}>&nbsp;через Google</span>
+          </>
+        )}
       </button>
     </form>
   )

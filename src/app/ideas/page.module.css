@@ -88,8 +88,8 @@
 }
 
 /* Карточка — само превью плюс строка под ним. Строка **вне** превью: превью
-   носит тему постера, а название, счёт лайков и кнопка жалобы — часть сайта
-   и красятся его цветами. */
+   носит тему постера, а счёт лайков и кнопка жалобы — часть сайта и красятся
+   его цветами. */
 .card {
   display: flex;
   flex-direction: column;
@@ -99,29 +99,16 @@
 .meta {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   padding: 0 2px;
 }
 
-.name {
-  flex: 1 1 auto;
-  overflow: hidden;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--ink-soft);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .likes {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
   flex: none;
   font-size: 13px;
   font-weight: 700;
   color: var(--ink-muted);
-  font-variant-numeric: tabular-nums;
 }
 
 /* Кнопка жалобы — приглушённая: она нужна редко, и рядом с названием сезона

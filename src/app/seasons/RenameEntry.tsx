@@ -70,9 +70,7 @@ export function RenameEntry({
         <h2 className={styles.dialogTitle} id={`rename-${code}`}>
           Новое название
         </h2>
-        <p className={styles.dialogText}>
-          Имя нужно только вам и только в этом списке: на самом постере оно нигде не печатается.
-        </p>
+        <p className={styles.dialogText}>Введите новое имя для сезона.</p>
         <label className={styles.dialogLabel} htmlFor={`title-${code}`}>
           Название
         </label>

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
+import { LikeCount } from '../../components/community/LikeCount'
 import { SeasonPreview } from '../../components/community/SeasonPreview'
-import { HeartDoodle } from '../../components/doodles'
 import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import { Toast } from '../../components/site/Toast'
 import { ROUTES } from '../../model/site'
@@ -63,12 +63,11 @@ export default async function IdeasPage({
                 {ideas.map((idea) => (
                   <li className={styles.card} key={idea.code}>
                     <SeasonPreview idea={idea} />
+                    {/* Названия под превью нет: оно и есть тема месяца,
+                        крупно написанная на самом превью, — второй раз
+                        повторять её незачем. */}
                     <div className={styles.meta}>
-                      <span className={styles.name}>{idea.title}</span>
-                      <span className={styles.likes} role="img" aria-label={`Лайков: ${idea.likes}`}>
-                        <HeartDoodle size={14} filled strokeWidth={4} />
-                        {idea.likes}
-                      </span>
+                      <LikeCount likes={idea.likes} size={14} className={styles.likes} />
                       {/* На наши примеры не жалуются: шестеро недовольных иначе
                           убрали бы их с витрины. Сервер такую жалобу и так не
                           примет — кнопке тем более здесь не место. */}
