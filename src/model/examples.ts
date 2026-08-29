@@ -6,13 +6,16 @@ import { FACE_ORDER } from './accents'
 import { knownIconSet } from './icons'
 import { knownPalette } from './palettes'
 import { normalizeTemplate } from './codec'
+import { shortCode } from './shortcode'
+import { publicSeasonHref } from './site'
 import { normalizeFill } from './fill'
 import type { FillState, Template } from './types'
 import { EMPTY_FILL } from './types'
 
 /**
  * Готовые примеры сезонов. Один пример — один файл `src/data/examples/<id>.json`
- * и одна строка в реестре ниже; в ссылке от примера едет только его id (`data=demo-1`).
+ * и одна строка в реестре ниже. Посев (`npm run db:seed`) кладёт их в `public_seasons`
+ * системными сезонами — на витрине они такие же строки, как людские, только без автора.
  *
  * Внутри файла два слоя лежат раздельно и намеренно:
  *   template — бланк, он печатается и умещается в ссылку;
@@ -38,6 +41,15 @@ interface RawExample {
 
 export interface Example {
   id: string
+  /**
+   * Строка примера в `public_seasons`. Id фиксирован порядком реестра — его же
+   * проставляет посев (`tools/db/seed-examples.ts`), — поэтому короткий адрес
+   * считается прямо здесь и не требует похода в базу: лендинг обязан работать
+   * и при мёртвой базе.
+   */
+  publicId: number
+  /** Постоянный адрес примера: он такой же публичный сезон, как людские. */
+  href: string
   /** Название примера — для карточек лендинга; в бланке его нет. */
   name: string
   summary: string
@@ -68,10 +80,12 @@ function facesOf(raw: RawExample): FaceVariant[] {
 }
 
 const EXAMPLES: Record<string, Example> = Object.fromEntries(
-  Object.entries(RAW).map(([id, raw]) => [
+  Object.entries(RAW).map(([id, raw], index) => [
     id,
     {
       id,
+      publicId: index + 1,
+      href: publicSeasonHref(shortCode('public', index + 1)),
       name: raw.name,
       summary: raw.summary,
       note: raw.note,
@@ -84,10 +98,6 @@ const EXAMPLES: Record<string, Example> = Object.fromEntries(
   ]),
 )
 
-/** id из адреса мог написать кто угодно: неизвестный — как будто его нет. */
-export function knownExampleId(id: string | null | undefined): string | null {
-  return id && id in EXAMPLES ? id : null
-}
 
 export function exampleById(id: string | null): Example | null {
   return (id && EXAMPLES[id]) ?? null

@@ -2,7 +2,7 @@
 
 import { useRef, useTransition } from 'react'
 import { PenDoodle } from '../../components/doodles'
-import { TITLE_LIMIT, type LibraryKind } from '../../model/library'
+import { TITLE_LIMIT } from '../../model/library'
 import { renameEntry } from '../../server/actions'
 import styles from './page.module.css'
 
@@ -23,13 +23,11 @@ import styles from './page.module.css'
  *    узел уже есть, React его не трогает. Значение кладём при открытии окна.
  */
 export function RenameEntry({
-  kind,
-  id,
+  code,
   title,
   back,
 }: {
-  kind: LibraryKind
-  id: string
+  code: string
   title: string
   back: string
 }) {
@@ -53,7 +51,7 @@ export function RenameEntry({
      * разбор `formData.get('title')` на сервере молча вернул бы пустоту — запрос
      * ушёл бы, а в базе ничего не изменилось (см. «Настройки и база» в CLAUDE.md).
      */
-    start(() => renameEntry(kind, id, back, next))
+    start(() => renameEntry(code, back, next))
   }
 
   return (
@@ -68,21 +66,19 @@ export function RenameEntry({
         <PenDoodle size={16} strokeWidth={3.6} />
       </button>
 
-      <dialog className={styles.dialog} ref={dialog} aria-labelledby={`rename-${id}`}>
-        <h2 className={styles.dialogTitle} id={`rename-${id}`}>
+      <dialog className={styles.dialog} ref={dialog} aria-labelledby={`rename-${code}`}>
+        <h2 className={styles.dialogTitle} id={`rename-${code}`}>
           Новое название
         </h2>
         <p className={styles.dialogText}>
-          {kind === 'seasons'
-            ? 'Имя нужно только вам и только в этом списке: на самом постере оно нигде не печатается.'
-            : 'Имя закладки видно только вам. Сам постер оно не меняет.'}
+          Имя нужно только вам и только в этом списке: на самом постере оно нигде не печатается.
         </p>
-        <label className={styles.dialogLabel} htmlFor={`title-${id}`}>
+        <label className={styles.dialogLabel} htmlFor={`title-${code}`}>
           Название
         </label>
         <input
           className={styles.nameInput}
-          id={`title-${id}`}
+          id={`title-${code}`}
           ref={input}
           type="text"
           defaultValue={title}

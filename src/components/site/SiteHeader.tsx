@@ -1,50 +1,29 @@
 import Link from 'next/link'
 import { ROUTES } from '../../model/site'
-import { encodeTemplate, hashFor } from '../../model/codec'
-import { templateForFamily } from '../../model/family'
-import { DEFAULT_PALETTE } from '../../model/palettes'
-import { DEFAULT_ICON_SET } from '../../model/icons'
-import { logger } from '../../server/logger'
-import { readFamily } from '../../server/settings'
+import { auth } from '../../server/auth'
+import { createSeason } from '../../server/actions'
 import { HeartDoodle } from '../doodles'
 import { LoginButtons } from './LoginButtons'
 import styles from './SiteHeader.module.css'
 
 /**
- * Адрес кнопки «Новый сезон». Если человек вошёл и выбрал состав семьи, бланк
- * собирается здесь же и уезжает в ссылку готовым — постеру не нужно ни знать
- * о базе, ни ходить в неё: он как читал бланк из хэша, так и читает.
- *
- * Во всех остальных случаях — сегодняшний голый `/sheet/edit`, который лист
- * понимает как «пустой бланк». Сюда же откатываемся при любой ошибке: ссылка
- * в шапке не имеет права сломать страницу.
- */
-async function newSeasonHref(): Promise<string> {
-  /*
-   * Чтение сессии и настроек намеренно **вне** `try`: `auth()` трогает куки, а
-   * Next сообщает «эта страница обязана быть динамической» через исключение.
-   * Проглотив его, мы не дали бы роутеру пометить маршрут и завалили бы сборку
-   * логом. Ронять страницу этому чтению нечем: `query` в `db.ts` не бросает.
-   */
-  const family = await readFamily()
-  if (!family) return ROUTES.sheetEdit
-
-  try {
-    const payload = await encodeTemplate(templateForFamily(family))
-    return ROUTES.sheetEdit + hashFor(payload, DEFAULT_PALETTE, DEFAULT_ICON_SET)
-  } catch (error) {
-    // Кодирование — единственное, что тут может сломаться по-настоящему.
-    logger.error('new season link not built', { err: error })
-    return ROUTES.sheetEdit
-  }
-}
-
-/**
  * Общая шапка сайта. Намеренно не `sticky`: тулбар листа уже липнет к верху
- * (`edit/Toolbar.module.css`), а два липких слоя наезжают друг на друга.
+ * (`edit/Bar.module.css`), а два липких слоя наезжают друг на друга.
+ *
+ * «Новый сезон» у вошедшего — **действие, а не ссылка**: сезон заводится строкой
+ * сразу, вместе с составом семьи из кабинета, и человек попадает уже в него.
+ * Раньше здесь собирался бланк и уезжал в хэш ссылки — теперь бланку место в
+ * базе, и собирает его само действие (`createSeason`).
+ *
+ * У невошедшего ссылка на черновик остаётся: собрать и распечатать постер можно
+ * и без входа.
+ *
+ * Чтение сессии намеренно **вне** `try`: `auth()` трогает куки, а Next сообщает
+ * «эта страница обязана быть динамической» через исключение. Проглотив его, мы
+ * не дали бы роутеру пометить маршрут и завалили бы сборку логом.
  */
 export async function SiteHeader() {
-  const sheetEditHref = await newSeasonHref()
+  const session = await auth()
 
   return (
     <header className={styles.header}>
@@ -63,10 +42,20 @@ export async function SiteHeader() {
         <Link className={styles.link} href={ROUTES.seasons}>
           Мои сезоны
         </Link>
-        {/* В лист — обычная <a>: он ведёт историю сам, см. комментарий в Hero. */}
-        <a className={styles.action} href={sheetEditHref}>
-          Новый сезон
-        </a>
+        {session?.user ? (
+          // `display: contents` у формы: кнопка обязана встать в ряд навигации
+          // так же, как встала бы ссылка, а сама форма в раскладке лишняя.
+          <form className={styles.plainForm} action={createSeason}>
+            <button type="submit" className={styles.action}>
+              Новый сезон
+            </button>
+          </form>
+        ) : (
+          // В лист — обычная <a>: он ведёт историю сам, см. комментарий в Hero.
+          <a className={styles.action} href={ROUTES.sheetEdit}>
+            Новый сезон
+          </a>
+        )}
       </nav>
 
       <LoginButtons />

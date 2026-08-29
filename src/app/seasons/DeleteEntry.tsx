@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef } from 'react'
-import type { LibraryKind } from '../../model/library'
 import { dropEntry } from '../../server/actions'
 import styles from './page.module.css'
 
@@ -16,13 +15,11 @@ import styles from './page.module.css'
  * него больше нигде не осталась, постер пропадает совсем.
  */
 export function DeleteEntry({
-  kind,
-  id,
+  code,
   title,
   back,
 }: {
-  kind: LibraryKind
-  id: string
+  code: string
   title: string
   back: string
 }) {
@@ -39,14 +36,13 @@ export function DeleteEntry({
         ×
       </button>
 
-      <dialog className={styles.dialog} ref={dialog} aria-labelledby={`drop-${id}`}>
-        <h2 className={styles.dialogTitle} id={`drop-${id}`}>
+      <dialog className={styles.dialog} ref={dialog} aria-labelledby={`drop-${code}`}>
+        <h2 className={styles.dialogTitle} id={`drop-${code}`}>
           Удалить «{title}»?
         </h2>
         <p className={styles.dialogText}>
-          {kind === 'seasons'
-            ? 'Другой копии сезона у нас нет. Если ссылка на него не сохранилась где-то ещё, постер пропадёт совсем.'
-            : 'Закладка исчезнет из избранного. Сам постер никуда не денется — он живёт в своей ссылке.'}
+          Другой копии сезона нет ни у вас, ни у нас: постер живёт этой строкой и пропадёт
+          совсем.
         </p>
         <div className={styles.dialogActions}>
           <button
@@ -58,7 +54,7 @@ export function DeleteEntry({
           </button>
           {/* Действие серверное: аргументы привязаны, но проверяются заново —
               привязка уезжает в браузер и возвращается оттуда. */}
-          <form action={dropEntry.bind(null, kind, id, back)}>
+          <form action={dropEntry.bind(null, code, back)}>
             <button type="submit" className={styles.danger}>
               Удалить
             </button>

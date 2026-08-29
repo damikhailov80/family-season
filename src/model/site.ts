@@ -1,5 +1,5 @@
 import { QR_URL } from './qr.data'
-import type { PaletteId } from '../types'
+import type { IconSetId, PaletteId } from '../types'
 
 /**
  * Адреса и контакты сайта вокруг листа. Собраны в одном месте, чтобы почта и
@@ -20,13 +20,19 @@ export const SITE_URL = QR_URL
 
 export const ROUTES = {
   home: '/',
-  /** Просмотр: пример (`#d=…&data=<id>`) или свой лист (`#d=…`). */
+  /** Черновик невошедшего в просмотре; содержимое — в `localStorage`. */
   sheet: '/sheet',
-  /** Тот же лист в правке. Без `#d=…` — пустой бланк «с нуля». */
+  /** Тот же черновик в правке. Ничего в браузере нет — пустой бланк «с нуля». */
   sheetEdit: '/sheet/edit',
   seasons: '/seasons',
-  /** Витрина сезонов, которыми поделились семьи. Пока пусто: публикации ещё нет. */
+  /** Витрина сезонов, которыми поделились семьи. */
   ideas: '/ideas',
+  /** Корень постоянных адресов выложенных сезонов: `/s/<code>`. */
+  publicSeason: '/s',
+  /** Корень адресов своих сезонов: `/season/<code>` и `/season/<code>/edit`. */
+  season: '/season',
+  /** Корень приватных ссылок на свой сезон: `/p/<token>`. */
+  shared: '/p',
   /** Личный кабинет: настройки и выход. Только для вошедших. */
   account: '/account',
   /** Политика приватности: её адрес требует Google для публикации входа. */
@@ -43,20 +49,44 @@ export function modeFromPath(pathname: string = location.pathname): 'view' | 'ed
   return pathname.replace(/\/+$/, '') === ROUTES.sheetEdit ? 'edit' : 'view'
 }
 
-export function pathForMode(mode: 'view' | 'edit'): string {
-  return mode === 'edit' ? ROUTES.sheetEdit : ROUTES.sheet
+
+/**
+ * Постоянный адрес выложенного сезона. Код — перестановка id строки
+ * (`src/model/shortcode.ts`), поэтому адрес считается и без похода в базу:
+ * у наших примеров id известны заранее.
+ *
+ * Оформление дописывается перебивкой: `?p=<тема>&i=<набор рисунков>`. Тема и
+ * рисунки не часть бланка, в строке лежит своё — но примерившему чужой сезон
+ * в другой теме надо уметь послать ссылку на то, что он видит. Пометки те же
+ * `p=` и `i=`, что раньше жили в хэше, и по той же причине: оформление меняют
+ * чаще всего и хотят видеть его в адресе.
+ *
+ * В query, а не в хэше: хэш до сервера не доходит, и присланная ссылка
+ * открылась бы сперва в теме из базы, а потом перекрасилась.
+ */
+export function publicSeasonHref(
+  code: string,
+  decor?: { palette: PaletteId; iconSet: IconSetId },
+): string {
+  const address = `${ROUTES.publicSeason}/${code}`
+  return decor ? `${address}?p=${decor.palette}&i=${decor.iconSet}` : address
 }
 
 /**
- * Короткая ссылка на пример. Закодировать шаблон на сервере лендинг не может —
- * месяц в примере считается от «сегодня», — поэтому в адресе едет только id,
- * а лист достраивает бланк из реестра и сам канонизирует адрес в `#d=…&p=…&data=<id>`.
+ * Адрес своего сезона. Режим по-прежнему несёт путь, а не пометка: адрес правки
+ * можно сохранить, переслать себе и перезагрузить.
  *
- * Тему дописываем сразу, хотя лист взял бы её из реестра и сам: `p=` обязан быть
- * виден и правиться во всяком адресе просмотра, а не появляться задним числом
- * после открытия. Иначе скопированная с лендинга ссылка — единственная, в которой
- * темы нет.
+ * Открывается он только владельцем, поэтому короткий код здесь не секрет и не
+ * пропуск: строка ищется вместе с аккаунтом.
  */
-export function exampleHref(id: string, palette: PaletteId): string {
-  return `${ROUTES.sheet}#data=${id}&p=${palette}`
+export function seasonHref(code: string, mode: 'view' | 'edit' = 'view'): string {
+  return mode === 'edit' ? `${ROUTES.season}/${code}/edit` : `${ROUTES.season}/${code}`
+}
+
+/**
+ * Приватная ссылка на свой сезон. Токен случайный, а не выведенный из id: его
+ * отзывают и выдают заново (`src/model/shortcode.ts`).
+ */
+export function sharedHref(token: string): string {
+  return `${ROUTES.shared}/${token}`
 }

@@ -2,18 +2,34 @@
 
 import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
-import { addReport, publish, setLike, unpublish } from './community'
-import { addFavorite, removeEntry, saveSeason, seasonIdOrNull, setTitle } from './library'
-import { writeFamily, type FamilyStatus } from './settings'
-import { normalizeComment, type CommunityStatus } from '../model/community'
-import { normalizeFamily } from '../model/family'
+import { readFamily, writeFamily, type FamilyStatus } from './settings'
 import {
-  normalizeTitle,
-  safeSeasonUrl,
-  type LibraryKind,
-  type LibraryStatus,
-} from '../model/library'
-import { ROUTES } from '../model/site'
+  addReport,
+  noteFork,
+  publishSeason,
+  setFavorite,
+  setLike,
+  withdrawPublic,
+} from './publicSeasons'
+import {
+  createUserSeason,
+  dropShareToken,
+  refreshShareToken,
+  removeUserSeason,
+  renameUserSeason,
+  saveUserSeason,
+} from './userSeasons'
+import { normalizeTemplate } from '../model/codec'
+import {
+  normalizeComment,
+  type PublishStatus,
+  type ReactionStatus,
+} from '../model/community'
+import { normalizeFamily, templateForFamily } from '../model/family'
+import { DEFAULT_ICON_SET, knownIconSet } from '../model/icons'
+import { defaultSeasonTitle, normalizeTitle, type LibraryStatus } from '../model/library'
+import { DEFAULT_PALETTE, knownPalette } from '../model/palettes'
+import { ROUTES, seasonHref } from '../model/site'
 
 /**
  * Вход и выход — серверные действия, а не клиентские обработчики: так в браузер
@@ -76,76 +92,151 @@ export async function saveFamily(family: unknown): Promise<Exclude<FamilyStatus,
 }
 
 /**
- * Библиотека сезонов. Правила у этих действий те же, что у `saveFamily`:
- * данные едут **аргументом, а не `FormData`** (форму из клиентского компонента
- * React кодирует под своими именами), а пришедшему не доверяем — адрес и
- * название проверяются здесь, у самой записи.
+ * Сезоны. Правила у этих действий те же, что у `saveFamily`: данные едут
+ * **аргументом, а не `FormData`** (форму из клиентского компонента React кодирует
+ * под своими именами), а пришедшему не доверяем — бланк и название проверяются
+ * здесь, у самой записи.
  *
- * Успех и неудача расходятся так же: листу статус нужен **значением** (постер
+ * Успех и неудача расходятся так же: постеру статус нужен **значением** (он
  * никуда не уходит и терять набранное нельзя), а страница «Мои сезоны»
  * заканчивается редиректом — удаление обязано пережить перезагрузку.
  */
-export async function toggleFavorite(
-  url: unknown,
-  title: unknown,
-  existingId: unknown,
-): Promise<{ status: LibraryStatus; id?: string }> {
-  const id = seasonIdOrNull(existingId)
-  if (id) return { status: await removeEntry('favorites', id) }
+/**
+ * Завести сезон из того, что сейчас на экране: черновик уезжает в кабинет, чужой
+ * или свой постер форкается.
+ *
+ * Форк — **копия**, а не ссылка: от исходного сезона в новой строке не остаётся
+ * ничего, и дальше он живёт сам по себе. Поэтому и повторный форк — это ещё одна
+ * строка, а не отказ «уже есть».
+ *
+ * `from` — код выложенного сезона, с которого форкнули. Он нужен только
+ * статистике автора («сколько людей взяло себе») и на саму строку не влияет:
+ * не запишется — форк от этого не отменяется.
+ */
+export async function storeSeason(
+  input: unknown,
+): Promise<{ status: LibraryStatus; code?: string }> {
+  const raw = (input ?? {}) as {
+    title?: unknown
+    template?: unknown
+    palette?: unknown
+    iconSet?: unknown
+    from?: unknown
+  }
+  const created = await createUserSeason({
+    title: normalizeTitle(raw.title),
+    template: normalizeTemplate(raw.template),
+    palette: knownPalette(raw.palette),
+    iconSet: knownIconSet(raw.iconSet),
+  })
 
-  const address = safeSeasonUrl(url)
-  if (!address) return { status: 'error' }
-  return addFavorite(address, normalizeTitle(title))
+  if (created.status === 'ok' && typeof raw.from === 'string') await noteFork(raw.from)
+  return created
 }
 
-export async function storeSeason(input: unknown): Promise<{ status: LibraryStatus; id?: string }> {
-  const raw = (input ?? {}) as { id?: unknown; url?: unknown; title?: unknown }
-  const address = safeSeasonUrl(raw.url)
-  if (!address) return { status: 'error' }
-  return saveSeason({
-    id: seasonIdOrNull(raw.id),
-    url: address,
-    title: normalizeTitle(raw.title),
+/**
+ * «Новый сезон» из шапки для вошедшего: строка заводится сразу, и человек
+ * попадает уже в свой сезон, а не в черновик. Состав семьи из кабинета
+ * подставляется здесь же — постеру про базу знать по-прежнему нечего.
+ *
+ * Неудача уезжает пометкой в адрес кабинета: страница всё равно перерисуется, а
+ * рассказать о ней надо — молча вернуть человека «никуда» нельзя.
+ */
+export async function createSeason() {
+  const family = await readFamily()
+  const template = templateForFamily(family ?? [])
+  const result = await createUserSeason({
+    template,
+    // Имя даётся сразу: список без имён нечитаем. Оно выводится из бланка —
+    // месяц и подзаголовок темы, — и правится в кабинете.
+    title: defaultSeasonTitle(template),
+    palette: DEFAULT_PALETTE,
+    iconSet: DEFAULT_ICON_SET,
+  })
+  if (result.status === 'ok' && result.code) redirect(seasonHref(result.code, 'edit'))
+  redirect(`${ROUTES.seasons}?add=${result.status}`)
+}
+
+/**
+ * Автосохранение своего сезона. Зовётся дебаунсом с постера, поэтому пришедшему
+ * не доверяем ровно так же, как всему остальному: бланк прогоняется через
+ * `normalizeTemplate`, оформление — через свои проверки.
+ */
+export async function saveSeason(
+  code: unknown,
+  input: unknown,
+): Promise<LibraryStatus> {
+  if (typeof code !== 'string') return 'error'
+  const raw = (input ?? {}) as { template?: unknown; palette?: unknown; iconSet?: unknown }
+  return saveUserSeason(code, {
+    template: normalizeTemplate(raw.template),
+    palette: knownPalette(raw.palette),
+    iconSet: knownIconSet(raw.iconSet),
   })
 }
 
 /**
- * Витрина «Идеи сообщества». Правила те же, что у библиотеки: данные едут
- * аргументом, пришедшему не доверяем, статус возвращается **значением** —
- * постер под кнопкой никуда не уходит.
+ * Выложить свой сезон на витрину.
  *
- * Публикуется не адрес, а **строка** сохранённого сезона: название и адрес
- * витрина берёт из неё, второй копии постера не заводим.
+ * Уезжает **код своего сезона**, а не бланк: копию с него сервер снимет сам,
+ * из собственной строки. Иначе на витрину можно было бы положить что угодно,
+ * не имея этого у себя.
  */
-export async function togglePublish(
-  seasonId: unknown,
-  on: unknown,
-): Promise<{ status: CommunityStatus; id?: string }> {
-  const key = seasonIdOrNull(seasonId)
-  if (!key) return { status: 'error' }
-  if (!on) return { status: await unpublish(key) }
-  return publish(key)
+export async function shareSeason(
+  code: unknown,
+  anonymize: unknown,
+): Promise<{ status: PublishStatus; code?: string; fresh?: boolean }> {
+  if (typeof code !== 'string') return { status: 'error' }
+  return publishSeason(code, Boolean(anonymize))
+}
+
+/** Убрать свою публикацию с витрины. Что с ней станет — решает `withdrawPublic`. */
+export async function withdrawSeason(code: unknown): Promise<{ status: PublishStatus; hidden?: boolean }> {
+  if (typeof code !== 'string') return { status: 'error' }
+  return withdrawPublic(code)
 }
 
 /**
- * Лайк. Желаемое состояние приходит от клиента — так запрос к базе один и
- * идемпотентен (см. `setLike`), а не «прочитать и переключить».
+ * Приватная ссылка на свой сезон: выдать (или заменить) и отозвать.
+ *
+ * Статус возвращается **значением**: постер под кнопкой никуда не уходит, а
+ * новую ссылку человеку надо тут же показать и скопировать.
  */
-export async function likeSeason(sharedId: unknown, on: unknown): Promise<CommunityStatus> {
-  const key = seasonIdOrNull(sharedId)
-  if (!key) return 'error'
-  return setLike(key, Boolean(on))
+export async function shareLink(code: unknown): Promise<{ status: LibraryStatus; token?: string }> {
+  if (typeof code !== 'string') return { status: 'error' }
+  return refreshShareToken(code)
+}
+
+export async function revokeLink(code: unknown): Promise<LibraryStatus> {
+  if (typeof code !== 'string') return 'error'
+  return dropShareToken(code)
+}
+
+/**
+ * Лайк, звёздочка и жалоба — то, что делают с чужим выложенным сезоном.
+ *
+ * Желаемое состояние приходит от клиента, а не «переключи там сам»: так запрос
+ * к базе один и идемпотентен, и повторное нажатие в соседней вкладке ничего не
+ * ломает. Статус возвращается **значением**: постер под кнопкой никуда не идёт.
+ */
+export async function likeSeason(code: unknown, on: unknown): Promise<ReactionStatus> {
+  if (typeof code !== 'string') return 'error'
+  return setLike(code, Boolean(on))
+}
+
+export async function favoriteSeason(code: unknown, on: unknown): Promise<ReactionStatus> {
+  if (typeof code !== 'string') return 'error'
+  return setFavorite(code, Boolean(on))
 }
 
 /**
  * Жалоба. Без комментария не принимаем: жалоба без слов бесполезна тому, кто
  * будет в ней разбираться. Окно пустую и не отправит — это проверка у записи.
  */
-export async function reportSeason(sharedId: unknown, comment: unknown): Promise<CommunityStatus> {
-  const key = seasonIdOrNull(sharedId)
+export async function reportSeason(code: unknown, comment: unknown): Promise<ReactionStatus> {
   const text = normalizeComment(comment)
-  if (!key || !text) return 'error'
-  return addReport(key, text)
+  if (typeof code !== 'string' || !text) return 'error'
+  return addReport(code, text)
 }
 
 /**
@@ -153,32 +244,32 @@ export async function reportSeason(sharedId: unknown, comment: unknown): Promise
  * компоненте, но привязанные аргументы уезжают в браузер и возвращаются оттуда —
  * поэтому проверяются наравне со всем остальным, включая адрес возврата.
  */
-export async function renameEntry(kind: unknown, id: unknown, back: unknown, title: unknown) {
-  const list = listOrNull(kind)
-  const key = seasonIdOrNull(id)
-  if (list && key) await setTitle(list, key, normalizeTitle(title))
+export async function renameEntry(code: unknown, back: unknown, title: unknown) {
+  if (typeof code === 'string') await renameUserSeason(code, normalizeTitle(title))
   redirect(safeReturnTo(back) ?? ROUTES.seasons)
 }
 
 /**
- * Снятие с витрины со страницы «Мои сезоны». Отдельно от `togglePublish` ровно
- * потому, что кончается **редиректом**, а не значением: постеру статус нужен на
- * месте, а списку — перерисоваться без выложенной строки, и пережить это должна
- * перезагрузка. То же различие, что у `storeSeason` и `dropEntry`.
+ * Убрать свою публикацию с витрины **со страницы списка**. Отдельно от
+ * `withdrawSeason` ровно потому, что кончается редиректом, а не значением:
+ * списку надо перерисоваться и пережить перезагрузку.
  */
-export async function unpublishEntry(seasonId: unknown, back: unknown) {
-  const key = seasonIdOrNull(seasonId)
-  if (key) await unpublish(key)
+export async function withdrawEntry(code: unknown, back: unknown) {
+  if (typeof code === 'string') await withdrawPublic(code)
+  redirect(safeReturnTo(back) ?? `${ROUTES.seasons}?tab=published`)
+}
+
+/**
+ * Убрать отложенное из кабинета. Отдельно от `favoriteSeason` ровно потому, что
+ * кончается **редиректом**, а не значением: списку надо перерисоваться и пережить
+ * перезагрузку. То же различие, что у `storeSeason` и `dropEntry`.
+ */
+export async function unfavoriteEntry(code: unknown, back: unknown) {
+  if (typeof code === 'string') await setFavorite(code, false)
   redirect(safeReturnTo(back) ?? ROUTES.seasons)
 }
 
-export async function dropEntry(kind: unknown, id: unknown, back: unknown) {
-  const list = listOrNull(kind)
-  const key = seasonIdOrNull(id)
-  if (list && key) await removeEntry(list, key)
+export async function dropEntry(code: unknown, back: unknown) {
+  if (typeof code === 'string') await removeUserSeason(code)
   redirect(safeReturnTo(back) ?? ROUTES.seasons)
-}
-
-function listOrNull(kind: unknown): LibraryKind | null {
-  return kind === 'seasons' || kind === 'favorites' ? kind : null
 }

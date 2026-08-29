@@ -1,5 +1,5 @@
 import { EXAMPLE_LIST } from '../../model/examples'
-import { exampleHref, ROUTES } from '../../model/site'
+import { ROUTES } from '../../model/site'
 import { AvatarFace } from '../AvatarFace'
 import { SectionBox } from '../SectionBox'
 import styles from './Examples.module.css'
@@ -10,7 +10,7 @@ export function Examples() {
       <div className={styles.grid}>
         {/* Обычная <a>, а не next/link: лист ведёт историю сам, см. комментарий в Hero. */}
         {EXAMPLE_LIST.map((example) => (
-          <a className={styles.card} key={example.id} href={exampleHref(example.id, example.palette)}>
+          <a className={styles.card} key={example.id} href={example.href}>
             <div className={styles.faces}>
               {example.faces.map((face, index) => (
                 <span

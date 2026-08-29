@@ -1,16 +1,11 @@
 import { monthName } from './calendar'
 import { PLACEHOLDERS } from './labels'
-import { ROUTES } from './site'
 import type { Template } from './types'
 
 /**
- * Библиотека сезонов: избранное и свои сохранённые постеры.
+ * Общее для всех сезонов: пределы, название, статусы.
  *
- * В базу едет **адрес постера**, а не разобранный бланк, — ровно та строка, что
- * стоит в адресной строке браузера. Поэтому второй копии состояния не появляется:
- * формат по-прежнему знает один `codec.ts`, а сервер хранит его вывод как есть.
- *
- * Файл намеренно без серверных зависимостей: им пользуются и лист, и серверные
+ * Файл намеренно без серверных зависимостей: им пользуются и постер, и серверные
  * действия, и страница «Мои сезоны».
  */
 
@@ -33,9 +28,6 @@ export const TITLE_LIMIT = 60
  */
 export type LibraryStatus = 'ok' | 'anonymous' | 'stale' | 'error' | 'limit'
 
-/** Что за список: свои сезоны или отложенное чужое. */
-export type LibraryKind = 'seasons' | 'favorites'
-
 /** Порядок в списке. По умолчанию дата: свежее сверху. */
 export type LibrarySort = 'date' | 'name'
 
@@ -55,37 +47,23 @@ export function defaultSeasonTitle(template: Template): string {
   return `${monthName(template.theme)} ${template.theme.year}, ${name}`.slice(0, TITLE_LIMIT)
 }
 
+/**
+ * Слова, которыми сезоны объясняют отказ. Живут в модели, а не рядом с кнопкой:
+ * заводить сезон умеют три разные панели, и вторая копия этих строк разошлась бы
+ * с первой при первой же правке.
+ *
+ * `anonymous` сюда не попадает: «войдите» — не отказ, а предложение, и показывает
+ * его окно входа.
+ */
+export const LIBRARY_TEXT: Record<Exclude<LibraryStatus, 'ok' | 'anonymous'>, string> = {
+  limit: `Больше ${LIBRARY_LIMIT} сезонов на аккаунт мы не храним — удалите лишние в «Моих сезонах».`,
+  stale: 'Не удалось сохранить: вход выполнен слишком давно. Обновите страницу и войдите заново.',
+  error: 'Не удалось сохранить — ошибка на сервере. Попробуйте ещё раз.',
+}
+
 /** Название приходит из браузера: однострочное, обрезанное, без хвостовых пробелов. */
 export function normalizeTitle(input: unknown, fallback = 'Сезон'): string {
   if (typeof input !== 'string') return fallback
   return input.replace(/\s+/g, ' ').trim().slice(0, TITLE_LIMIT) || fallback
 }
 
-/**
- * Адрес постера приходит из браузера, а потом уезжает в `href` на странице
- * «Мои сезоны» — значит, проверяется. Пускаем только свой адрес просмотра с
- * бланком в хэше: `javascript:` и чужой сайт так не проедут.
- */
-export function safeSeasonUrl(input: unknown): string | null {
-  if (typeof input !== 'string') return null
-  if (input.length > 4000) return null
-  return input.startsWith(`${ROUTES.sheet}#d=`) ? input : null
-}
-
-/**
- * Адрес своего сохранённого сезона: к постеру дописывается пометка `s=`, по
- * которой лист узнаёт, что правит именно эту строку (см. `readSeasonId`).
- * В самой базе пометки нет — там лежит обычный адрес постера, готовый к пересылке.
- */
-export function withSeasonMark(url: string, id: string): string {
-  return `${url}&s=${id}`
-}
-
-/**
- * Хэш из сохранённого адреса. Читалки `codec.ts` ждут именно хэш: скорми им
- * весь адрес — и первым ключом `URLSearchParams` станет «/sheet#d».
- */
-export function hashOf(url: string): string {
-  const at = url.indexOf('#')
-  return at < 0 ? '' : url.slice(at)
-}

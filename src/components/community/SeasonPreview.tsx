@@ -1,5 +1,6 @@
 import { PLACEHOLDERS } from '../../model/labels'
-import { ideaMonth, type Idea } from '../../server/community'
+import { publicSeasonHref } from '../../model/site'
+import { ideaMonth, type Idea } from '../../server/publicSeasons'
 
 import styles from './SeasonPreview.module.css'
 
@@ -13,18 +14,17 @@ import styles from './SeasonPreview.module.css'
  * проекты, настроения и итоги на превью не идут намеренно: это и есть то, ради
  * чего сезон открывают, — витрина заманивает, а не заменяет постер.
  *
- * Всё рисуется из разобранного адреса: второго источника у превью нет.
+ * Всё рисуется из содержимого строки: второго источника у превью нет.
  */
 export function SeasonPreview({ idea }: { idea: Idea }) {
   const { template } = idea
-  if (!template) return null
 
   // Пустых полей на бланке не бывает: незаполненное показывает свою подсказку —
   // ровно то же, что человек увидит на постере и на бумаге.
   const shown = (value: string, fallback: string) => value.trim() || fallback
 
   return (
-    <a className={styles.paper} data-palette={idea.palette} href={idea.url}>
+    <a className={styles.paper} data-palette={idea.palette} href={publicSeasonHref(idea.code)}>
       <span className={styles.month}>{ideaMonth(template)}</span>
       <span className={styles.headline}>{shown(template.theme.subtitle, PLACEHOLDERS.subtitle)}</span>
       <span className={styles.question}>{shown(template.theme.question, PLACEHOLDERS.question)}</span>

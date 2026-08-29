@@ -13,7 +13,9 @@
     "qr": "node tools/qr/build.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local tools/db/migrate.mjs",
     "logo": "node tools/logo/build.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:status": "node --env-file-if-exists=.env.local tools/db/migrate.mjs --status",
+    "db:seed": "node --env-file-if-exists=.env.local --import tsx tools/db/seed-examples.ts"
   },
   "dependencies": {
     "next": "^16.3.2",
@@ -29,6 +31,7 @@
     "@types/react-dom": "^19.2.3",
     "oxlint": "^1.75.0",
     "qrcode-generator": "^2.0.4",
+    "tsx": "^4.23.12",
     "typescript": "~6.0.2"
   }
 }

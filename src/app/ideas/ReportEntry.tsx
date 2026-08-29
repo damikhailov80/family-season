@@ -5,7 +5,7 @@ import { FlagDoodle } from '../../components/doodles'
 import { LoginDialog } from '../../components/edit/LoginDialog'
 import { ReportDialog } from '../../components/edit/ReportDialog'
 import { Toast } from '../../components/site/Toast'
-import { COMMUNITY_TEXT } from '../../model/community'
+import { REACTION_TEXT } from '../../model/community'
 import { reportSeason } from '../../server/actions'
 import styles from './page.module.css'
 
@@ -20,9 +20,9 @@ import styles from './page.module.css'
  * клиентская здесь одна кнопка строки.
  *
  * Окна и слова те же, что у постера: `ReportDialog`, `LoginDialog` и
- * `COMMUNITY_TEXT`. Вторых копий не заводим — разошлись бы при первой правке.
+ * `REACTION_TEXT`. Вторых копий не заводим — разошлись бы при первой правке.
  */
-export function ReportEntry({ id, title }: { id: string; title: string }) {
+export function ReportEntry({ code, title }: { code: string; title: string }) {
   const [open, setOpen] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -32,7 +32,7 @@ export function ReportEntry({ id, title }: { id: string; title: string }) {
 
   const send = async (comment: string) => {
     setBusy(true)
-    const status = await reportSeason(id, comment)
+    const status = await reportSeason(code, comment)
     setBusy(false)
     setOpen(false)
     // «Войдите» — не отказ, а предложение: его показывает окно, а не тост.
@@ -41,7 +41,7 @@ export function ReportEntry({ id, title }: { id: string; title: string }) {
       return
     }
     if (status !== 'ok') {
-      setNotice({ text: COMMUNITY_TEXT[status], at: Date.now() })
+      setNotice({ text: REACTION_TEXT[status], at: Date.now() })
       return
     }
     setSent(true)

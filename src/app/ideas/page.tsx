@@ -6,7 +6,7 @@ import { SeasonPreview } from '../../components/community/SeasonPreview'
 import { HeartDoodle, MegaphoneDoodle } from '../../components/doodles'
 import { Toast } from '../../components/site/Toast'
 import { ROUTES } from '../../model/site'
-import { randomIdeas } from '../../server/community'
+import { randomIdeas } from '../../server/publicSeasons'
 import { ReportEntry } from './ReportEntry'
 import styles from './page.module.css'
 
@@ -59,7 +59,7 @@ export default async function IdeasPage({
             <>
               <ul className={styles.grid}>
                 {ideas.map((idea) => (
-                  <li className={styles.card} key={idea.id}>
+                  <li className={styles.card} key={idea.code}>
                     <SeasonPreview idea={idea} />
                     <div className={styles.meta}>
                       <span className={styles.name}>{idea.title}</span>
@@ -67,7 +67,7 @@ export default async function IdeasPage({
                         <HeartDoodle size={14} filled strokeWidth={4} />
                         {idea.likes}
                       </span>
-                      <ReportEntry id={idea.id} title={idea.title} />
+                      <ReportEntry code={idea.code} title={idea.title} />
                     </div>
                   </li>
                 ))}
@@ -85,10 +85,10 @@ export default async function IdeasPage({
               </div>
 
               <p className={styles.note}>
-                Сезоны выкладывают сами семьи — кнопкой с мегафоном на постере. Показываем
-                каждый раз случайные: так у нового сезона есть шанс попасться на глаза, а не
-                утонуть под теми, кого уже видно. Увидели рекламу, грубость или чужие личные
-                данные — нажмите флажок: такие сезоны мы с витрины убираем.
+                Сезоны выкладывают сами семьи — кнопкой с мегафоном на своём сезоне.
+                Показываем каждый раз случайные: так у нового есть шанс попасться на глаза,
+                а не утонуть под теми, кого уже видно. Увидели рекламу, грубость или чужие
+                личные данные — нажмите флажок: такие сезоны мы с витрины убираем.
               </p>
             </>
           ) : (
@@ -100,13 +100,13 @@ export default async function IdeasPage({
                 <a className={styles.primary} href={ROUTES.sheetEdit}>
                   Собрать свой сезон
                 </a>
-                <a className={styles.ghost} href={ROUTES.sheet}>
+                <a className={styles.ghost} href={ROUTES.home}>
                   Посмотреть примеры
                 </a>
               </div>
               <p className={styles.note}>
-                Сохраните сезон в «Мои», откройте его и нажмите на постере кнопку с мегафоном —
-                он появится здесь.
+                Заведите сезон в «Моих», откройте его и нажмите кнопку с мегафоном — он
+                появится здесь.
               </p>
             </>
           ))}

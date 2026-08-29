@@ -85,43 +85,6 @@
   border-bottom-color: var(--accent-deep);
 }
 
-/* Вкладки: два списка на одной странице — свои сезоны и отложенное чужое.
-   Обычные ссылки, а не кнопки: у каждой вкладки свой адрес, и его можно
-   переслать, положить в закладки и перезагрузить. */
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-.tab,
-.tabActive {
-  padding: 8px 16px;
-  border: 1.5px solid var(--sheet-border);
-  border-radius: 999px;
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 1;
-  text-decoration: none;
-}
-
-.tab {
-  background: var(--surface);
-  color: var(--ink-soft);
-}
-
-.tab:hover {
-  border-color: var(--accent-deep);
-  background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
-}
-
-.tabActive {
-  border-color: var(--accent-deep);
-  background: var(--accent-deep);
-  color: var(--on-accent);
-}
-
 .filters {
   display: flex;
   align-items: center;
@@ -298,27 +261,6 @@
 }
 
 .rowButton:focus-visible,
-.tab:focus-visible,
-.tabActive:focus-visible,
-.ghost:focus-visible,
-.primaryAction:focus-visible,
-.danger:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
-  outline-offset: 2px;
-}
-
-/* Окно подтверждения. Обвязка повторяет диалоги постера, но модуль свой:
-   те живут в `components/edit`, и тянуть их стили на страницу сайта незачем. */
-.dialog {
-  max-width: 460px;
-  padding: 22px 24px;
-  border: var(--border-w) solid var(--accent-deep);
-  border-radius: var(--radius-box);
-  background: var(--surface);
-  color: var(--ink);
-  font-family: var(--font-ui);
-}
-
 .dialog::backdrop {
   background: rgb(0 0 0 / 35%);
 }
@@ -400,6 +342,48 @@
   cursor: default;
 }
 
+/* Вкладки: два списка на одной странице — свои сезоны и отложенное чужое.
+   Обычные ссылки, а не кнопки: у каждой вкладки свой адрес, и его можно
+   переслать, положить в закладки и перезагрузить. */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.tab,
+.tabActive {
+  padding: 8px 16px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.tabActive {
+  padding: 8px 16px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+/* Пометка «на витрине» в строке метаданных. Цветом, а не рамкой: это состояние
+   строки, а рамка сделала бы из неё кнопку, которой она не является. */
+.offStage {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--accent-theme);
+  font-weight: 700;
+}
+
 /* Удаление необратимо, поэтому кнопка не «главная», а именно опасная: цвет
    «плохого» настроения — единственный красный в проекте, и он вне тем. */
 .danger {
@@ -425,12 +409,3 @@
   }
 }
 
-/* Пометка «на витрине» в строке метаданных. Цветом, а не рамкой: это состояние
-   строки, а рамка сделала бы из неё кнопку, которой она не является. */
-.onStage {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  color: var(--accent-theme);
-  font-weight: 700;
-}

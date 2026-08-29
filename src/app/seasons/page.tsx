@@ -5,21 +5,18 @@ import { SectionBox } from '../../components/SectionBox'
 import { HeartDoodle, RocketDoodle } from '../../components/doodles'
 import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
 import { Toast } from '../../components/site/Toast'
-import { loginWithGoogle } from '../../server/actions'
+import { createSeason, loginWithGoogle } from '../../server/actions'
 import { PALETTE_LABELS } from '../../model/palettes'
-import {
-  LIBRARY_LIMIT,
-  TITLE_LIMIT,
-  withSeasonMark,
-  type LibraryKind,
-  type LibrarySort,
-} from '../../model/library'
-import { ROUTES } from '../../model/site'
+import { LIBRARY_LIMIT, TITLE_LIMIT, type LibrarySort } from '../../model/library'
+import { publicSeasonHref, ROUTES, seasonHref } from '../../model/site'
 import { auth } from '../../server/auth'
-import { libraryState, type Entry } from '../../server/library'
+import { listFavorites, listPublished } from '../../server/publicSeasons'
+import { listUserSeasons } from '../../server/userSeasons'
+import { UnfavoriteEntry } from './UnfavoriteEntry'
+import { WithdrawEntry } from './WithdrawEntry'
+import type { PaletteId } from '../../types'
 import { DeleteEntry } from './DeleteEntry'
 import { RenameEntry } from './RenameEntry'
-import { UnpublishEntry } from './UnpublishEntry'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
@@ -27,9 +24,13 @@ export const metadata: Metadata = {
   description: 'Личный кабинет: сохранённые сезоны и отложенное в избранное.',
 }
 
-const TABS: { kind: LibraryKind; label: string }[] = [
+/** Что показать: свои сезоны, отложенное чужое или своё выложенное. */
+type Tab = 'seasons' | 'favorites' | 'published'
+
+const TABS: { kind: Tab; label: string }[] = [
   { kind: 'seasons', label: 'Мои' },
   { kind: 'favorites', label: 'Избранное' },
+  { kind: 'published', label: 'Опубликованные' },
 ]
 
 /**
@@ -37,7 +38,7 @@ const TABS: { kind: LibraryKind; label: string }[] = [
  * переслать и перезагрузить, страница остаётся серверной, и всё работает без JS.
  * Умолчания в адрес не пишем — короткий `/seasons` должен оставаться коротким.
  */
-function listHref(kind: LibraryKind, search: string, sort: LibrarySort): string {
+function listHref(kind: Tab, search: string, sort: LibrarySort): string {
   const params = new URLSearchParams()
   if (kind !== 'seasons') params.set('tab', kind)
   if (search) params.set('q', search)
@@ -71,11 +72,25 @@ const MONTHS_OF = [
   'декабря',
 ]
 
-function Row({ entry, kind, back }: { entry: Entry; kind: LibraryKind; back: string }) {
-  // Свой сезон открывается с пометкой `s=`: по ней лист узнаёт, какую строку он
-  // правит. У избранного пометки нет — это чужой постер, перезаписывать нечего.
-  const href = kind === 'seasons' ? withSeasonMark(entry.url, entry.id) : entry.url
+/**
+ * Строка списка. Оба списка сводятся к ней заранее: свои сезоны лежат теперь в
+ * своей таблице и адресуются кодом, отложенное чужое — пока по-старому адресом.
+ */
+interface RowData {
+  code: string
+  title: string
+  savedAt: Date
+  palette: PaletteId
+  month: string | null
+  /** У отложенного и выложенного: сезон сняли с витрины, но ссылка работает. */
+  hidden?: boolean
+  /** Только у своих публикаций: что они собрали у людей. */
+  likes?: number
+  favorites?: number
+  forks?: number
+}
 
+function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string }) {
   return (
     <li className={styles.entry}>
       {/* Четыре сектора темы — тот же образец, что на кнопке переключателя:
@@ -87,39 +102,53 @@ function Row({ entry, kind, back }: { entry: Entry; kind: LibraryKind; back: str
         aria-hidden="true"
       />
       <span className={styles.entryText}>
-        <a className={styles.entryTitle} href={href}>
+        <a
+          className={styles.entryTitle}
+          href={kind === 'seasons' ? seasonHref(entry.code) : publicSeasonHref(entry.code)}
+        >
           {entry.title}
         </a>
         <span className={styles.entryMeta}>
-          сохранён {savedOn(entry.savedAt)}
+          {kind === 'seasons' ? 'сохранён' : kind === 'favorites' ? 'отложен' : 'выложен'}{' '}
+          {savedOn(entry.savedAt)}
           {entry.month ? ` · ${entry.month}` : ''}
-          {/* «На витрине» — состояние строки, а не действие над ней, поэтому это
-              пометка в той же серой строке, что дата и месяц, а не ещё одна
-              кнопка. Лайки показываем только когда они есть: ноль рядом со
-              свежей публикацией читался бы как упрёк. */}
-          {entry.sharedId && (
-            <span className={styles.onStage}>
-              · на витрине
-              {entry.likes > 0 && (
-                <>
-                  {' · '}
-                  <HeartDoodle size={12} filled strokeWidth={4} />
-                  {entry.likes}
-                </>
-              )}
-            </span>
+          {/* Числа автору показываем всегда, включая нули: это его собственные
+              данные, а не оценка. «В избранном» стоит рядом не для красоты —
+              именно оно решает, исчезнет публикация при снятии или спрячется. */}
+          {kind === 'published' && (
+            <>
+              {' · '}
+              <HeartDoodle size={12} filled strokeWidth={4} />
+              {entry.likes} · в избранном у {entry.favorites} · форкнули {entry.forks}
+            </>
           )}
+          {/* Снятое с витрины остаётся в избранном и открывается по ссылке —
+              но сказать об этом надо: в «Идеях» его больше нет. */}
+          {entry.hidden && <span className={styles.offStage}>{' · снят с витрины'}</span>}
         </span>
       </span>
       <span className={styles.rowTools}>
-        {/* Снять с витрины можно только выложенное — кнопки у остальных строк
-            нет вовсе. Выложить отсюда, наоборот, нельзя: делятся тем, что видят
-            на постере, и кнопка живёт там. */}
-        {entry.sharedId && (
-          <UnpublishEntry id={entry.id} title={entry.title} likes={entry.likes} back={back} />
+        {kind === 'seasons' && (
+          <>
+            <RenameEntry code={entry.code} title={entry.title} back={back} />
+            <DeleteEntry code={entry.code} title={entry.title} back={back} />
+          </>
         )}
-        <RenameEntry kind={kind} id={entry.id} title={entry.title} back={back} />
-        <DeleteEntry kind={kind} id={entry.id} title={entry.title} back={back} />
+        {/* Убрать закладку — не удаление: сам сезон никуда не денется, и
+            спрашивать подтверждение не о чем. */}
+        {kind === 'favorites' && (
+          <UnfavoriteEntry code={entry.code} title={entry.title} back={back} />
+        )}
+        {/* Снять с витрины можно только то, что на ней есть: у снятого кнопки
+            нет вовсе — погашенная обещала бы, что когда-нибудь оживёт. */}
+        {kind === 'published' && !entry.hidden && (
+          <WithdrawEntry
+            code={entry.code}
+            title={entry.title}
+            favorites={entry.favorites ?? 0}
+            back={back}
+          />
+        )}
       </span>
     </li>
   )
@@ -137,7 +166,7 @@ function Row({ entry, kind, back }: { entry: Entry; kind: LibraryKind; back: str
 export default async function SeasonsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; q?: string; sort?: string }>
+  searchParams: Promise<{ tab?: string; q?: string; sort?: string; add?: string }>
 }) {
   const session = await auth()
   const who = session?.user?.name || session?.user?.email
@@ -167,12 +196,20 @@ export default async function SeasonsPage({
   }
 
   const flags = await searchParams
-  const kind: LibraryKind = flags.tab === 'favorites' ? 'favorites' : 'seasons'
+  // Вкладка приходит из адреса: неизвестная — как будто её не называли.
+  const kind: Tab =
+    flags.tab === 'favorites' || flags.tab === 'published' ? flags.tab : 'seasons'
   const sort: LibrarySort = flags.sort === 'name' ? 'name' : 'date'
   // Строку поиска режем по тому же пределу, что и название: искать длиннее нечего.
   const search = typeof flags.q === 'string' ? flags.q.slice(0, TITLE_LIMIT) : ''
-  const state = await libraryState(kind, search, sort)
   const here = listHref(kind, search, sort)
+  const state =
+    kind === 'seasons'
+      ? await listUserSeasons(search, sort)
+      : kind === 'favorites'
+        ? await listFavorites(search, sort)
+        : await listPublished(search, sort)
+  const entries: RowData[] = state.status === 'ok' ? state.entries : []
 
   return (
     <PaperSheet>
@@ -229,10 +266,10 @@ export default async function SeasonsPage({
         {/* Не прочитали — показываем пустоту и тост, а не умолчание: выдумывать
             содержимое списка нельзя. */}
         {state.status === 'ok' &&
-          (state.entries.length ? (
+          (entries.length ? (
             <ul className={styles.entries}>
-              {state.entries.map((entry) => (
-                <Row key={entry.id} entry={entry} kind={kind} back={here} />
+              {entries.map((entry) => (
+                <Row key={entry.code} entry={entry} kind={kind} back={here} />
               ))}
             </ul>
           ) : (
@@ -240,8 +277,10 @@ export default async function SeasonsPage({
               {search
                 ? 'По этому запросу ничего не нашлось.'
                 : kind === 'seasons'
-                  ? 'Сохранённых сезонов пока нет. Соберите постер и нажмите на нём «Сохранить».'
-                  : 'В избранном пока пусто. Нажмите ☆ на любом постере — он ляжет сюда.'}
+                  ? 'Сезонов пока нет. Заведите новый — он появится здесь сразу.'
+                  : kind === 'favorites'
+                    ? 'В избранном пока пусто. Нажмите ☆ на любом выложенном сезоне — он ляжет сюда.'
+                    : 'Вы ещё ничего не выкладывали. Откройте свой сезон и нажмите кнопку с мегафоном.'}
             </p>
           ))}
 
@@ -259,9 +298,12 @@ export default async function SeasonsPage({
           </div>
         )}
 
-        <a className={styles.primary} href={ROUTES.sheetEdit}>
-          Собрать новый сезон
-        </a>
+        {/* Сезон заводится строкой сразу — это действие, а не ссылка на бланк. */}
+        <form action={createSeason}>
+          <button type="submit" className={styles.primary}>
+            Собрать новый сезон
+          </button>
+        </form>
 
         <p className={styles.note}>
           Имя и почта лежат только в куке вашего браузера — на сервере их нет. В базе у нас
@@ -276,6 +318,17 @@ export default async function SeasonsPage({
 
         {state.status === 'error' && (
           <Toast message="Не удалось загрузить список — ошибка на сервере." />
+        )}
+
+        {/* Сюда возвращается неудача «Нового сезона»: строку завести не вышло, и
+            человек оказался здесь вместо своего сезона — молчать об этом нельзя. */}
+        {flags.add === 'limit' && (
+          <Toast
+            message={`Больше ${LIBRARY_LIMIT} сезонов на аккаунт мы не храним — удалите лишние.`}
+          />
+        )}
+        {flags.add && flags.add !== 'limit' && (
+          <Toast message="Не удалось завести сезон — ошибка на сервере." />
         )}
       </SectionBox>
     </PaperSheet>

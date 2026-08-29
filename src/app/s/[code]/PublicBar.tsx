@@ -1,0 +1,301 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import {
+  FlagDoodle,
+  HeartDoodle,
+  LinkDoodle,
+  MegaphoneDoodle,
+  PrinterDoodle,
+  SparkStar,
+} from '../../../components/doodles'
+import { ForkButton } from '../../../components/edit/ForkButton'
+import { LoginDialog } from '../../../components/edit/LoginDialog'
+import { ReportDialog } from '../../../components/edit/ReportDialog'
+import { WithdrawDialog } from '../../../components/edit/WithdrawDialog'
+import { Toast } from '../../../components/site/Toast'
+import { PUBLISH_TEXT, REACTION_TEXT, type ReactionStatus } from '../../../model/community'
+import { ROUTES } from '../../../model/site'
+import { favoriteSeason, likeSeason, reportSeason, withdrawSeason } from '../../../server/actions'
+import styles from '../../../components/edit/Bar.module.css'
+
+/** Толщина обводки рисунков из библиотеки в размере кнопки — см. `Icon`. */
+const ICON_STROKE = 4
+
+/**
+ * Панель выложенного сезона.
+ *
+ * Кнопки стоят по двум краям, и это два разных края. Слева, до подсказки, — то,
+ * что делают с этим постером **у себя**: звёздочка, лайк, жалоба. Справа — то,
+ * что уносит его наружу: ссылка и печать. Форк посередине, в общем ряду
+ * действий: он не про этот сезон, а про следующий, свой.
+ *
+ * Про лайк и звёздочку вход, в отличие от форка, не спрашивается заранее: действие уходит на
+ * сервер, и `anonymous` в ответе открывает окно входа. Это не отказ, а
+ * предложение, и оттого показывает его окно, а не тост.
+ */
+export function PublicBar({
+  code,
+  demo,
+  signedIn,
+  mine,
+  system,
+  hidden,
+  published,
+  state,
+}: {
+  code: string
+  demo: boolean
+  signedIn: boolean
+  /** Это моя публикация: её можно убрать с витрины, но не лайкать. */
+  mine: boolean
+  /** Ничей системный сезон — наш пример: на такой не жалуются. */
+  system: boolean
+  /** Снята с витрины, но живёт по ссылке. */
+  hidden: boolean
+  /** Пришли сюда прямо с публикации: `new` — выложили сейчас, `again` — уже лежал. */
+  published: 'new' | 'again' | null
+  /** Что этот сезон уже собрал и что с ним сделал сам смотрящий. */
+  state: { likes: number; liked: boolean; reported: boolean; favorited: boolean }
+}) {
+  const [withdrawOpen, setWithdrawOpen] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
+  /**
+   * Ответ сервера уже известен из самого действия — переспрашивать его незачем,
+   * поэтому состояние кнопок живёт здесь, начавшись с пришедшего со страницы.
+   */
+  const [marks, setMarks] = useState(state)
+
+  /*
+   * Пометка о публикации нужна ровно один раз — объяснить, почему человек тут
+   * оказался. Дальше она только мешала бы: этот адрес копируют и отправляют.
+   * Чистим `replaceState`-ом, как кабинет чистит свой `?ok=1`; `history.state`
+   * передаём обязательно (см. «Каркас»).
+   */
+  useEffect(() => {
+    if (!published) return
+    const url = new URL(location.href)
+    url.searchParams.delete('published')
+    history.replaceState(history.state, '', url.pathname + url.search)
+  }, [published])
+
+  /** «Войдите» — не отказ сервера, а предложение: его показывает окно, не тост. */
+  const react = (status: ReactionStatus) => {
+    if (status === 'anonymous') setLoginOpen(true)
+    else if (status !== 'ok') setNotice({ text: REACTION_TEXT[status], at: Date.now() })
+    return status === 'ok'
+  }
+
+  const switchFavorite = async () => {
+    if (busy) return
+    const on = !marks.favorited
+    setBusy(true)
+    const status = await favoriteSeason(code, on)
+    setBusy(false)
+    if (react(status)) setMarks({ ...marks, favorited: on })
+  }
+
+  const switchLike = async () => {
+    if (busy) return
+    const on = !marks.liked
+    setBusy(true)
+    const status = await likeSeason(code, on)
+    setBusy(false)
+    if (react(status)) setMarks({ ...marks, liked: on, likes: marks.likes + (on ? 1 : -1) })
+  }
+
+  /** Окно закрываем при любом исходе: два модальных окна друг на друге — не разговор. */
+  const sendReport = async (comment: string) => {
+    setBusy(true)
+    const status = await reportSeason(code, comment)
+    setBusy(false)
+    setReportOpen(false)
+    if (!react(status)) return
+    setMarks({ ...marks, reported: true })
+    setNotice({ text: 'Жалоба отправлена — спасибо, мы разберёмся', at: Date.now() })
+  }
+
+  const copyLink = async () => {
+    // Ровно то, что в адресной строке: короткий код плюс примеренное оформление,
+    // если его меняли. Собирать адрес заново здесь нечего — он уже собран.
+    const url = location.href
+    try {
+      await navigator.clipboard.writeText(url)
+      setNotice({ text: 'Ссылка на сезон скопирована — можно отправлять', at: Date.now() })
+    } catch {
+      // Без разрешения на буфер — показываем ссылку, скопирует руками.
+      prompt('Ссылка на сезон:', url)
+    }
+  }
+
+  const withdraw = async () => {
+    setBusy(true)
+    const result = await withdrawSeason(code)
+    setBusy(false)
+    setWithdrawOpen(false)
+    if (result.status !== 'ok') {
+      setNotice({
+        text: PUBLISH_TEXT[result.status as 'duplicate' | 'limit' | 'stale' | 'error'],
+        at: Date.now(),
+      })
+      return
+    }
+    // Осталась скрытой — страница по-прежнему открывается, и её надо перечитать;
+    // ушла совсем — открывать больше нечего, уводим в кабинет.
+    if (result.hidden) location.reload()
+    else location.assign(ROUTES.seasons)
+  }
+
+  return (
+    <>
+      <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
+        {/* Своё не откладывают и не лайкают: оно и так лежит в кабинете, а
+            избранное вдобавок держало бы собственную публикацию от снятия. */}
+        {!mine && (
+          <>
+            <button
+              type="button"
+              className={styles.icon}
+              onClick={() => void switchFavorite()}
+              disabled={busy}
+              aria-pressed={marks.favorited}
+              title={marks.favorited ? 'Убрать из избранного' : 'Отложить в избранное'}
+              aria-label={marks.favorited ? 'Убрать из избранного' : 'Отложить в избранное'}
+            >
+              <SparkStar size={18} filled={marks.favorited} />
+            </button>
+            {/* Число живёт **внутри** кнопки, в её же рамке: за рамкой оно
+                читалось как подпись неизвестно к чему. Ноль не показываем —
+                пустой счёт у свежего сезона выглядел бы упрёком автору. */}
+            <button
+              type="button"
+              className={marks.likes > 0 ? `${styles.icon} ${styles.withCount}` : styles.icon}
+              onClick={() => void switchLike()}
+              disabled={busy}
+              aria-pressed={marks.liked}
+              title={marks.liked ? 'Убрать лайк' : 'Поставить лайк'}
+              aria-label={`${marks.liked ? 'Убрать лайк' : 'Поставить лайк'}${
+                marks.likes > 0 ? `, сейчас лайков: ${marks.likes}` : ''
+              }`}
+            >
+              <HeartDoodle size={18} filled={marks.liked} strokeWidth={ICON_STROKE} />
+              {/* Счёт уже назван в `aria-label` кнопки — читалке он второй раз не нужен. */}
+              {marks.likes > 0 && (
+                <span className={styles.count} aria-hidden="true">
+                  {marks.likes}
+                </span>
+              )}
+            </button>
+            {/* На наши примеры не жалуются: шестеро недовольных иначе убрали бы
+                их с витрины. */}
+            {!system && (
+              <button
+                type="button"
+                className={styles.icon}
+                onClick={() => setReportOpen(true)}
+                disabled={busy}
+                aria-pressed={marks.reported}
+                title={marks.reported ? 'Жалоба отправлена — можно уточнить' : 'Пожаловаться'}
+                aria-label={marks.reported ? 'Жалоба отправлена — можно уточнить' : 'Пожаловаться'}
+              >
+                <FlagDoodle size={18} filled={marks.reported} strokeWidth={ICON_STROKE} />
+              </button>
+            )}
+          </>
+        )}
+
+        {/* Свой выложенный сезон: счёт лайков видно, а нажать нечего. Это
+            **читалка, а не погашенная кнопка**: погашенная обещала бы, что
+            когда-нибудь станет доступной, — а она не станет никогда. */}
+        {mine && (
+          <span className={styles.score} role="img" aria-label={`Лайков на витрине: ${marks.likes}`}>
+            <HeartDoodle size={18} filled strokeWidth={ICON_STROKE} />
+            {marks.likes}
+          </span>
+        )}
+
+        <span className={styles.hint}>
+          {hidden
+            ? 'Сезон снят с витрины — он открывается только по этой ссылке'
+            : demo
+              ? 'Это наш пример — так выглядит прожитый сезон'
+              : 'Этот сезон выложили в «Идеи сообщества»'}
+        </span>
+
+        <span className={styles.actions}>
+          <ForkButton
+            signedIn={signedIn}
+            from={code}
+            onFailure={(text) => setNotice({ text, at: Date.now() })}
+          />
+          {/* Убрать с витрины может только тот, кто выложил. Кнопка нажата
+              (`aria-pressed`), пока сезон на витрине: это состояние строки, а
+              не действие «выложить ещё раз» — выкладывают из своего сезона. */}
+          {mine && (
+            <button
+              type="button"
+              className={styles.icon}
+              disabled={busy || hidden}
+              aria-pressed={!hidden}
+              onClick={() => setWithdrawOpen(true)}
+              title={hidden ? 'Сезон уже снят с витрины' : 'Убрать с витрины'}
+              aria-label={hidden ? 'Сезон уже снят с витрины' : 'Убрать с витрины'}
+            >
+              <MegaphoneDoodle size={19} strokeWidth={ICON_STROKE} />
+            </button>
+          )}
+          <button
+            type="button"
+            className={styles.icon}
+            onClick={() => void copyLink()}
+            title="Скопировать ссылку на сезон"
+            aria-label="Скопировать ссылку на сезон"
+          >
+            <LinkDoodle size={19} strokeWidth={3.4} />
+          </button>
+          <button
+            type="button"
+            className={styles.icon}
+            onClick={() => print()}
+            title="Печать / PDF"
+            aria-label="Печать / PDF"
+          >
+            <PrinterDoodle size={19} strokeWidth={3.4} />
+          </button>
+        </span>
+      </div>
+
+      {/* Окна и тост — вне бара: у `.bar` есть `backdrop-filter`, а он делает
+          элемент содержащим блоком для `position: fixed`. */}
+      {withdrawOpen && (
+        <WithdrawDialog
+          busy={busy}
+          onDismiss={() => setWithdrawOpen(false)}
+          onSubmit={() => void withdraw()}
+        />
+      )}
+      {reportOpen && (
+        <ReportDialog
+          busy={busy}
+          sent={marks.reported}
+          onDismiss={() => setReportOpen(false)}
+          onSubmit={(comment) => void sendReport(comment)}
+        />
+      )}
+      <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
+      {published && (
+        <Toast
+          message={
+            published === 'new'
+              ? 'Сезон на витрине — вот его постоянная ссылка'
+              : 'Такой сезон на витрине уже был — вот он'
+          }
+        />
+      )}
+      {notice && <Toast key={notice.at} message={notice.text} />}
+    </>
+  )
+}

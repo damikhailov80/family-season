@@ -143,6 +143,26 @@
   margin-top: 18px;
 }
 
+/* Галочка обезличивания. Метка кликабельна целиком: попадать в саму галочку
+   пальцем неудобно, а выбор здесь не мелочь — он про имена детей. */
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.checkBox {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--accent-deep);
+}
+
 /* Экранный контрол на бумагу не идёт. Закрытый <dialog> и так не рисуется,
    но правило нужно на случай печати с открытым окном. */
 @media print {

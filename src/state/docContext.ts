@@ -5,9 +5,6 @@ import type { FamilyPreset } from '../model/family'
 
 export type DocMode = 'view' | 'edit'
 
-/** demo — пример главной страницы, custom — свой лист (форк или пустой). */
-export type DocSource = 'demo' | 'custom'
-
 export interface FieldBinding {
   value: string
   onChange: (value: string) => void
@@ -15,59 +12,43 @@ export interface FieldBinding {
   maxLength: number
 }
 
+/**
+ * Сам постер: всё, что нужно, чтобы его нарисовать и править.
+ *
+ * Контекст один и знает только про бланк. Всё, что вокруг постера — где он
+ * лежит, куда сохраняется, что с ним можно сделать, — держат страницы: у
+ * черновика, своего сезона и выложенного они разные, а сам лист один и тот же.
+ */
 export interface DocValue {
   template: Template
-  /** Тема оформления. В бланк не входит: её несёт пометка `p=` в адресе. */
+  /** Тема оформления. В бланк не входит: она хранится рядом с ним. */
   palette: PaletteId
-  /** Набор рисунков. Тоже не бланк: его несёт пометка `i=` в адресе. */
+  /** Набор рисунков. Тоже не бланк, и хранится так же, как тема. */
   iconSet: IconSetId
   fill: FillState
-  /** id своей сохранённой строки из `s=`; null — сезон ещё нигде не сохранён. */
-  seasonId: string | null
   mode: DocMode
-  source: DocSource
   /** Число дней месяца — считается из темы, отдельного поля в модели нет. */
   days: number
   editing: boolean
-  /**
-   * Адреса навигационных кнопок для `<a href>`: те же, что уходят в историю по
-   * обычному клику, поэтому клик с модификатором открывает лист в новой вкладке.
-   * `fork` кодируется асинхронно — до готовности пустая строка.
-   */
-  links: { fork: string }
   /** Привязка текстового поля по пути в шаблоне: field('people.0.name'). */
   field: (path: string) => FieldBinding
-  setMode: (mode: DocMode) => void
-  fork: () => void
-  /** «Отмена» — шаг назад по истории; своего адреса, в отличие от форка, у неё нет. */
-  cancel: () => void
   addPerson: () => void
   removePerson: (id: string) => void
   cycleFace: (id: string) => void
   /**
    * Подставляет состав семьи из кабинета: меняются только рисунок и имя,
-   * содержимое карточек остаётся на своих местах (см. `replacePeople`
-   * в `DocProvider`).
+   * содержимое карточек остаётся на своих местах.
    */
   replacePeople: (members: FamilyPreset) => void
   stepMonth: (delta: number) => void
   setPalette: (palette: PaletteId) => void
   setIconSet: (iconSet: IconSetId) => void
-  /** Ставится после сохранения; `null` стирает чужую или устаревшую пометку `s=`. */
-  setSeasonId: (id: string | null) => void
-  /**
-   * Относительный адрес просмотра — то, что уезжает в базу. Без `s=`: в строке
-   * лежит постер, готовый к пересылке, а не ссылка на чужой кабинет.
-   */
-  buildSeasonUrl: () => Promise<string>
-  /** Актуальная ссылка на лист (дожидается кодирования, а не читает location). */
-  buildShareUrl: () => Promise<string>
 }
 
 export const DocContext = createContext<DocValue | null>(null)
 
 export function useDoc(): DocValue {
   const value = useContext(DocContext)
-  if (!value) throw new Error('useDoc вызван вне <DocProvider>')
+  if (!value) throw new Error('useDoc вызван вне провайдера постера')
   return value
 }

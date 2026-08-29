@@ -1,12 +1,12 @@
+import { DEFAULT_EXAMPLE_ID, exampleById } from '../../model/examples'
 import { ROUTES } from '../../model/site'
 import { FamilyIcon, HeartDoodle, SparkleRays } from '../doodles'
 import styles from './Hero.module.css'
 
 /*
- * Ссылки в лист — обычные <a>, а не next/link: лист управляет историей руками
- * (pushState с пометкой `own` в DocProvider), и заходить в него свежим документом
- * надёжнее, чем мягким переходом роутера. Страница листа всё равно клиентская,
- * так что на скорости это не сказывается.
+ * Ссылки в постер — обычные <a>, а не next/link: страницы постера клиентские и
+ * тянут за собой свой кусок бандла, так что мягкий переход выигрывает немного, а
+ * свежий документ надёжнее — на нём точно не останется состояния лендинга.
  */
 export function Hero() {
   return (
@@ -30,7 +30,7 @@ export function Hero() {
       <p className={styles.hand}>Не список дел, а афиша: месяц, который хочется прожить.</p>
 
       <div className={styles.actions}>
-        <a className={styles.primary} href={ROUTES.sheet}>
+        <a className={styles.primary} href={exampleById(DEFAULT_EXAMPLE_ID)!.href}>
           Посмотреть пример
         </a>
         <a className={styles.ghost} href={ROUTES.sheetEdit}>
