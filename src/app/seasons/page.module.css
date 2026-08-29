@@ -376,17 +376,20 @@
   font-size: 13px;
   line-height: 1;
   text-decoration: none;
+  color: var(--ink-soft);
 }
 
+.tab:hover {
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}
+
+/* Активная вкладка залита, а не обведена: рядом стоят такие же ссылки-таблетки,
+   и разница обязана читаться пятном — оттенка рамки тут не видно. */
 .tabActive {
-  padding: 8px 16px;
-  border: 1.5px solid var(--sheet-border);
-  border-radius: 999px;
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 1;
-  text-decoration: none;
+  border-color: var(--accent-deep);
+  background: var(--accent-deep);
+  color: var(--on-deep);
 }
 
 /* Пометка «на витрине» в строке метаданных. Цветом, а не рамкой: это состояние
