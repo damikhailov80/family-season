@@ -1,13 +1,6 @@
-import { DEFAULT_EXAMPLE_ID, exampleById } from '../../model/examples'
 import { FamilyIcon, HeartDoodle, SparkleRays } from '../doodles'
-import { NewSeasonAction } from '../site/NewSeasonAction'
 import styles from './Hero.module.css'
 
-/*
- * Ссылки в постер — обычные <a>, а не next/link: страницы постера клиентские и
- * тянут за собой свой кусок бандла, так что мягкий переход выигрывает немного, а
- * свежий документ надёжнее — на нём точно не останется состояния лендинга.
- */
 export function Hero() {
   return (
     <section className={styles.hero}>
@@ -29,12 +22,14 @@ export function Hero() {
 
       <p className={styles.hand}>Не список дел, а афиша: месяц, который хочется прожить.</p>
 
-      <div className={styles.actions}>
-        <a className={styles.primary} href={exampleById(DEFAULT_EXAMPLE_ID)!.href}>
-          Посмотреть пример
-        </a>
-        <NewSeasonAction className={styles.ghost}>Собрать свой сезон</NewSeasonAction>
-      </div>
+      {/*
+       * Ссылка, а не кнопка: примеры лежат ниже на этой же странице, никакого
+       * действия за этим нет. Якорь обычный — прокрутку делает браузер сам,
+       * и она работает без JS.
+       */}
+      <a className={styles.jump} href="#examples">
+        Посмотреть примеры ↓
+      </a>
     </section>
   )
 }

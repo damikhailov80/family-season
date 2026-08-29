@@ -11,6 +11,8 @@ interface SectionBoxProps {
   className?: string
   bodyClassName?: string
   labelId?: string
+  /** Якорь секции: на «Примеры» ссылается кнопка первого экрана. */
+  id?: string
 }
 
 /**
@@ -25,9 +27,11 @@ export function SectionBox({
   className,
   bodyClassName,
   labelId,
+  id,
 }: SectionBoxProps) {
   return (
     <div
+      id={id}
       className={[styles.box, className].filter(Boolean).join(' ')}
       style={{ '--accent': `var(--accent-${accent})` } as React.CSSProperties}
     >

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Community } from '../components/landing/Community'
 import { Examples } from '../components/landing/Examples'
 import { Hero } from '../components/landing/Hero'
 import { Inside } from '../components/landing/Inside'
@@ -18,6 +19,7 @@ export default function Page() {
       <Steps />
       <Inside />
       <Examples />
+      <Community />
     </PaperSheet>
   )
 }

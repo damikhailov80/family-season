@@ -6,9 +6,19 @@ import styles from './Examples.module.css'
 
 export function Examples() {
   return (
-    <SectionBox accent="goal" label="Примеры" note="три сезона, все разные">
+    <SectionBox
+      accent="goal"
+      label="Примеры"
+      note="три сезона, все разные"
+      id="examples"
+      className={styles.section}
+    >
       <div className={styles.grid}>
-        {/* Обычная <a>, а не next/link: лист ведёт историю сам, см. комментарий в Hero. */}
+        {/*
+          Ссылки в постер — обычные <a>, а не next/link: страницы постера клиентские и
+          тянут за собой свой кусок бандла, так что мягкий переход выигрывает немного, а
+          свежий документ надёжнее — на нём точно не останется состояния лендинга.
+        */}
         {EXAMPLE_LIST.map((example) => (
           <a className={styles.card} key={example.id} href={example.href}>
             <div className={styles.faces}>

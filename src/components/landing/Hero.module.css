@@ -74,52 +74,30 @@
   color: var(--accent-theme);
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.primary,
-.ghost {
-  display: inline-flex;
-  align-items: center;
-  text-decoration: none;
+/*
+ * Приглашение к примерам ниже по странице. Нарочно не кнопка: кнопками на сайте
+ * отмечены действия — завести сезон, открыть витрину, — а тут прокрутка на
+ * соседний блок.
+ */
+.jump {
+  margin-top: 2px;
   font-family: var(--font-ui);
   font-weight: 700;
-  font-size: 15px;
-  line-height: 1;
-  padding: 13px 22px;
-  border-radius: 8px;
-  cursor: pointer;
-  border: 1.5px solid var(--accent-deep);
-  transition: background-color 0.12s ease;
-}
-
-.primary {
-  background: var(--accent-deep);
-  color: var(--on-accent);
-}
-
-.ghost {
-  background: transparent;
+  font-size: 16px;
   color: var(--accent-deep);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+  border-radius: 4px;
 }
 
-.primary:hover {
-  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
+.jump:hover {
+  color: var(--accent-theme);
 }
 
-.ghost:hover {
-  background: color-mix(in srgb, var(--accent-deep) 10%, transparent);
-}
-
-.primary:focus-visible,
-.ghost:focus-visible {
+.jump:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 @media (max-width: 820px) {
@@ -136,12 +114,6 @@
 @media (max-width: 480px) {
   .rays {
     display: none;
-  }
-
-  .primary,
-  .ghost {
-    width: 100%;
-    justify-content: center;
   }
 }
 
