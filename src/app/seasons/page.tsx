@@ -84,6 +84,8 @@ interface RowData {
   month: string | null
   /** У отложенного и выложенного: сезон сняли с витрины, но ссылка работает. */
   hidden?: boolean
+  /** Только у своих публикаций: закрыта после разбора жалоб. */
+  blocked?: boolean
   /** Только у своих публикаций: что они собрали у людей. */
   likes?: number
   favorites?: number
@@ -102,12 +104,17 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
         aria-hidden="true"
       />
       <span className={styles.entryText}>
-        <a
-          className={styles.entryTitle}
-          href={kind === 'seasons' ? seasonHref(entry.code) : publicSeasonHref(entry.code)}
-        >
-          {entry.title}
-        </a>
+        {/* Закрытый сезон не открывается нигде — ссылка вела бы в 404. */}
+        {entry.blocked ? (
+          <span className={styles.entryTitle}>{entry.title}</span>
+        ) : (
+          <a
+            className={styles.entryTitle}
+            href={kind === 'seasons' ? seasonHref(entry.code) : publicSeasonHref(entry.code)}
+          >
+            {entry.title}
+          </a>
+        )}
         <span className={styles.entryMeta}>
           {kind === 'seasons' ? 'сохранён' : kind === 'favorites' ? 'отложен' : 'выложен'}{' '}
           {savedOn(entry.savedAt)}
@@ -124,7 +131,14 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
           )}
           {/* Снятое с витрины остаётся в избранном и открывается по ссылке —
               но сказать об этом надо: в «Идеях» его больше нет. */}
-          {entry.hidden && <span className={styles.offStage}>{' · снят с витрины'}</span>}
+          {/* Разделитель — снаружи пометки: у `.offStage` `display: inline-flex`,
+              а флекс-контейнер срезает ведущий пробел внутри себя. */}
+          {(entry.blocked || entry.hidden) && ' · '}
+          {entry.blocked ? (
+            <span className={styles.offStage}>закрыт после жалоб</span>
+          ) : (
+            entry.hidden && <span className={styles.offStage}>снят с витрины</span>
+          )}
         </span>
       </span>
       <span className={styles.rowTools}>
@@ -141,7 +155,7 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
         )}
         {/* Снять с витрины можно только то, что на ней есть: у снятого кнопки
             нет вовсе — погашенная обещала бы, что когда-нибудь оживёт. */}
-        {kind === 'published' && !entry.hidden && (
+        {kind === 'published' && !entry.hidden && !entry.blocked && (
           <WithdrawEntry
             code={entry.code}
             title={entry.title}

@@ -2,12 +2,7 @@ import { auth } from './auth'
 import { query } from './db'
 import { logger } from './logger'
 import { monthName } from '../model/calendar'
-import {
-  IDEAS_PAGE,
-  REPORTS_TO_HIDE,
-  type PublishStatus,
-  type ReactionStatus,
-} from '../model/community'
+import { IDEAS_PAGE, type PublishStatus, type ReactionStatus } from '../model/community'
 import { knownIconSet } from '../model/icons'
 import { defaultSeasonTitle, LIBRARY_LIMIT, type LibrarySort } from '../model/library'
 import { knownPalette } from '../model/palettes'
@@ -60,6 +55,7 @@ interface Row {
   rolling_month: boolean
   author_key: string | null
   hidden_at: Date | null
+  blocked_at: Date | null
   likes: number
   liked: boolean
   reported: boolean
@@ -84,7 +80,7 @@ export async function readPublicSeason(value: string): Promise<PublicSeasonState
   const result = await query<Row>(
     'public:read',
     `select p.code, p.content, p.names, p.palette, p.icon_set, p.fill_id, p.rolling_month,
-            p.author_key, p.hidden_at,
+            p.author_key, p.hidden_at, p.blocked_at,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes,
             exists(select 1 from public_likes l
                     where l.public_id = p.id and l.account_key = $2) as liked,
@@ -102,6 +98,13 @@ export async function readPublicSeason(value: string): Promise<PublicSeasonState
 
   const row = result.rows[0]
   if (!row) return { status: 'missing' }
+  /*
+   * Закрытая публикация не открывается никому, включая автора: «не показывается
+   * ни по прямой ссылке, ни на витрине» — значит, нигде. В базе она при этом
+   * остаётся: на неё пожаловались, и разбор не должен упираться в удалённую
+   * строку. Автор узнаёт о закрытии в своём списке «Опубликованных».
+   */
+  if (row.blocked_at) return { status: 'missing' }
 
   const template = joinSeason(row.content, row.names)
   return {
@@ -170,6 +173,10 @@ export async function noteFork(value: string): Promise<void> {
  * витрины**, публикация не заводит вторую строку, а забирает прежнюю себе —
  * с её кодом, лайками и всем, что она успела собрать. Меняется только авторство
  * и оформление. Видимую же строку никто не перехватывает: там `duplicate`.
+ *
+ * **Закрытую строку не перехватывает никто и никогда.** Иначе блокировка ничего
+ * бы не стоила: форкнул, выложил заново — и тот же самый постер снова на витрине.
+ * Закрывают не строку, а содержимое.
  */
 export async function publishSeason(
   value: string,
@@ -209,13 +216,16 @@ export async function publishSeason(
     added: string | null
     taken: string | null
     existing: string | null
+    blocked: boolean | null
   }>(
     'public:publish',
     `with mine as (
        select content, palette, icon_set from user_seasons where code = $1 and account_key = $2
      ),
      key as (select md5((select content from mine)::text) as value),
-     existing as (select code from public_seasons where content_key = (select value from key)),
+     existing as (
+       select code, blocked_at from public_seasons where content_key = (select value from key)
+     ),
      room as (select count(*) < $6 as ok from public_seasons where author_key = $2),
      taken as (
        update public_seasons
@@ -226,6 +236,7 @@ export async function publishSeason(
               hidden_at = null
         where content_key = (select value from key)
           and hidden_at is not null
+          and blocked_at is null
           and (select ok from room)
        returning code
      ),
@@ -238,7 +249,8 @@ export async function publishSeason(
      select (select ok from room) as room,
             (select code from added) as added,
             (select code from taken) as taken,
-            (select code from existing) as existing`,
+            (select code from existing) as existing,
+            (select blocked_at is not null from existing) as blocked`,
     [code, session.accountKey, id, shortCode('public', id), JSON.stringify(shown), LIBRARY_LIMIT],
   )
   if (result.status !== 'ok') {
@@ -249,6 +261,8 @@ export async function publishSeason(
   const outcome = result.rows[0]
   const fresh = outcome?.added ?? outcome?.taken
   if (fresh) return { status: 'ok', code: fresh, fresh: true }
+  // Закрытое не показываем даже кодом: смотреть там нечего.
+  if (outcome?.blocked) return { status: 'blocked' }
   // Дубль сообщаем вместе с кодом: человеку нужен не отказ, а тот самый сезон.
   if (outcome?.existing) return { status: 'duplicate', code: outcome.existing }
   return { status: outcome?.room === false ? 'limit' : 'error' }
@@ -257,12 +271,17 @@ export async function publishSeason(
 /**
  * Убрать свой сезон с витрины.
  *
- * Если его кто-то успел отложить в избранное, строка остаётся и лишь помечается
- * скрытой: у людей в кабинете не должно пропадать то, что они отложили, — а
- * прямая ссылка на сезон уже разошлась. Не отложил никто — удаляем совсем.
+ * Строка остаётся (и лишь помечается скрытой), если её держит хоть что-то из
+ * двух:
  *
- * Лайки и форки удалению не мешают: лайк — знак внимания, форк — копия, которая
- * и так живёт своей жизнью.
+ *  — её **отложили в избранное**: у людей в кабинете не должно пропадать то, что
+ *    они отложили, а прямая ссылка на сезон уже разошлась;
+ *  — на неё **пожаловались**: жалоба обязана указывать на то, на что подана, и
+ *    уносить её вместе с публикацией нельзя — как раз из-за жалобы публикацию
+ *    и могут разбирать.
+ *
+ * Не держит ничего — удаляем совсем. Лайки и форки удалению не мешают: лайк —
+ * знак внимания, форк — копия, которая и так живёт своей жизнью.
  */
 export async function withdrawPublic(value: string): Promise<{ status: PublishStatus; hidden?: boolean }> {
   const code = codeOrNull(value)
@@ -274,7 +293,8 @@ export async function withdrawPublic(value: string): Promise<{ status: PublishSt
   const found = await query<{ id: string; held: boolean }>(
     'public:withdraw:find',
     `select p.id,
-            exists(select 1 from public_favorites f where f.public_id = p.id) as held
+            exists(select 1 from public_favorites f where f.public_id = p.id)
+            or exists(select 1 from public_reports r where r.public_id = p.id) as held
        from public_seasons p
       where p.code = $1 and p.author_key = $2`,
     [code, session.accountKey],
@@ -321,9 +341,11 @@ export type IdeasState = { status: 'ok'; ideas: Idea[] } | { status: 'error' }
  * никем не замеченный, шанс сохраняет. Сортировка по лайкам такого не умеет:
  * она навсегда заперла бы витрину на первой десятке.
  *
- * Порог жалоб считает **авторов**, а не нажатия: повторная жалоба одного и того
- * же человека прежнюю заменяет, иначе спрятать чужой сезон мог бы кто угодно
- * в одиночку. Снятые с витрины сюда не попадают вовсе.
+ * Сама витрина ничего не прячет по жалобам: закрытые сезоны отсеиваются по
+ * `blocked_at`, который ставит человек, разобрав жалобы (`npm run db:reports`).
+ * Автоматический порог тут стоял раньше и был плох двумя вещами сразу: сезон
+ * пропадал молча, а шестеро сговорившихся убирали чужое без всякого разбора.
+ * Снятые с витрины сюда не попадают тоже.
  */
 export async function randomIdeas(): Promise<IdeasState> {
   const result = await query<{
@@ -338,15 +360,13 @@ export async function randomIdeas(): Promise<IdeasState> {
     `select p.code, p.content, p.names, p.palette, p.rolling_month,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes
        from public_seasons p
-      where p.hidden_at is null
-        and (select count(distinct r.reporter_key) from public_reports r
-              where r.public_id = p.id) < $1
+      where p.hidden_at is null and p.blocked_at is null
       order by power(
                  random(),
                  1.0 / (1 + (select count(*) from public_likes l where l.public_id = p.id))
                ) desc
-      limit $2`,
-    [REPORTS_TO_HIDE, IDEAS_PAGE],
+      limit $1`,
+    [IDEAS_PAGE],
   )
 
   if (result.status !== 'ok') {
@@ -410,15 +430,16 @@ export async function setLike(value: string, on: boolean): Promise<ReactionStatu
 
   const result = await query<Verdict>(
     'public:like',
-    `with post as (select id, author_key from public_seasons where code = $1),
+    `with post as (select id, author_key, blocked_at from public_seasons where code = $1),
      added as (
        insert into public_likes (public_id, account_key)
-       select id, $2 from post where author_key is distinct from $2
+       select id, $2 from post where author_key is distinct from $2 and blocked_at is null
        on conflict do nothing
        returning 1
      )
      select (select count(*) from post)::int as found,
-            coalesce((select author_key = $2 from post), false) as own`,
+            coalesce((select author_key = $2 from post), false) as own,
+            coalesce((select blocked_at is not null from post), false) as blocked`,
     [code, session.accountKey],
   )
   if (result.status !== 'ok') return reacted('like not added', code, result.status)
@@ -453,7 +474,7 @@ export async function setFavorite(value: string, on: boolean): Promise<ReactionS
 
   const result = await query<Verdict & { room: boolean; held: boolean }>(
     'public:favorite',
-    `with post as (select id, author_key from public_seasons where code = $1),
+    `with post as (select id, author_key, blocked_at from public_seasons where code = $1),
      held as (
        select exists(
          select 1 from public_favorites
@@ -464,12 +485,13 @@ export async function setFavorite(value: string, on: boolean): Promise<ReactionS
      added as (
        insert into public_favorites (account_key, public_id)
        select $2, id from post
-        where author_key is distinct from $2 and (select ok from room)
+        where author_key is distinct from $2 and blocked_at is null and (select ok from room)
        on conflict do nothing
        returning 1
      )
      select (select count(*) from post)::int as found,
             coalesce((select author_key = $2 from post), false) as own,
+            coalesce((select blocked_at is not null from post), false) as blocked,
             (select ok from room) as room,
             (select yes from held) as held`,
     [code, session.accountKey, LIBRARY_LIMIT],
@@ -488,11 +510,13 @@ export async function setFavorite(value: string, on: boolean): Promise<ReactionS
  *
  * Повторная жалоба **уточняет прежнюю**, а не заводит вторую: человек вправе
  * дописать, что именно не так, и это не должно выглядеть отказом. Считаются
- * поэтому авторы, а не нажатия — на том и держится порог `REPORTS_TO_HIDE`.
+ * поэтому авторы, а не нажатия — на том и держится порог `REPORTS_TO_REVIEW`, после
+ * которого публикацию смотрит человек (`npm run db:reports`).
  *
- * В строке остаются код и автор публикации: жалоба живёт дольше самой
- * публикации и нужна тому, кто будет разбираться, — а разбираются с человеком,
- * а не со строкой.
+ * Автор публикации в строке — **снимок**, а не дубль: у скрытой публикации
+ * авторство меняется (её перехватывает тот, кто выложил тот же контент заново),
+ * а жалоба обязана помнить, на кого её подавали. Сама публикация при этом никуда
+ * не денется: строку с жалобами не удаляют (см. `withdrawPublic`).
  *
  * На системный сезон пожаловаться нельзя: иначе шестеро недовольных спрятали бы
  * с витрины наши примеры.
@@ -506,21 +530,23 @@ export async function addReport(value: string, comment: string): Promise<Reactio
 
   const result = await query<Verdict & { room: boolean }>(
     'public:report',
-    `with post as (select id, author_key from public_seasons where code = $1),
+    `with post as (select id, author_key, blocked_at from public_seasons where code = $1),
      room as (
        select count(*) < $4 as ok from public_reports
         where reporter_key = $2 and public_id is distinct from (select id from post)
      ),
      added as (
-       insert into public_reports (public_id, code, author_key, reporter_key, comment)
-       select id, $1, author_key, $2, $3 from post
-        where author_key is not null and author_key <> $2 and (select ok from room)
+       insert into public_reports (public_id, author_key, reporter_key, comment)
+       select id, author_key, $2, $3 from post
+        where author_key is not null and author_key <> $2
+          and blocked_at is null and (select ok from room)
        on conflict (public_id, reporter_key)
          do update set comment = excluded.comment, created_at = now()
        returning 1
      )
      select (select count(*) from post)::int as found,
             coalesce((select author_key is null or author_key = $2 from post), false) as own,
+            coalesce((select blocked_at is not null from post), false) as blocked,
             (select ok from room) as room`,
     [code, session.accountKey, comment, LIBRARY_LIMIT],
   )
@@ -536,6 +562,8 @@ interface Verdict {
   found: number
   /** Своё — или ничьё системное: и то и другое трогать нечего. */
   own: boolean
+  /** Закрытая публикация: с ней не делают вообще ничего. */
+  blocked: boolean
 }
 
 /**
@@ -545,6 +573,7 @@ interface Verdict {
  */
 function verdict(row: Verdict | undefined): ReactionStatus {
   if (!row?.found) return 'error'
+  if (row.blocked) return 'blocked'
   return row.own ? 'own' : 'ok'
 }
 
@@ -573,6 +602,9 @@ export type FavoritesState =
  * Отложенное. Поиск и порядок считаются **здесь, а не в запросе**, и это не
  * лень: названия у публикаций нет — оно выводится из содержимого, и искать по
  * нему в SQL нечего. Строк не больше сотни, разбор дешёвый.
+ *
+ * Закрытых сезонов в списке нет: показывать нечего, открыть их всё равно нельзя.
+ * Сама закладка при этом остаётся — вернут сезон, вернётся и она.
  */
 export async function listFavorites(
   search: string,
@@ -595,7 +627,7 @@ export async function listFavorites(
     `select p.code, p.content, p.names, p.palette, p.rolling_month, p.hidden_at, f.created_at
        from public_favorites f
        join public_seasons p on p.id = f.public_id
-      where f.account_key = $1
+      where f.account_key = $1 and p.blocked_at is null
       order by f.created_at desc
       limit ${LIBRARY_LIMIT}`,
     [session.accountKey],
@@ -634,6 +666,8 @@ export interface PublishedEntry {
   month: string
   /** Снята с витрины: живёт по ссылке, в «Идеях» её нет. */
   hidden: boolean
+  /** Закрыта после разбора жалоб: не открывается нигде. */
+  blocked: boolean
   likes: number
   /** Сколько людей отложило её себе — они же держат её от удаления. */
   favorites: number
@@ -668,13 +702,15 @@ export async function listPublished(
     palette: string
     rolling_month: boolean
     hidden_at: Date | null
+    blocked_at: Date | null
     created_at: Date
     likes: number
     favorites: number
     forks: number
   }>(
     'public:mine',
-    `select p.code, p.content, p.names, p.palette, p.rolling_month, p.hidden_at, p.created_at,
+    `select p.code, p.content, p.names, p.palette, p.rolling_month, p.hidden_at, p.blocked_at,
+            p.created_at,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes,
             (select count(*) from public_favorites f where f.public_id = p.id)::int as favorites,
             (select count(*) from public_forks k where k.public_id = p.id)::int as forks
@@ -699,6 +735,7 @@ export async function listPublished(
       palette: knownPalette(row.palette),
       month: `${monthName(shown.theme).toLowerCase()} ${shown.theme.year}`,
       hidden: Boolean(row.hidden_at),
+      blocked: Boolean(row.blocked_at),
       likes: row.likes,
       favorites: row.favorites,
       forks: row.forks,

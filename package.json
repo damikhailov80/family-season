@@ -15,7 +15,8 @@
     "logo": "node tools/logo/build.mjs",
     "typecheck": "tsc --noEmit",
     "db:status": "node --env-file-if-exists=.env.local tools/db/migrate.mjs --status",
-    "db:seed": "node --env-file-if-exists=.env.local --import tsx tools/db/seed-examples.ts"
+    "db:seed": "node --env-file-if-exists=.env.local --import tsx tools/db/seed-examples.ts",
+    "db:reports": "node --env-file-if-exists=.env.local --import tsx tools/db/reports.ts"
   },
   "dependencies": {
     "next": "^16.3.2",
