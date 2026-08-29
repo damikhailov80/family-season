@@ -108,6 +108,9 @@
   font-weight: 700;
   font-size: 14px;
   line-height: 1;
+  background: transparent;
+  font-family: var(--font-ui);
+  cursor: pointer;
   color: var(--accent-deep);
   text-decoration: none;
   transition: background-color 0.12s ease;

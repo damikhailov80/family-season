@@ -4,6 +4,7 @@ import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
 import { SeasonPreview } from '../../components/community/SeasonPreview'
 import { HeartDoodle, MegaphoneDoodle } from '../../components/doodles'
+import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import { Toast } from '../../components/site/Toast'
 import { ROUTES } from '../../model/site'
 import { randomIdeas } from '../../server/publicSeasons'
@@ -79,9 +80,7 @@ export default async function IdeasPage({
                 <Link className={styles.primary} href={`${ROUTES.ideas}?r=${next}`}>
                   Показать другие
                 </Link>
-                <a className={styles.ghost} href={ROUTES.sheetEdit}>
-                  Собрать свой сезон
-                </a>
+                <NewSeasonAction className={styles.ghost}>Собрать свой сезон</NewSeasonAction>
               </div>
 
               <p className={styles.note}>
@@ -97,9 +96,7 @@ export default async function IdeasPage({
                 Пока витрина пуста — никто ещё не выложил свой сезон. Будете первыми?
               </p>
               <div className={styles.actions}>
-                <a className={styles.primary} href={ROUTES.sheetEdit}>
-                  Собрать свой сезон
-                </a>
+                <NewSeasonAction className={styles.primary}>Собрать свой сезон</NewSeasonAction>
                 <a className={styles.ghost} href={ROUTES.home}>
                   Посмотреть примеры
                 </a>

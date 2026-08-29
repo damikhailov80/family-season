@@ -43,8 +43,12 @@ export const ROUTES = {
  * Режим листа несёт путь, а не пометка в хэше: адрес правки можно сохранить,
  * переслать и перезагрузить. Тип берём голым union'ом — `model` не должен
  * зависеть от `state`, а `DocMode` объявлен там.
+ *
+ * Путь передают обязательно, и брать его надо у роутера (`usePathname`), а не из
+ * `location`: при мягком переходе адрес в `location` меняется уже после рендера,
+ * и умолчание отдавало бы прежний режим.
  */
-export function modeFromPath(pathname: string = location.pathname): 'view' | 'edit' {
+export function modeFromPath(pathname: string): 'view' | 'edit' {
   // Хвостовой слэш Next убирает редиректом, но сравнение путей не должно от этого зависеть.
   return pathname.replace(/\/+$/, '') === ROUTES.sheetEdit ? 'edit' : 'view'
 }

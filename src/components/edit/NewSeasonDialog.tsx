@@ -1,19 +1,22 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { GoogleLoginButton } from '../site/GoogleLoginButton'
 import { TITLE_LIMIT } from '../../model/library'
+import { ROUTES } from '../../model/site'
 import styles from './Dialog.module.css'
 
 /**
- * Заведение сезона: черновик уезжает в кабинет, чужой или свой постер форкается.
+ * Заведение сезона: черновик уезжает в кабинет, чужой или свой постер форкается,
+ * новый сезон собирается с нуля.
  *
  * Окно нужно ради двух вещей сразу — имени (список без имён нечитаем) и самого
- * подтверждения: заводить строку молча, одним нажатием, слишком похоже на промах
+ * подтверждения: заводить сезон молча, одним нажатием, слишком похоже на промах
  * по кнопке. `confirm()` не годится: он вешает вкладку и не умеет показать поле.
  *
- * Имя спрашивается не всегда: у невошедшего сезона в коллекции нет, форк ложится
- * черновиком, а у черновика имени не бывает. Тогда `initialTitle` — `null`, и
- * окно остаётся подтверждением: черновик в браузере один, и форк его заменит.
+ * Имя спрашивается **всегда** — и у вошедшего, и у невошедшего. Раньше у
+ * черновика имени не бывало, потому что он нигде не показывался; теперь он
+ * строка в списке на `/seasons`, и безымянным ей быть незачем.
  *
  * Поле неконтролируемое: значение читается с узла при отправке. Контролируемое
  * пришлось бы сбрасывать при каждом изменении бланка — а бланк под окном
@@ -21,16 +24,17 @@ import styles from './Dialog.module.css'
  */
 export function NewSeasonDialog({
   heading,
-  text,
+  warning,
   initialTitle,
   busy,
   onDismiss,
   onSubmit,
 }: {
   heading: string
-  text: string
-  /** `null` — имени не спрашиваем: сезон ляжет черновиком. */
-  initialTitle: string | null
+  warning?: string
+  /** Показать вход. Он же и уносит черновик в коллекцию — см. `/seasons?claim=1`. */
+  offerLogin?: boolean
+  initialTitle: string
   busy: boolean
   onDismiss: () => void
   onSubmit: (title: string) => void
@@ -50,24 +54,20 @@ export function NewSeasonDialog({
         {heading}
       </h2>
 
-      <p className={styles.text}>{text}</p>
+      {warning && <p className={styles.warning}>{warning}</p>}
 
-      {initialTitle !== null && (
-        <>
-          <label className={styles.label} htmlFor="season-title">
-            Название
-          </label>
-          <input
-            className={styles.input}
-            id="season-title"
-            ref={input}
-            type="text"
-            defaultValue={initialTitle}
-            maxLength={TITLE_LIMIT}
-            autoComplete="off"
-          />
-        </>
-      )}
+      <label className={styles.label} htmlFor="season-title">
+        Название
+      </label>
+      <input
+        className={styles.input}
+        id="season-title"
+        ref={input}
+        type="text"
+        defaultValue={initialTitle}
+        maxLength={TITLE_LIMIT}
+        autoComplete="off"
+      />
 
       <div className={styles.actions}>
         <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
@@ -76,7 +76,7 @@ export function NewSeasonDialog({
         <button
           type="button"
           className={styles.primary}
-          onClick={() => onSubmit(input.current?.value ?? initialTitle ?? '')}
+          onClick={() => onSubmit(input.current?.value ?? initialTitle)}
           disabled={busy}
         >
           {busy ? 'Заводим…' : 'Готово'}

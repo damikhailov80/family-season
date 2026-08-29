@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
-import { CONTACT_EMAIL, ROUTES } from '../../model/site'
+import { CONTACT_EMAIL } from '../../model/site'
+import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
@@ -145,9 +146,7 @@ export default function PrivacyPage() {
 
         <p className={styles.updated}>Обновлено 29 августа 2026 года</p>
 
-        <a className={styles.primary} href={ROUTES.sheetEdit}>
-          Собрать свой сезон
-        </a>
+        <NewSeasonAction className={styles.primary}>Собрать свой сезон</NewSeasonAction>
       </SectionBox>
     </PaperSheet>
   )

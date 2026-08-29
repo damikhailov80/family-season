@@ -1,14 +1,14 @@
-'use client'
-
-import dynamic from 'next/dynamic'
+import { auth } from '../../server/auth'
+import { SheetLoader } from './SheetLoader'
 
 /*
- * Лист целиком живёт в хэше, а хэш до сервера не доходит — предрендерить нечего.
- * Плюс дата в демо-бланке считается «сейчас»: серверный рендер разошёлся бы с
- * клиентским при гидратации. Поэтому лист грузится только в браузере.
+ * Страница серверная, а лист внутри — по-прежнему только браузерный (см.
+ * `SheetLoader`). Сессия нужна самой панели черновика: невошедшему «Сохранить в
+ * мои сезоны» предлагать нечего — у него нет ни коллекции, ни строки, — а
+ * узнавать об этом из отказа сервера значит вести человека через два окна к
+ * стене.
  */
-const Sheet = dynamic(() => import('./Sheet'), { ssr: false })
-
-export default function Page() {
-  return <Sheet />
+export default async function Page() {
+  const session = await auth()
+  return <SheetLoader signedIn={Boolean(session?.user)} />
 }

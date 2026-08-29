@@ -5,9 +5,10 @@ import { SectionBox } from '../../components/SectionBox'
 import { HeartDoodle, RocketDoodle } from '../../components/doodles'
 import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
 import { Toast } from '../../components/site/Toast'
-import { createSeason, loginWithGoogle } from '../../server/actions'
+import { NewSeasonAction } from '../../components/site/NewSeasonAction'
+import { loginWithGoogle } from '../../server/actions'
 import { PALETTE_LABELS } from '../../model/palettes'
-import { LIBRARY_LIMIT, TITLE_LIMIT, type LibrarySort } from '../../model/library'
+import { LIBRARY_LIMIT, savedOn, TITLE_LIMIT, type LibrarySort } from '../../model/library'
 import { publicSeasonHref, ROUTES, seasonHref } from '../../model/site'
 import { auth } from '../../server/auth'
 import { listFavorites, listPublished } from '../../server/publicSeasons'
@@ -15,7 +16,9 @@ import { listUserSeasons } from '../../server/userSeasons'
 import { UnfavoriteEntry } from './UnfavoriteEntry'
 import { WithdrawEntry } from './WithdrawEntry'
 import type { PaletteId } from '../../types'
+import { ClaimDraft } from './ClaimDraft'
 import { DeleteEntry } from './DeleteEntry'
+import { DraftEntry } from './DraftEntry'
 import { RenameEntry } from './RenameEntry'
 import styles from './page.module.css'
 
@@ -46,31 +49,6 @@ function listHref(kind: Tab, search: string, sort: LibrarySort): string {
   const query = params.toString()
   return query ? `${ROUTES.seasons}?${query}` : ROUTES.seasons
 }
-
-/**
- * «27 августа 2026». Своими руками, а не `Intl`: тот дописывает «г.», и рядом с
- * месяцем самого постера строка начинает рябить. Названия месяцев в проекте и так
- * есть — второму списку взяться неоткуда.
- */
-function savedOn(date: Date): string {
-  return `${date.getDate()} ${MONTHS_OF[date.getMonth()]} ${date.getFullYear()}`
-}
-
-/** Родительный падеж: «27 августа», а не «27 август». */
-const MONTHS_OF = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
-]
 
 /**
  * Строка списка. Оба списка сводятся к ней заранее: свои сезоны лежат теперь в
@@ -189,21 +167,21 @@ export default async function SeasonsPage({
     return (
       <PaperSheet>
         <SectionBox accent="deep" label="Мои сезоны" className={styles.section}>
-          <h1 className={styles.title}>Здесь живут ваши сезоны</h1>
+          <h1 className={styles.title}>Ваш черновик</h1>
           <p className={styles.text}>
-            Все прожитые сезоны в одном месте: вернуться к прошлому месяцу, посмотреть, что из
-            задуманного случилось, и собрать следующий из готового. Чтобы отличить ваши сезоны
-            от чужих, нужно войти.
+            Без входа сезон живёт в этом браузере, и черновик здесь один: новый займёт место
+            прежнего. Войдите — и сезонов станет сколько нужно, они переживут смену устройства,
+            а этот черновик уедет в коллекцию первым.
           </p>
+
+          {/* Черновик лежит в браузере, поэтому строку рисует клиент. Вкладок
+              анониму не показываем: избранного и публикаций без входа не бывает. */}
+          <DraftEntry />
+
           <div className={styles.login}>
             <GoogleLoginButton />
           </div>
-          <p className={styles.hand}>
-            А собрать и распечатать постер можно и без входа — сезон целиком помещается в ссылку.
-          </p>
-          <a className={styles.primary} href={ROUTES.sheetEdit}>
-            Собрать свой сезон
-          </a>
+          <NewSeasonAction className={styles.primary}>Собрать свой сезон</NewSeasonAction>
         </SectionBox>
       </PaperSheet>
     )
@@ -312,12 +290,9 @@ export default async function SeasonsPage({
           </div>
         )}
 
-        {/* Сезон заводится строкой сразу — это действие, а не ссылка на бланк. */}
-        <form action={createSeason}>
-          <button type="submit" className={styles.primary}>
-            Собрать новый сезон
-          </button>
-        </form>
+        {/* Имя спрашивается окном, и только потом заводится строка: молча
+            заведённый сезон слишком похож на промах по кнопке. */}
+        <NewSeasonAction className={styles.primary}>Собрать новый сезон</NewSeasonAction>
 
         <p className={styles.note}>
           Имя и почта лежат только в куке вашего браузера — на сервере их нет. В базе у нас
@@ -329,6 +304,11 @@ export default async function SeasonsPage({
           </Link>
           .
         </p>
+
+        {/* Черновик, за которым и ходили входить: `?claim=1` ставит окно
+            «черновик будет затёрт», а забирает его отсюда клиент — в браузере он
+            лежит, серверу его негде взять. */}
+        <ClaimDraft />
 
         {state.status === 'error' && (
           <Toast message="Не удалось загрузить список — ошибка на сервере." />

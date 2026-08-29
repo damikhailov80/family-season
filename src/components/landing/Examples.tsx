@@ -1,7 +1,7 @@
 import { EXAMPLE_LIST } from '../../model/examples'
-import { ROUTES } from '../../model/site'
 import { AvatarFace } from '../AvatarFace'
 import { SectionBox } from '../SectionBox'
+import { NewSeasonAction } from '../site/NewSeasonAction'
 import styles from './Examples.module.css'
 
 export function Examples() {
@@ -39,12 +39,11 @@ export function Examples() {
             быстрее.
           </p>
           <p className={styles.hand}>
-            Сезон целиком помещается в ссылку: отправили — и у близких открылся тот же постер.
+            Своим сезоном можно поделиться личной ссылкой: она открывается у кого угодно и без
+            входа.
           </p>
         </div>
-        <a className={styles.ghost} href={ROUTES.sheetEdit}>
-          Собрать свой сезон
-        </a>
+        <NewSeasonAction className={styles.ghost}>Собрать свой сезон</NewSeasonAction>
       </div>
     </SectionBox>
   )

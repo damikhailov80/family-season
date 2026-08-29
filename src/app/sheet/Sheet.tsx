@@ -1,5 +1,6 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Poster } from '../../components/Poster'
 import { FloatingControls } from '../../components/edit/FloatingControls'
@@ -16,19 +17,27 @@ import { DraftStore } from './DraftStore'
  * Лист берёт их из `localStorage` (`src/model/draft.ts`), а режим по-прежнему
  * несёт путь: `/sheet` — просмотр, `/sheet/edit` — правка.
  *
- * Компонент грузится только в браузере (`ssr: false`), поэтому и `location`, и
- * хранилище доступны уже в первом рендере: паузы на чтение нет.
+ * Компонент грузится только в браузере (`ssr: false`), поэтому хранилище
+ * доступно уже в первом рендере: паузы на чтение нет.
  */
-export default function Sheet() {
+export default function Sheet({ signedIn }: { signedIn: boolean }) {
   const [boot] = useState(() => readDraft() ?? emptyDraft())
-  const editing = modeFromPath() === 'edit'
+  /*
+   * Путь берём у роутера, а не из `location`: при мягком переходе между
+   * `/sheet` и `/sheet/edit` лист не перемонтируется (тот же элемент на том же
+   * месте дерева), а адрес в `location` меняется уже после рендера — режим
+   * отставал на один клик, и «Править» приходилось нажимать дважды.
+   */
+  const editing = modeFromPath(usePathname()) === 'edit'
 
   return (
+    /* Имя черновика мимо провайдера: контекст знает только про бланк, а имя —
+       про то, где сезон лежит и как называется в списке. */
     <SeasonProvider boot={{ ...boot, fillId: null }} mode={editing ? 'edit' : 'view'}>
-      <DraftBar editing={editing} />
+      <DraftBar editing={editing} title={boot.title} signedIn={signedIn} />
       <FloatingControls />
       <Poster />
-      <DraftStore />
+      <DraftStore title={boot.title} />
     </SeasonProvider>
   )
 }

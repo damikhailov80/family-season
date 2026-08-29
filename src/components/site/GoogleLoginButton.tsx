@@ -39,14 +39,18 @@ function GoogleMark() {
  *
  * Больше этот компонент ничего не делает: сам вход, как и прежде, серверный —
  * в браузер не уезжает ни строчки Auth.js.
+ *
+ * `returnTo` перебивает это умолчание там, где возвращать на текущую страницу
+ * бессмысленно: из окна «черновик будет затёрт» человек уходит в кабинет с
+ * пометкой `?claim=1`, и черновик там подхватывают строкой.
  */
-export function GoogleLoginButton() {
+export function GoogleLoginButton({ returnTo }: { returnTo?: string }) {
   return (
     <form
       className={styles.form}
       onSubmit={(event) => {
         event.preventDefault()
-        const back = location.pathname + location.search + location.hash
+        const back = returnTo ?? location.pathname + location.search + location.hash
         startTransition(() => loginWithGoogle(back))
       }}
     >

@@ -115,8 +115,10 @@ export function OwnBar({
             : 'Ваш сезон: он лежит в «Моих сезонах» и виден только вам'}
         </span>
         <span className={styles.actions}>
+          {/* Заливка — на переключателе режима, и в просмотре тоже: в ряду она
+              одна и с кнопки на кнопку не переезжает (см. `Bar.module.css`). */}
           <Link
-            className={editing ? styles.primary : styles.ghost}
+            className={styles.primary}
             href={seasonHref(code, editing ? 'view' : 'edit')}
           >
             {editing ? 'Готово' : 'Править'}
@@ -172,7 +174,6 @@ export function OwnBar({
       {forkOpen && (
         <NewSeasonDialog
           heading="Форкнуть сезон"
-          text="Рядом появится копия этого сезона — отдельная строка со своим адресом. Правки в ней на исходный сезон не влияют."
           initialTitle={defaultSeasonTitle(template)}
           busy={busy}
           onDismiss={() => setForkOpen(false)}

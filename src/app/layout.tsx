@@ -35,7 +35,7 @@ const marckScript = Marck_Script({
 
 export const metadata: Metadata = {
   title: 'Семейный сезон',
-  description: 'Постер семейного месяца: печатается на двух листах A4 и живёт целиком в ссылке.',
+  description: 'Постер семейного месяца: печатается на двух листах A4 и живёт в вашей коллекции.',
   icons: { icon: '/favicon.svg' },
 }
 

@@ -1,6 +1,6 @@
 import { DEFAULT_EXAMPLE_ID, exampleById } from '../../model/examples'
-import { ROUTES } from '../../model/site'
 import { FamilyIcon, HeartDoodle, SparkleRays } from '../doodles'
+import { NewSeasonAction } from '../site/NewSeasonAction'
 import styles from './Hero.module.css'
 
 /*
@@ -33,9 +33,7 @@ export function Hero() {
         <a className={styles.primary} href={exampleById(DEFAULT_EXAMPLE_ID)!.href}>
           Посмотреть пример
         </a>
-        <a className={styles.ghost} href={ROUTES.sheetEdit}>
-          Собрать свой сезон
-        </a>
+        <NewSeasonAction className={styles.ghost}>Собрать свой сезон</NewSeasonAction>
       </div>
     </section>
   )

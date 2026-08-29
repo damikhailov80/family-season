@@ -78,6 +78,9 @@
   font-weight: 700;
   font-size: 13px;
   line-height: 1;
+  background: transparent;
+  font-family: var(--font-ui);
+  cursor: pointer;
   color: var(--accent-deep);
   text-decoration: none;
   transition: background-color 0.12s ease;
@@ -149,12 +152,6 @@
   .link {
     background: color-mix(in srgb, var(--accent-deep) 6%, transparent);
   }
-}
-
-/* Форма вокруг кнопки «Новый сезон»: в раскладке её быть не должно, иначе
-   кнопка встанет не так, как встала бы ссылка на её месте. */
-.plainForm {
-  display: contents;
 }
 
 /* Сайтовая обвязка на бумагу не идёт: печатается только бланк. */

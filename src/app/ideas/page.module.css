@@ -47,6 +47,8 @@
   border: 1.5px solid var(--accent-deep);
   border-radius: 8px;
   background: var(--accent-deep);
+  font-family: var(--font-ui);
+  cursor: pointer;
   color: var(--on-accent);
   font-weight: 700;
   font-size: 14px;
@@ -66,6 +68,8 @@
   border: 1.5px solid var(--sheet-border);
   border-radius: 8px;
   background: var(--surface);
+  font-family: var(--font-ui);
+  cursor: pointer;
   color: var(--ink-soft);
   font-weight: 700;
   font-size: 14px;

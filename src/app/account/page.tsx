@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
 import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
+import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import { DEFAULT_FAMILY } from '../../model/family'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../model/types'
-import { ROUTES } from '../../model/site'
 import { auth } from '../../server/auth'
 import { loginWithGoogle, logout } from '../../server/actions'
 import { familyState } from '../../server/settings'
@@ -50,9 +50,7 @@ export default async function AccountPage({
           <div className={styles.login}>
             <GoogleLoginButton />
           </div>
-          <a className={styles.primary} href={ROUTES.sheetEdit}>
-            Собрать свой сезон
-          </a>
+          <NewSeasonAction className={styles.primary}>Собрать свой сезон</NewSeasonAction>
         </SectionBox>
       </PaperSheet>
     )
