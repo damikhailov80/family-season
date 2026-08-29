@@ -82,3 +82,16 @@ export function normalizeComment(input: unknown): string | null {
   if (typeof input !== 'string') return null
   return input.replace(/\s+/g, ' ').trim().slice(0, COMMENT_LIMIT) || null
 }
+
+/**
+ * Зачем понадобился вход: у избранного, лайка и жалобы своя строчка. Заголовок
+ * у окна общий («Нужен вход»), меняется только фраза под ним — она называет то,
+ * что человек нажал.
+ */
+export type LoginReason = 'favorite' | 'like' | 'report'
+
+export const LOGIN_TEXT: Record<LoginReason, string> = {
+  favorite: 'Чтобы добавить сезон в избранное, нужно войти.',
+  like: 'Чтобы поставить лайк, нужно войти.',
+  report: 'Чтобы пожаловаться на сезон, нужно войти.',
+}

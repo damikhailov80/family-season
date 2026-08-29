@@ -328,6 +328,8 @@ export interface Idea {
   palette: PaletteId
   template: Template
   likes: number
+  /** Ничей системный сезон — наш пример: флажка жалобы у него нет. */
+  system: boolean
 }
 
 export type IdeasState = { status: 'ok'; ideas: Idea[] } | { status: 'error' }
@@ -355,9 +357,11 @@ export async function randomIdeas(): Promise<IdeasState> {
     palette: string
     rolling_month: boolean
     likes: number
+    system: boolean
   }>(
     'public:ideas',
     `select p.code, p.content, p.names, p.palette, p.rolling_month,
+            p.author_key is null as system,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes
        from public_seasons p
       where p.hidden_at is null and p.blocked_at is null
@@ -387,6 +391,7 @@ export async function randomIdeas(): Promise<IdeasState> {
         palette: knownPalette(row.palette),
         template: shown,
         likes: row.likes,
+        system: row.system,
       }
     }),
   }

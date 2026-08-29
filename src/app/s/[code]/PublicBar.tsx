@@ -14,7 +14,12 @@ import { LoginDialog } from '../../../components/edit/LoginDialog'
 import { ReportDialog } from '../../../components/edit/ReportDialog'
 import { WithdrawDialog } from '../../../components/edit/WithdrawDialog'
 import { Toast } from '../../../components/site/Toast'
-import { PUBLISH_TEXT, REACTION_TEXT, type ReactionStatus } from '../../../model/community'
+import {
+  PUBLISH_TEXT,
+  REACTION_TEXT,
+  type LoginReason,
+  type ReactionStatus,
+} from '../../../model/community'
 import { ROUTES } from '../../../model/site'
 import { favoriteSeason, likeSeason, reportSeason, withdrawSeason } from '../../../server/actions'
 import styles from '../../../components/edit/Bar.module.css'
@@ -32,7 +37,12 @@ const ICON_STROKE = 4
  *
  * Про лайк и звёздочку вход, в отличие от форка, не спрашивается заранее: действие уходит на
  * сервер, и `anonymous` в ответе открывает окно входа. Это не отказ, а
- * предложение, и оттого показывает его окно, а не тост.
+ * предложение, и оттого показывает его окно, а не тост. У жалобы иначе: её
+ * окно просит **написать текст**, и заставлять человека сочинять жалобу, чтобы
+ * в ответ услышать «сначала войдите», нельзя — там вход спрошен заранее.
+ *
+ * Окно входа одно, но разговор у каждой кнопки свой: причина едет в него
+ * состоянием (`login`), а слова лежат в `LOGIN_TEXT`.
  */
 export function PublicBar({
   code,
@@ -60,7 +70,8 @@ export function PublicBar({
 }) {
   const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
+  /** Открытое окно входа помнит, ради чего его открыли: слова у трёх кнопок разные. */
+  const [login, setLogin] = useState<LoginReason | null>(null)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
   /**
@@ -83,8 +94,8 @@ export function PublicBar({
   }, [published])
 
   /** «Войдите» — не отказ сервера, а предложение: его показывает окно, не тост. */
-  const react = (status: ReactionStatus) => {
-    if (status === 'anonymous') setLoginOpen(true)
+  const react = (status: ReactionStatus, reason: LoginReason) => {
+    if (status === 'anonymous') setLogin(reason)
     else if (status !== 'ok') setNotice({ text: REACTION_TEXT[status], at: Date.now() })
     return status === 'ok'
   }
@@ -95,7 +106,7 @@ export function PublicBar({
     setBusy(true)
     const status = await favoriteSeason(code, on)
     setBusy(false)
-    if (react(status)) setMarks({ ...marks, favorited: on })
+    if (react(status, 'favorite')) setMarks({ ...marks, favorited: on })
   }
 
   const switchLike = async () => {
@@ -104,7 +115,7 @@ export function PublicBar({
     setBusy(true)
     const status = await likeSeason(code, on)
     setBusy(false)
-    if (react(status)) setMarks({ ...marks, liked: on, likes: marks.likes + (on ? 1 : -1) })
+    if (react(status, 'like')) setMarks({ ...marks, liked: on, likes: marks.likes + (on ? 1 : -1) })
   }
 
   /** Окно закрываем при любом исходе: два модальных окна друг на друге — не разговор. */
@@ -113,7 +124,7 @@ export function PublicBar({
     const status = await reportSeason(code, comment)
     setBusy(false)
     setReportOpen(false)
-    if (!react(status)) return
+    if (!react(status, 'report')) return
     setMarks({ ...marks, reported: true })
     setNotice({ text: 'Жалоба отправлена — спасибо, мы разберёмся', at: Date.now() })
   }
@@ -195,7 +206,7 @@ export function PublicBar({
               <button
                 type="button"
                 className={styles.icon}
-                onClick={() => setReportOpen(true)}
+                onClick={() => (signedIn ? setReportOpen(true) : setLogin('report'))}
                 disabled={busy}
                 aria-pressed={marks.reported}
                 title={marks.reported ? 'Жалоба отправлена — можно уточнить' : 'Пожаловаться'}
@@ -285,7 +296,7 @@ export function PublicBar({
           onSubmit={(comment) => void sendReport(comment)}
         />
       )}
-      <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
+      {login && <LoginDialog reason={login} onClose={() => setLogin(null)} />}
       {published && (
         <Toast
           message={

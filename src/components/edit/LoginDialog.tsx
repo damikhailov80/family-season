@@ -1,30 +1,31 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { LOGIN_TEXT, type LoginReason } from '../../model/community'
 import { GoogleLoginButton } from '../site/GoogleLoginButton'
 import styles from './Dialog.module.css'
 
 /**
- * «Чтобы сохранять сезоны, нужно войти».
+ * «Нужен вход».
  *
- * Окно открывается не заранее, а по отказу: кнопки ★ и «Сохранить» показываются
- * всем, действие уходит на сервер и возвращает `anonymous` — только тогда мы и
- * спрашиваем про вход. Так постер не обязан знать, вошёл человек или нет, и
- * работает без сервера как прежде.
+ * Окно открывается не заранее, а по нажатию: кнопки ★, ♥ и флажок показываются
+ * всем, и только когда до дела дошло, мы спрашиваем про вход.
+ *
+ * Заголовок общий, а фраза под ним берётся из `LOGIN_TEXT` по причине, с которой
+ * окно открыли: она называет то, что человек нажал, — и больше ничего.
  *
  * Внутри — обычный `GoogleLoginButton`. Он клиентский ровно затем, чтобы
- * собрать адрес возврата из `pathname + search + hash`: сезон живёт в хэше, и
- * без этого человек вернулся бы из Google на пустой бланк.
+ * собрать адрес возврата из `pathname + search + hash`: примеренное оформление
+ * живёт в адресе, и без этого человек вернулся бы из Google на другой постер.
  */
-export function LoginDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function LoginDialog({ reason, onClose }: { reason: LoginReason; onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null)
 
+  // Окно рисуется, только пока открыто, поэтому показывать его надо при
+  // монтировании — как у остальных окон проекта.
   useEffect(() => {
-    const node = dialog.current
-    if (!node) return
-    if (open && !node.open) node.showModal()
-    if (!open && node.open) node.close()
-  }, [open])
+    dialog.current?.showModal()
+  }, [])
 
   return (
     // onClose ловит и Esc, и закрытие по подложке — состояние обязано сойтись
@@ -33,11 +34,9 @@ export function LoginDialog({ open, onClose }: { open: boolean; onClose: () => v
       <h2 className={styles.title} id="login-title">
         Нужен вход
       </h2>
-      <p className={styles.text}>
-        Чтобы добавлять сезоны в избранное нужен пожалуйста залогиньтесь.
-      </p>
+      <p className={styles.text}>{LOGIN_TEXT[reason]}</p>
       <div className={styles.actions}>
-         <GoogleLoginButton />
+        <GoogleLoginButton />
         <button type="button" className={styles.ghost} onClick={onClose}>
           Не сейчас
         </button>

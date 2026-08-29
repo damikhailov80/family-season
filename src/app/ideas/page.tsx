@@ -7,6 +7,7 @@ import { HeartDoodle } from '../../components/doodles'
 import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import { Toast } from '../../components/site/Toast'
 import { ROUTES } from '../../model/site'
+import { auth } from '../../server/auth'
 import { randomIdeas } from '../../server/publicSeasons'
 import { ReportEntry } from './ReportEntry'
 import styles from './page.module.css'
@@ -39,7 +40,9 @@ export default async function IdeasPage({
   // считать его от `Date.now()` нельзя — это вызов нечистой функции в рендере.
   const flags = await searchParams
   const next = (Number(flags.r) || 0) + 1
-  const state = await randomIdeas()
+  // Вход спрашиваем здесь: от него зависит, что покажет флажок жалобы —
+  // окно с текстом или предложение войти.
+  const [state, session] = await Promise.all([randomIdeas(), auth()])
   const ideas = state.status === 'ok' ? state.ideas : []
 
   return (
@@ -66,7 +69,16 @@ export default async function IdeasPage({
                         <HeartDoodle size={14} filled strokeWidth={4} />
                         {idea.likes}
                       </span>
-                      <ReportEntry code={idea.code} title={idea.title} />
+                      {/* На наши примеры не жалуются: шестеро недовольных иначе
+                          убрали бы их с витрины. Сервер такую жалобу и так не
+                          примет — кнопке тем более здесь не место. */}
+                      {!idea.system && (
+                        <ReportEntry
+                          code={idea.code}
+                          title={idea.title}
+                          signedIn={Boolean(session?.user)}
+                        />
+                      )}
                     </div>
                   </li>
                 ))}

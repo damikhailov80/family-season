@@ -21,8 +21,21 @@ import styles from './page.module.css'
  *
  * Окна и слова те же, что у постера: `ReportDialog`, `LoginDialog` и
  * `REACTION_TEXT`. Вторых копий не заводим — разошлись бы при первой правке.
+ *
+ * Вход спрашивается **до** окна жалобы, а не после: окно просит написать текст,
+ * и заставлять человека сочинять жалобу, чтобы в ответ услышать «сначала
+ * войдите», нельзя. Ответ сервера `anonymous` при этом всё равно обрабатываем —
+ * сессия могла кончиться, пока человек набирал текст.
  */
-export function ReportEntry({ code, title }: { code: string; title: string }) {
+export function ReportEntry({
+  code,
+  title,
+  signedIn,
+}: {
+  code: string
+  title: string
+  signedIn: boolean
+}) {
   const [open, setOpen] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -53,7 +66,7 @@ export function ReportEntry({ code, title }: { code: string; title: string }) {
       <button
         type="button"
         className={styles.report}
-        onClick={() => setOpen(true)}
+        onClick={() => (signedIn ? setOpen(true) : setLoginOpen(true))}
         disabled={busy}
         aria-pressed={sent}
         title={`Пожаловаться на «${title}»`}
@@ -70,7 +83,8 @@ export function ReportEntry({ code, title }: { code: string; title: string }) {
           onSubmit={(comment) => void send(comment)}
         />
       )}
-      <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
+      {/* Причина у флажка одна — жалоба, и других кнопок на витрине нет. */}
+      {loginOpen && <LoginDialog reason="report" onClose={() => setLoginOpen(false)} />}
       {notice && <Toast key={notice.at} message={notice.text} />}
     </>
   )
