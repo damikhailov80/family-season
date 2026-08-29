@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useTransition } from 'react'
-import { MegaphoneDoodle } from '../../components/doodles'
+import { WITHDRAW_NOTE } from '../../model/community'
 import { withdrawEntry } from '../../server/actions'
 import styles from './page.module.css'
 
@@ -41,7 +41,10 @@ export function WithdrawEntry({
         title={`Убрать «${title}» с витрины`}
         aria-label={`Убрать «${title}» с витрины`}
       >
-        <MegaphoneDoodle size={16} strokeWidth={4} />
+        {/* Крестик, как у удаления и у закладки: в строке списка «убрать» — одно
+            и то же движение, и рисовать его тремя разными значками незачем.
+            Мегафон стоял бы здесь не к месту вдвойне — он значок «выложить». */}
+        ×
       </button>
 
       <dialog className={styles.dialog} ref={dialog} aria-labelledby={`off-${code}`}>
@@ -51,6 +54,9 @@ export function WithdrawEntry({
         <p className={styles.dialogText}>
           Вы уверены, что хотите убрать сезон «{title}» из «Идей сообщества»?
         </p>
+        {/* Приписка та же, что в окне у самого сезона, и оттуда же: «убрать» —
+            не «удалить», отложенный кем-то сезон никуда не денется. */}
+        <p className={styles.dialogText}>{WITHDRAW_NOTE}</p>
         <div className={styles.dialogActions}>
           <button
             type="button"

@@ -8,7 +8,7 @@ import { PublishDialog } from '../../../components/edit/PublishDialog'
 import { ShareLinkDialog } from '../../../components/edit/ShareLinkDialog'
 import { Toast } from '../../../components/site/Toast'
 import { PUBLISH_TEXT } from '../../../model/community'
-import { defaultSeasonTitle, LIBRARY_TEXT } from '../../../model/library'
+import { defaultSeasonTitle, ideaTitle, LIBRARY_TEXT } from '../../../model/library'
 import { publicSeasonHref, seasonHref } from '../../../model/site'
 import { revokeLink, shareLink, shareSeason, storeSeason } from '../../../server/actions'
 import { useDoc } from '../../../state/docContext'
@@ -109,8 +109,11 @@ export function OwnBar({
   return (
     <>
       <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
+        {/* Название — из содержимого, а не из колонки `title`: в панели оно
+            обязано меняться вместе с темой месяца, которую тут же и правят.
+            В правке на его месте стоит слово о записи: она важнее. */}
         <span className={styles.hint}>
-          {editing ? 'Сохраняется само' : 'Ваш сезон'}
+          {editing ? 'Сохраняется само' : `Ваш сезон: ${ideaTitle(template)}`}
         </span>
         <span className={styles.actions}>
           {/* Заливка — на переключателе режима, и в просмотре тоже: в ряду она

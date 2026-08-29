@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { PaperSheet } from '../../components/PaperSheet'
 import { SectionBox } from '../../components/SectionBox'
-import { LikeCount } from '../../components/community/LikeCount'
 import { Toast } from '../../components/site/Toast'
 import { NewSeasonAction } from '../../components/site/NewSeasonAction'
 import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
@@ -101,16 +100,6 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
           {kind === 'seasons' ? 'сохранён' : kind === 'favorites' ? 'отложен' : 'выложен'}{' '}
           {savedOn(entry.savedAt)}
           {entry.month ? ` · ${entry.month}` : ''}
-          {/* Числа автору показываем всегда, включая нули: это его собственные
-              данные, а не оценка. «В избранном» стоит рядом не для красоты —
-              именно оно решает, исчезнет публикация при снятии или спрячется. */}
-          {kind === 'published' && (
-            <>
-              {' · '}
-              <LikeCount likes={entry.likes} size={12} />
-              {' · '}в избранном у {entry.favorites} · форкнули {entry.forks}
-            </>
-          )}
           {/* Снятое с витрины остаётся в избранном и открывается по ссылке —
               но сказать об этом надо: в «Идеях» его больше нет. */}
           {/* Разделитель — снаружи пометки: у `.offStage` `display: inline-flex`,
@@ -122,6 +111,18 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
             entry.hidden && <span className={styles.offStage}>снят с витрины</span>
           )}
         </span>
+        {/* Числа автору показываем всегда, включая нули: это его собственные
+            данные, а не оценка. «В избранном» стоит рядом не для красоты —
+            именно оно решает, исчезнет публикация при снятии или спрячется.
+
+            Своей строкой и одинаковыми парами «слово: число»: в общей подписи
+            они собирались в хвост из даты, месяца, сердца и двух разных по
+            складу фраз, а сердце вдобавок сбивало числу базовую линию. */}
+        {kind === 'published' && (
+          <span className={styles.entryStats}>
+            лайков: {entry.likes} · в избранном: {entry.favorites} · форков: {entry.forks}
+          </span>
+        )}
       </span>
       <span className={styles.rowTools}>
         {kind === 'seasons' && (

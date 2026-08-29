@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { WITHDRAW_NOTE } from '../../model/community'
 import styles from './Dialog.module.css'
 
 /**
@@ -33,10 +34,11 @@ export function WithdrawDialog({
         Убрать с витрины
       </h2>
 
-      {/* Один вопрос про то, что человек нажал. Почему публикация иногда
-          остаётся жить по ссылке, а иногда исчезает совсем, — устройство
-          витрины, а не его забота (см. «Витрина» в CLAUDE.md). */}
+      {/* Вопрос про то, что человек нажал, и одна приписка под ним: «убрать» —
+          не «удалить», отложенный кем-то сезон никуда не денется. Остального
+          устройства витрины окно по-прежнему не пересказывает. */}
       <p className={styles.text}>Вы уверены, что хотите убрать сезон из «Идей сообщества»?</p>
+      <p className={styles.text}>{WITHDRAW_NOTE}</p>
 
       <div className={styles.actions}>
         <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>

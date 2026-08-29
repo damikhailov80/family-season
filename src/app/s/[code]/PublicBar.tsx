@@ -20,8 +20,10 @@ import {
   type LoginReason,
   type ReactionStatus,
 } from '../../../model/community'
+import { ideaTitle } from '../../../model/library'
 import { ROUTES } from '../../../model/site'
 import { favoriteSeason, likeSeason, reportSeason, withdrawSeason } from '../../../server/actions'
+import { useDoc } from '../../../state/docContext'
 import styles from '../../../components/edit/Bar.module.css'
 
 /** Толщина обводки рисунков из библиотеки в размере кнопки — см. `Icon`. */
@@ -68,6 +70,9 @@ export function PublicBar({
   /** Что этот сезон уже собрал и что с ним сделал сам смотрящий. */
   state: { likes: number; liked: boolean; reported: boolean; favorited: boolean }
 }) {
+  // Название берётся из содержимого, а не из строки: колонка рядом была бы
+  // второй копией того, что уже лежит в `content`.
+  const { template } = useDoc()
   const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
   /** Открытое окно входа помнит, ради чего его открыли: слова у трёх кнопок разные. */
@@ -223,11 +228,14 @@ export function PublicBar({
           />
         )}
 
-        {/* Только имя места, без пересказа его устройства: человеку важно, где
-            он оказался, а не как сезон сюда попал. Снятый с витрины молчит —
-            «Идей сообщества» для него больше нет, а пустое место всё равно
-            нужно: оно и разводит кнопки по краям ряда. */}
-        <span className={styles.hint}>{hidden ? '' : demo ? 'Наш пример' : 'Идеи сообщества'}</span>
+        {/* Имя места и название сезона — и ничего больше: человеку важно, где он
+            оказался и что перед ним, а не как сезон сюда попал. У снятого с
+            витрины места нет — остаётся одно название. */}
+        <span className={styles.hint}>
+          {hidden
+            ? ideaTitle(template)
+            : `${demo ? 'Наш пример' : 'Сезон сообщества'}: ${ideaTitle(template)}`}
+        </span>
 
         <span className={styles.actions}>
           <ForkButton
