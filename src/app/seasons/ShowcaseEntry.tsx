@@ -1,6 +1,8 @@
 'use client'
 
-import { useRef, useTransition } from 'react'
+import { useState, useTransition } from 'react'
+import { Dialog } from '../../components/dialog/Dialog'
+import dialogStyles from '../../components/dialog/Dialog.module.css'
 import { MegaphoneDoodle } from '../../components/doodles'
 import { WITHDRAW_NOTE } from '../../model/community'
 import { republishEntry, withdrawEntry } from '../../server/actions'
@@ -36,7 +38,7 @@ export function ShowcaseEntry({
   hidden: boolean
   back: string
 }) {
-  const dialog = useRef<HTMLDialogElement>(null)
+  const [open, setOpen] = useState(false)
   const [busy, start] = useTransition()
   const label = hidden ? `Вернуть «${title}» на витрину` : `Убрать «${title}» с витрины`
 
@@ -45,9 +47,7 @@ export function ShowcaseEntry({
       <button
         type="button"
         className={styles.rowButton}
-        onClick={() =>
-          hidden ? start(() => republishEntry(code, back)) : dialog.current?.showModal()
-        }
+        onClick={() => (hidden ? start(() => republishEntry(code, back)) : setOpen(true))}
         disabled={busy}
         aria-pressed={!hidden}
         title={label}
@@ -56,38 +56,42 @@ export function ShowcaseEntry({
         <MegaphoneDoodle size={17} strokeWidth={4} />
       </button>
 
-      <dialog className={styles.dialog} ref={dialog} aria-labelledby={`off-${code}`}>
-        <h2 className={styles.dialogTitle} id={`off-${code}`}>
-          Убрать с витрины
-        </h2>
-        <p className={styles.dialogText}>
-          Вы уверены, что хотите убрать сезон «{title}» из «Идей сообщества»?
-        </p>
-        {/* Приписка та же, что в окне у самого сезона, и оттуда же: «убрать» —
-            не «удалить», отложенный кем-то сезон никуда не денется. */}
-        <p className={styles.dialogText}>{WITHDRAW_NOTE}</p>
-        <div className={styles.dialogActions}>
-          <button
-            type="button"
-            className={styles.ghost}
-            disabled={busy}
-            onClick={() => dialog.current?.close()}
-          >
-            Отмена
-          </button>
-          <button
-            type="button"
-            className={styles.danger}
-            disabled={busy}
-            onClick={() => {
-              dialog.current?.close()
-              start(() => withdrawEntry(code, back))
-            }}
-          >
-            Убрать
-          </button>
-        </div>
-      </dialog>
+      {open && (
+        <Dialog
+          title="Убрать с витрины"
+          onDismiss={() => setOpen(false)}
+          actions={
+            <>
+              <button
+                type="button"
+                className={dialogStyles.ghost}
+                disabled={busy}
+                onClick={() => setOpen(false)}
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                className={dialogStyles.primary}
+                disabled={busy}
+                onClick={() => {
+                  setOpen(false)
+                  start(() => withdrawEntry(code, back))
+                }}
+              >
+                Убрать
+              </button>
+            </>
+          }
+        >
+          <p className={dialogStyles.text}>
+            Вы уверены, что хотите убрать сезон «{title}» из «Идей сообщества»?
+          </p>
+          {/* Приписка та же, что в окне у самого сезона, и оттуда же: «убрать» —
+              не «удалить», отложенный кем-то сезон никуда не денется. */}
+          <p className={dialogStyles.text}>{WITHDRAW_NOTE}</p>
+        </Dialog>
+      )}
     </>
   )
 }

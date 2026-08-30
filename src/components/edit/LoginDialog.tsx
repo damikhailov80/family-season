@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { Dialog } from '../dialog/Dialog'
+import styles from '../dialog/Dialog.module.css'
 import { LOGIN_TEXT, type LoginReason } from '../../model/community'
 import { GoogleLoginButton } from '../site/GoogleLoginButton'
-import styles from './Dialog.module.css'
 
 /**
  * «Нужен вход».
@@ -17,30 +17,26 @@ import styles from './Dialog.module.css'
  * Внутри — обычный `GoogleLoginButton`. Он клиентский ровно затем, чтобы
  * собрать адрес возврата из `pathname + search + hash`: примеренное оформление
  * живёт в адресе, и без этого человек вернулся бы из Google на другой постер.
+ * Стоит он справа, на месте `.primary`: порядок «отказ слева, действие справа»
+ * один на все окна.
  */
 export function LoginDialog({ reason, onClose }: { reason: LoginReason; onClose: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null)
-
-  // Окно рисуется, только пока открыто, поэтому показывать его надо при
-  // монтировании — как у остальных окон проекта.
-  useEffect(() => {
-    dialog.current?.showModal()
-  }, [])
-
   return (
-    // onClose ловит и Esc, и закрытие по подложке — состояние обязано сойтись
+    // onDismiss ловит и Esc, и закрытие по подложке — состояние обязано сойтись
     // с настоящим состоянием окна, иначе второй раз оно не откроется.
-    <dialog className={styles.dialog} ref={dialog} onClose={onClose} aria-labelledby="login-title">
-      <h2 className={styles.title} id="login-title">
-        Нужен вход
-      </h2>
+    <Dialog
+      title="Нужен вход"
+      onDismiss={onClose}
+      actions={
+        <>
+          <button type="button" className={styles.ghost} onClick={onClose}>
+            Не сейчас
+          </button>
+          <GoogleLoginButton />
+        </>
+      }
+    >
       <p className={styles.text}>{LOGIN_TEXT[reason]}</p>
-      <div className={styles.actions}>
-        <GoogleLoginButton />
-        <button type="button" className={styles.ghost} onClick={onClose}>
-          Не сейчас
-        </button>
-      </div>
-    </dialog>
+    </Dialog>
   )
 }

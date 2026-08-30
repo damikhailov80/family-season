@@ -16,35 +16,9 @@
   background: color-mix(in srgb, var(--accent-deep) 8%, transparent);
 }
 
-.button:focus-visible,
-.ghost:focus-visible,
-.primary:focus-visible {
+.button:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
   outline-offset: 2px;
-}
-
-.dialog {
-  max-width: 560px;
-  /* Та же нижняя граница, что у окон постера (`Dialog.module.css`). */
-  min-height: 200px;
-  padding: 22px 24px;
-  border: var(--border-w) solid var(--accent-deep);
-  border-radius: var(--radius-box);
-  background: var(--surface);
-  color: var(--ink);
-  font-family: var(--font-ui);
-}
-
-.dialog::backdrop {
-  background: rgb(0 0 0 / 35%);
-}
-
-.title {
-  font-family: var(--font-hand);
-  font-weight: 700;
-  font-size: 28px;
-  line-height: 1.1;
-  color: var(--accent-deep);
 }
 
 .compare {
@@ -103,69 +77,9 @@
   color: var(--ink);
 }
 
-.text {
-  margin-top: 16px;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--ink-soft);
-}
-
-/* Потеря карточек — единственное необратимое здесь, поэтому отдельной рамкой. */
-.warn {
-  margin-top: 10px;
-  padding: 9px 11px;
-  border: 1.5px solid var(--accent-theme);
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--ink-soft);
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.ghost,
-.primary {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1;
-  padding: 11px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.ghost {
-  border: 1.5px solid var(--sheet-border);
-  background: var(--surface);
-  color: var(--ink-soft);
-}
-
-.ghost:hover {
-  border-color: var(--accent-deep);
-  background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
-}
-
-.primary {
-  border: 1.5px solid var(--accent-deep);
-  background: var(--accent-deep);
-  color: var(--on-accent);
-}
-
-.primary:hover {
-  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
-}
-
-/* Экранный контрол на бумагу не идёт. Закрытый <dialog> и так не рисуется,
-   но правило нужно на случай печати с открытым окном. */
+/* Экранный контрол на бумагу не идёт. Само окно скрывает общий модуль. */
 @media print {
-  .button,
-  .dialog {
+  .button {
     display: none;
   }
 }

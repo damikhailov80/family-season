@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
+import { Dialog } from '../dialog/Dialog'
+import styles from '../dialog/Dialog.module.css'
 import { PUBLISH_TEXT, type PublishStatus } from '../../model/community'
 import { publicSeasonHref } from '../../model/site'
-import styles from './Dialog.module.css'
 
 /**
  * Выложить сезон на витрину.
@@ -37,65 +38,64 @@ export function PublishDialog({
   onDismiss: () => void
   onSubmit: (anonymize: boolean) => void
 }) {
-  const dialog = useRef<HTMLDialogElement>(null)
   const anonymize = useRef<HTMLInputElement>(null)
-
-  // Окно рисуется, только пока открыто, поэтому показывать его надо при монтировании.
-  useEffect(() => {
-    dialog.current?.showModal()
-  }, [])
 
   const refusal =
     check?.status === 'duplicate' || check?.status === 'blocked' || check?.status === 'limit'
       ? PUBLISH_TEXT[check.status]
       : null
 
+  if (refusal) {
+    return (
+      <Dialog
+        title="Выложить на витрину"
+        onDismiss={onDismiss}
+        actions={
+          // Отменять тут нечего: ничего не случится в любом случае, и кнопка
+          // остаётся одна.
+          <button type="button" className={styles.primary} onClick={onDismiss}>
+            Закрыть
+          </button>
+        }
+      >
+        <p className={styles.text}>{refusal}</p>
+        {/* Ссылка есть не всегда: у снятого с витрины сезона места нет, и
+            вести туда незачем — на витрине его не увидят. */}
+        {check.code && (
+          <a className={styles.link} href={publicSeasonHref(check.code)}>
+            Посмотреть на витрине
+          </a>
+        )}
+      </Dialog>
+    )
+  }
+
   return (
-    <dialog className={styles.dialog} ref={dialog} onClose={onDismiss} aria-labelledby="publish">
-      <h2 className={styles.title} id="publish">
-        Выложить на витрину
-      </h2>
-
-      {refusal ? (
+    <Dialog
+      title="Выложить на витрину"
+      onDismiss={onDismiss}
+      actions={
         <>
-          <p className={styles.text}>{refusal}</p>
-          {/* Ссылка есть не всегда: у снятого с витрины сезона места нет, и
-              вести туда незачем — на витрине его не увидят. */}
-          {check.code && (
-            <a className={styles.link} href={publicSeasonHref(check.code)}>
-              Посмотреть на витрине
-            </a>
-          )}
-          <div className={styles.actions}>
-            <button type="button" className={styles.primary} onClick={onDismiss}>
-              Закрыть
-            </button>
-          </div>
+          <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
+            Отмена
+          </button>
+          <button
+            type="button"
+            className={styles.primary}
+            onClick={() => onSubmit(Boolean(anonymize.current?.checked))}
+            disabled={busy || !check}
+          >
+            {busy ? 'Выкладываем…' : check ? 'Выложить' : 'Проверяем…'}
+          </button>
         </>
-      ) : (
-        <>
-          <p className={styles.text}>Копия сезона появится в «Идеях сообщества».</p>
+      }
+    >
+      <p className={styles.text}>Копия сезона появится в «Идеях сообщества».</p>
 
-          <label className={styles.check}>
-            <input className={styles.checkBox} ref={anonymize} type="checkbox" />
-            <span>Заменить имена на случайные</span>
-          </label>
-
-          <div className={styles.actions}>
-            <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
-              Отмена
-            </button>
-            <button
-              type="button"
-              className={styles.primary}
-              onClick={() => onSubmit(Boolean(anonymize.current?.checked))}
-              disabled={busy || !check}
-            >
-              {busy ? 'Выкладываем…' : check ? 'Выложить' : 'Проверяем…'}
-            </button>
-          </div>
-        </>
-      )}
-    </dialog>
+      <label className={styles.check}>
+        <input className={styles.checkBox} ref={anonymize} type="checkbox" />
+        <span>Заменить имена на случайные</span>
+      </label>
+    </Dialog>
   )
 }

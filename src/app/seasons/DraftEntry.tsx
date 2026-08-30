@@ -1,6 +1,8 @@
 'use client'
 
-import { useMemo, useRef, useSyncExternalStore } from 'react'
+import { useMemo, useRef, useState, useSyncExternalStore } from 'react'
+import { Dialog } from '../../components/dialog/Dialog'
+import dialogStyles from '../../components/dialog/Dialog.module.css'
 import { PenDoodle } from '../../components/doodles'
 import { monthName } from '../../model/calendar'
 import { clearDraft, draftSnapshot, parseDraft, subscribeDraft, writeDraft } from '../../model/draft'
@@ -33,9 +35,9 @@ import styles from './page.module.css'
 export function DraftEntry() {
   const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, () => undefined)
   const draft = useMemo(() => (raw === undefined ? null : parseDraft(raw)), [raw])
-  const renameDialog = useRef<HTMLDialogElement>(null)
-  const dropDialog = useRef<HTMLDialogElement>(null)
   const input = useRef<HTMLInputElement>(null)
+  const [renaming, setRenaming] = useState(false)
+  const [dropping, setDropping] = useState(false)
 
   if (raw === undefined) return null
 
@@ -47,13 +49,13 @@ export function DraftEntry() {
 
   const rename = () => {
     const title = input.current?.value ?? draft.title
-    renameDialog.current?.close()
+    setRenaming(false)
     // Перерисовки не просим: запись сама будит подписку на хранилище.
     writeDraft({ ...draft, title })
   }
 
   const drop = () => {
-    dropDialog.current?.close()
+    setDropping(false)
     clearDraft()
   }
 
@@ -80,12 +82,7 @@ export function DraftEntry() {
             <button
               type="button"
               className={styles.rowButton}
-              onClick={() => {
-                // Значение кладём при открытии, а не через `defaultValue`: узел уже
-                // есть, и после переименования React его не тронет.
-                if (input.current) input.current.value = draft.title
-                renameDialog.current?.showModal()
-              }}
+              onClick={() => setRenaming(true)}
               title={`Переименовать «${draft.title}»`}
               aria-label={`Переименовать «${draft.title}»`}
             >
@@ -94,7 +91,7 @@ export function DraftEntry() {
             <button
               type="button"
               className={styles.rowButton}
-              onClick={() => dropDialog.current?.showModal()}
+              onClick={() => setDropping(true)}
               aria-label={`Удалить «${draft.title}»`}
             >
               ×
@@ -103,59 +100,69 @@ export function DraftEntry() {
         </li>
       </ul>
 
-      <dialog className={styles.dialog} ref={renameDialog} aria-labelledby="rename-draft">
-        <h2 className={styles.dialogTitle} id="rename-draft">
-          Новое название
-        </h2>
-        <p className={styles.dialogText}>Введите новое имя для сезона.</p>
-        <label className={styles.dialogLabel} htmlFor="draft-title">
-          Название
-        </label>
-        <input
-          className={styles.nameInput}
-          id="draft-title"
-          ref={input}
-          type="text"
-          defaultValue={draft.title}
-          maxLength={TITLE_LIMIT}
-          autoComplete="off"
-        />
-        <div className={styles.dialogActions}>
-          <button
-            type="button"
-            className={styles.ghost}
-            onClick={() => renameDialog.current?.close()}
-          >
-            Отмена
-          </button>
-          <button type="button" className={styles.primaryAction} onClick={rename}>
-            Сохранить
-          </button>
-        </div>
-      </dialog>
+      {renaming && (
+        <Dialog
+          title="Новое название"
+          onDismiss={() => setRenaming(false)}
+          actions={
+            <>
+              <button
+                type="button"
+                className={dialogStyles.ghost}
+                onClick={() => setRenaming(false)}
+              >
+                Отмена
+              </button>
+              <button type="button" className={dialogStyles.primary} onClick={rename}>
+                Сохранить
+              </button>
+            </>
+          }
+        >
+          <p className={dialogStyles.text}>Введите новое имя для сезона.</p>
+          <label className={dialogStyles.label} htmlFor="draft-title">
+            Название
+          </label>
+          {/* Поле каждый раз новое — окно рисуется, только пока открыто, — и
+              `defaultValue` подставляется честно даже после переименования. */}
+          <input
+            className={dialogStyles.input}
+            id="draft-title"
+            ref={input}
+            type="text"
+            defaultValue={draft.title}
+            maxLength={TITLE_LIMIT}
+            autoComplete="off"
+          />
+        </Dialog>
+      )}
 
       {/* Спрашиваем по той же причине, что и у строки из базы: другой копии
           черновика нет ни у нас, ни у человека. */}
-      <dialog className={styles.dialog} ref={dropDialog} aria-labelledby="drop-draft">
-        <h2 className={styles.dialogTitle} id="drop-draft">
-          Подтверждение удаления
-        </h2>
-        <p className={styles.dialogText}>
-          Вы уверены, что хотите удалить черновик «{draft.title}»?
-        </p>
-        <div className={styles.dialogActions}>
-          <button
-            type="button"
-            className={styles.ghost}
-            onClick={() => dropDialog.current?.close()}
-          >
-            Отмена
-          </button>
-          <button type="button" className={styles.danger} onClick={drop}>
-            Удалить
-          </button>
-        </div>
-      </dialog>
+      {dropping && (
+        <Dialog
+          title="Подтверждение удаления"
+          onDismiss={() => setDropping(false)}
+          actions={
+            <>
+              <button
+                type="button"
+                className={dialogStyles.ghost}
+                onClick={() => setDropping(false)}
+              >
+                Отмена
+              </button>
+              <button type="button" className={dialogStyles.primary} onClick={drop}>
+                Удалить
+              </button>
+            </>
+          }
+        >
+          <p className={dialogStyles.text}>
+            Вы уверены, что хотите удалить черновик «{draft.title}»?
+          </p>
+        </Dialog>
+      )}
     </>
   )
 }

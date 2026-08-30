@@ -1,7 +1,9 @@
 'use client'
 
-import { useRef } from 'react'
+import { useState } from 'react'
 import { AvatarFace } from '../AvatarFace'
+import { Dialog } from '../dialog/Dialog'
+import dialogStyles from '../dialog/Dialog.module.css'
 import { FACE_LABELS } from '../../model/accents'
 import { PLACEHOLDERS } from '../../model/labels'
 import { useDoc } from '../../state/docContext'
@@ -16,15 +18,15 @@ import styles from './FamilySwap.module.css'
  * Поэтому постер по-прежнему работает без сервера — просто без этой кнопки.
  *
  * Подтверждение обязательно: действие затирает имена с рисунками, а при
- * меньшей семье ещё и отбрасывает карточки вместе с их проектами. Диалог —
- * нативный `<dialog>` с `showModal()`, первый в проекте. `confirm()` не годится:
- * он вешает вкладку, ломает автоматическую проверку и не умеет показать
- * главное — **что именно** изменится.
+ * меньшей семье ещё и отбрасывает карточки вместе с их проектами. Ради этого
+ * окно и заведено — показать **что именно** изменится; списки составов и
+ * предупреждение о потере карточек рисуются своим модулем, всё остальное
+ * (рамка, заголовок, ряд кнопок) — общей обвязкой окон.
  */
 export function FamilySwap() {
   const { template, editing, replacePeople } = useDoc()
   const family = useFamilyPreset(editing)
-  const dialog = useRef<HTMLDialogElement>(null)
+  const [open, setOpen] = useState(false)
 
   if (!editing || !family) return null
 
@@ -33,74 +35,88 @@ export function FamilySwap() {
 
   const apply = () => {
     replacePeople(family)
-    dialog.current?.close()
+    setOpen(false)
   }
 
   return (
     <>
-      <button type="button" className={styles.button} onClick={() => dialog.current?.showModal()}>
+      <button type="button" className={styles.button} onClick={() => setOpen(true)}>
         Подставить свою семью
       </button>
 
-      <dialog className={styles.dialog} ref={dialog} aria-labelledby="family-swap-title">
-        <h2 className={styles.title} id="family-swap-title">
-          Заменить героев на свою семью?
-        </h2>
+      {open && (
+        <Dialog
+          title="Заменить героев на свою семью?"
+          onDismiss={() => setOpen(false)}
+          actions={
+            <>
+              <button
+                type="button"
+                className={dialogStyles.ghost}
+                onClick={() => setOpen(false)}
+              >
+                Отмена
+              </button>
+              <button type="button" className={dialogStyles.primary} onClick={apply}>
+                Заменить
+              </button>
+            </>
+          }
+        >
+          <div className={styles.compare}>
+            <section className={styles.side}>
+              <h3 className={styles.sideTitle}>Сейчас на постере</h3>
+              <ul className={styles.people}>
+                {people.map((person) => (
+                  <li className={styles.person} key={person.id}>
+                    <span
+                      className={styles.avatar}
+                      style={{ color: `var(--person-${person.face})` }}
+                    >
+                      <AvatarFace variant={person.face} size={30} />
+                    </span>
+                    <span className={styles.name}>{person.name || PLACEHOLDERS.name}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
 
-        <div className={styles.compare}>
-          <section className={styles.side}>
-            <h3 className={styles.sideTitle}>Сейчас на постере</h3>
-            <ul className={styles.people}>
-              {people.map((person) => (
-                <li className={styles.person} key={person.id}>
-                  <span className={styles.avatar} style={{ color: `var(--person-${person.face})` }}>
-                    <AvatarFace variant={person.face} size={30} />
-                  </span>
-                  <span className={styles.name}>{person.name || PLACEHOLDERS.name}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+            <span className={styles.arrow} aria-hidden="true">
+              →
+            </span>
 
-          <span className={styles.arrow} aria-hidden="true">
-            →
-          </span>
+            <section className={styles.side}>
+              <h3 className={styles.sideTitle}>Станет</h3>
+              <ul className={styles.people}>
+                {family.map((member, index) => (
+                  <li className={styles.person} key={index}>
+                    <span
+                      className={styles.avatar}
+                      style={{ color: `var(--person-${member.face})` }}
+                    >
+                      <AvatarFace variant={member.face} size={30} />
+                    </span>
+                    <span className={styles.name}>{member.name || FACE_LABELS[member.face]}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
 
-          <section className={styles.side}>
-            <h3 className={styles.sideTitle}>Станет</h3>
-            <ul className={styles.people}>
-              {family.map((member, index) => (
-                <li className={styles.person} key={index}>
-                  <span className={styles.avatar} style={{ color: `var(--person-${member.face})` }}>
-                    <AvatarFace variant={member.face} size={30} />
-                  </span>
-                  <span className={styles.name}>{member.name || FACE_LABELS[member.face]}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
+          <p className={dialogStyles.text}>Поменяются только рисунки и имена.</p>
 
-        <p className={styles.text}>Поменяются только рисунки и имена.</p>
-
-        {/* Ради этой строки диалог и заведён: потерю карточек надо видеть заранее. */}
-        {dropped > 0 && (
-          <p className={styles.warn}>
-            {dropped === 1
-              ? 'Одна нижняя карточка будет удалена.'
-              : `Нижние карточки (${dropped}) будут удалены.`}
-          </p>
-        )}
-
-        <div className={styles.actions}>
-          <button type="button" className={styles.ghost} onClick={() => dialog.current?.close()}>
-            Отмена
-          </button>
-          <button type="button" className={styles.primary} onClick={apply}>
-            Заменить
-          </button>
-        </div>
-      </dialog>
+          {/* Ради этой строки окно и заведено: потерю карточек надо видеть заранее.
+              Рамка та же, что у «черновик будет затёрт», — это одно и то же
+              предупреждение о потере, и цвет светофора у него один. */}
+          {dropped > 0 && (
+            <p className={dialogStyles.warning}>
+              {dropped === 1
+                ? 'Одна нижняя карточка будет удалена.'
+                : `Нижние карточки (${dropped}) будут удалены.`}
+            </p>
+          )}
+        </Dialog>
+      )}
     </>
   )
 }
