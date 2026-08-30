@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { PUBLISH_TEXT, type PublishStatus } from '../../model/community'
+import { publicSeasonHref } from '../../model/site'
 import styles from './Dialog.module.css'
 
 /**
@@ -14,12 +16,23 @@ import styles from './Dialog.module.css'
  * Галочка обезличивания стоит здесь же, а не в настройках: решение принимают
  * про конкретный сезон, а не вообще. Имена подменяются только в копии — свой
  * сезон остаётся с настоящими.
+ *
+ * **Ответ витрины приходит до нажатия, а не после.** Пока идёт проверка
+ * (`check === null`), кнопка ждёт; нашёлся такой же сезон — окно говорит об этом
+ * сразу и, если ему есть куда вести, предлагает посмотреть. Прежде человек
+ * заполнял окно, жал «Выложить» и только тогда получал отказ тостом.
+ *
+ * Своей беды проверка не показывает: не ответила база — окно ведёт себя как
+ * раньше, а отказ, если он будет, объяснит сама публикация.
  */
 export function PublishDialog({
+  check,
   busy,
   onDismiss,
   onSubmit,
 }: {
+  /** Что показала проверка витрины; `null` — ещё проверяем. */
+  check: { status: PublishStatus; code?: string } | null
   busy: boolean
   onDismiss: () => void
   onSubmit: (anonymize: boolean) => void
@@ -32,32 +45,57 @@ export function PublishDialog({
     dialog.current?.showModal()
   }, [])
 
+  const refusal =
+    check?.status === 'duplicate' || check?.status === 'blocked' || check?.status === 'limit'
+      ? PUBLISH_TEXT[check.status]
+      : null
+
   return (
     <dialog className={styles.dialog} ref={dialog} onClose={onDismiss} aria-labelledby="publish">
       <h2 className={styles.title} id="publish">
         Выложить на витрину
       </h2>
 
-      <p className={styles.text}>Копия сезона появится в «Идеях сообщества».</p>
+      {refusal ? (
+        <>
+          <p className={styles.text}>{refusal}</p>
+          {/* Ссылка есть не всегда: у снятого с витрины сезона места нет, и
+              вести туда незачем — на витрине его не увидят. */}
+          {check.code && (
+            <a className={styles.link} href={publicSeasonHref(check.code)}>
+              Посмотреть на витрине
+            </a>
+          )}
+          <div className={styles.actions}>
+            <button type="button" className={styles.primary} onClick={onDismiss}>
+              Закрыть
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className={styles.text}>Копия сезона появится в «Идеях сообщества».</p>
 
-      <label className={styles.check}>
-        <input className={styles.checkBox} ref={anonymize} type="checkbox" />
-        <span>Заменить имена на случайные</span>
-      </label>
+          <label className={styles.check}>
+            <input className={styles.checkBox} ref={anonymize} type="checkbox" />
+            <span>Заменить имена на случайные</span>
+          </label>
 
-      <div className={styles.actions}>
-        <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
-          Отмена
-        </button>
-        <button
-          type="button"
-          className={styles.primary}
-          onClick={() => onSubmit(Boolean(anonymize.current?.checked))}
-          disabled={busy}
-        >
-          {busy ? 'Выкладываем…' : 'Выложить'}
-        </button>
-      </div>
+          <div className={styles.actions}>
+            <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
+              Отмена
+            </button>
+            <button
+              type="button"
+              className={styles.primary}
+              onClick={() => onSubmit(Boolean(anonymize.current?.checked))}
+              disabled={busy || !check}
+            >
+              {busy ? 'Выкладываем…' : check ? 'Выложить' : 'Проверяем…'}
+            </button>
+          </div>
+        </>
+      )}
     </dialog>
   )
 }

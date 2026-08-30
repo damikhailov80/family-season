@@ -6,6 +6,7 @@ import { readFamily, writeFamily, type FamilyStatus } from './settings'
 import {
   addReport,
   noteFork,
+  previewPublish,
   publishSeason,
   republishPublic,
   setFavorite,
@@ -209,6 +210,17 @@ export async function shareSeason(
 ): Promise<{ status: PublishStatus; code?: string; fresh?: boolean }> {
   if (typeof code !== 'string') return { status: 'error' }
   return publishSeason(code, Boolean(anonymize))
+}
+
+/**
+ * Чем кончится публикация, если нажать прямо сейчас. Спрашивает окно, когда
+ * открывается: разговор должен начинаться с ответа, а не кончаться им.
+ */
+export async function previewShare(
+  code: unknown,
+): Promise<{ status: PublishStatus; code?: string }> {
+  if (typeof code !== 'string') return { status: 'error' }
+  return previewPublish(code)
 }
 
 /** Убрать свою публикацию с витрины. Что с ней станет — решает `withdrawPublic`. */

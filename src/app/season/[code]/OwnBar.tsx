@@ -1,17 +1,24 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { LinkDoodle, MegaphoneDoodle, PrinterDoodle } from '../../../components/doodles'
 import { NewSeasonDialog } from '../../../components/edit/NewSeasonDialog'
 import { PublishDialog } from '../../../components/edit/PublishDialog'
 import { RenameDialog } from '../../../components/edit/RenameDialog'
 import { ShareLinkDialog } from '../../../components/edit/ShareLinkDialog'
 import { Toast } from '../../../components/site/Toast'
-import { PUBLISH_TEXT } from '../../../model/community'
+import { PUBLISH_TEXT, type PublishStatus } from '../../../model/community'
 import { defaultSeasonTitle, LIBRARY_TEXT, normalizeTitle } from '../../../model/library'
 import { publicSeasonHref, seasonHref } from '../../../model/site'
-import { renameSeason, revokeLink, shareLink, shareSeason, storeSeason } from '../../../server/actions'
+import {
+  previewShare,
+  renameSeason,
+  revokeLink,
+  shareLink,
+  shareSeason,
+  storeSeason,
+} from '../../../server/actions'
 import { useDoc } from '../../../state/docContext'
 import styles from '../../../components/edit/Bar.module.css'
 
@@ -32,19 +39,19 @@ import styles from '../../../components/edit/Bar.module.css'
  * сезона своя жизнь и своя ссылка, и показать надо именно её. Дубль уводит туда
  * же — человеку нужен не отказ, а тот самый сезон, который уже лежит на витрине.
  *
- * Выложенный сезон мегафон показывает нажатым и окна больше не открывает — он
- * просто уводит на копию. Прежде он предлагал выложить сезон, который уже на
- * витрине: нажимать можно было сколько угодно раз, и каждый раз человек
- * приезжал на ту же копию с отказом. Знание это выведенное, а не хранимое
- * (`publishedCode` сверяет содержимое), поэтому правка сезона возвращает кнопку
- * в исходное сама собой.
+ * **Состояния у мегафона нет: он всегда обычная кнопка.** Отвечает на вопрос
+ * «а такой сезон уже выложен?» окно, и отвечает в тот миг, когда открывается
+ * (`previewPublish`), — сценария там ровно два: выложить или «такой уже есть», и
+ * тогда со ссылкой. Нажатость кнопки была третьим ответом на тот же вопрос и
+ * стоила запроса к базе на каждый показ страницы: витрину приходилось спрашивать
+ * до того, как человек ею заинтересовался. Хуже того, ответ этот был неполным —
+ * чужих публикаций того же содержимого он не искал вовсе.
  */
 export function OwnBar({
   code,
   editing,
   title,
   token,
-  published,
 }: {
   code: string
   editing: boolean
@@ -52,12 +59,14 @@ export function OwnBar({
   title: string
   /** Токен приватной ссылки; `null` — её не выдавали. */
   token: string | null
-  /** Код копии на витрине; `null` — этого сезона там нет. */
-  published: string | null
 }) {
   const { template, palette, iconSet } = useDoc()
   const [forkOpen, setForkOpen] = useState(false)
   const [publishOpen, setPublishOpen] = useState(false)
+  /** Что витрина ответит на «Выложить»; `null` — ещё спрашиваем. */
+  const [check, setCheck] = useState<{ status: PublishStatus; code?: string } | null>(null)
+  /** Номер проверки: ответ на закрытое окно не должен попасть в следующее. */
+  const checkRun = useRef(0)
   const [linkOpen, setLinkOpen] = useState(false)
   // Ответ известен из самого действия — переспрашивать сервер незачем.
   const [link, setLink] = useState(token)
@@ -118,6 +127,19 @@ export function OwnBar({
       // Без разрешения на буфер поле с ссылкой и так открыто: скопирует руками.
       setNotice({ text: 'Скопируйте ссылку из поля', at: Date.now() })
     }
+  }
+
+  /*
+   * Окно открывается сразу, а витрину спрашиваем следом: ждать ответа с закрытым
+   * окном — значит на секунду оставить нажатие без всякого следа.
+   */
+  const openPublish = () => {
+    const run = ++checkRun.current
+    setCheck(null)
+    setPublishOpen(true)
+    void previewShare(code).then((result) => {
+      if (checkRun.current === run) setCheck(result)
+    })
   }
 
   const publish = async (anonymize: boolean) => {
@@ -192,16 +214,9 @@ export function OwnBar({
                 type="button"
                 className={styles.icon}
                 disabled={busy}
-                aria-pressed={Boolean(published)}
-                onClick={() =>
-                  published
-                    ? location.assign(publicSeasonHref(published))
-                    : setPublishOpen(true)
-                }
-                title={published ? 'Сезон на витрине — открыть' : 'Выложить на витрину сообщества'}
-                aria-label={
-                  published ? 'Сезон на витрине — открыть' : 'Выложить на витрину сообщества'
-                }
+                onClick={openPublish}
+                title="Выложить на витрину сообщества"
+                aria-label="Выложить на витрину сообщества"
               >
                 <MegaphoneDoodle size={19} strokeWidth={4} />
               </button>
@@ -248,6 +263,7 @@ export function OwnBar({
       )}
       {publishOpen && (
         <PublishDialog
+          check={check}
           busy={busy}
           onDismiss={() => setPublishOpen(false)}
           onSubmit={(anonymize) => void publish(anonymize)}

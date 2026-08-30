@@ -157,40 +157,69 @@ export async function noteFork(value: string): Promise<void> {
 }
 
 /**
- * Лежит ли этот свой сезон на витрине — и под каким кодом.
+ * Что случится, если сейчас нажать «Выложить». Спрашивает окно публикации в тот
+ * миг, когда открывается.
  *
- * Связи между строками при этом не заводится: ответ **выводится** из содержимого
- * тем же `content_key`, которым витрина держит уникальность. Оттуда и приятное
- * следствие — правку сезона витрина не видит, и мегафон сам собой возвращается
- * в исходное: на витрине лежит уже не этот текст.
+ * Не дубль проверок из `publishSeason`, а их **сухой прогон**: разговор о
+ * публикации должен начинаться с ответа, а не кончаться им. Раньше человек
+ * заполнял окно, жал кнопку и только тогда узнавал, что такой сезон уже выложен.
  *
- * Нужен ответ затем, чтобы кнопка не предлагала выложить сезон, который уже
- * на витрине. Без него нажимать её можно было сколько угодно раз подряд, и
- * каждый раз человек приезжал на ту же копию с отказом «такой сезон уже есть».
+ * Ответ тот же, что вернула бы публикация, с одним отличием: **своя снятая
+ * строка — это `ok`**, потому что публикация её вернёт (см. `taken`), а не
+ * отобьёт. Рубежом защиты проверка при этом не является — решает по-прежнему
+ * `publishSeason`, и на молчание базы окно ведёт себя как раньше.
  */
-export async function publishedCode(value: string): Promise<string | null> {
+export async function previewPublish(
+  value: string,
+): Promise<{ status: PublishStatus; code?: string }> {
   const code = codeOrNull(value)
   const session = await auth()
-  if (!code || !session?.accountKey) return null
+  if (!session?.user) return { status: 'anonymous' }
+  if (!session.accountKey) return { status: 'stale' }
+  if (!code) return { status: 'error' }
 
-  const result = await query<{ code: string }>(
-    'public:publish:twin',
-    `select p.code from public_seasons p
-      where p.author_key = $2
-        and p.hidden_at is null
-        and p.blocked_at is null
-        and p.content_key = (select md5(u.content::text)
-                               from user_seasons u
-                              where u.code = $1 and u.account_key = $2)`,
-    [code, session.accountKey],
+  const result = await query<{
+    found: number
+    existing: string | null
+    off: boolean
+    blocked: boolean
+    own: boolean
+    room: boolean
+  }>(
+    'public:publish:preview',
+    `with mine as (select content from user_seasons where code = $1 and account_key = $2),
+     existing as (
+       select code, hidden_at, blocked_at, author_key = $2 as own
+         from public_seasons
+        where content_key = md5((select content from mine)::text)
+     ),
+     room as (
+       select count(*) < $3 as ok from public_seasons
+        where author_key = $2 and hidden_at is null and blocked_at is null
+     )
+     select (select count(*) from mine)::int as found,
+            (select code from existing) as existing,
+            coalesce((select hidden_at is not null from existing), false) as off,
+            coalesce((select blocked_at is not null from existing), false) as blocked,
+            coalesce((select own from existing), false) as own,
+            (select ok from room) as room`,
+    [code, session.accountKey, PUBLISH_LIMIT],
   )
-  /*
-   * Молчание базы — это «не знаем», а не «не выложен»: кнопка останется обычной,
-   * и если человек её нажмёт, объяснится сама публикация. Своего тоста здесь нет
-   * намеренно — ради подписи на кнопке страницу тревожить незачем.
-   */
-  if (result.status !== 'ok') return null
-  return result.rows[0]?.code ?? null
+  if (result.status !== 'ok') {
+    logger.error('publish not previewed', { code, reason: result.status })
+    return { status: 'error' }
+  }
+
+  const row = result.rows[0]
+  // Сезона нет или он чужой — это испорченный запрос, а не «мест не осталось».
+  if (!row?.found) return { status: 'error' }
+  if (row.blocked) return { status: 'blocked' }
+  // Витрину видно — отдаём код: окно предложит посмотреть, что там уже лежит.
+  if (row.existing && !row.off) return { status: 'duplicate', code: row.existing }
+  // Чужая снятая: выложить нельзя, а вести туда некуда — её нет на витрине.
+  if (row.existing && !row.own) return { status: 'duplicate' }
+  if (row.room === false) return { status: 'limit' }
+  return { status: 'ok' }
 }
 
 /**

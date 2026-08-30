@@ -50,7 +50,9 @@ export type PublishStatus = LibraryStatus | 'duplicate' | 'blocked'
  * выкладывают **свой сохранённый** сезон, а он есть только у него.
  */
 export const PUBLISH_TEXT: Record<Exclude<PublishStatus, 'ok' | 'anonymous'>, string> = {
-  duplicate: 'Такой сезон на витрине уже есть.',
+  // Не «на витрине уже есть»: тем же ответом отбивается и снятый с витрины
+  // сезон, а его там как раз нет.
+  duplicate: 'Такой сезон уже выложен.',
   blocked: 'Этот сезон закрыт после жалоб.',
   limit: `Выложить можно не больше ${PUBLISH_LIMIT} сезонов — уберите лишние с витрины.`,
   stale: 'Обновите страницу и войдите заново.',

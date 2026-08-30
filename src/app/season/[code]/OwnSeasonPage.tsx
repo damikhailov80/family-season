@@ -1,7 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { Toast } from '../../../components/site/Toast'
 import { ROUTES } from '../../../model/site'
-import { publishedCode } from '../../../server/publicSeasons'
 import { readUserSeason } from '../../../server/userSeasons'
 import { OwnSeason } from './OwnSeason'
 
@@ -23,12 +22,7 @@ export async function OwnSeasonPage({ code, editing }: { code: string; editing: 
   if (state.status === 'error') {
     return <Toast message="Не удалось открыть сезон — ошибка на сервере." />
   }
-  /*
-   * Лежит ли этот сезон на витрине, спрашиваем только в просмотре: мегафон есть
-   * только там, а в правке ответ устарел бы на первом же нажатии клавиши.
-   */
-  const published = editing ? null : await publishedCode(state.season.code)
-  return <OwnSeason season={state.season} editing={editing} published={published} />
+  return <OwnSeason season={state.season} editing={editing} />
 }
 
 /** Название сезона в заголовке вкладки: у человека их сто, и они разные. */
