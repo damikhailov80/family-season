@@ -18,7 +18,7 @@ import { auth } from '../../server/auth'
 import { listFavorites, listPublished } from '../../server/publicSeasons'
 import { listUserSeasons } from '../../server/userSeasons'
 import { UnfavoriteEntry } from './UnfavoriteEntry'
-import { WithdrawEntry } from './WithdrawEntry'
+import { ShowcaseEntry } from './ShowcaseEntry'
 import type { PaletteId } from '../../types'
 import { DeleteEntry } from './DeleteEntry'
 import { DraftEntry } from './DraftEntry'
@@ -136,12 +136,14 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
         {kind === 'favorites' && (
           <UnfavoriteEntry code={entry.code} title={entry.title} back={back} />
         )}
-        {/* Снять с витрины можно только то, что на ней есть: у снятого кнопки
-            нет вовсе — погашенная обещала бы, что когда-нибудь оживёт. */}
-        {kind === 'published' && !entry.hidden && !entry.blocked && (
-          <WithdrawEntry
+        {/* Мегафон, как на самом сезоне: нажат — сезон на витрине и его можно
+            снять, отжат — снят, и его можно вернуть. Нет кнопки только у
+            закрытого после жалоб: там решает не автор. */}
+        {kind === 'published' && !entry.blocked && (
+          <ShowcaseEntry
             code={entry.code}
             title={entry.title}
+            hidden={Boolean(entry.hidden)}
             back={back}
           />
         )}

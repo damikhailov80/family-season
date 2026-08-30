@@ -31,12 +31,20 @@ import styles from '../../../components/edit/Bar.module.css'
  * постер наружу не отдают. После удачи уходим на **адрес копии**: у выложенного
  * сезона своя жизнь и своя ссылка, и показать надо именно её. Дубль уводит туда
  * же — человеку нужен не отказ, а тот самый сезон, который уже лежит на витрине.
+ *
+ * Выложенный сезон мегафон показывает нажатым и окна больше не открывает — он
+ * просто уводит на копию. Прежде он предлагал выложить сезон, который уже на
+ * витрине: нажимать можно было сколько угодно раз, и каждый раз человек
+ * приезжал на ту же копию с отказом. Знание это выведенное, а не хранимое
+ * (`publishedCode` сверяет содержимое), поэтому правка сезона возвращает кнопку
+ * в исходное сама собой.
  */
 export function OwnBar({
   code,
   editing,
   title,
   token,
+  published,
 }: {
   code: string
   editing: boolean
@@ -44,6 +52,8 @@ export function OwnBar({
   title: string
   /** Токен приватной ссылки; `null` — её не выдавали. */
   token: string | null
+  /** Код копии на витрине; `null` — этого сезона там нет. */
+  published: string | null
 }) {
   const { template, palette, iconSet } = useDoc()
   const [forkOpen, setForkOpen] = useState(false)
@@ -182,9 +192,16 @@ export function OwnBar({
                 type="button"
                 className={styles.icon}
                 disabled={busy}
-                onClick={() => setPublishOpen(true)}
-                title="Выложить на витрину сообщества"
-                aria-label="Выложить на витрину сообщества"
+                aria-pressed={Boolean(published)}
+                onClick={() =>
+                  published
+                    ? location.assign(publicSeasonHref(published))
+                    : setPublishOpen(true)
+                }
+                title={published ? 'Сезон на витрине — открыть' : 'Выложить на витрину сообщества'}
+                aria-label={
+                  published ? 'Сезон на витрине — открыть' : 'Выложить на витрину сообщества'
+                }
               >
                 <MegaphoneDoodle size={19} strokeWidth={4} />
               </button>

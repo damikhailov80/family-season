@@ -259,6 +259,30 @@
   color: var(--accent-deep);
 }
 
+/* Нажатое состояние кнопки-переключателя — заливкой, как у иконок тулбара
+   (`Bar.module.css`): у мегафона залитой формы нет и быть не может, а заливка
+   кнопки от формы не зависит и читается одинаково.
+
+   Стоит после `.rowButton:hover` намеренно: специфичность у них одна и та же
+   (класс + псевдокласс против класса + атрибута), и выигрывает последний. */
+.rowButton[aria-pressed='true'] {
+  border-color: var(--accent-deep);
+  background: var(--accent-deep);
+  color: var(--on-accent);
+}
+
+.rowButton[aria-pressed='true']:hover {
+  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
+  color: var(--on-accent);
+}
+
+/* Кнопка ждёт ответа сервера. Гасим, а не прячем: исчезнувшая сдвинула бы
+   соседнюю, и второй клик попал бы не туда. */
+.rowButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .rowButton:focus-visible,
 .tab:focus-visible,
 .tabActive:focus-visible,

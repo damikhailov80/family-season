@@ -22,7 +22,13 @@ import {
 } from '../../../model/community'
 import { ideaTitle } from '../../../model/library'
 import { ROUTES } from '../../../model/site'
-import { favoriteSeason, likeSeason, reportSeason, withdrawSeason } from '../../../server/actions'
+import {
+  favoriteSeason,
+  likeSeason,
+  reportSeason,
+  republishSeason,
+  withdrawSeason,
+} from '../../../server/actions'
 import { useDoc } from '../../../state/docContext'
 import styles from '../../../components/edit/Bar.module.css'
 
@@ -165,6 +171,25 @@ export function PublicBar({
     else location.assign(ROUTES.seasons)
   }
 
+  /*
+   * Возврат на витрину окна не просит: терять нечего, и строка та же самая.
+   * Подтверждают только снятие — там сезон может исчезнуть совсем.
+   */
+  const republish = async () => {
+    setBusy(true)
+    const status = await republishSeason(code)
+    setBusy(false)
+    if (status === 'ok') {
+      // Подсказка ряда снова назовёт место: перечитываем страницу целиком.
+      location.reload()
+      return
+    }
+    setNotice({
+      text: PUBLISH_TEXT[status as 'duplicate' | 'limit' | 'stale' | 'error'],
+      at: Date.now(),
+    })
+  }
+
   return (
     <>
       <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
@@ -243,18 +268,20 @@ export function PublicBar({
             from={code}
             onFailure={(text) => setNotice({ text, at: Date.now() })}
           />
-          {/* Убрать с витрины может только тот, кто выложил. Кнопка нажата
-              (`aria-pressed`), пока сезон на витрине: это состояние строки, а
-              не действие «выложить ещё раз» — выкладывают из своего сезона. */}
+          {/* Распоряжается витриной только тот, кто выложил, — и в обе стороны:
+              кнопка нажата (`aria-pressed`), пока сезон на витрине, и снимает
+              его; отжатая возвращает обратно. Погашенной она была, пока вернуть
+              снятое было нечем: сезон оказывался в тупике, из которого его
+              выводила только повторная публикация из личного сезона. */}
           {mine && (
             <button
               type="button"
               className={styles.icon}
-              disabled={busy || hidden}
+              disabled={busy}
               aria-pressed={!hidden}
-              onClick={() => setWithdrawOpen(true)}
-              title={hidden ? 'Сезон уже снят с витрины' : 'Убрать с витрины'}
-              aria-label={hidden ? 'Сезон уже снят с витрины' : 'Убрать с витрины'}
+              onClick={() => (hidden ? void republish() : setWithdrawOpen(true))}
+              title={hidden ? 'Вернуть на витрину' : 'Убрать с витрины'}
+              aria-label={hidden ? 'Вернуть на витрину' : 'Убрать с витрины'}
             >
               <MegaphoneDoodle size={19} strokeWidth={ICON_STROKE} />
             </button>

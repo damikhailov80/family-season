@@ -7,6 +7,7 @@ import {
   addReport,
   noteFork,
   publishSeason,
+  republishPublic,
   setFavorite,
   setLike,
   withdrawPublic,
@@ -216,6 +217,12 @@ export async function withdrawSeason(code: unknown): Promise<{ status: PublishSt
   return withdrawPublic(code)
 }
 
+/** Вернуть свою снятую публикацию на витрину — та же строка, тот же код. */
+export async function republishSeason(code: unknown): Promise<PublishStatus> {
+  if (typeof code !== 'string') return 'error'
+  return republishPublic(code)
+}
+
 /**
  * Приватная ссылка на свой сезон: выдать (или заменить) и отозвать.
  *
@@ -276,6 +283,12 @@ export async function renameEntry(code: unknown, back: unknown, title: unknown) 
  */
 export async function withdrawEntry(code: unknown, back: unknown) {
   if (typeof code === 'string') await withdrawPublic(code)
+  redirect(safeReturnTo(back) ?? `${ROUTES.seasons}?tab=published`)
+}
+
+/** Вернуть публикацию на витрину **со страницы списка** — та же пара, что выше. */
+export async function republishEntry(code: unknown, back: unknown) {
+  if (typeof code === 'string') await republishPublic(code)
   redirect(safeReturnTo(back) ?? `${ROUTES.seasons}?tab=published`)
 }
 
