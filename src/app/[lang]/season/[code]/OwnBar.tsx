@@ -184,7 +184,8 @@ export function OwnBar({
       // Пометка нужна витрине, чтобы объяснить, что случилось: выложили сейчас
       // или такой сезон там уже был. Свой адрес страница потом почистит.
       location.assign(
-        `${publicSeasonHref(uiLang, result.code)}?published=${result.fresh ? 'new' : 'again'}`,
+        // Язык — публикации, а не интерфейса: она живёт только в своём.
+        `${publicSeasonHref(publishLang, result.code)}?published=${result.fresh ? 'new' : 'again'}`,
       )
       return
     }

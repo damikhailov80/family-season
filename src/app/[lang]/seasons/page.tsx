@@ -112,7 +112,9 @@ function Row({
             href={
               kind === 'seasons'
                 ? seasonHref(lang, entry.code)
-                : publicSeasonHref(lang, entry.code)
+                : // Публикация живёт только в своём языке: у отложенного и
+                  // выложенного он может отличаться от языка кабинета.
+                  publicSeasonHref(entry.lang, entry.code)
             }
           >
             {entry.title}

@@ -1,7 +1,7 @@
 'use client'
 
 import { startTransition } from 'react'
-import { useDict, useLang } from '../../i18n/context'
+import { useDict } from '../../i18n/context'
 import { googleLoginUrl } from '../../server/actions'
 import styles from './LoginButtons.module.css'
 
@@ -50,7 +50,6 @@ function GoogleMark() {
  */
 export function GoogleLoginButton({ label }: { label?: string }) {
   const { site } = useDict()
-  const lang = useLang()
 
   return (
     <form
@@ -59,7 +58,7 @@ export function GoogleLoginButton({ label }: { label?: string }) {
         event.preventDefault()
         const back = location.pathname + location.search + location.hash
         startTransition(async () => {
-          location.href = await googleLoginUrl(back, lang)
+          location.href = await googleLoginUrl(back)
         })
       }}
     >

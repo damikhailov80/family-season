@@ -397,6 +397,10 @@ export const en: Dict = {
   },
 
   pages: {
+    seasonGoneTitle: 'No such season',
+    seasonGoneText:
+      'We do not have this season. Its author may have taken it off the showcase or deleted it, and the link may have been mistyped.',
+    seasonGoneIdeas: 'See Community Ideas',
     notFoundTitle: 'Page not found',
     notFoundText:
       'There is no such address on the site. The link may have been mistyped, or the season deleted.',

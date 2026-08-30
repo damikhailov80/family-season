@@ -77,8 +77,13 @@ interface Row {
  *
  * Скрытые с витрины сезоны открываются как обычные: снятие с «Идей» не отменяет
  * прямую ссылку — её уже кому-то отправили.
+ *
+ * **Сезон живёт только в своём языке**: `/en/s/<код русского сезона>` отвечает
+ * `missing`, а не показывает русский лист в английской обвязке. Поэтому всякая
+ * ссылка на `/s/` собирается языком **сезона**, а не смотрящего, — иначе кабинет
+ * и сама публикация вели бы в 404 (см. `publicSeasonHref`).
  */
-export async function readPublicSeason(value: string): Promise<PublicSeasonState> {
+export async function readPublicSeason(value: string, lang: Lang): Promise<PublicSeasonState> {
   const code = codeOrNull(value)
   if (!code) return { status: 'missing' }
 
@@ -96,8 +101,8 @@ export async function readPublicSeason(value: string): Promise<PublicSeasonState
                     where r.code = p.code and r.reporter_key = $2) as reported,
             exists(select 1 from public_favorites f
                     where f.public_id = p.id and f.account_key = $2) as favorited
-       from public_seasons p where p.code = $1`,
-    [code, me],
+       from public_seasons p where p.code = $1 and p.language = $3`,
+    [code, me, lang],
   )
   if (result.status !== 'ok') {
     logger.error('public season not read', { code, reason: result.status })

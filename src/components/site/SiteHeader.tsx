@@ -1,7 +1,10 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
 import { getDict, getLang } from '../../i18n/server'
+import { LANG_PATH_HEADER } from '../../model/lang'
 import { ROUTES, withLang } from '../../model/site'
 import { HeartDoodle } from '../doodles'
+import { LangSwitcher } from './LangSwitcher'
 import { LoginButtons } from './LoginButtons'
 import { NewSeasonAction } from './NewSeasonAction'
 import styles from './SiteHeader.module.css'
@@ -22,6 +25,10 @@ import styles from './SiteHeader.module.css'
 export async function SiteHeader() {
   const lang = await getLang()
   const { site } = await getDict()
+  // Путь для ссылок переключателя приходит заголовком от `proxy`: смена языка
+  // обязана оставлять человека на той же странице, а своего адреса серверный
+  // компонент не знает.
+  const path = (await headers()).get(LANG_PATH_HEADER) || '/'
 
   return (
     <header className={styles.header}>
@@ -43,6 +50,7 @@ export async function SiteHeader() {
         <NewSeasonAction className={styles.action}>{site.newSeason}</NewSeasonAction>
       </nav>
 
+      <LangSwitcher lang={lang} path={path} label={site.langsAria} />
       <LoginButtons />
     </header>
   )

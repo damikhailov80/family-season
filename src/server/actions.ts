@@ -34,7 +34,7 @@ import { knownLang, LANG_COOKIE, LANG_COOKIE_MAX_AGE } from '../model/lang'
 import { posterText } from '../model/labels'
 import { defaultSeasonTitle, normalizeTitle, type LibraryStatus } from '../model/library'
 import { DEFAULT_PALETTE, knownPalette } from '../model/palettes'
-import { ROUTES, seasonHref, withLang } from '../model/site'
+import { ROUTES, seasonHref, stripLang, withLang } from '../model/site'
 
 /**
  * Вход и выход — серверные действия, а не клиентские хуки Auth.js: так в браузер
@@ -68,10 +68,23 @@ function safeReturnTo(value: unknown): string | null {
  * Куки входа (`state` и PKCE) от этого не теряются: их кладёт сам `signIn`
  * через `cookies()`, а не заголовки редиректа.
  */
-export async function googleLoginUrl(returnTo?: unknown, lang?: unknown): Promise<string> {
+export async function googleLoginUrl(returnTo?: unknown): Promise<string> {
+  /*
+   * Возвращаемся на ту же страницу, но **без языка в адресе**, и это не мелочь.
+   *
+   * Язык в пути `proxy` считает выбором человека и настройке из базы уступает
+   * (см. «Языки» в CLAUDE.md). Вернув `/en/ideas` как есть, мы бы сказали ровно
+   * это — «человек выбрал английский», — и вошедший с русской настройкой так и
+   * остался бы на английском: вход это ведь и есть «заход на сайт», где язык
+   * берётся из базы. Отдаём голый путь — `proxy` подставит язык сам, пометит
+   * это как `auto`, и настройка победит.
+   *
+   * Страницу при этом не теряем: возвращается тот же путь и та же примерка
+   * оформления в `?p=` и `?i=`.
+   */
   return signIn('google', {
     redirect: false,
-    redirectTo: safeReturnTo(returnTo) ?? withLang(knownLang(lang), ROUTES.seasons),
+    redirectTo: stripLang(safeReturnTo(returnTo) ?? ROUTES.seasons),
   })
 }
 

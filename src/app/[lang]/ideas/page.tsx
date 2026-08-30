@@ -66,7 +66,7 @@ export default async function IdeasPage({
               <ul className={styles.grid}>
                 {ideas.map((idea) => (
                   <li className={styles.card} key={idea.code}>
-                    <SeasonPreview idea={idea} lang={lang} />
+                    <SeasonPreview idea={idea} />
                     {/* Названия под превью нет: оно и есть тема месяца,
                         крупно написанная на самом превью, — второй раз
                         повторять её незачем. */}

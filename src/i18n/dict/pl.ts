@@ -396,6 +396,10 @@ export const pl: Dict = {
   },
 
   pages: {
+    seasonGoneTitle: 'Nie ma takiego sezonu',
+    seasonGoneText:
+      'Takiego sezonu u nas nie ma. Autor mógł zdjąć go z witryny albo usunąć całkiem, a link mógł zostać przepisany z błędem.',
+    seasonGoneIdeas: 'Zobacz pomysły społeczności',
     notFoundTitle: 'Nie znaleziono strony',
     notFoundText:
       'Takiego adresu na stronie nie ma. Może link został przepisany z błędem albo sezon usunięto.',

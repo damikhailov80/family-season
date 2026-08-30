@@ -75,9 +75,12 @@ export function PublishDialog({
       >
         <p className={styles.text}>{refusal}</p>
         {/* Ссылка есть не всегда: у снятого с витрины сезона места нет, и
-            вести туда незачем — на витрине его не увидят. */}
+            вести туда незачем — на витрине его не увидят.
+
+            Язык в адресе — выкладываемого сезона: дубль всегда в том же языке,
+            уникальность считается вместе с ним. */}
         {check.code && (
-          <a className={styles.link} href={publicSeasonHref(lang, check.code)}>
+          <a className={styles.link} href={publicSeasonHref(seasonLang, check.code)}>
             {dialogs.publishSeeIt}
           </a>
         )}

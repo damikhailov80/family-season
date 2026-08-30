@@ -11,15 +11,20 @@
   color: var(--ink-soft);
 }
 
-.primary {
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.primary,
+.ghost {
   display: inline-flex;
   align-items: center;
-  margin-top: 20px;
   padding: 12px 20px;
-  border: 1.5px solid var(--accent-deep);
   border-radius: 8px;
-  background: var(--accent-deep);
-  color: var(--on-accent);
   font-family: var(--font-ui);
   font-weight: 700;
   font-size: 14px;
@@ -27,8 +32,25 @@
   text-decoration: none;
 }
 
+.primary {
+  border: 1.5px solid var(--accent-deep);
+  background: var(--accent-deep);
+  color: var(--on-accent);
+}
+
 .primary:hover {
   background: color-mix(in srgb, var(--accent-deep) 85%, #000);
+}
+
+.ghost {
+  border: 1.5px solid var(--sheet-border);
+  background: var(--surface);
+  color: var(--ink-soft);
+}
+
+.ghost:hover {
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
 }
 
 /* Правило «сайтовая обвязка на бумагу не идёт»: печатать 404 незачем. */

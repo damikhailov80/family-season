@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Toast } from '../../../../components/site/Toast'
-import { getDict } from '../../../../i18n/server'
+import { getDict, getLang } from '../../../../i18n/server'
 import { iconSetOrNull } from '../../../../model/icons'
 import { paletteOrNull } from '../../../../model/palettes'
 import { auth } from '../../../../server/auth'
@@ -38,7 +38,12 @@ export default async function PublicSeasonPage({
   const { code } = await params
   // Вход спрашиваем здесь, а не на клиенте: от него зависит, куда ляжет форк, а
   // постер не должен ждать ответа сервера, чтобы нарисовать кнопку.
-  const [decor, state, session] = await Promise.all([searchParams, readPublicSeason(code), auth()])
+  const lang = await getLang()
+  const [decor, state, session] = await Promise.all([
+    searchParams,
+    readPublicSeason(code, lang),
+    auth(),
+  ])
 
   if (state.status === 'missing') notFound()
   if (state.status === 'error') {
