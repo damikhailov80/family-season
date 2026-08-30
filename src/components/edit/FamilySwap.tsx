@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { AvatarFace } from '../AvatarFace'
 import { Dialog } from '../dialog/Dialog'
 import dialogStyles from '../dialog/Dialog.module.css'
-import { FACE_LABELS } from '../../model/accents'
-import { PLACEHOLDERS } from '../../model/labels'
-import { useDoc } from '../../state/docContext'
+import { faceLabels } from '../../model/accents'
+import { useDict } from '../../i18n/context'
+import { fill } from '../../i18n/fill'
+import { useDoc, usePoster } from '../../state/docContext'
 import { useFamilyPreset } from '../../state/useFamilyPreset'
 import styles from './FamilySwap.module.css'
 
@@ -24,9 +25,14 @@ import styles from './FamilySwap.module.css'
  * (рамка, заголовок, ряд кнопок) — общей обвязкой окон.
  */
 export function FamilySwap() {
-  const { template, editing, replacePeople } = useDoc()
+  const { template, editing, replacePeople, lang } = useDoc()
   const family = useFamilyPreset(editing)
   const [open, setOpen] = useState(false)
+  const { dialogs } = useDict()
+  // Имя и подпись рисунка — часть листа, поэтому языком сезона: окно показывает
+  // то, что встанет на постер, а не то, как это называется в интерфейсе.
+  const { placeholders } = usePoster()
+  const faces = faceLabels(lang)
 
   if (!editing || !family) return null
 
@@ -41,12 +47,12 @@ export function FamilySwap() {
   return (
     <>
       <button type="button" className={styles.button} onClick={() => setOpen(true)}>
-        Подставить свою семью
+        {dialogs.familySwap}
       </button>
 
       {open && (
         <Dialog
-          title="Заменить героев на свою семью?"
+          title={dialogs.familyAsk}
           onDismiss={() => setOpen(false)}
           actions={
             <>
@@ -55,17 +61,17 @@ export function FamilySwap() {
                 className={dialogStyles.ghost}
                 onClick={() => setOpen(false)}
               >
-                Отмена
+                {dialogs.cancel}
               </button>
               <button type="button" className={dialogStyles.primary} onClick={apply}>
-                Заменить
+                {dialogs.familyApply}
               </button>
             </>
           }
         >
           <div className={styles.compare}>
             <section className={styles.side}>
-              <h3 className={styles.sideTitle}>Сейчас на постере</h3>
+              <h3 className={styles.sideTitle}>{dialogs.familyNow}</h3>
               <ul className={styles.people}>
                 {people.map((person) => (
                   <li className={styles.person} key={person.id}>
@@ -75,7 +81,7 @@ export function FamilySwap() {
                     >
                       <AvatarFace variant={person.face} size={30} />
                     </span>
-                    <span className={styles.name}>{person.name || PLACEHOLDERS.name}</span>
+                    <span className={styles.name}>{person.name || placeholders.name}</span>
                   </li>
                 ))}
               </ul>
@@ -86,7 +92,7 @@ export function FamilySwap() {
             </span>
 
             <section className={styles.side}>
-              <h3 className={styles.sideTitle}>Станет</h3>
+              <h3 className={styles.sideTitle}>{dialogs.familyNext}</h3>
               <ul className={styles.people}>
                 {family.map((member, index) => (
                   <li className={styles.person} key={index}>
@@ -96,14 +102,14 @@ export function FamilySwap() {
                     >
                       <AvatarFace variant={member.face} size={30} />
                     </span>
-                    <span className={styles.name}>{member.name || FACE_LABELS[member.face]}</span>
+                    <span className={styles.name}>{member.name || faces[member.face]}</span>
                   </li>
                 ))}
               </ul>
             </section>
           </div>
 
-          <p className={dialogStyles.text}>Поменяются только рисунки и имена.</p>
+          <p className={dialogStyles.text}>{dialogs.familyNote}</p>
 
           {/* Ради этой строки окно и заведено: потерю карточек надо видеть заранее.
               Рамка та же, что у «черновик будет затёрт», — это одно и то же
@@ -111,8 +117,8 @@ export function FamilySwap() {
           {dropped > 0 && (
             <p className={dialogStyles.warning}>
               {dropped === 1
-                ? 'Одна нижняя карточка будет удалена.'
-                : `Нижние карточки (${dropped}) будут удалены.`}
+                ? dialogs.familyDropOne
+                : fill(dialogs.familyDropMany, { n: dropped })}
             </p>
           )}
         </Dialog>

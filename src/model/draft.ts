@@ -1,5 +1,6 @@
 import { normalizeTemplate } from './codec'
 import { knownIconSet } from './icons'
+import { knownLang, type Lang } from './lang'
 import { defaultSeasonTitle, normalizeTitle } from './library'
 import { knownPalette } from './palettes'
 import { createEmptyTemplate } from './templates'
@@ -35,6 +36,13 @@ export interface Draft {
   palette: PaletteId
   iconSet: IconSetId
   /**
+   * Язык сезона: им подписан сам лист. Лежит рядом с темой и набором рисунков,
+   * а не внутри бланка, — ровно как у строки в базе лежит колонка `language`.
+   * Язык интерфейса ему не указ: переключив сайт, человек не переписывает
+   * набранный черновик.
+   */
+  lang: Lang
+  /**
    * Когда записан в последний раз. Единственное поле, которое приходится хранить:
    * месяц и тему список выводит из самого бланка, а дату вывести неоткуда.
    */
@@ -42,22 +50,20 @@ export interface Draft {
 }
 
 /**
- * А это уже про потерю набранного, и говорится только когда черновик есть.
- * Название называем: «черновик будет затёрт» человек проверить не может, а
- * «„Сентябрь у бабушки“ будет затёрт» — может.
+ * Пустой бланк — с него начинается черновик, которого ещё нет.
+ *
+ * Слова о том, что прежний черновик будет затёрт, живут в словаре
+ * (`dialogs.draftWillBeLost`): окон заведения два, и вторая копия текста
+ * разошлась бы с первой.
  */
-export function draftWillBeLost(title: string): string {
-  return `Без входа можно вести только один сезон. Черновик «${title}» будет заменён новым.`
-}
-
-/** Пустой бланк — с него начинается черновик, которого ещё нет. */
-export function emptyDraft(): Draft {
+export function emptyDraft(lang: Lang): Draft {
   const template = createEmptyTemplate()
   return {
-    title: defaultSeasonTitle(template),
+    title: defaultSeasonTitle(template, lang),
     template,
     palette: knownPalette(null),
     iconSet: knownIconSet(null),
+    lang,
     savedAt: Date.now(),
   }
 }
@@ -102,13 +108,17 @@ export function parseDraft(raw: string | null): Draft | null {
     if (!raw) return null
     const saved = JSON.parse(raw) as Partial<Draft>
     const template = normalizeTemplate(saved?.template)
+    // Черновик, записанный до появления языков, получает русский — тот
+    // единственный, на котором его и собирали.
+    const lang = knownLang(saved?.lang)
     return {
       // Черновики, записанные до появления имени, получают его на месте — то же
       // самое, каким его подставит окно заведения.
-      title: normalizeTitle(saved?.title, defaultSeasonTitle(template)),
+      title: normalizeTitle(saved?.title, defaultSeasonTitle(template, lang)),
       template,
       palette: knownPalette(saved?.palette),
       iconSet: knownIconSet(saved?.iconSet),
+      lang,
       savedAt: typeof saved?.savedAt === 'number' ? saved.savedAt : Date.now(),
     }
   } catch {

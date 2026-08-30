@@ -1,8 +1,9 @@
 'use server'
 
+import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
-import { readFamily, writeFamily, type FamilyStatus } from './settings'
+import { readFamily, writeFamily, writeLanguage, type FamilyStatus } from './settings'
 import {
   addReport,
   noteFork,
@@ -29,9 +30,11 @@ import {
 } from '../model/community'
 import { normalizeFamily, templateForFamily } from '../model/family'
 import { DEFAULT_ICON_SET, knownIconSet } from '../model/icons'
+import { knownLang, LANG_COOKIE, LANG_COOKIE_MAX_AGE } from '../model/lang'
+import { posterText } from '../model/labels'
 import { defaultSeasonTitle, normalizeTitle, type LibraryStatus } from '../model/library'
 import { DEFAULT_PALETTE, knownPalette } from '../model/palettes'
-import { ROUTES, seasonHref } from '../model/site'
+import { ROUTES, seasonHref, withLang } from '../model/site'
 
 /**
  * Вход и выход — серверные действия, а не клиентские хуки Auth.js: так в браузер
@@ -65,16 +68,48 @@ function safeReturnTo(value: unknown): string | null {
  * Куки входа (`state` и PKCE) от этого не теряются: их кладёт сам `signIn`
  * через `cookies()`, а не заголовки редиректа.
  */
-export async function googleLoginUrl(returnTo?: unknown): Promise<string> {
+export async function googleLoginUrl(returnTo?: unknown, lang?: unknown): Promise<string> {
   return signIn('google', {
     redirect: false,
-    redirectTo: safeReturnTo(returnTo) ?? ROUTES.seasons,
+    redirectTo: safeReturnTo(returnTo) ?? withLang(knownLang(lang), ROUTES.seasons),
   })
 }
 
-export async function logout() {
+export async function logout(lang: unknown) {
   // А после выхода — на лендинг: кабинет уже закрыт, показывать нечего.
-  await signOut({ redirectTo: ROUTES.home })
+  // Язык переживает выход: он свойство браузера, а не сессии.
+  await signOut({ redirectTo: withLang(knownLang(lang), ROUTES.home) })
+}
+
+/**
+ * Язык из кабинета: пишем и в базу, и в куку.
+ *
+ * Кука здесь обязательна. Она — то, чем `proxy` пользуется на пути без языка, и
+ * оставить её со старым значением значило бы, что человек сменил язык, а голый
+ * `/` по-прежнему уводит его на прежний. Действия — единственное место, кроме
+ * `proxy`, где куку вообще можно поставить.
+ */
+export async function saveLanguage(value: unknown): Promise<Exclude<FamilyStatus, 'ok'>> {
+  const lang = knownLang(value)
+  const outcome = await writeLanguage(lang)
+  if (outcome !== 'ok') return outcome
+
+  const jar = await cookies()
+  jar.set(LANG_COOKIE, lang, { path: '/', maxAge: LANG_COOKIE_MAX_AGE, sameSite: 'lax' })
+  redirect(`${withLang(lang, ROUTES.account)}?ok=1`)
+}
+
+/**
+ * Язык определился по браузеру, а в настройках его ещё нет — записываем.
+ *
+ * Это и есть «при создании нового пользователя язык определяется по региону»:
+ * таблицы пользователей у нас нет, и «создание» — первая строка `user_settings`.
+ * Зовёт действие клиентский `LangSync` из корневого лейаута, ровно как
+ * `DraftClaimer` зовёт разбор черновика: серверный компонент писать в базу при
+ * рендере не имеет права, а действие — имеет.
+ */
+export async function rememberLanguage(value: unknown): Promise<void> {
+  await writeLanguage(knownLang(value))
 }
 
 /**
@@ -95,9 +130,12 @@ export async function logout() {
  * а набранного состава у сервера нет — он молча пропал бы, и повторять было бы
  * нечего. Поэтому статус возвращаем, и форма показывает его, не теряя ввод.
  */
-export async function saveFamily(family: unknown): Promise<Exclude<FamilyStatus, 'ok'>> {
+export async function saveFamily(
+  family: unknown,
+  lang: unknown,
+): Promise<Exclude<FamilyStatus, 'ok'>> {
   const outcome = await writeFamily(normalizeFamily(family))
-  if (outcome === 'ok') redirect(`${ROUTES.account}?ok=1`)
+  if (outcome === 'ok') redirect(`${withLang(knownLang(lang), ROUTES.account)}?ok=1`)
   return outcome
 }
 
@@ -131,13 +169,18 @@ export async function storeSeason(
     template?: unknown
     palette?: unknown
     iconSet?: unknown
+    lang?: unknown
     from?: unknown
   }
+  // Язык копируется вместе с бланком: форкают то, что видят на экране, а
+  // подписи листа — часть увиденного.
+  const lang = knownLang(raw.lang)
   const created = await createUserSeason({
-    title: normalizeTitle(raw.title),
+    title: normalizeTitle(raw.title, posterText(lang).untitled),
     template: normalizeTemplate(raw.template),
     palette: knownPalette(raw.palette),
     iconSet: knownIconSet(raw.iconSet),
+    lang,
   })
 
   if (created.status === 'ok' && typeof raw.from === 'string') await noteFork(raw.from)
@@ -156,17 +199,19 @@ export async function storeSeason(
  * Неудача уезжает пометкой в адрес кабинета: страница всё равно перерисуется, а
  * рассказать о ней надо — молча вернуть человека «никуда» нельзя.
  */
-export async function createSeason(title: unknown) {
+export async function createSeason(title: unknown, value: unknown) {
+  const lang = knownLang(value)
   const family = await readFamily()
   const template = templateForFamily(family ?? [])
   const result = await createUserSeason({
     template,
-    title: normalizeTitle(title, defaultSeasonTitle(template)),
+    title: normalizeTitle(title, defaultSeasonTitle(template, lang)),
     palette: DEFAULT_PALETTE,
     iconSet: DEFAULT_ICON_SET,
+    lang,
   })
-  if (result.status === 'ok' && result.code) redirect(seasonHref(result.code, 'edit'))
-  redirect(`${ROUTES.seasons}?add=${result.status}`)
+  if (result.status === 'ok' && result.code) redirect(seasonHref(lang, result.code, 'edit'))
+  redirect(`${withLang(lang, ROUTES.seasons)}?add=${result.status}`)
 }
 
 /**
@@ -192,9 +237,14 @@ export async function saveSeason(
  * ровно потому, что кончается значением, а не редиректом: название правят прямо
  * в панели, постер под ней никуда не уходит и перерисовывать страницу незачем.
  */
-export async function renameSeason(code: unknown, title: unknown): Promise<LibraryStatus> {
+export async function renameSeason(
+  code: unknown,
+  title: unknown,
+  lang: unknown,
+): Promise<LibraryStatus> {
   if (typeof code !== 'string') return 'error'
-  return renameUserSeason(code, normalizeTitle(title))
+  const seasonLang = knownLang(lang)
+  return renameUserSeason(code, normalizeTitle(title, posterText(seasonLang).untitled), seasonLang)
 }
 
 /**
@@ -207,9 +257,10 @@ export async function renameSeason(code: unknown, title: unknown): Promise<Libra
 export async function shareSeason(
   code: unknown,
   anonymize: unknown,
+  lang: unknown,
 ): Promise<{ status: PublishStatus; code?: string; fresh?: boolean }> {
   if (typeof code !== 'string') return { status: 'error' }
-  return publishSeason(code, Boolean(anonymize))
+  return publishSeason(code, Boolean(anonymize), knownLang(lang))
 }
 
 /**
@@ -218,9 +269,10 @@ export async function shareSeason(
  */
 export async function previewShare(
   code: unknown,
+  lang: unknown,
 ): Promise<{ status: PublishStatus; code?: string }> {
   if (typeof code !== 'string') return { status: 'error' }
-  return previewPublish(code)
+  return previewPublish(code, knownLang(lang))
 }
 
 /** Убрать свою публикацию с витрины. Что с ней станет — решает `withdrawPublic`. */
@@ -283,9 +335,17 @@ export async function reportSeason(code: unknown, comment: unknown): Promise<Rea
  * компоненте, но привязанные аргументы уезжают в браузер и возвращаются оттуда —
  * поэтому проверяются наравне со всем остальным, включая адрес возврата.
  */
-export async function renameEntry(code: unknown, back: unknown, title: unknown) {
-  if (typeof code === 'string') await renameUserSeason(code, normalizeTitle(title))
-  redirect(safeReturnTo(back) ?? ROUTES.seasons)
+export async function renameEntry(
+  code: unknown,
+  back: unknown,
+  title: unknown,
+  lang: unknown,
+) {
+  const seasonLang = knownLang(lang)
+  if (typeof code === 'string') {
+    await renameUserSeason(code, normalizeTitle(title, posterText(seasonLang).untitled), seasonLang)
+  }
+  redirect(safeReturnTo(back) ?? withLang(seasonLang, ROUTES.seasons))
 }
 
 /**
@@ -293,15 +353,15 @@ export async function renameEntry(code: unknown, back: unknown, title: unknown) 
  * `withdrawSeason` ровно потому, что кончается редиректом, а не значением:
  * списку надо перерисоваться и пережить перезагрузку.
  */
-export async function withdrawEntry(code: unknown, back: unknown) {
+export async function withdrawEntry(code: unknown, back: unknown, lang: unknown) {
   if (typeof code === 'string') await withdrawPublic(code)
-  redirect(safeReturnTo(back) ?? `${ROUTES.seasons}?tab=published`)
+  redirect(safeReturnTo(back) ?? `${withLang(knownLang(lang), ROUTES.seasons)}?tab=published`)
 }
 
 /** Вернуть публикацию на витрину **со страницы списка** — та же пара, что выше. */
-export async function republishEntry(code: unknown, back: unknown) {
+export async function republishEntry(code: unknown, back: unknown, lang: unknown) {
   if (typeof code === 'string') await republishPublic(code)
-  redirect(safeReturnTo(back) ?? `${ROUTES.seasons}?tab=published`)
+  redirect(safeReturnTo(back) ?? `${withLang(knownLang(lang), ROUTES.seasons)}?tab=published`)
 }
 
 /**
@@ -309,12 +369,12 @@ export async function republishEntry(code: unknown, back: unknown) {
  * кончается **редиректом**, а не значением: списку надо перерисоваться и пережить
  * перезагрузку. То же различие, что у `storeSeason` и `dropEntry`.
  */
-export async function unfavoriteEntry(code: unknown, back: unknown) {
+export async function unfavoriteEntry(code: unknown, back: unknown, lang: unknown) {
   if (typeof code === 'string') await setFavorite(code, false)
-  redirect(safeReturnTo(back) ?? ROUTES.seasons)
+  redirect(safeReturnTo(back) ?? withLang(knownLang(lang), ROUTES.seasons))
 }
 
-export async function dropEntry(code: unknown, back: unknown) {
+export async function dropEntry(code: unknown, back: unknown, lang: unknown) {
   if (typeof code === 'string') await removeUserSeason(code)
-  redirect(safeReturnTo(back) ?? ROUTES.seasons)
+  redirect(safeReturnTo(back) ?? withLang(knownLang(lang), ROUTES.seasons))
 }

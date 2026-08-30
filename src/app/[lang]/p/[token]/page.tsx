@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Toast } from '../../../components/site/Toast'
-import { auth } from '../../../server/auth'
-import { readSharedSeason } from '../../../server/userSeasons'
+import { Toast } from '../../../../components/site/Toast'
+import { getDict } from '../../../../i18n/server'
+import { auth } from '../../../../server/auth'
+import { readSharedSeason } from '../../../../server/userSeasons'
 import { SharedSeason } from './SharedSeason'
 
-export const metadata: Metadata = {
-  title: 'Сезон по ссылке — Семейный сезон',
-  description: 'Семейный сезон, которым с вами поделились: посмотрите и заберите себе.',
+export async function generateMetadata(): Promise<Metadata> {
+  const { pages } = await getDict()
+  return { title: pages.sharedTitle, description: pages.sharedDescription }
 }
 
 /**
@@ -30,7 +31,8 @@ export default async function SharedSeasonPage({
 
   if (state.status === 'missing' || state.status === 'anonymous') notFound()
   if (state.status === 'error') {
-    return <Toast message="Не удалось открыть сезон — ошибка на сервере." />
+    const { pages } = await getDict()
+    return <Toast message={pages.sharedError} />
   }
   return <SharedSeason season={state.season} signedIn={Boolean(session?.user)} />
 }

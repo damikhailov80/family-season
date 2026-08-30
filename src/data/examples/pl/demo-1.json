@@ -1,0 +1,92 @@
+{
+  "name": "Miesiąc Spider-Mana",
+  "summary": "Osiem filmów po kolei, trzy epoki i jeden spór: czyj Spider-Man jest nasz.",
+  "note": "we czworo · sezon przeżyty do końca",
+  "palette": "greece",
+  "icons": "classic",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasza rodzina. Nasze wieczory. Nasze historie."
+    },
+    "theme": {
+      "subtitle": "Miesiąc Spider-Mana",
+      "question": "Czyj Spider-Man okazał się naszym?"
+    },
+    "weeksNote": "4 tygodnie – 8 filmów – jeden bohater",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Tobey Maguire: trzy filmy, wieczór po wieczorze"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Andrew Garfield: dwie części w weekend"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Tom Holland: dwie części wieczorami"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Tom Holland: finał, w którym są wszyscy trzej"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Obejrzeć wszystkie filmy o Spider-Manie i wybrać tego naszego.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Porządkuję garaż",
+        "description": "Jedna półka w każdy weekend",
+        "goal": "Dojść do dalekiego kąta"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Czytam wieczorami",
+        "description": "Dwadzieścia stron zamiast przewijania",
+        "goal": "Skończyć to, co zaczęłam wiosną"
+      },
+      {
+        "id": "p3",
+        "name": "Alek",
+        "face": "son",
+        "project": "Drążek na podwórku",
+        "description": "Co drugi dzień, bez rekordów",
+        "goal": "O dwa razy więcej niż na początku"
+      },
+      {
+        "id": "p4",
+        "name": "Liza",
+        "face": "daughter",
+        "project": "Rysuję codziennie",
+        "description": "Jeden szkic przed snem",
+        "goal": "Nie opuścić więcej niż trzech dni"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 40,
+      "p2": 60,
+      "p3": 70,
+      "p4": 50
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggyg",
+      "p2": "gygggyygggryggygg",
+      "p3": "ggggyggyggggyyggg",
+      "p4": "gyrggygggyryggygg"
+    },
+    "summaryAnswer": "— Trylogię z lat dwutysięcznych oglądaliśmy trzy wieczory i spieraliśmy się o najstraszniejszego złoczyńcę.\n— Liza zasnęła w połowie drugiego filmu, a rano kazała sobie wszystko opowiedzieć.\n— Alek wszedł na ścianę w korytarzu i zerwał wieszak: kostium był z prześcieradła.\n— Ostatniego wieczoru każdy wybrał swojego: troje było zgodnych, tata został przy swoim.",
+    "nextIdeas": "— Miesiąc planszówek: w każdy piątek nowa gra, zwycięzca wybiera deser.\n— Wyprawa do lasu na grzyby, termos i kanapki w plecaku.\n— Zrobić album ze zdjęciami z miesiąca i podpisać każde odręcznie.\n— Upiec ciasto według przepisu babci — wszyscy razem, bez podpowiedzi.",
+    "photos": {
+      "0": "/examples/demo-1/week-1.svg",
+      "1": "/examples/demo-1/week-2.svg"
+    }
+  }
+}

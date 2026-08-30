@@ -1,0 +1,39 @@
+.langs {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.lang {
+  color: var(--ink-muted);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink-muted) 35%, transparent);
+}
+
+.lang:hover {
+  color: var(--ink-soft);
+  border-bottom-color: var(--ink-soft);
+}
+
+.lang:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/*
+ * Текущий язык остаётся ссылкой, но подчёркивания у него нет: подчёркнутое
+ * зовёт нажать, а нажимать тут нечего — человек уже здесь.
+ */
+.lang[aria-current='true'] {
+  color: var(--ink-soft);
+  font-weight: 700;
+  border-bottom-color: transparent;
+}
+
+/* Правило «сайтовая обвязка на бумагу не идёт»: подвал и так скрыт, но
+   переключатель прячем сразу — иначе он всплывёт при первом же переносе. */
+@media print {
+  .langs {
+    display: none;
+  }
+}

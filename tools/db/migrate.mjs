@@ -26,6 +26,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import pg from 'pg'
+import { dbTarget } from './target.mjs'
 
 const url = process.env.DATABASE_URL
 if (!url) {
@@ -38,16 +39,6 @@ if (!url) {
 
 const statusOnly = process.argv.includes('--status')
 
-/** Куда именно едем — без пользователя и пароля. */
-function target(value) {
-  try {
-    const parsed = new URL(value)
-    return `${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}${parsed.pathname}`
-  } catch {
-    return 'адрес не разобрался'
-  }
-}
-
 const here = dirname(fileURLToPath(import.meta.url))
 const dir = join(here, 'migrations')
 // Порядок — имя файла: нумерация для того и нужна.
@@ -56,7 +47,7 @@ const steps = readdirSync(dir)
   .sort()
 
 // Печатаем до подключения: это единственная защита от «накатил не на ту базу».
-console.log(`База ${target(url)}, шагов в папке: ${steps.length}`)
+console.log(`База ${dbTarget(url)}, шагов в папке: ${steps.length}`)
 
 const client = new pg.Client({ connectionString: url })
 try {

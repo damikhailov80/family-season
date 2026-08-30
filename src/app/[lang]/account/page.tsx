@@ -1,20 +1,24 @@
 import type { Metadata } from 'next'
-import { PaperSheet } from '../../components/PaperSheet'
-import { SectionBox } from '../../components/SectionBox'
-import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
-import { NewSeasonAction } from '../../components/site/NewSeasonAction'
-import { DEFAULT_FAMILY } from '../../model/family'
-import { MAX_PEOPLE, MIN_PEOPLE } from '../../model/types'
-import { auth } from '../../server/auth'
-import { logout } from '../../server/actions'
-import { familyState } from '../../server/settings'
-import { Toast } from '../../components/site/Toast'
+import { PaperSheet } from '../../../components/PaperSheet'
+import { SectionBox } from '../../../components/SectionBox'
+import { GoogleLoginButton } from '../../../components/site/GoogleLoginButton'
+import { NewSeasonAction } from '../../../components/site/NewSeasonAction'
+import { getDict, getLang } from '../../../i18n/server'
+import { fill } from '../../../i18n/fill'
+import { DEFAULT_FAMILY } from '../../../model/family'
+import { DEFAULT_LANG } from '../../../model/lang'
+import { MAX_PEOPLE, MIN_PEOPLE } from '../../../model/types'
+import { auth } from '../../../server/auth'
+import { logout } from '../../../server/actions'
+import { familyState } from '../../../server/settings'
+import { Toast } from '../../../components/site/Toast'
 import { FamilyEditor } from './FamilyEditor'
+import { LanguageEditor } from './LanguageEditor'
 import styles from './page.module.css'
 
-export const metadata: Metadata = {
-  title: 'Кабинет — Семейный сезон',
-  description: 'Настройки аккаунта: язык, состав семьи для новых постеров, выход.',
+export async function generateMetadata(): Promise<Metadata> {
+  const { account } = await getDict()
+  return { title: account.title, description: account.description }
 }
 
 /**
@@ -35,22 +39,22 @@ export default async function AccountPage({
    */
   searchParams: Promise<{ ok?: string }>
 }) {
+  const lang = await getLang()
+  const dict = await getDict()
+  const { account } = dict
   const session = await auth()
   const who = session?.user?.name || session?.user?.email
 
   if (!who) {
     return (
       <PaperSheet>
-        <SectionBox accent="deep" label="Кабинет" className={styles.section}>
-          <h1 className={styles.title}>Настройки — для своих</h1>
-          <p className={styles.text}>
-            Здесь живут язык и состав семьи, с которым открываются новые постеры. Чтобы
-            настройки было к чему привязать, нужно войти.
-          </p>
+        <SectionBox accent="deep" label={account.heading} className={styles.section}>
+          <h1 className={styles.title}>{account.signedOutTitle}</h1>
+          <p className={styles.text}>{account.signedOutText}</p>
           <div className={styles.login}>
             <GoogleLoginButton />
           </div>
-          <NewSeasonAction className={styles.primary}>Собрать свой сезон</NewSeasonAction>
+          <NewSeasonAction className={styles.primary}>{account.newSeason}</NewSeasonAction>
         </SectionBox>
       </PaperSheet>
     )
@@ -61,7 +65,7 @@ export default async function AccountPage({
 
   return (
     <PaperSheet>
-      <SectionBox accent="deep" label="Кабинет" className={styles.section}>
+      <SectionBox accent="deep" label={account.heading} className={styles.section}>
         <h1 className={styles.title}>{who}</h1>
         {session?.user?.email && session.user.name && (
           <p className={styles.sub}>{session.user.email}</p>
@@ -71,30 +75,30 @@ export default async function AccountPage({
             пометка в адресе переживает перезагрузку, а состояние базы — нет. */}
         {flags.ok && state.status === 'ok' && (
           <p className={styles.saved} role="status">
-            Сохранено ✓
+            {account.saved}
           </p>
         )}
         {state.status === 'stale' && (
           <div className={styles.warn} role="status">
-            <p>
-              Вход был выполнен до того, как появились настройки, поэтому привязать их не к чему.
-              Достаточно войти заново — это нужно один раз.
-            </p>
+            <p>{account.staleNote}</p>
             {/* Кнопка, а не совет «нажмите Выйти внизу»: чинится одним кликом. */}
-            <GoogleLoginButton label="Войти заново" />
+            <GoogleLoginButton label={dict.site.loginAgain} />
           </div>
         )}
 
-        <h2 className={styles.head}>Язык</h2>
-        <p className={styles.text}>
-          Русский. Других языков пока нет — появятся, и здесь будет из чего выбрать.
-        </p>
+        <h2 className={styles.head}>{account.langHead}</h2>
+        <p className={styles.text}>{account.langText}</p>
 
-        <h2 className={styles.head}>Семья для новых постеров</h2>
-        <p className={styles.text}>
-          С этими героями будет открываться «Новый сезон». Уже заведённые сезоны настройка
-          не трогает.
-        </p>
+        {/* Настройку показываем, только когда её и правда прочитали — то же
+            правило, что у состава: умолчание выдало бы себя за выбор человека.
+            Пока выбора не было, показываем язык текущего адреса: он и есть то,
+            что человек видит, и `LangSync` уже записал его в базу. */}
+        {state.status === 'ok' && (
+          <LanguageEditor initial={state.language ?? lang} key={state.language ?? DEFAULT_LANG} />
+        )}
+
+        <h2 className={styles.head}>{account.familyHead}</h2>
+        <p className={styles.text}>{account.familyText}</p>
 
         {/* Редактор — только когда состав прочитан. Не прочитан — здесь пусто:
             умолчание выдало бы себя за настоящие настройки, а «Сохранить» —
@@ -109,22 +113,19 @@ export default async function AccountPage({
             />
 
             <p className={styles.hint}>
-              Клик по рисунку меняет героя. От {MIN_PEOPLE} до {MAX_PEOPLE} человек, имена
-              можно не заполнять.
+              {fill(account.familyHint, { min: MIN_PEOPLE, max: MAX_PEOPLE })}
             </p>
           </>
         )}
 
         {/* Об ошибке сервера говорит тост, и только он: отдельной страницы-
             заглушки под отказ базы нет — механизм на весь сайт один. */}
-        {state.status === 'error' && (
-          <Toast message="Не удалось загрузить настройки — ошибка на сервере." />
-        )}
+        {state.status === 'error' && <Toast message={account.error} />}
 
-        <h2 className={styles.head}>Выход</h2>
-        <form action={logout}>
+        <h2 className={styles.head}>{account.logoutHead}</h2>
+        <form action={logout.bind(null, lang)}>
           <button type="submit" className={styles.ghost}>
-            Выйти
+            {account.logout}
           </button>
         </form>
       </SectionBox>

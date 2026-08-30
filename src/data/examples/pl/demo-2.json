@@ -1,0 +1,81 @@
+{
+  "name": "Miesiąc planszówek",
+  "summary": "Wyciągamy klasykę, uczymy się nowej gry, zapraszamy znajomych i gramy z babcią.",
+  "note": "we troje · sezon w pełni",
+  "palette": "jewel",
+  "icons": "holiday",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasze dni. Nasze weekendy. Nasze wspomnienia."
+    },
+    "theme": {
+      "subtitle": "Miesiąc planszówek",
+      "question": "Która gra została w rodzinie na zawsze?"
+    },
+    "weeksNote": "4 tygodnie – 4 gry – 4 wieczory",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Klasyka: wyciągamy wszystko, w co graliśmy"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Nowa gra: wybieramy razem i uczymy się zasad"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Znajomi u nas: gramy w dużym gronie"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Uczymy babcię: tłumaczymy i gramy razem"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Znaleźć grę, w którą zechcemy zagrać znowu, i zebrać przy stole wszystkich, kogo się da.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Uczę się angielskiego",
+        "description": "Dwadzieścia minut dziennie, bez opuszczania",
+        "goal": "Przeczytać książkę bez słownika"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Dziennik kulinarny",
+        "description": "Zapisuję każdą kolację: co wyszło, a co nie",
+        "goal": "Cztery przepisy, które zostaną na zawsze"
+      },
+      {
+        "id": "p3",
+        "name": "Dasza",
+        "face": "daughter",
+        "project": "Kostka Rubika",
+        "description": "Uczę się formuł po jednej i układam co wieczór",
+        "goal": "Ułożyć całą bez podpowiedzi"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 45,
+      "p2": 60,
+      "p3": 80
+    },
+    "moods": {
+      "p1": "ggyggygrggyggy",
+      "p2": "gggyggggyggggg",
+      "p3": "gygggggyggrggg"
+    },
+    "summaryAnswer": "— Pierwsza partia przeciągnęła się do północy: nikt nie wstał od stołu, póki nie skończyliśmy.\n— Dasza wygrała z nami dwa razy pod rząd i tłumaczy zasady lepiej niż tata.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-2/week-1.svg"
+    }
+  }
+}

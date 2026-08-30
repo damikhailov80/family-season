@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { Dialog } from '../dialog/Dialog'
 import styles from '../dialog/Dialog.module.css'
+import { useDict } from '../../i18n/context'
 import { TITLE_LIMIT } from '../../model/library'
 
 /**
@@ -37,6 +38,7 @@ export function NewSeasonDialog({
   onSubmit: (title: string) => void
 }) {
   const input = useRef<HTMLInputElement>(null)
+  const { dialogs } = useDict()
 
   return (
     // Esc и клик по подложке закрывают окно и оставляют всё как было.
@@ -46,7 +48,7 @@ export function NewSeasonDialog({
       actions={
         <>
           <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
-            Отмена
+            {dialogs.cancel}
           </button>
           <button
             type="button"
@@ -54,7 +56,7 @@ export function NewSeasonDialog({
             onClick={() => onSubmit(input.current?.value ?? initialTitle)}
             disabled={busy}
           >
-            {busy ? 'Заводим…' : 'Готово'}
+            {busy ? dialogs.creating : dialogs.done}
           </button>
         </>
       }
@@ -62,7 +64,7 @@ export function NewSeasonDialog({
       {warning && <p className={styles.warning}>{warning}</p>}
 
       <label className={styles.label} htmlFor="season-title">
-        Название
+        {dialogs.titleLabel}
       </label>
       <input
         className={styles.input}

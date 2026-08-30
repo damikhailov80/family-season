@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { FlagDoodle } from '../../components/doodles'
-import { LoginDialog } from '../../components/edit/LoginDialog'
-import { ReportDialog } from '../../components/edit/ReportDialog'
-import { Toast } from '../../components/site/Toast'
-import { REACTION_TEXT } from '../../model/community'
-import { reportSeason } from '../../server/actions'
+import { FlagDoodle } from '../../../components/doodles'
+import { LoginDialog } from '../../../components/edit/LoginDialog'
+import { ReportDialog } from '../../../components/edit/ReportDialog'
+import { Toast } from '../../../components/site/Toast'
+import { useDict, useLang } from '../../../i18n/context'
+import { fill } from '../../../i18n/fill'
+import { reactionText } from '../../../model/community'
+import { reportSeason } from '../../../server/actions'
 import styles from './page.module.css'
 
 /**
@@ -36,6 +38,8 @@ export function ReportEntry({
   title: string
   signedIn: boolean
 }) {
+  const lang = useLang()
+  const { ideas } = useDict()
   const [open, setOpen] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -54,11 +58,11 @@ export function ReportEntry({
       return
     }
     if (status !== 'ok') {
-      setNotice({ text: REACTION_TEXT[status], at: Date.now() })
+      setNotice({ text: reactionText(lang, status), at: Date.now() })
       return
     }
     setSent(true)
-    setNotice({ text: 'Жалоба отправлена', at: Date.now() })
+    setNotice({ text: ideas.reportSent, at: Date.now() })
   }
 
   return (
@@ -69,8 +73,8 @@ export function ReportEntry({
         onClick={() => (signedIn ? setOpen(true) : setLoginOpen(true))}
         disabled={busy}
         aria-pressed={sent}
-        title={`Пожаловаться на «${title}»`}
-        aria-label={`Пожаловаться на «${title}»`}
+        title={fill(ideas.reportOne, { title })}
+        aria-label={fill(ideas.reportOne, { title })}
       >
         <FlagDoodle size={16} filled={sent} strokeWidth={4} />
       </button>

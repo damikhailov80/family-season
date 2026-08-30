@@ -1,7 +1,10 @@
+import { getDict } from '../../i18n/server'
 import { FamilyIcon, HeartDoodle, SparkleRays } from '../doodles'
 import styles from './Hero.module.css'
 
-export function Hero() {
+export async function Hero() {
+  const { landing } = await getDict()
+
   return (
     <section className={styles.hero}>
       <HeartDoodle className={styles.heart} size={44} />
@@ -9,18 +12,15 @@ export function Hero() {
 
       <div className={styles.titleRow}>
         <SparkleRays className={styles.rays} />
-        <h1 className={styles.title}>Семейный сезон</h1>
+        <h1 className={styles.title}>{landing.heroTitle}</h1>
         <SparkleRays className={`${styles.rays} ${styles.raysRight}`} />
       </div>
 
-      <p className={styles.ribbon}>Новый сезон каждый месяц</p>
+      <p className={styles.ribbon}>{landing.heroRibbon}</p>
 
-      <p className={styles.lead}>
-        Постер следующего месяца вашей семьи: чем займётесь, что попробуете, куда сходите и кто
-        за что взялся. Соберите его заранее, распечатайте и повесьте на холодильник.
-      </p>
+      <p className={styles.lead}>{landing.heroLead}</p>
 
-      <p className={styles.hand}>Не список дел, а афиша: месяц, который хочется прожить.</p>
+      <p className={styles.hand}>{landing.heroHand}</p>
 
       {/*
        * Ссылка, а не кнопка: примеры лежат ниже на этой же странице, никакого
@@ -28,7 +28,7 @@ export function Hero() {
        * и она работает без JS.
        */}
       <a className={styles.jump} href="#examples">
-        Посмотреть примеры ↓
+        {landing.heroJump}
       </a>
     </section>
   )

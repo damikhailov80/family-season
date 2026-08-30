@@ -1,5 +1,4 @@
-import { PLACEHOLDERS } from '../model/labels'
-import { useDoc } from '../state/docContext'
+import { useDoc, usePoster } from '../state/docContext'
 import { SparkleRays } from './doodles'
 import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
@@ -7,6 +6,7 @@ import styles from './Header.module.css'
 
 export function Header() {
   const { field } = useDoc()
+  const { placeholders } = usePoster()
 
   return (
     <header className={styles.header}>
@@ -18,7 +18,7 @@ export function Header() {
         <EditableText
           as="h1"
           className={styles.title}
-          placeholder={PLACEHOLDERS.title}
+          placeholder={placeholders.title}
           {...field('header.title')}
         />
         <SparkleRays className={`${styles.rays} ${styles.raysRight}`} />
@@ -28,7 +28,7 @@ export function Header() {
       <EditableText
         as="p"
         className={styles.ribbon}
-        placeholder={PLACEHOLDERS.ribbon}
+        placeholder={placeholders.ribbon}
         {...field('header.ribbon')}
       />
     </header>

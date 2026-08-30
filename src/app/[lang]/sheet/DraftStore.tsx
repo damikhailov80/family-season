@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect } from 'react'
-import { writeDraft } from '../../model/draft'
-import { useDoc } from '../../state/docContext'
+import type { Lang } from '../../../model/lang'
+import { writeDraft } from '../../../model/draft'
+import { useDoc } from '../../../state/docContext'
 
 /** Столько же, сколько ждёт автосохранение своего сезона. */
 const SAVE_DELAY = 400
@@ -17,15 +18,19 @@ const SAVE_DELAY = 400
  * открыл, — уже черновик, и после перезагрузки он должен остаться тем же.
  *
  * Имя черновика правится не здесь, а в списке, поэтому оно приходит пропом:
- * контекст постера знает только про бланк.
+ * контекст постера знает только про бланк. Язык — тем же путём и по той же
+ * причине: он свойство черновика, а не бланка, и правке не подлежит.
  */
-export function DraftStore({ title }: { title: string }) {
+export function DraftStore({ title, lang }: { title: string; lang: Lang }) {
   const { template, palette, iconSet } = useDoc()
 
   useEffect(() => {
-    const timer = setTimeout(() => writeDraft({ title, template, palette, iconSet }), SAVE_DELAY)
+    const timer = setTimeout(
+      () => writeDraft({ title, template, palette, iconSet, lang }),
+      SAVE_DELAY,
+    )
     return () => clearTimeout(timer)
-  }, [title, template, palette, iconSet])
+  }, [title, template, palette, iconSet, lang])
 
   return null
 }

@@ -1,14 +1,16 @@
 'use client'
 
 import { useMemo, useRef, useState, useSyncExternalStore } from 'react'
-import { Dialog } from '../../components/dialog/Dialog'
-import dialogStyles from '../../components/dialog/Dialog.module.css'
-import { PenDoodle } from '../../components/doodles'
-import { monthName } from '../../model/calendar'
-import { clearDraft, draftSnapshot, parseDraft, subscribeDraft, writeDraft } from '../../model/draft'
-import { EMPTY_LIST, savedOn, TITLE_LIMIT } from '../../model/library'
-import { PALETTE_LABELS } from '../../model/palettes'
-import { ROUTES } from '../../model/site'
+import { Dialog } from '../../../components/dialog/Dialog'
+import dialogStyles from '../../../components/dialog/Dialog.module.css'
+import { PenDoodle } from '../../../components/doodles'
+import { useDict, useLang } from '../../../i18n/context'
+import { fill } from '../../../i18n/fill'
+import { monthInText, monthName } from '../../../model/calendar'
+import { clearDraft, draftSnapshot, parseDraft, subscribeDraft, writeDraft } from '../../../model/draft'
+import { savedOn, TITLE_LIMIT } from '../../../model/library'
+import { paletteLabel } from '../../../model/palettes'
+import { sheetHref } from '../../../model/site'
 import styles from './page.module.css'
 
 /**
@@ -33,6 +35,9 @@ import styles from './page.module.css'
  * возвращаться неоткуда, список перерисовывает своё же состояние.
  */
 export function DraftEntry() {
+  const lang = useLang()
+  const dict = useDict()
+  const { seasons, dialogs } = dict
   const raw = useSyncExternalStore(subscribeDraft, draftSnapshot, () => undefined)
   const draft = useMemo(() => (raw === undefined ? null : parseDraft(raw)), [raw])
   const input = useRef<HTMLInputElement>(null)
@@ -44,7 +49,7 @@ export function DraftEntry() {
   if (!draft) {
     // Фраза общая со списком вошедшего: пустая коллекция и отсутствие черновика —
     // для человека одно и то же, «сезонов пока нет».
-    return <p className={styles.hand}>{EMPTY_LIST}</p>
+    return <p className={styles.hand}>{dict.status.emptyList}</p>
   }
 
   const rename = () => {
@@ -66,16 +71,17 @@ export function DraftEntry() {
           <span
             className={styles.ink}
             data-palette={draft.palette}
-            title={PALETTE_LABELS[draft.palette]}
+            title={paletteLabel(draft.palette, lang)}
             aria-hidden="true"
           />
           <span className={styles.entryText}>
-            <a className={styles.entryTitle} href={ROUTES.sheet}>
+            <a className={styles.entryTitle} href={sheetHref(lang)}>
               {draft.title}
             </a>
             <span className={styles.entryMeta}>
-              сохранён {savedOn(new Date(draft.savedAt))} ·{' '}
-              {monthName(draft.template.theme).toLowerCase()} {draft.template.theme.year}
+              {seasons.savedAt} {savedOn(new Date(draft.savedAt), lang)} ·{' '}
+              {monthInText(monthName(draft.template.theme, draft.lang), draft.lang)}{' '}
+              {draft.template.theme.year}
             </span>
           </span>
           <span className={styles.rowTools}>
@@ -83,8 +89,8 @@ export function DraftEntry() {
               type="button"
               className={styles.rowButton}
               onClick={() => setRenaming(true)}
-              title={`Переименовать «${draft.title}»`}
-              aria-label={`Переименовать «${draft.title}»`}
+              title={fill(seasons.renameOne, { title: draft.title })}
+              aria-label={fill(seasons.renameOne, { title: draft.title })}
             >
               <PenDoodle size={16} strokeWidth={3.6} />
             </button>
@@ -92,7 +98,7 @@ export function DraftEntry() {
               type="button"
               className={styles.rowButton}
               onClick={() => setDropping(true)}
-              aria-label={`Удалить «${draft.title}»`}
+              aria-label={fill(seasons.removeOne, { title: draft.title })}
             >
               ×
             </button>
@@ -102,7 +108,7 @@ export function DraftEntry() {
 
       {renaming && (
         <Dialog
-          title="Новое название"
+          title={dialogs.rename}
           onDismiss={() => setRenaming(false)}
           actions={
             <>
@@ -111,17 +117,17 @@ export function DraftEntry() {
                 className={dialogStyles.ghost}
                 onClick={() => setRenaming(false)}
               >
-                Отмена
+                {dialogs.cancel}
               </button>
               <button type="button" className={dialogStyles.primary} onClick={rename}>
-                Сохранить
+                {dialogs.save}
               </button>
             </>
           }
         >
-          <p className={dialogStyles.text}>Введите новое имя для сезона.</p>
+          <p className={dialogStyles.text}>{dialogs.renameHint}</p>
           <label className={dialogStyles.label} htmlFor="draft-title">
-            Название
+            {dialogs.titleLabel}
           </label>
           {/* Поле каждый раз новое — окно рисуется, только пока открыто, — и
               `defaultValue` подставляется честно даже после переименования. */}
@@ -141,7 +147,7 @@ export function DraftEntry() {
           черновика нет ни у нас, ни у человека. */}
       {dropping && (
         <Dialog
-          title="Подтверждение удаления"
+          title={seasons.removeHeading}
           onDismiss={() => setDropping(false)}
           actions={
             <>
@@ -150,16 +156,16 @@ export function DraftEntry() {
                 className={dialogStyles.ghost}
                 onClick={() => setDropping(false)}
               >
-                Отмена
+                {dialogs.cancel}
               </button>
               <button type="button" className={dialogStyles.primary} onClick={drop}>
-                Удалить
+                {seasons.removeAction}
               </button>
             </>
           }
         >
           <p className={dialogStyles.text}>
-            Вы уверены, что хотите удалить черновик «{draft.title}»?
+            {fill(seasons.removeDraftAsk, { title: draft.title })}
           </p>
         </Dialog>
       )}

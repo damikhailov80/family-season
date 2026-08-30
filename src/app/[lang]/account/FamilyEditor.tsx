@@ -1,23 +1,25 @@
 'use client'
 
 import { useActionState, useEffect, useState } from 'react'
-import { AvatarFace } from '../../components/AvatarFace'
-import { FACE_LABELS, nextFace } from '../../model/accents'
-import { NAME_LIMIT, type FamilyPreset } from '../../model/family'
-import { MAX_PEOPLE, MIN_PEOPLE } from '../../model/types'
-import { saveFamily } from '../../server/actions'
-import type { FamilyStatus } from '../../server/settings'
-import { Toast } from '../../components/site/Toast'
+import { AvatarFace } from '../../../components/AvatarFace'
+import { useDict, useLang } from '../../../i18n/context'
+import { fill } from '../../../i18n/fill'
+import { faceLabels, nextFace } from '../../../model/accents'
+import { NAME_LIMIT, type FamilyPreset } from '../../../model/family'
+import { MAX_PEOPLE, MIN_PEOPLE } from '../../../model/types'
+import { saveFamily } from '../../../server/actions'
+import type { FamilyStatus } from '../../../server/settings'
+import type { Dict } from '../../../i18n/types'
+import { Toast } from '../../../components/site/Toast'
 import styles from './page.module.css'
 
 /**
  * Что сказать, когда сохранить не вышло. Успеха здесь нет: он уводит редиректом
  * и показывается уже страницей.
  */
-const FAILURE_TEXT: Record<Exclude<FamilyStatus, 'ok'>, string> = {
-  error: 'Не удалось сохранить настройки — ошибка на сервере. Попробуйте ещё раз.',
-  stale: 'Не удалось сохранить. Обновите страницу и войдите заново.',
-  anonymous: 'Не удалось сохранить. Обновите страницу и войдите снова.',
+function failureText(status: Exclude<FamilyStatus, 'ok'>, account: Dict['account']): string {
+  if (status === 'error') return account.saveFailedError
+  return status === 'stale' ? account.saveFailedStale : account.saveFailedAnonymous
 }
 
 /**
@@ -43,6 +45,11 @@ interface Failure {
 
 export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
   const [people, setPeople] = useState<FamilyPreset>(initial)
+  const lang = useLang()
+  const { account } = useDict()
+  // Подписи рисунков — часть словаря постера, но здесь листа нет вовсе, и берём
+  // их языком интерфейса: кабинет говорит с человеком, а не печатается.
+  const faces = faceLabels(lang)
 
   /*
    * `useActionState`, а не `useTransition`: действие возвращает статус неудачи
@@ -54,7 +61,7 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
    * отказ прошёл бы незамеченным. По ней и ставится `key`.
    */
   const [failure, save, saving] = useActionState<Failure | null, FormData>(
-    async () => ({ status: await saveFamily(people), at: Date.now() }),
+    async () => ({ status: await saveFamily(people, lang), at: Date.now() }),
     null,
   )
 
@@ -99,8 +106,8 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
               className={styles.avatarButton}
               style={{ color: `var(--person-${person.face})` }}
               onClick={() => cycle(index)}
-              title="Сменить рисунок"
-              aria-label={`Рисунок: ${FACE_LABELS[person.face]}. Сменить`}
+              title={account.changeFace}
+              aria-label={fill(account.faceAria, { face: faces[person.face] })}
             >
               <AvatarFace variant={person.face} size={44} />
             </button>
@@ -112,8 +119,8 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
               value={person.name}
               onChange={(event) => rename(index, event.target.value)}
               maxLength={NAME_LIMIT}
-              placeholder="Имя"
-              aria-label={`Имя: ${FACE_LABELS[person.face]}`}
+              placeholder={account.namePlaceholder}
+              aria-label={fill(account.nameAria, { face: faces[person.face] })}
             />
 
             {people.length > MIN_PEOPLE && (
@@ -121,8 +128,8 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
                 type="button"
                 className={styles.remove}
                 onClick={() => remove(index)}
-                title="Убрать из состава"
-                aria-label={`Убрать: ${person.name || FACE_LABELS[person.face]}`}
+                title={account.removeTitle}
+                aria-label={fill(account.removeAria, { name: person.name || faces[person.face] })}
               >
                 ×
               </button>
@@ -134,17 +141,17 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
       <div className={styles.familyActions}>
         {people.length < MAX_PEOPLE && (
           <button type="button" className={styles.add} onClick={add}>
-            + Добавить человека
+            {account.addPerson}
           </button>
         )}
         <button type="submit" className={styles.primary} disabled={saving}>
-          {saving ? 'Сохраняем…' : 'Сохранить'}
+          {saving ? account.saving : account.saveFamily}
         </button>
       </div>
 
       {/* Ошибка сервера — тост, набранный состав остаётся в форме нетронутым:
           повторяют отсюда же, не сходя со страницы. */}
-      {failure && <Toast key={failure.at} message={FAILURE_TEXT[failure.status]} />}
+      {failure && <Toast key={failure.at} message={failureText(failure.status, account)} />}
     </form>
   )
 }

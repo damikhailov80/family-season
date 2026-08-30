@@ -1,15 +1,23 @@
-import { EXAMPLE_LIST } from '../../model/examples'
+import { examplesFor } from '../../model/examples'
+import { getDict, getLang } from '../../i18n/server'
 import { AvatarFace } from '../AvatarFace'
 import { SectionBox } from '../SectionBox'
 import { NewSeasonAction } from '../site/NewSeasonAction'
 import styles from './Examples.module.css'
 
-export function Examples() {
+/**
+ * Карточки примеров — свои у каждого языка: содержимое примеров переведено
+ * целиком, и это три разные строки витрины, а не один сезон с подписями.
+ */
+export async function Examples() {
+  const lang = await getLang()
+  const { landing } = await getDict()
+
   return (
     <SectionBox
       accent="goal"
-      label="Примеры"
-      note="три сезона, все разные"
+      label={landing.examplesLabel}
+      note={landing.examplesNote}
       id="examples"
       className={styles.section}
     >
@@ -19,8 +27,8 @@ export function Examples() {
           тянут за собой свой кусок бандла, так что мягкий переход выигрывает немного, а
           свежий документ надёжнее — на нём точно не останется состояния лендинга.
         */}
-        {EXAMPLE_LIST.map((example) => (
-          <a className={styles.card} key={example.id} href={example.href}>
+        {examplesFor(lang).map((example) => (
+          <a className={styles.card} key={example.key} href={example.href}>
             <div className={styles.faces}>
               {example.faces.map((face, index) => (
                 <span
@@ -35,25 +43,18 @@ export function Examples() {
             <h3 className={styles.title}>{example.name}</h3>
             <p className={styles.note}>{example.note}</p>
             <p className={styles.text}>{example.summary}</p>
-            <span className={styles.more}>Открыть пример →</span>
+            <span className={styles.more}>{landing.exampleOpen}</span>
           </a>
         ))}
       </div>
 
       <div className={styles.aside}>
         <div>
-          <h3 className={styles.asideTitle}>Возьмите за основу</h3>
-          <p className={styles.text}>
-            Любой пример можно форкнуть прямо на постере и переписать под себя — героев,
-            проекты, название сезона. Или собрать сезон с нуля, если своё придумывается
-            быстрее.
-          </p>
-          <p className={styles.hand}>
-            Своим сезоном можно поделиться личной ссылкой: она открывается у кого угодно и без
-            входа.
-          </p>
+          <h3 className={styles.asideTitle}>{landing.examplesAsideTitle}</h3>
+          <p className={styles.text}>{landing.examplesAsideText}</p>
+          <p className={styles.hand}>{landing.examplesAsideHand}</p>
         </div>
-        <NewSeasonAction className={styles.ghost}>Собрать свой сезон</NewSeasonAction>
+        <NewSeasonAction className={styles.ghost}>{landing.examplesAction}</NewSeasonAction>
       </div>
     </SectionBox>
   )

@@ -60,12 +60,22 @@ for (const icon of icons) {
   }
 }
 
+/** Языки сайта: подпись набора обязана быть на всех трёх. */
+const LANGS = ['ru', 'en', 'pl']
+
 const used = new Set()
 const ids = new Set()
 for (const set of sets) {
   if (ids.has(set.id)) fail(`набор «${set.id}» объявлен дважды`)
   ids.add(set.id)
-  if (!set.label) fail(`у набора «${set.id}» нет подписи`)
+  if (!set.label || typeof set.label !== 'object') {
+    fail(`у набора «${set.id}» подпись должна быть объектом {ru, en, pl}`)
+  }
+  // Подпись набора видно на плавающей кнопке, значит, она переводится. Проверка
+  // здесь ровно затем, зачем и остальные: проглядеть забытый язык в двадцати
+  // наборах — дело одной минуты, а цена ошибки видна только на живом сайте.
+  const noLabel = LANGS.filter((lang) => !set.label[lang])
+  if (noLabel.length) fail(`у набора «${set.id}» нет подписи на ${noLabel.join(', ')}`)
   const keys = Object.keys(set.slots)
   const extra = keys.filter((slot) => !slots.includes(slot))
   const missing = slots.filter((slot) => !keys.includes(slot))
@@ -127,7 +137,8 @@ export type IconName = keyof typeof ICONS
 
 const rows = sets.map(({ id, label, slots: map }) => {
   const pairs = slots.map((slot) => `${slot}: '${map[slot]}'`).join(', ')
-  return `  ['${id}', '${label}', { ${pairs} }],`
+  const caption = LANGS.map((lang) => `${lang}: '${label[lang].replace(/'/g, "\\'")}'`).join(', ')
+  return `  ['${id}', { ${caption} }, { ${pairs} }],`
 })
 
 const registry = `/**
@@ -147,7 +158,7 @@ export const ICON_SETS = [
 ${rows.join('\n')}
 ] as const satisfies readonly (readonly [
   id: string,
-  label: string,
+  label: Readonly<Record<'ru' | 'en' | 'pl', string>>,
   slots: Readonly<Record<(typeof ICON_SLOTS)[number], IconName>>,
 ])[]
 `

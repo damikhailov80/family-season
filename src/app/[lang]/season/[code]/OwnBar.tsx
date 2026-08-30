@@ -2,15 +2,19 @@
 
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-import { LinkDoodle, MegaphoneDoodle, PrinterDoodle } from '../../../components/doodles'
-import { NewSeasonDialog } from '../../../components/edit/NewSeasonDialog'
-import { PublishDialog } from '../../../components/edit/PublishDialog'
-import { RenameDialog } from '../../../components/edit/RenameDialog'
-import { ShareLinkDialog } from '../../../components/edit/ShareLinkDialog'
-import { Toast } from '../../../components/site/Toast'
-import { PUBLISH_TEXT, type PublishStatus } from '../../../model/community'
-import { defaultSeasonTitle, LIBRARY_TEXT, normalizeTitle } from '../../../model/library'
-import { publicSeasonHref, seasonHref } from '../../../model/site'
+import { LinkDoodle, MegaphoneDoodle, PrinterDoodle } from '../../../../components/doodles'
+import { NewSeasonDialog } from '../../../../components/edit/NewSeasonDialog'
+import { PublishDialog } from '../../../../components/edit/PublishDialog'
+import { RenameDialog } from '../../../../components/edit/RenameDialog'
+import { ShareLinkDialog } from '../../../../components/edit/ShareLinkDialog'
+import { Toast } from '../../../../components/site/Toast'
+import { useDict, useLang } from '../../../../i18n/context'
+import { fill } from '../../../../i18n/fill'
+import { publishText, type PublishStatus } from '../../../../model/community'
+import type { Lang } from '../../../../model/lang'
+import { posterText } from '../../../../model/labels'
+import { defaultSeasonTitle, libraryText, normalizeTitle } from '../../../../model/library'
+import { publicSeasonHref, seasonHref } from '../../../../model/site'
 import {
   previewShare,
   renameSeason,
@@ -18,9 +22,9 @@ import {
   shareLink,
   shareSeason,
   storeSeason,
-} from '../../../server/actions'
-import { useDoc } from '../../../state/docContext'
-import styles from '../../../components/edit/Bar.module.css'
+} from '../../../../server/actions'
+import { useDoc } from '../../../../state/docContext'
+import styles from '../../../../components/edit/Bar.module.css'
 
 /**
  * Панель своего сезона.
@@ -60,9 +64,16 @@ export function OwnBar({
   /** Токен приватной ссылки; `null` — её не выдавали. */
   token: string | null
 }) {
-  const { template, palette, iconSet } = useDoc()
+  const { template, palette, iconSet, lang } = useDoc()
+  const uiLang = useLang()
+  const { bars, dialogs } = useDict()
   const [forkOpen, setForkOpen] = useState(false)
   const [publishOpen, setPublishOpen] = useState(false)
+  /**
+   * Язык, с которым сезон уедет на витрину. Изначально — язык самого сезона:
+   * им подписан лист, и менять его при публикации обычно незачем.
+   */
+  const [publishLang, setPublishLang] = useState<Lang>(lang)
   /** Что витрина ответит на «Выложить»; `null` — ещё спрашиваем. */
   const [check, setCheck] = useState<{ status: PublishStatus; code?: string } | null>(null)
   /** Номер проверки: ответ на закрытое окно не должен попасть в следующее. */
@@ -78,28 +89,32 @@ export function OwnBar({
   const [renameOpen, setRenameOpen] = useState(false)
 
   const rename = async (next: string) => {
-    const clean = normalizeTitle(next, name)
+    const clean = normalizeTitle(next, name || posterText(lang).untitled)
     setBusy(true)
-    const status = clean === name ? 'ok' : await renameSeason(code, clean)
+    const status = clean === name ? 'ok' : await renameSeason(code, clean, lang)
     setBusy(false)
     setRenameOpen(false)
     if (status === 'ok') {
       setName(clean)
       return
     }
-    setNotice({ text: LIBRARY_TEXT[status as 'limit' | 'stale' | 'error'], at: Date.now() })
+    setNotice({ text: libraryText(uiLang, status as 'limit' | 'stale' | 'error'), at: Date.now() })
   }
 
   const fork = async (title: string) => {
     setBusy(true)
-    const result = await storeSeason({ title, template, palette, iconSet })
+    // Язык копируется вместе с бланком: форк — копия увиденного.
+    const result = await storeSeason({ title, template, palette, iconSet, lang })
     setBusy(false)
     setForkOpen(false)
     if (result.status === 'ok' && result.code) {
-      location.assign(seasonHref(result.code, 'edit'))
+      location.assign(seasonHref(uiLang, result.code, 'edit'))
       return
     }
-    setNotice({ text: LIBRARY_TEXT[result.status as 'limit' | 'stale' | 'error'], at: Date.now() })
+    setNotice({
+      text: libraryText(uiLang, result.status as 'limit' | 'stale' | 'error'),
+      at: Date.now(),
+    })
   }
 
   const issueLink = async () => {
@@ -107,7 +122,11 @@ export function OwnBar({
     const result = await shareLink(code)
     setBusy(false)
     if (result.status === 'ok' && result.token) setLink(result.token)
-    else setNotice({ text: LIBRARY_TEXT[result.status as 'limit' | 'stale' | 'error'], at: Date.now() })
+    else
+      setNotice({
+        text: libraryText(uiLang, result.status as 'limit' | 'stale' | 'error'),
+        at: Date.now(),
+      })
   }
 
   const dropLink = async () => {
@@ -115,17 +134,21 @@ export function OwnBar({
     const status = await revokeLink(code)
     setBusy(false)
     if (status === 'ok') setLink(null)
-    else setNotice({ text: LIBRARY_TEXT[status as 'limit' | 'stale' | 'error'], at: Date.now() })
+    else
+      setNotice({
+        text: libraryText(uiLang, status as 'limit' | 'stale' | 'error'),
+        at: Date.now(),
+      })
   }
 
   const copyLink = async (url: string) => {
     try {
       await navigator.clipboard.writeText(url)
       setLinkOpen(false)
-      setNotice({ text: 'Ссылка скопирована', at: Date.now() })
+      setNotice({ text: bars.linkCopied, at: Date.now() })
     } catch {
       // Без разрешения на буфер поле с ссылкой и так открыто: скопирует руками.
-      setNotice({ text: 'Скопируйте ссылку из поля', at: Date.now() })
+      setNotice({ text: bars.linkCopyByHand, at: Date.now() })
     }
   }
 
@@ -134,34 +157,46 @@ export function OwnBar({
    * окном — значит на секунду оставить нажатие без всякого следа.
    */
   const openPublish = () => {
+    setPublishLang(lang)
+    askShowcase(lang)
+    setPublishOpen(true)
+  }
+
+  /*
+   * Уникальность публикации считается вместе с языком, поэтому смена языка в
+   * окне — новый вопрос витрине, а не косметика. Номер прогона отсекает ответ
+   * на прежний язык: он мог прийти позже.
+   */
+  const askShowcase = (next: Lang) => {
     const run = ++checkRun.current
     setCheck(null)
-    setPublishOpen(true)
-    void previewShare(code).then((result) => {
+    void previewShare(code, next).then((result) => {
       if (checkRun.current === run) setCheck(result)
     })
   }
 
   const publish = async (anonymize: boolean) => {
     setBusy(true)
-    const result = await shareSeason(code, anonymize)
+    const result = await shareSeason(code, anonymize, publishLang)
     setBusy(false)
     setPublishOpen(false)
     if (result.code) {
       // Пометка нужна витрине, чтобы объяснить, что случилось: выложили сейчас
       // или такой сезон там уже был. Свой адрес страница потом почистит.
-      location.assign(`${publicSeasonHref(result.code)}?published=${result.fresh ? 'new' : 'again'}`)
+      location.assign(
+        `${publicSeasonHref(uiLang, result.code)}?published=${result.fresh ? 'new' : 'again'}`,
+      )
       return
     }
     setNotice({
-      text: PUBLISH_TEXT[result.status as 'duplicate' | 'limit' | 'stale' | 'error'],
+      text: publishText(uiLang, result.status as 'duplicate' | 'limit' | 'stale' | 'error'),
       at: Date.now(),
     })
   }
 
   return (
     <>
-      <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
+      <div className={styles.bar} role="toolbar" aria-label={bars.toolbarAria}>
         {/* Название — то самое, что стоит в списке: колонка `title`. В правке
             по нему нажимают и переименовывают окном; поле прямо в ряду росло
             вместе с набранным и дёргало кнопки на каждом знаке. */}
@@ -170,21 +205,23 @@ export function OwnBar({
             type="button"
             className={`${styles.hint} ${styles.rename}`}
             onClick={() => setRenameOpen(true)}
-            title="Переименовать сезон"
+            title={bars.rename}
           >
-            Ваш сезон: {name}
+            {fill(bars.withTitle, { place: bars.placeOwn, title: name })}
           </button>
         ) : (
-          <span className={styles.hint}>Ваш сезон: {name}</span>
+          <span className={styles.hint}>
+            {fill(bars.withTitle, { place: bars.placeOwn, title: name })}
+          </span>
         )}
         <span className={styles.actions}>
           {/* Заливка — на переключателе режима, и в просмотре тоже: в ряду она
               одна и с кнопки на кнопку не переезжает (см. `Bar.module.css`). */}
           <Link
             className={styles.primary}
-            href={seasonHref(code, editing ? 'view' : 'edit')}
+            href={seasonHref(uiLang, code, editing ? 'view' : 'edit')}
           >
-            {editing ? 'Готово' : 'Править'}
+            {editing ? bars.ready : bars.edit}
           </Link>
           {!editing && (
             <>
@@ -194,7 +231,7 @@ export function OwnBar({
                 disabled={busy}
                 onClick={() => setForkOpen(true)}
               >
-                Форкнуть
+                {dialogs.forkAction}
               </button>
               {/* Поделиться ссылкой — «показать», витрина — «выложить». Рядом стоят
                   намеренно: это два разных способа показать сезон, и выбирать
@@ -205,8 +242,8 @@ export function OwnBar({
                 disabled={busy}
                 aria-pressed={Boolean(link)}
                 onClick={() => setLinkOpen(true)}
-                title={link ? 'Поделиться ссылкой выдана' : 'Показать по личной ссылке'}
-                aria-label={link ? 'Поделиться ссылкой выдана' : 'Показать по личной ссылке'}
+                title={link ? bars.linkIssued : bars.linkNone}
+                aria-label={link ? bars.linkIssued : bars.linkNone}
               >
                 <LinkDoodle size={19} strokeWidth={3.4} />
               </button>
@@ -215,8 +252,8 @@ export function OwnBar({
                 className={styles.icon}
                 disabled={busy}
                 onClick={openPublish}
-                title="Выложить на витрину сообщества"
-                aria-label="Выложить на витрину сообщества"
+                title={bars.publish}
+                aria-label={bars.publish}
               >
                 <MegaphoneDoodle size={19} strokeWidth={4} />
               </button>
@@ -226,8 +263,8 @@ export function OwnBar({
             type="button"
             className={styles.icon}
             onClick={() => print()}
-            title="Печать / PDF"
-            aria-label="Печать / PDF"
+            title={bars.printTitle}
+            aria-label={bars.printTitle}
           >
             <PrinterDoodle size={19} strokeWidth={3.4} />
           </button>
@@ -236,8 +273,8 @@ export function OwnBar({
 
       {forkOpen && (
         <NewSeasonDialog
-          heading="Форкнуть сезон"
-          initialTitle={defaultSeasonTitle(template)}
+          heading={dialogs.fork}
+          initialTitle={defaultSeasonTitle(template, lang)}
           busy={busy}
           onDismiss={() => setForkOpen(false)}
           onSubmit={(title) => void fork(title)}
@@ -265,6 +302,11 @@ export function OwnBar({
         <PublishDialog
           check={check}
           busy={busy}
+          seasonLang={publishLang}
+          onLangChange={(next) => {
+            setPublishLang(next)
+            askShowcase(next)
+          }}
           onDismiss={() => setPublishOpen(false)}
           onSubmit={(anonymize) => void publish(anonymize)}
         />

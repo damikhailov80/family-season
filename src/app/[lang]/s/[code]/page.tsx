@@ -1,15 +1,16 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { Toast } from '../../../components/site/Toast'
-import { iconSetOrNull } from '../../../model/icons'
-import { paletteOrNull } from '../../../model/palettes'
-import { auth } from '../../../server/auth'
-import { readPublicSeason } from '../../../server/publicSeasons'
+import { Toast } from '../../../../components/site/Toast'
+import { getDict } from '../../../../i18n/server'
+import { iconSetOrNull } from '../../../../model/icons'
+import { paletteOrNull } from '../../../../model/palettes'
+import { auth } from '../../../../server/auth'
+import { readPublicSeason } from '../../../../server/publicSeasons'
 import { PublicSeason } from './PublicSeason'
 
-export const metadata: Metadata = {
-  title: 'Сезон — Семейный сезон',
-  description: 'Выложенный сезон: чужой месяц целиком, с сюжетными линиями и целью.',
+export async function generateMetadata(): Promise<Metadata> {
+  const { pages } = await getDict()
+  return { title: pages.publicTitle, description: pages.publicDescription }
 }
 
 /**
@@ -41,7 +42,8 @@ export default async function PublicSeasonPage({
 
   if (state.status === 'missing') notFound()
   if (state.status === 'error') {
-    return <Toast message="Не удалось открыть сезон — ошибка на сервере." />
+    const { pages } = await getDict()
+    return <Toast message={pages.publicError} />
   }
 
   return (

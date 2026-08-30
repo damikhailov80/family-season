@@ -1,9 +1,9 @@
 'use client'
 
-import { Poster } from '../../../components/Poster'
-import { FloatingControls } from '../../../components/edit/FloatingControls'
-import { SeasonProvider } from '../../../state/SeasonProvider'
-import type { UserSeason } from '../../../server/userSeasons'
+import { Poster } from '../../../../components/Poster'
+import { FloatingControls } from '../../../../components/edit/FloatingControls'
+import { SeasonProvider } from '../../../../state/SeasonProvider'
+import type { UserSeason } from '../../../../server/userSeasons'
 import { SharedBar } from './SharedBar'
 
 /**

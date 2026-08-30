@@ -1,9 +1,34 @@
 {
-  "slots": ["mark", "love", "voice", "spark", "path", "goal", "care", "idea"],
+  "slots": [
+    "mark",
+    "love",
+    "voice",
+    "spark",
+    "path",
+    "goal",
+    "care",
+    "idea"
+  ],
   "icons": [
     {
       "name": "family-three",
-      "circles": [[12, 14, 5.5], [32, 25, 4.5], [52, 14, 5.5]],
+      "circles": [
+        [
+          12,
+          14,
+          5.5
+        ],
+        [
+          32,
+          25,
+          4.5
+        ],
+        [
+          52,
+          14,
+          5.5
+        ]
+      ],
       "paths": [
         "M12 20v15M12 25l-7 5M12 25l7 5M12 35l-4 14M12 35l4 14",
         "M32 30v10M32 33l-5 4M32 33l5 4M32 40l-3 9M32 40l3 9",
@@ -12,7 +37,18 @@
     },
     {
       "name": "family-pair",
-      "circles": [[20, 16, 6], [44, 16, 6]],
+      "circles": [
+        [
+          20,
+          16,
+          6
+        ],
+        [
+          44,
+          16,
+          6
+        ]
+      ],
       "paths": [
         "M20 22v16M20 27l-8 6M20 27l12 6M20 38l-5 13M20 38l5 13",
         "M44 22v16M44 27l8 6M44 27l-12 6M44 38l-5 13M44 38l5 13"
@@ -28,7 +64,18 @@
     },
     {
       "name": "cat-dog",
-      "circles": [[20, 36, 11], [46, 37, 10]],
+      "circles": [
+        [
+          20,
+          36,
+          11
+        ],
+        [
+          46,
+          37,
+          10
+        ]
+      ],
       "paths": [
         "M12 28l-1-10 9 5ZM28 28l1-10-9 5Z",
         "M17 34v2M23 34v2M20 39l-2 2M20 39l2 2",
@@ -46,7 +93,6 @@
         "M32 34c-6-5-8-7-8-9.5 0-2.5 3-3.5 5-1.5.9.9 2 2.1 3 3.5 1-1.4 2.1-2.6 3-3.5 2-2 5-1 5 1.5 0 2.5-2 4.5-8 9.5Z"
       ]
     },
-
     {
       "name": "heart",
       "paths": [
@@ -63,7 +109,18 @@
     },
     {
       "name": "hug",
-      "circles": [[25, 20, 10], [41, 17, 9]],
+      "circles": [
+        [
+          25,
+          20,
+          10
+        ],
+        [
+          41,
+          17,
+          9
+        ]
+      ],
       "paths": [
         "M9 58c0-13 8-21 20-21h6c10 0 18 8 18 21",
         "M18 42c9 5 21 5 30 0"
@@ -71,7 +128,13 @@
     },
     {
       "name": "sun-smile",
-      "circles": [[32, 32, 15]],
+      "circles": [
+        [
+          32,
+          32,
+          15
+        ]
+      ],
       "paths": [
         "M32 6v5M32 53v5M6 32h5M53 32h5M13.5 13.5 17 17M47 47l3.5 3.5M50.5 13.5 47 17M17 47l-3.5 3.5",
         "M26 29v2M38 29v2M25 37c3 4 11 4 14 0"
@@ -85,7 +148,6 @@
         "M32 48c4 4-4 6 0 10"
       ]
     },
-
     {
       "name": "megaphone",
       "paths": [
@@ -121,13 +183,18 @@
     },
     {
       "name": "radio",
-      "circles": [[32, 32, 6]],
+      "circles": [
+        [
+          32,
+          32,
+          6
+        ]
+      ],
       "paths": [
         "M20 20c-7 7-7 17 0 24M44 20c7 7 7 17 0 24",
         "M12 12c-11 11-11 29 0 40M52 12c11 11 11 29 0 40"
       ]
     },
-
     {
       "name": "star",
       "fill": true,
@@ -163,7 +230,23 @@
       "name": "bubble",
       "fill": true,
       "stroke": 3,
-      "circles": [[26, 26, 14], [46, 44, 9], [17, 50, 6]]
+      "circles": [
+        [
+          26,
+          26,
+          14
+        ],
+        [
+          46,
+          44,
+          9
+        ],
+        [
+          17,
+          50,
+          6
+        ]
+      ]
     },
     {
       "name": "moon",
@@ -173,10 +256,15 @@
         "M40 6C22 10 10 26 12 42c2 16 18 22 32 16-14-4-22-16-20-30 1-12 8-19 16-22Z"
       ]
     },
-
     {
       "name": "rocket",
-      "circles": [[32, 22, 5]],
+      "circles": [
+        [
+          32,
+          22,
+          5
+        ]
+      ],
       "paths": [
         "M32 5c9 9 11 22 9 34H23C21 27 23 14 32 5Z",
         "M23 29 13 41h10M41 29l10 12H41",
@@ -185,14 +273,36 @@
     },
     {
       "name": "compass",
-      "circles": [[32, 32, 26], [32, 32, 2]],
+      "circles": [
+        [
+          32,
+          32,
+          26
+        ],
+        [
+          32,
+          32,
+          2
+        ]
+      ],
       "paths": [
         "M43 21 35 35 21 43 29 29Z"
       ]
     },
     {
       "name": "bicycle",
-      "circles": [[14, 44, 11], [50, 44, 11]],
+      "circles": [
+        [
+          14,
+          44,
+          11
+        ],
+        [
+          50,
+          44,
+          11
+        ]
+      ],
       "paths": [
         "M14 44 24 24h16l10 20",
         "M24 24 40 44",
@@ -217,10 +327,25 @@
         "M6 46h52l-8 12H14Z"
       ]
     },
-
     {
       "name": "target",
-      "circles": [[34, 30, 23], [34, 30, 15], [34, 30, 7]],
+      "circles": [
+        [
+          34,
+          30,
+          23
+        ],
+        [
+          34,
+          30,
+          15
+        ],
+        [
+          34,
+          30,
+          7
+        ]
+      ],
       "paths": [
         "M5 59 34 30",
         "M5 59v-9M5 59h9",
@@ -229,7 +354,13 @@
     },
     {
       "name": "mountain",
-      "circles": [[48, 16, 6]],
+      "circles": [
+        [
+          48,
+          16,
+          6
+        ]
+      ],
       "paths": [
         "M4 50 24 18l12 18 6-8 18 22Z",
         "M18 28l6-10 6 10-6-2Z"
@@ -245,7 +376,18 @@
     },
     {
       "name": "key",
-      "circles": [[20, 24, 12], [20, 24, 4]],
+      "circles": [
+        [
+          20,
+          24,
+          12
+        ],
+        [
+          20,
+          24,
+          4
+        ]
+      ],
       "paths": [
         "M28 32 50 54",
         "M42 46l-6 6M48 52l-6 6"
@@ -260,7 +402,6 @@
         "M32 7h14l-5 5 5 5H32Z"
       ]
     },
-
     {
       "name": "cup",
       "paths": [
@@ -272,28 +413,75 @@
     },
     {
       "name": "clover",
-      "circles": [[24, 24, 9], [40, 24, 9], [24, 40, 9], [40, 40, 9]],
+      "circles": [
+        [
+          24,
+          24,
+          9
+        ],
+        [
+          40,
+          24,
+          9
+        ],
+        [
+          24,
+          40,
+          9
+        ],
+        [
+          40,
+          40,
+          9
+        ]
+      ],
       "paths": [
         "M33 48c3 4 4 7 4 10"
       ]
     },
     {
       "name": "paw",
-      "circles": [[18, 28, 6], [28, 19, 6], [40, 19, 6], [50, 28, 6]],
+      "circles": [
+        [
+          18,
+          28,
+          6
+        ],
+        [
+          28,
+          19,
+          6
+        ],
+        [
+          40,
+          19,
+          6
+        ],
+        [
+          50,
+          28,
+          6
+        ]
+      ],
       "paths": [
         "M34 34c-9 0-16 6-16 12s7 8 16 8 16-2 16-8-7-12-16-12Z"
       ]
     },
     {
       "name": "flower",
-      "circles": [[32, 28, 6]],
+      "circles": [
+        [
+          32,
+          28,
+          6
+        ]
+      ],
       "paths": [
         "M32 8c5 0 8 3 8 7 4-2 9-1 11 3 2 4 0 8-4 10 4 2 6 6 4 10-2 4-7 5-11 3 0 4-3 7-8 7s-8-3-8-7c-4 2-9 1-11-3-2-4 0-8 4-10-4-2-6-6-4-10 2-4 7-5 11-3 0-4 3-7 8-7Z",
         "M32 48v10",
         "M32 53c5-2 8-5 8-9-4 0-7 4-8 9"
       ]
     },
-
     {
       "name": "bulb",
       "paths": [
@@ -313,7 +501,13 @@
     },
     {
       "name": "map",
-      "circles": [[32, 28, 3]],
+      "circles": [
+        [
+          32,
+          28,
+          3
+        ]
+      ],
       "paths": [
         "M4 16 22 10v38L4 54Z",
         "M22 10l20 6v38l-20-6Z",
@@ -331,32 +525,383 @@
     },
     {
       "name": "note",
-      "circles": [[19, 46, 7], [41, 40, 7]],
+      "circles": [
+        [
+          19,
+          46,
+          7
+        ],
+        [
+          41,
+          40,
+          7
+        ]
+      ],
       "paths": [
         "M26 46V12l22-6v34"
       ]
     }
   ],
   "sets": [
-    { "id": "classic", "label": "Классика", "slots": { "mark": "family-three", "love": "heart", "voice": "megaphone", "spark": "star", "path": "rocket", "goal": "target", "care": "heart", "idea": "star" } },
-    { "id": "home", "label": "Дом", "slots": { "mark": "house-heart", "love": "hug", "voice": "letter", "spark": "sparkle", "path": "compass", "goal": "key", "care": "cup", "idea": "bulb" } },
-    { "id": "travel", "label": "Путешествие", "slots": { "mark": "family-pair", "love": "balloon", "voice": "flag", "spark": "sparkle", "path": "paper-plane", "goal": "mountain", "care": "cup", "idea": "map" } },
-    { "id": "garden", "label": "Сад", "slots": { "mark": "tree-family", "love": "sun-smile", "voice": "letter", "spark": "leaf", "path": "bicycle", "goal": "flag-peak", "care": "flower", "idea": "seed" } },
-    { "id": "winter", "label": "Зима", "slots": { "mark": "house-heart", "love": "hug", "voice": "bell", "spark": "snowflake", "path": "sailboat", "goal": "mountain", "care": "cup", "idea": "gift" } },
-    { "id": "sport", "label": "Спорт", "slots": { "mark": "family-pair", "love": "sun-smile", "voice": "flag", "spark": "sparkle", "path": "bicycle", "goal": "trophy", "care": "clover", "idea": "star" } },
-    { "id": "tale", "label": "Сказка", "slots": { "mark": "family-three", "love": "balloon", "voice": "letter", "spark": "moon", "path": "sailboat", "goal": "key", "care": "flower", "idea": "note" } },
-    { "id": "sea", "label": "Море", "slots": { "mark": "family-pair", "love": "sun-smile", "voice": "flag", "spark": "bubble", "path": "sailboat", "goal": "flag-peak", "care": "paw", "idea": "map" } },
-    { "id": "kitchen", "label": "Кухня", "slots": { "mark": "house-heart", "love": "heart", "voice": "bell", "spark": "sparkle", "path": "compass", "goal": "trophy", "care": "cup", "idea": "gift" } },
-    { "id": "space", "label": "Космос", "slots": { "mark": "family-three", "love": "balloon", "voice": "radio", "spark": "star", "path": "rocket", "goal": "target", "care": "heart", "idea": "bulb" } },
-    { "id": "forest", "label": "Лес", "slots": { "mark": "tree-family", "love": "hug", "voice": "flag", "spark": "leaf", "path": "compass", "goal": "mountain", "care": "paw", "idea": "seed" } },
-    { "id": "holiday", "label": "Праздник", "slots": { "mark": "family-three", "love": "balloon", "voice": "bell", "spark": "sparkle", "path": "paper-plane", "goal": "trophy", "care": "cup", "idea": "gift" } },
-    { "id": "craft", "label": "Ремесло", "slots": { "mark": "house-heart", "love": "heart-hands", "voice": "letter", "spark": "sparkle", "path": "compass", "goal": "key", "care": "clover", "idea": "bulb" } },
-    { "id": "music", "label": "Музыка", "slots": { "mark": "family-pair", "love": "sun-smile", "voice": "radio", "spark": "star", "path": "bicycle", "goal": "trophy", "care": "heart", "idea": "note" } },
-    { "id": "pets", "label": "Питомцы", "slots": { "mark": "cat-dog", "love": "heart", "voice": "bell", "spark": "sparkle", "path": "bicycle", "goal": "target", "care": "paw", "idea": "gift" } },
-    { "id": "city", "label": "Городские будни", "slots": { "mark": "family-pair", "love": "balloon", "voice": "radio", "spark": "sparkle", "path": "bicycle", "goal": "flag-peak", "care": "cup", "idea": "map" } },
-    { "id": "picnic", "label": "Пикник", "slots": { "mark": "tree-family", "love": "sun-smile", "voice": "letter", "spark": "leaf", "path": "bicycle", "goal": "target", "care": "flower", "idea": "gift" } },
-    { "id": "hygge", "label": "Уют", "slots": { "mark": "house-heart", "love": "hug", "voice": "bell", "spark": "moon", "path": "sailboat", "goal": "key", "care": "cup", "idea": "note" } },
-    { "id": "discovery", "label": "Открытие", "slots": { "mark": "family-three", "love": "heart-hands", "voice": "radio", "spark": "sparkle", "path": "compass", "goal": "mountain", "care": "clover", "idea": "map" } },
-    { "id": "summer", "label": "Лето", "slots": { "mark": "cat-dog", "love": "sun-smile", "voice": "flag", "spark": "bubble", "path": "sailboat", "goal": "flag-peak", "care": "flower", "idea": "seed" } }
+    {
+      "id": "classic",
+      "label": {
+        "ru": "Классика",
+        "en": "Classic",
+        "pl": "Klasyka"
+      },
+      "slots": {
+        "mark": "family-three",
+        "love": "heart",
+        "voice": "megaphone",
+        "spark": "star",
+        "path": "rocket",
+        "goal": "target",
+        "care": "heart",
+        "idea": "star"
+      }
+    },
+    {
+      "id": "home",
+      "label": {
+        "ru": "Дом",
+        "en": "Home",
+        "pl": "Dom"
+      },
+      "slots": {
+        "mark": "house-heart",
+        "love": "hug",
+        "voice": "letter",
+        "spark": "sparkle",
+        "path": "compass",
+        "goal": "key",
+        "care": "cup",
+        "idea": "bulb"
+      }
+    },
+    {
+      "id": "travel",
+      "label": {
+        "ru": "Путешествие",
+        "en": "Travel",
+        "pl": "Podróż"
+      },
+      "slots": {
+        "mark": "family-pair",
+        "love": "balloon",
+        "voice": "flag",
+        "spark": "sparkle",
+        "path": "paper-plane",
+        "goal": "mountain",
+        "care": "cup",
+        "idea": "map"
+      }
+    },
+    {
+      "id": "garden",
+      "label": {
+        "ru": "Сад",
+        "en": "Garden",
+        "pl": "Ogród"
+      },
+      "slots": {
+        "mark": "tree-family",
+        "love": "sun-smile",
+        "voice": "letter",
+        "spark": "leaf",
+        "path": "bicycle",
+        "goal": "flag-peak",
+        "care": "flower",
+        "idea": "seed"
+      }
+    },
+    {
+      "id": "winter",
+      "label": {
+        "ru": "Зима",
+        "en": "Winter",
+        "pl": "Zima"
+      },
+      "slots": {
+        "mark": "house-heart",
+        "love": "hug",
+        "voice": "bell",
+        "spark": "snowflake",
+        "path": "sailboat",
+        "goal": "mountain",
+        "care": "cup",
+        "idea": "gift"
+      }
+    },
+    {
+      "id": "sport",
+      "label": {
+        "ru": "Спорт",
+        "en": "Sport",
+        "pl": "Sport"
+      },
+      "slots": {
+        "mark": "family-pair",
+        "love": "sun-smile",
+        "voice": "flag",
+        "spark": "sparkle",
+        "path": "bicycle",
+        "goal": "trophy",
+        "care": "clover",
+        "idea": "star"
+      }
+    },
+    {
+      "id": "tale",
+      "label": {
+        "ru": "Сказка",
+        "en": "Fairy Tale",
+        "pl": "Bajka"
+      },
+      "slots": {
+        "mark": "family-three",
+        "love": "balloon",
+        "voice": "letter",
+        "spark": "moon",
+        "path": "sailboat",
+        "goal": "key",
+        "care": "flower",
+        "idea": "note"
+      }
+    },
+    {
+      "id": "sea",
+      "label": {
+        "ru": "Море",
+        "en": "Sea",
+        "pl": "Morze"
+      },
+      "slots": {
+        "mark": "family-pair",
+        "love": "sun-smile",
+        "voice": "flag",
+        "spark": "bubble",
+        "path": "sailboat",
+        "goal": "flag-peak",
+        "care": "paw",
+        "idea": "map"
+      }
+    },
+    {
+      "id": "kitchen",
+      "label": {
+        "ru": "Кухня",
+        "en": "Kitchen",
+        "pl": "Kuchnia"
+      },
+      "slots": {
+        "mark": "house-heart",
+        "love": "heart",
+        "voice": "bell",
+        "spark": "sparkle",
+        "path": "compass",
+        "goal": "trophy",
+        "care": "cup",
+        "idea": "gift"
+      }
+    },
+    {
+      "id": "space",
+      "label": {
+        "ru": "Космос",
+        "en": "Space",
+        "pl": "Kosmos"
+      },
+      "slots": {
+        "mark": "family-three",
+        "love": "balloon",
+        "voice": "radio",
+        "spark": "star",
+        "path": "rocket",
+        "goal": "target",
+        "care": "heart",
+        "idea": "bulb"
+      }
+    },
+    {
+      "id": "forest",
+      "label": {
+        "ru": "Лес",
+        "en": "Forest",
+        "pl": "Las"
+      },
+      "slots": {
+        "mark": "tree-family",
+        "love": "hug",
+        "voice": "flag",
+        "spark": "leaf",
+        "path": "compass",
+        "goal": "mountain",
+        "care": "paw",
+        "idea": "seed"
+      }
+    },
+    {
+      "id": "holiday",
+      "label": {
+        "ru": "Праздник",
+        "en": "Holiday",
+        "pl": "Święto"
+      },
+      "slots": {
+        "mark": "family-three",
+        "love": "balloon",
+        "voice": "bell",
+        "spark": "sparkle",
+        "path": "paper-plane",
+        "goal": "trophy",
+        "care": "cup",
+        "idea": "gift"
+      }
+    },
+    {
+      "id": "craft",
+      "label": {
+        "ru": "Ремесло",
+        "en": "Craft",
+        "pl": "Rzemiosło"
+      },
+      "slots": {
+        "mark": "house-heart",
+        "love": "heart-hands",
+        "voice": "letter",
+        "spark": "sparkle",
+        "path": "compass",
+        "goal": "key",
+        "care": "clover",
+        "idea": "bulb"
+      }
+    },
+    {
+      "id": "music",
+      "label": {
+        "ru": "Музыка",
+        "en": "Music",
+        "pl": "Muzyka"
+      },
+      "slots": {
+        "mark": "family-pair",
+        "love": "sun-smile",
+        "voice": "radio",
+        "spark": "star",
+        "path": "bicycle",
+        "goal": "trophy",
+        "care": "heart",
+        "idea": "note"
+      }
+    },
+    {
+      "id": "pets",
+      "label": {
+        "ru": "Питомцы",
+        "en": "Pets",
+        "pl": "Zwierzaki"
+      },
+      "slots": {
+        "mark": "cat-dog",
+        "love": "heart",
+        "voice": "bell",
+        "spark": "sparkle",
+        "path": "bicycle",
+        "goal": "target",
+        "care": "paw",
+        "idea": "gift"
+      }
+    },
+    {
+      "id": "city",
+      "label": {
+        "ru": "Городские будни",
+        "en": "City Days",
+        "pl": "Miejska codzienność"
+      },
+      "slots": {
+        "mark": "family-pair",
+        "love": "balloon",
+        "voice": "radio",
+        "spark": "sparkle",
+        "path": "bicycle",
+        "goal": "flag-peak",
+        "care": "cup",
+        "idea": "map"
+      }
+    },
+    {
+      "id": "picnic",
+      "label": {
+        "ru": "Пикник",
+        "en": "Picnic",
+        "pl": "Piknik"
+      },
+      "slots": {
+        "mark": "tree-family",
+        "love": "sun-smile",
+        "voice": "letter",
+        "spark": "leaf",
+        "path": "bicycle",
+        "goal": "target",
+        "care": "flower",
+        "idea": "gift"
+      }
+    },
+    {
+      "id": "hygge",
+      "label": {
+        "ru": "Уют",
+        "en": "Comfort",
+        "pl": "Przytulność"
+      },
+      "slots": {
+        "mark": "house-heart",
+        "love": "hug",
+        "voice": "bell",
+        "spark": "moon",
+        "path": "sailboat",
+        "goal": "key",
+        "care": "cup",
+        "idea": "note"
+      }
+    },
+    {
+      "id": "discovery",
+      "label": {
+        "ru": "Открытие",
+        "en": "Discovery",
+        "pl": "Odkrycie"
+      },
+      "slots": {
+        "mark": "family-three",
+        "love": "heart-hands",
+        "voice": "radio",
+        "spark": "sparkle",
+        "path": "compass",
+        "goal": "mountain",
+        "care": "clover",
+        "idea": "map"
+      }
+    },
+    {
+      "id": "summer",
+      "label": {
+        "ru": "Лето",
+        "en": "Summer",
+        "pl": "Lato"
+      },
+      "slots": {
+        "mark": "cat-dog",
+        "love": "sun-smile",
+        "voice": "flag",
+        "spark": "bubble",
+        "path": "sailboat",
+        "goal": "flag-peak",
+        "care": "flower",
+        "idea": "seed"
+      }
+    }
   ]
 }

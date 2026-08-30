@@ -22,8 +22,10 @@
  */
 import pg from 'pg'
 import { REPORTS_TO_REVIEW } from '../../src/model/community'
+import { knownLang } from '../../src/model/lang'
 import { ideaTitle } from '../../src/model/library'
 import { joinSeason } from '../../src/model/season'
+import { dbTarget } from './target.mjs'
 
 const url = process.env.DATABASE_URL
 if (!url) {
@@ -40,6 +42,9 @@ if (flag && !code) {
   console.error(`Не назван код: ${flag} <code>`)
   process.exit(1)
 }
+
+// Куда едем: очередь жалоб и `--block` зовут и на проде, руками.
+console.log(`База ${dbTarget(url)}.`)
 
 const client = new pg.Client({ connectionString: url })
 try {
@@ -67,6 +72,7 @@ try {
       select r.code, p.id is not null as alive, p.hidden_at, p.blocked_at, p.block_note,
              max(r.author_key) as author_key,
              (array_agg(r.content order by r.created_at desc))[1] as content,
+             (array_agg(r.language order by r.created_at desc))[1] as language,
              count(distinct r.reporter_key)::int as reporters,
              (select count(*) from public_favorites f where f.public_id = p.id)::int as favorites,
              max(r.created_at) as last_report,
@@ -96,7 +102,7 @@ try {
         console.log(`/s/${row.code}  жалоб: ${row.reporters}  избранное: ${row.favorites}  ${state}${mark}`)
         // Тема из снимка: у удалённой публикации это единственное, по чему
         // вообще видно, о чём шла речь.
-        console.log(`  тема: ${ideaTitle(joinSeason(row.content, []))}`)
+        console.log(`  тема: ${ideaTitle(joinSeason(row.content, []), knownLang(row.language))}`)
         console.log(`  автор: ${row.author_key}`)
         console.log(`  последняя: ${row.last_report.toISOString().slice(0, 16).replace('T', ' ')}`)
         console.log(`  жалобы: ${row.comments}`)

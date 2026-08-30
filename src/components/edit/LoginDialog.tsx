@@ -2,7 +2,8 @@
 
 import { Dialog } from '../dialog/Dialog'
 import styles from '../dialog/Dialog.module.css'
-import { LOGIN_TEXT, type LoginReason } from '../../model/community'
+import { useDict, useLang } from '../../i18n/context'
+import { loginText, type LoginReason } from '../../model/community'
 import { GoogleLoginButton } from '../site/GoogleLoginButton'
 
 /**
@@ -21,22 +22,25 @@ import { GoogleLoginButton } from '../site/GoogleLoginButton'
  * один на все окна.
  */
 export function LoginDialog({ reason, onClose }: { reason: LoginReason; onClose: () => void }) {
+  const { dialogs } = useDict()
+  const lang = useLang()
+
   return (
     // onDismiss ловит и Esc, и закрытие по подложке — состояние обязано сойтись
     // с настоящим состоянием окна, иначе второй раз оно не откроется.
     <Dialog
-      title="Нужен вход"
+      title={dialogs.login}
       onDismiss={onClose}
       actions={
         <>
           <button type="button" className={styles.ghost} onClick={onClose}>
-            Не сейчас
+            {dialogs.notNow}
           </button>
           <GoogleLoginButton />
         </>
       }
     >
-      <p className={styles.text}>{LOGIN_TEXT[reason]}</p>
+      <p className={styles.text}>{loginText(lang, reason)}</p>
     </Dialog>
   )
 }

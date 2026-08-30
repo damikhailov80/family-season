@@ -22,8 +22,10 @@ const HEART_STROKE = 4
  * подписи, а на кнопке он наследует её цвет и белеет вместе с сердцем, когда
  * лайк поставлен.
  *
- * Имя для читалки даёт сам компонент: сердце ей ничего не говорит, а голое
- * число рядом с датой читалось бы как продолжение подписи.
+ * Имя для читалки приходит пропом и обязательно: сердце ей ничего не говорит,
+ * а голое число рядом с датой читалось бы как продолжение подписи. Своего
+ * словаря компонент не заводит — его рисует и серверная витрина, и клиентская
+ * панель, а `useDict()` серверному компоненту недоступен.
  */
 export function LikeCount({
   likes,
@@ -39,14 +41,14 @@ export function LikeCount({
   size?: number
   filled?: boolean
   hideZero?: boolean
-  label?: string
+  label: string
   className?: string
 }) {
   return (
     <span
       className={className ? `${styles.likes} ${className}` : styles.likes}
       role="img"
-      aria-label={label ?? `Лайков: ${likes}`}
+      aria-label={label}
     >
       <HeartDoodle size={size} filled={filled} strokeWidth={HEART_STROKE} />
       {(likes > 0 || !hideZero) && likes}

@@ -1,12 +1,13 @@
 'use client'
 
 import { useCallback } from 'react'
-import { Poster } from '../../../components/Poster'
-import { FloatingControls } from '../../../components/edit/FloatingControls'
-import { publicSeasonHref } from '../../../model/site'
-import { SeasonProvider } from '../../../state/SeasonProvider'
-import type { PublicSeasonView } from '../../../server/publicSeasons'
-import type { IconSetId, PaletteId } from '../../../types'
+import { Poster } from '../../../../components/Poster'
+import { FloatingControls } from '../../../../components/edit/FloatingControls'
+import { useLang } from '../../../../i18n/context'
+import { publicSeasonHref } from '../../../../model/site'
+import { SeasonProvider } from '../../../../state/SeasonProvider'
+import type { PublicSeasonView } from '../../../../server/publicSeasons'
+import type { IconSetId, PaletteId } from '../../../../types'
 import { PublicBar } from './PublicBar'
 
 /**
@@ -33,11 +34,12 @@ export function PublicSeason({
    * «назад» в перебор примеренных тем. `history.state` передаём обязательно —
    * иначе патченный Next-ом вызов пойдёт мимо короткого пути (см. «Каркас»).
    */
+  const lang = useLang()
   const rememberDecor = useCallback(
     (decor: { palette: PaletteId; iconSet: IconSetId }) => {
-      history.replaceState(history.state, '', publicSeasonHref(season.code, decor))
+      history.replaceState(history.state, '', publicSeasonHref(lang, season.code, decor))
     },
-    [season.code],
+    [season.code, lang],
   )
 
   return (

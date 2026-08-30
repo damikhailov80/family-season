@@ -1,6 +1,7 @@
 'use client'
 
 import { startTransition } from 'react'
+import { useDict, useLang } from '../../i18n/context'
 import { googleLoginUrl } from '../../server/actions'
 import styles from './LoginButtons.module.css'
 
@@ -48,6 +49,9 @@ function GoogleMark() {
  * строчка `location.href`.
  */
 export function GoogleLoginButton({ label }: { label?: string }) {
+  const { site } = useDict()
+  const lang = useLang()
+
   return (
     <form
       className={styles.form}
@@ -55,18 +59,19 @@ export function GoogleLoginButton({ label }: { label?: string }) {
         event.preventDefault()
         const back = location.pathname + location.search + location.hash
         startTransition(async () => {
-          location.href = await googleLoginUrl(back)
+          location.href = await googleLoginUrl(back, lang)
         })
       }}
     >
       {/* На телефоне от подписи остаётся «Войти» (`.provider` скрыт): рядом с
           брендом и навигацией полное название провайдера не помещается. Значок
           его и так называет, а `aria-label` держит полное имя для читалки. */}
-      <button type="submit" className={styles.button} aria-label={label ?? 'Войти через Google'}>
+      <button type="submit" className={styles.button} aria-label={label ?? site.loginFull}>
         <GoogleMark />
         {label ?? (
           <>
-            Войти<span className={styles.provider}>&nbsp;через Google</span>
+            {site.login}
+            <span className={styles.provider}>{site.loginProvider}</span>
           </>
         )}
       </button>

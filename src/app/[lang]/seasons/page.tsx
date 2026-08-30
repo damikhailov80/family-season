@@ -1,56 +1,59 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { PaperSheet } from '../../components/PaperSheet'
-import { SectionBox } from '../../components/SectionBox'
-import { Toast } from '../../components/site/Toast'
-import { NewSeasonAction } from '../../components/site/NewSeasonAction'
-import { GoogleLoginButton } from '../../components/site/GoogleLoginButton'
-import { PALETTE_LABELS } from '../../model/palettes'
-import {
-  EMPTY_LIST,
-  LIBRARY_LIMIT,
-  savedOn,
-  TITLE_LIMIT,
-  type LibrarySort,
-} from '../../model/library'
-import { publicSeasonHref, ROUTES, seasonHref } from '../../model/site'
-import { auth } from '../../server/auth'
-import { listFavorites, listPublished } from '../../server/publicSeasons'
-import { listUserSeasons } from '../../server/userSeasons'
+import { PaperSheet } from '../../../components/PaperSheet'
+import { SectionBox } from '../../../components/SectionBox'
+import { Toast } from '../../../components/site/Toast'
+import { NewSeasonAction } from '../../../components/site/NewSeasonAction'
+import { GoogleLoginButton } from '../../../components/site/GoogleLoginButton'
+import { getDict, getLang } from '../../../i18n/server'
+import { fill } from '../../../i18n/fill'
+import type { Dict } from '../../../i18n/types'
+import type { Lang } from '../../../model/lang'
+import { paletteLabel } from '../../../model/palettes'
+import { LIBRARY_LIMIT, savedOn, TITLE_LIMIT, type LibrarySort } from '../../../model/library'
+import { publicSeasonHref, ROUTES, seasonHref, withLang } from '../../../model/site'
+import { auth } from '../../../server/auth'
+import { listFavorites, listPublished } from '../../../server/publicSeasons'
+import { listUserSeasons } from '../../../server/userSeasons'
 import { UnfavoriteEntry } from './UnfavoriteEntry'
 import { ShowcaseEntry } from './ShowcaseEntry'
-import type { PaletteId } from '../../types'
+import type { PaletteId } from '../../../types'
 import { DeleteEntry } from './DeleteEntry'
 import { DraftEntry } from './DraftEntry'
 import { RenameEntry } from './RenameEntry'
 import styles from './page.module.css'
 
-export const metadata: Metadata = {
-  title: 'Мои сезоны — Семейный сезон',
-  description: 'Личный кабинет: сохранённые сезоны и отложенное в избранное.',
+export async function generateMetadata(): Promise<Metadata> {
+  const { seasons } = await getDict()
+  return { title: seasons.title, description: seasons.description }
 }
 
 /** Что показать: свои сезоны, отложенное чужое или своё выложенное. */
 type Tab = 'seasons' | 'favorites' | 'published'
 
-const TABS: { kind: Tab; label: string }[] = [
-  { kind: 'seasons', label: 'Мои' },
-  { kind: 'favorites', label: 'Избранное' },
-  { kind: 'published', label: 'Опубликованные' },
-]
+const TABS: Tab[] = ['seasons', 'favorites', 'published']
+
+function tabLabel(kind: Tab, dict: Dict): string {
+  return kind === 'seasons'
+    ? dict.seasons.tabSeasons
+    : kind === 'favorites'
+      ? dict.seasons.tabFavorites
+      : dict.seasons.tabPublished
+}
 
 /**
  * Поиск и сортировка живут в адресе, а не в состоянии React. Так их можно
  * переслать и перезагрузить, страница остаётся серверной, и всё работает без JS.
  * Умолчания в адрес не пишем — короткий `/seasons` должен оставаться коротким.
  */
-function listHref(kind: Tab, search: string, sort: LibrarySort): string {
+function listHref(lang: Lang, kind: Tab, search: string, sort: LibrarySort): string {
   const params = new URLSearchParams()
   if (kind !== 'seasons') params.set('tab', kind)
   if (search) params.set('q', search)
   if (sort !== 'date') params.set('sort', sort)
   const query = params.toString()
-  return query ? `${ROUTES.seasons}?${query}` : ROUTES.seasons
+  const base = withLang(lang, ROUTES.seasons)
+  return query ? `${base}?${query}` : base
 }
 
 /**
@@ -63,6 +66,8 @@ interface RowData {
   savedAt: Date
   palette: PaletteId
   month: string | null
+  /** Язык сезона: им названы месяц и сам сезон. Список от него не зависит. */
+  lang: Lang
   /** У отложенного и выложенного: сезон сняли с витрины, но ссылка работает. */
   hidden?: boolean
   /** Только у своих публикаций: закрыта после разбора жалоб. */
@@ -73,7 +78,20 @@ interface RowData {
   forks?: number
 }
 
-function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string }) {
+function Row({
+  entry,
+  kind,
+  back,
+  lang,
+  dict,
+}: {
+  entry: RowData
+  kind: Tab
+  back: string
+  lang: Lang
+  dict: Dict
+}) {
+  const { seasons } = dict
   return (
     <li className={styles.entry}>
       {/* Четыре сектора темы — тот же образец, что на кнопке переключателя:
@@ -81,7 +99,7 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
       <span
         className={styles.ink}
         data-palette={entry.palette}
-        title={PALETTE_LABELS[entry.palette]}
+        title={paletteLabel(entry.palette, lang)}
         aria-hidden="true"
       />
       <span className={styles.entryText}>
@@ -91,14 +109,22 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
         ) : (
           <a
             className={styles.entryTitle}
-            href={kind === 'seasons' ? seasonHref(entry.code) : publicSeasonHref(entry.code)}
+            href={
+              kind === 'seasons'
+                ? seasonHref(lang, entry.code)
+                : publicSeasonHref(lang, entry.code)
+            }
           >
             {entry.title}
           </a>
         )}
         <span className={styles.entryMeta}>
-          {kind === 'seasons' ? 'сохранён' : kind === 'favorites' ? 'отложен' : 'выложен'}{' '}
-          {savedOn(entry.savedAt)}
+          {kind === 'seasons'
+            ? seasons.savedAt
+            : kind === 'favorites'
+              ? seasons.favoritedAt
+              : seasons.publishedAt}{' '}
+          {savedOn(entry.savedAt, lang)}
           {entry.month ? ` · ${entry.month}` : ''}
           {/* Снятое с витрины остаётся в избранном и открывается по ссылке —
               но сказать об этом надо: в «Идеях» его больше нет. */}
@@ -106,9 +132,9 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
               а флекс-контейнер срезает ведущий пробел внутри себя. */}
           {(entry.blocked || entry.hidden) && ' · '}
           {entry.blocked ? (
-            <span className={styles.offStage}>закрыт после жалоб</span>
+            <span className={styles.offStage}>{seasons.blocked}</span>
           ) : (
-            entry.hidden && <span className={styles.offStage}>снят с витрины</span>
+            entry.hidden && <span className={styles.offStage}>{seasons.offStage}</span>
           )}
         </span>
         {/* Числа автору показываем всегда, включая нули: это его собственные
@@ -120,14 +146,21 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
             складу фраз, а сердце вдобавок сбивало числу базовую линию. */}
         {kind === 'published' && (
           <span className={styles.entryStats}>
-            лайков: {entry.likes} · в избранном: {entry.favorites} · форков: {entry.forks}
+            {fill(seasons.statLikes, { n: entry.likes ?? 0 })} ·{' '}
+            {fill(seasons.statFavorites, { n: entry.favorites ?? 0 })} ·{' '}
+            {fill(seasons.statForks, { n: entry.forks ?? 0 })}
           </span>
         )}
       </span>
       <span className={styles.rowTools}>
         {kind === 'seasons' && (
           <>
-            <RenameEntry code={entry.code} title={entry.title} back={back} />
+            <RenameEntry
+              code={entry.code}
+              title={entry.title}
+              back={back}
+              lang={entry.lang}
+            />
             <DeleteEntry code={entry.code} title={entry.title} back={back} />
           </>
         )}
@@ -145,6 +178,7 @@ function Row({ entry, kind, back }: { entry: RowData; kind: Tab; back: string })
             title={entry.title}
             hidden={Boolean(entry.hidden)}
             back={back}
+            lang={lang}
           />
         )}
       </span>
@@ -168,6 +202,9 @@ export default async function SeasonsPage({
 }: {
   searchParams: Promise<{ tab?: string; q?: string; sort?: string; add?: string }>
 }) {
+  const lang = await getLang()
+  const dict = await getDict()
+  const { seasons } = dict
   const session = await auth()
   // Имя из сессии больше нигде не нужно: страница здоровается не с человеком,
   // а показывает его список. Остаётся сам факт входа — от него зависит, где
@@ -177,7 +214,7 @@ export default async function SeasonsPage({
   if (!signedIn) {
     return (
       <PaperSheet>
-        <SectionBox accent="deep" label="Мои сезоны" className={styles.section}>
+        <SectionBox accent="deep" label={seasons.heading} className={styles.section}>
 
           {/* Список у невошедшего тот же самый, просто короткий: черновик здесь
               один. Про вход разговор ведёт окно заведения сезона — оно и так
@@ -188,7 +225,7 @@ export default async function SeasonsPage({
               анониму не показываем: избранного и публикаций без входа не бывает. */}
           <DraftEntry />
 
-          <NewSeasonAction className={styles.primary}>Создать новый сезон</NewSeasonAction>
+          <NewSeasonAction className={styles.primary}>{seasons.newSeason}</NewSeasonAction>
         </SectionBox>
       </PaperSheet>
     )
@@ -201,35 +238,35 @@ export default async function SeasonsPage({
   const sort: LibrarySort = flags.sort === 'name' ? 'name' : 'date'
   // Строку поиска режем по тому же пределу, что и название: искать длиннее нечего.
   const search = typeof flags.q === 'string' ? flags.q.slice(0, TITLE_LIMIT) : ''
-  const here = listHref(kind, search, sort)
+  const here = listHref(lang, kind, search, sort)
   const state =
     kind === 'seasons'
       ? await listUserSeasons(search, sort)
       : kind === 'favorites'
-        ? await listFavorites(search, sort)
-        : await listPublished(search, sort)
+        ? await listFavorites(search, sort, lang)
+        : await listPublished(search, sort, lang)
   const entries: RowData[] = state.status === 'ok' ? state.entries : []
 
   return (
     <PaperSheet>
-      <SectionBox accent="deep" label="Мои сезоны" className={styles.section}>
+      <SectionBox accent="deep" label={seasons.heading} className={styles.section}>
 
-        <nav className={styles.tabs} aria-label="Что показать">
+        <nav className={styles.tabs} aria-label={seasons.tabsAria}>
           {TABS.map((tab) => (
             <Link
-              key={tab.kind}
-              className={tab.kind === kind ? styles.tabActive : styles.tab}
-              href={listHref(tab.kind, search, sort)}
-              aria-current={tab.kind === kind ? 'page' : undefined}
+              key={tab}
+              className={tab === kind ? styles.tabActive : styles.tab}
+              href={listHref(lang, tab, search, sort)}
+              aria-current={tab === kind ? 'page' : undefined}
             >
-              {tab.label}
+              {tabLabel(tab, dict)}
             </Link>
           ))}
         </nav>
 
         {/* Обычная GET-форма: поиск обязан пережить перезагрузку и пересылку,
             а страница — остаться серверной. */}
-        <form className={styles.filters} action={ROUTES.seasons} method="get">
+        <form className={styles.filters} action={withLang(lang, ROUTES.seasons)} method="get">
           {kind !== 'seasons' && <input type="hidden" name="tab" value={kind} />}
           {sort !== 'date' && <input type="hidden" name="sort" value={sort} />}
           <input
@@ -238,24 +275,24 @@ export default async function SeasonsPage({
             name="q"
             defaultValue={search}
             maxLength={TITLE_LIMIT}
-            placeholder="Поиск по названию"
-            aria-label="Поиск по названию"
+            placeholder={seasons.searchPlaceholder}
+            aria-label={seasons.searchPlaceholder}
           />
           <button type="submit" className={styles.ghost}>
-            Найти
+            {seasons.searchAction}
           </button>
           <span className={styles.sort}>
             <Link
               className={sort === 'date' ? styles.sortActive : styles.sortLink}
-              href={listHref(kind, search, 'date')}
+              href={listHref(lang, kind, search, 'date')}
             >
-              по дате
+              {seasons.sortByDate}
             </Link>
             <Link
               className={sort === 'name' ? styles.sortActive : styles.sortLink}
-              href={listHref(kind, search, 'name')}
+              href={listHref(lang, kind, search, 'name')}
             >
-              по названию
+              {seasons.sortByName}
             </Link>
           </span>
         </form>
@@ -266,49 +303,40 @@ export default async function SeasonsPage({
           (entries.length ? (
             <ul className={styles.entries}>
               {entries.map((entry) => (
-                <Row key={entry.code} entry={entry} kind={kind} back={here} />
+                <Row key={entry.code} entry={entry} kind={kind} back={here} lang={lang} dict={dict} />
               ))}
             </ul>
           ) : (
             <p className={styles.hand}>
               {search
-                ? 'По этому запросу ничего не нашлось.'
+                ? seasons.nothingFound
                 : kind === 'seasons'
-                  ? EMPTY_LIST
+                  ? dict.status.emptyList
                   : kind === 'favorites'
-                    ? 'В избранном пока пусто. Нажмите ☆ на любом сезоне с витрины.'
-                    : 'Вы ещё ничего не выкладывали. Откройте свой сезон и нажмите кнопку с мегафоном.'}
+                    ? seasons.emptyFavorites
+                    : seasons.emptyPublished}
             </p>
           ))}
 
         {state.status === 'stale' && (
           <div className={styles.warn}>
-            <p className={styles.text}>
-              Вход был выполнен до того, как появился кабинет, и привязать сезоны не к чему.
-              Лечится одним повторным входом.
-            </p>
-            <GoogleLoginButton label="Войти заново" />
+            <p className={styles.text}>{seasons.staleNote}</p>
+            <GoogleLoginButton label={dict.site.loginAgain} />
           </div>
         )}
 
         {/* Имя спрашивается окном, и только потом заводится строка: молча
             заведённый сезон слишком похож на промах по кнопке. */}
-        <NewSeasonAction className={styles.primary}>Создать новый сезон</NewSeasonAction>
+        <NewSeasonAction className={styles.primary}>{seasons.newSeason}</NewSeasonAction>
 
-        {state.status === 'error' && (
-          <Toast message="Не удалось загрузить список — ошибка на сервере." />
-        )}
+        {state.status === 'error' && <Toast message={seasons.listError} />}
 
         {/* Сюда возвращается неудача «Нового сезона»: строку завести не вышло, и
             человек оказался здесь вместо своего сезона — молчать об этом нельзя. */}
         {flags.add === 'limit' && (
-          <Toast
-            message={`Больше ${LIBRARY_LIMIT} сезонов на аккаунт мы не храним — удалите лишние.`}
-          />
+          <Toast message={fill(seasons.addLimit, { n: LIBRARY_LIMIT })} />
         )}
-        {flags.add && flags.add !== 'limit' && (
-          <Toast message="Не удалось завести сезон — ошибка на сервере." />
-        )}
+        {flags.add && flags.add !== 'limit' && <Toast message={seasons.addError} />}
       </SectionBox>
     </PaperSheet>
   )

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Dialog } from '../dialog/Dialog'
 import styles from '../dialog/Dialog.module.css'
+import { useDict } from '../../i18n/context'
 import { COMMENT_LIMIT } from '../../model/community'
 
 /**
@@ -33,15 +34,16 @@ export function ReportDialog({
   onSubmit: (comment: string) => void
 }) {
   const [comment, setComment] = useState('')
+  const { dialogs } = useDict()
 
   return (
     <Dialog
-      title={sent ? 'Уточнить жалобу' : 'Пожаловаться на сезон'}
+      title={sent ? dialogs.reportAgain : dialogs.report}
       onDismiss={onDismiss}
       actions={
         <>
           <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
-            Отмена
+            {dialogs.cancel}
           </button>
           <button
             type="button"
@@ -49,17 +51,17 @@ export function ReportDialog({
             onClick={() => onSubmit(comment)}
             disabled={busy || !comment.trim()}
           >
-            {busy ? 'Отправляем…' : 'Отправить'}
+            {busy ? dialogs.reportSending : dialogs.reportSend}
           </button>
         </>
       }
     >
       <p className={styles.text}>
-        {sent ? 'Новый текст заменит прежний.' : 'Напишите, что не так с этим сезоном.'}
+        {sent ? dialogs.reportAgainHint : dialogs.reportHint}
       </p>
 
       <label className={styles.label} htmlFor="report-comment">
-        Что не так
+        {dialogs.reportLabel}
       </label>
       <textarea
         className={styles.textarea}
@@ -68,7 +70,7 @@ export function ReportDialog({
         value={comment}
         onChange={(event) => setComment(event.target.value)}
         maxLength={COMMENT_LIMIT}
-        placeholder="Например: реклама в описании недели"
+        placeholder={dialogs.reportPlaceholder}
       />
     </Dialog>
   )

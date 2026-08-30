@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Dialog } from '../../components/dialog/Dialog'
-import dialogStyles from '../../components/dialog/Dialog.module.css'
-import { MegaphoneDoodle } from '../../components/doodles'
-import { WITHDRAW_NOTE } from '../../model/community'
-import { republishEntry, withdrawEntry } from '../../server/actions'
+import { Dialog } from '../../../components/dialog/Dialog'
+import dialogStyles from '../../../components/dialog/Dialog.module.css'
+import { MegaphoneDoodle } from '../../../components/doodles'
+import { useDict } from '../../../i18n/context'
+import { fill } from '../../../i18n/fill'
+import type { Lang } from '../../../model/lang'
+import { republishEntry, withdrawEntry } from '../../../server/actions'
 import styles from './page.module.css'
 
 /**
@@ -31,23 +33,26 @@ export function ShowcaseEntry({
   title,
   hidden,
   back,
+  lang,
 }: {
   code: string
   title: string
   /** Снят с витрины: кнопка отжата и возвращает сезон обратно. */
   hidden: boolean
   back: string
+  lang: Lang
 }) {
   const [open, setOpen] = useState(false)
   const [busy, start] = useTransition()
-  const label = hidden ? `Вернуть «${title}» на витрину` : `Убрать «${title}» с витрины`
+  const { seasons, dialogs } = useDict()
+  const label = fill(hidden ? seasons.showcaseOffOne : seasons.showcaseOnOne, { title })
 
   return (
     <>
       <button
         type="button"
         className={styles.rowButton}
-        onClick={() => (hidden ? start(() => republishEntry(code, back)) : setOpen(true))}
+        onClick={() => (hidden ? start(() => republishEntry(code, back, lang)) : setOpen(true))}
         disabled={busy}
         aria-pressed={!hidden}
         title={label}
@@ -58,7 +63,7 @@ export function ShowcaseEntry({
 
       {open && (
         <Dialog
-          title="Убрать с витрины"
+          title={dialogs.withdraw}
           onDismiss={() => setOpen(false)}
           actions={
             <>
@@ -68,7 +73,7 @@ export function ShowcaseEntry({
                 disabled={busy}
                 onClick={() => setOpen(false)}
               >
-                Отмена
+                {dialogs.cancel}
               </button>
               <button
                 type="button"
@@ -76,20 +81,18 @@ export function ShowcaseEntry({
                 disabled={busy}
                 onClick={() => {
                   setOpen(false)
-                  start(() => withdrawEntry(code, back))
+                  start(() => withdrawEntry(code, back, lang))
                 }}
               >
-                Убрать
+                {dialogs.withdrawAction}
               </button>
             </>
           }
         >
-          <p className={dialogStyles.text}>
-            Вы уверены, что хотите убрать сезон «{title}» из «Идей сообщества»?
-          </p>
+          <p className={dialogStyles.text}>{fill(seasons.withdrawAskOne, { title })}</p>
           {/* Приписка та же, что в окне у самого сезона, и оттуда же: «убрать» —
               не «удалить», отложенный кем-то сезон никуда не денется. */}
-          <p className={dialogStyles.text}>{WITHDRAW_NOTE}</p>
+          <p className={dialogStyles.text}>{dialogs.withdrawNote}</p>
         </Dialog>
       )}
     </>

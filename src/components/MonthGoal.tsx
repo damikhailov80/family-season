@@ -1,5 +1,4 @@
-import { LABELS, PLACEHOLDERS } from '../model/labels'
-import { useDoc } from '../state/docContext'
+import { useDoc, usePoster } from '../state/docContext'
 import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
 import { QrCode } from './QrCode'
@@ -14,13 +13,14 @@ import styles from './MonthGoal.module.css'
  */
 export function MonthGoal() {
   const { field } = useDoc()
+  const { labels, placeholders } = usePoster()
 
   return (
     <section aria-labelledby="goal-label" className={styles.wrap}>
       <PosterIcon slot="goal" className={styles.target} size={72} />
       <SectionBox
         accent="goal"
-        label={LABELS.goal}
+        label={labels.goal}
         labelId="goal-label"
         className={styles.box}
         bodyClassName={styles.body}
@@ -28,7 +28,7 @@ export function MonthGoal() {
         <EditableText
           as="p"
           className={styles.text}
-          placeholder={PLACEHOLDERS.goal}
+          placeholder={placeholders.goal}
           {...field('goal')}
         />
         <PosterIcon slot="care" className={styles.heart} size={38} />

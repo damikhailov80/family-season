@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { fillOf } from '../model/examples'
+import type { Lang } from '../model/lang'
 import type { Template } from '../model/types'
 import type { IconSetId, PaletteId } from '../types'
 import type { DocMode, DocValue } from './docContext'
@@ -24,6 +25,8 @@ export interface SeasonBoot {
   template: Template
   palette: PaletteId
   iconSet: IconSetId
+  /** Язык сезона: им подписан лист. Приезжает колонкой строки или полем черновика. */
+  lang: Lang
   /** Набор заполнения — только у системных сезонов. */
   fillId: string | null
 }
@@ -75,6 +78,7 @@ export function SeasonProvider({
       template,
       palette,
       iconSet,
+      lang: boot.lang,
       fill,
       mode,
       days,
@@ -92,6 +96,7 @@ export function SeasonProvider({
       template,
       palette,
       iconSet,
+      boot.lang,
       fill,
       mode,
       days,

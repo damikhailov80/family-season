@@ -1,4 +1,5 @@
 import { QR_URL } from './qr.data'
+import { langOrNull, type Lang } from './lang'
 import type { IconSetId, PaletteId } from '../types'
 
 /**
@@ -18,6 +19,11 @@ export const CONTACT_EMAIL = 'smart.scriptorium+familyseason.online@gmail.com'
  */
 export const SITE_URL = QR_URL
 
+/**
+ * Пути **без языка**. Язык приписывает `withLang`, а не сама таблица: путь один
+ * и тот же на всех трёх языках, и держать по три копии каждого адреса значило
+ * бы поссорить их при первой же правке.
+ */
 export const ROUTES = {
   home: '/',
   /** Черновик невошедшего в просмотре; содержимое — в `localStorage`. */
@@ -40,6 +46,30 @@ export const ROUTES = {
 } as const
 
 /**
+ * Адрес с языком: `/ru/seasons`, `/en/`, `/pl/s/abc123`.
+ *
+ * Язык стоит в адресе всегда, включая русский. Так адрес одинаково устроен на
+ * всех трёх языках, присланная ссылка открывается ровно тем, чем её видел
+ * отправитель, и `[lang]` остаётся **корневым параметром** — иначе
+ * `next/root-params` не работает вовсе.
+ */
+export function withLang(lang: Lang, path: string): string {
+  return path === ROUTES.home ? `/${lang}` : `/${lang}${path}`
+}
+
+/**
+ * Отрезать язык от пути: `/pl/sheet/edit` → `/sheet/edit`.
+ *
+ * Нужно там, где путь сравнивают с `ROUTES` или переносят в другой язык. Если
+ * первого сегмента-языка нет, путь возвращается как есть: так функция годится и
+ * для адреса, который до `proxy` ещё не дошёл.
+ */
+export function stripLang(pathname: string): string {
+  const [, first, ...rest] = pathname.split('/')
+  return langOrNull(first) ? `/${rest.join('/')}` : pathname
+}
+
+/**
  * Режим листа несёт путь, а не пометка в хэше: адрес правки можно сохранить,
  * переслать и перезагрузить. Тип берём голым union'ом — `model` не должен
  * зависеть от `state`, а `DocMode` объявлен там.
@@ -50,7 +80,7 @@ export const ROUTES = {
  */
 export function modeFromPath(pathname: string): 'view' | 'edit' {
   // Хвостовой слэш Next убирает редиректом, но сравнение путей не должно от этого зависеть.
-  return pathname.replace(/\/+$/, '') === ROUTES.sheetEdit ? 'edit' : 'view'
+  return stripLang(pathname).replace(/\/+$/, '') === ROUTES.sheetEdit ? 'edit' : 'view'
 }
 
 
@@ -69,10 +99,11 @@ export function modeFromPath(pathname: string): 'view' | 'edit' {
  * открылась бы сперва в теме из базы, а потом перекрасилась.
  */
 export function publicSeasonHref(
+  lang: Lang,
   code: string,
   decor?: { palette: PaletteId; iconSet: IconSetId },
 ): string {
-  const address = `${ROUTES.publicSeason}/${code}`
+  const address = withLang(lang, `${ROUTES.publicSeason}/${code}`)
   return decor ? `${address}?p=${decor.palette}&i=${decor.iconSet}` : address
 }
 
@@ -83,14 +114,22 @@ export function publicSeasonHref(
  * Открывается он только владельцем, поэтому короткий код здесь не секрет и не
  * пропуск: строка ищется вместе с аккаунтом.
  */
-export function seasonHref(code: string, mode: 'view' | 'edit' = 'view'): string {
-  return mode === 'edit' ? `${ROUTES.season}/${code}/edit` : `${ROUTES.season}/${code}`
+export function seasonHref(lang: Lang, code: string, mode: 'view' | 'edit' = 'view'): string {
+  const address = `${ROUTES.season}/${code}${mode === 'edit' ? '/edit' : ''}`
+  return withLang(lang, address)
 }
 
 /**
  * Приватная ссылка на свой сезон. Токен случайный, а не выведенный из id: его
  * отзывают и выдают заново (`src/model/shortcode.ts`).
  */
-export function sharedHref(token: string): string {
-  return `${ROUTES.shared}/${token}`
+export function sharedHref(lang: Lang, token: string): string {
+  return withLang(lang, `${ROUTES.shared}/${token}`)
+}
+
+/**
+ * Черновик невошедшего: просмотр и правка — разные адреса, как и у своего сезона.
+ */
+export function sheetHref(lang: Lang, mode: 'view' | 'edit' = 'view'): string {
+  return withLang(lang, mode === 'edit' ? ROUTES.sheetEdit : ROUTES.sheet)
 }

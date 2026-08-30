@@ -2,9 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useDict, useLang } from '../../i18n/context'
+import { fill } from '../../i18n/fill'
 import { readDraft, sealDraft } from '../../model/draft'
-import { LIBRARY_TEXT } from '../../model/library'
-import { modeFromPath, ROUTES, seasonHref } from '../../model/site'
+import { libraryText } from '../../model/library'
+import { modeFromPath, ROUTES, seasonHref, stripLang } from '../../model/site'
 import { storeSeason } from '../../server/actions'
 import { Toast } from './Toast'
 
@@ -30,6 +32,8 @@ let taken = false
 
 export function DraftClaimer() {
   const router = useRouter()
+  const lang = useLang()
+  const { site } = useDict()
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
 
   useEffect(() => {
@@ -45,14 +49,17 @@ export function DraftClaimer() {
         template: draft.template,
         palette: draft.palette,
         iconSet: draft.iconSet,
+        // Язык уезжает вместе с бланком: подписи листа — часть черновика.
+        lang: draft.lang,
       })
 
       if (result.status !== 'ok' || !result.code) {
         taken = false
         // `anonymous` сюда приходит с протухшей кукой. Слов у него нет: человек
         // никуда не шёл, а предлагать вход тому, кто только что вошёл, — вздор.
-        if (result.status !== 'anonymous') {
-          setNotice({ text: LIBRARY_TEXT[result.status], at: Date.now() })
+        // `ok` без кода невозможен, но проверка стоит рядом с ним, а не в вере.
+        if (result.status !== 'ok' && result.status !== 'anonymous') {
+          setNotice({ text: libraryText(lang, result.status), at: Date.now() })
         }
         return
       }
@@ -68,17 +75,20 @@ export function DraftClaimer() {
        * `/sheet` грузится с `ssr: false` и о базе ничего не знает. Режим
        * сохраняем: правил — правит дальше, смотрел — смотрит.
        */
-      if (location.pathname.startsWith(ROUTES.sheet)) {
-        location.assign(seasonHref(result.code, modeFromPath(location.pathname)))
+      if (stripLang(location.pathname).startsWith(ROUTES.sheet)) {
+        location.assign(seasonHref(lang, result.code, modeFromPath(location.pathname)))
         return
       }
 
-      setNotice({ text: `Черновик «${draft.title}» сохранён в вашу коллекцию.`, at: Date.now() })
+      setNotice({
+        text: fill(site.draftClaimed, { title: draft.title }),
+        at: Date.now(),
+      })
       // Списку «Моих сезонов» надо показать новую строку; на остальных страницах
       // перерисовка ничего не стоит.
       router.refresh()
     })()
-  }, [router])
+  }, [router, lang, site])
 
   return notice ? <Toast key={notice.at} message={notice.text} /> : null
 }

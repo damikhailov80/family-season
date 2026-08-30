@@ -1,0 +1,81 @@
+{
+  "name": "Board Game Month",
+  "summary": "Out with the classics, learn a new one, invite friends and teach grandma to play.",
+  "note": "three of us · season in full swing",
+  "palette": "jewel",
+  "icons": "holiday",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our days. Our weekends. Our memories."
+    },
+    "theme": {
+      "subtitle": "Board Game Month",
+      "question": "Which game stayed in the family for good?"
+    },
+    "weeksNote": "4 weeks – 4 games – 4 evenings",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Classics: everything we used to play"
+      },
+      {
+        "title": "Week 2",
+        "text": "A new one: we pick it and learn the rules"
+      },
+      {
+        "title": "Week 3",
+        "text": "Friends over: playing with a big crowd"
+      },
+      {
+        "title": "Week 4",
+        "text": "Teaching grandma: explain it all and play"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Find a game worth playing again and get everyone we can around the table.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Learning English",
+        "description": "Twenty minutes a day, no days off",
+        "goal": "Finish a book without a dictionary"
+      },
+      {
+        "id": "p2",
+        "name": "Mom",
+        "face": "mom",
+        "project": "Cooking diary",
+        "description": "Writing down every dinner: what worked and what did not",
+        "goal": "Four recipes that stay with us for good"
+      },
+      {
+        "id": "p3",
+        "name": "Dasha",
+        "face": "daughter",
+        "project": "Rubik's cube",
+        "description": "One formula at a time, solving it every evening",
+        "goal": "Solve it start to finish with no hints"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 45,
+      "p2": 60,
+      "p3": 80
+    },
+    "moods": {
+      "p1": "ggyggygrggyggy",
+      "p2": "gggyggggyggggg",
+      "p3": "gygggggyggrggg"
+    },
+    "summaryAnswer": "— The first game ran until midnight: nobody left the table before it was over.\n— Dasha beat us twice in a row and now explains the rules better than Dad does.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-2/week-1.svg"
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 import { Dialog } from '../dialog/Dialog'
 import styles from '../dialog/Dialog.module.css'
-import { WITHDRAW_NOTE } from '../../model/community'
+import { useDict } from '../../i18n/context'
 
 /**
  * Убрать свой сезон с витрины.
@@ -21,17 +21,19 @@ export function WithdrawDialog({
   onDismiss: () => void
   onSubmit: () => void
 }) {
+  const { dialogs } = useDict()
+
   return (
     <Dialog
-      title="Убрать с витрины"
+      title={dialogs.withdraw}
       onDismiss={onDismiss}
       actions={
         <>
           <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
-            Отмена
+            {dialogs.cancel}
           </button>
           <button type="button" className={styles.primary} onClick={onSubmit} disabled={busy}>
-            {busy ? 'Убираем…' : 'Убрать'}
+            {busy ? dialogs.withdrawing : dialogs.withdrawAction}
           </button>
         </>
       }
@@ -39,8 +41,8 @@ export function WithdrawDialog({
       {/* Вопрос про то, что человек нажал, и одна приписка под ним: «убрать» —
           не «удалить», отложенный кем-то сезон никуда не денется. Остального
           устройства витрины окно по-прежнему не пересказывает. */}
-      <p className={styles.text}>Вы уверены, что хотите убрать сезон из «Идей сообщества»?</p>
-      <p className={styles.text}>{WITHDRAW_NOTE}</p>
+      <p className={styles.text}>{dialogs.withdrawAsk}</p>
+      <p className={styles.text}>{dialogs.withdrawNote}</p>
     </Dialog>
   )
 }

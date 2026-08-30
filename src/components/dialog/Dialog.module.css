@@ -91,6 +91,27 @@
   border-color: var(--accent-deep);
 }
 
+/* Список — тот же прибор, что и поле: рамка, отступы и фокус общие. Шрифт
+   рукописный, как у `.input`: выбранное значение читается как вписанное. */
+.select {
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-hand);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.select:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 1px;
+  border-color: var(--accent-deep);
+}
+
 /* `align-items` нужен не для красоты: в ряду удаления сезона стоит `<form>` с
    серверным действием, и растянутый по высоте флекс-элемент увёл бы кнопку в нём
    вверх от соседей. */

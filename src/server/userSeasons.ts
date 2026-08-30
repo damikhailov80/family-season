@@ -2,8 +2,10 @@ import { cache } from 'react'
 import { auth } from './auth'
 import { query } from './db'
 import { logger } from './logger'
-import { monthName } from '../model/calendar'
+import { monthInText, monthName } from '../model/calendar'
 import { knownIconSet } from '../model/icons'
+import { knownLang, type Lang } from '../model/lang'
+import { posterText } from '../model/labels'
 import {
   LIBRARY_LIMIT,
   normalizeTitle,
@@ -35,6 +37,11 @@ export interface UserSeason {
   template: Template
   palette: PaletteId
   iconSet: IconSetId
+  /**
+   * Язык сезона: им подписан сам лист. Ставится при заведении и не правится —
+   * подписи печатаются, и менять их у готового сезона незачем.
+   */
+  lang: Lang
   /** Токен приватной ссылки; `null` — её не выдавали. */
   shareToken: string | null
 }
@@ -53,6 +60,8 @@ export interface UserSeasonEntry {
   palette: PaletteId
   /** Месяц бланка: выводится из содержимого, отдельной колонкой не лежит. */
   month: string | null
+  /** Язык сезона — им же назван месяц в строке списка. */
+  lang: Lang
 }
 
 export type UserSeasonsState =
@@ -66,6 +75,7 @@ interface Row {
   names: unknown
   palette: string
   icon_set: string
+  language: string
   updated_at?: Date
   share_token?: string | null
 }
@@ -93,7 +103,7 @@ export const readUserSeason = cache(async function readUserSeason(
 
   const result = await query<Row>(
     'user-seasons:read',
-    `select code, title, content, names, palette, icon_set, share_token
+    `select code, title, content, names, palette, icon_set, language, share_token
        from user_seasons where code = $1 and account_key = $2`,
     [code, session.accountKey],
   )
@@ -112,6 +122,7 @@ export const readUserSeason = cache(async function readUserSeason(
       template: joinSeason(row.content, row.names),
       palette: knownPalette(row.palette),
       iconSet: knownIconSet(row.icon_set),
+      lang: knownLang(row.language),
       shareToken: row.share_token ?? null,
     },
   }
@@ -133,7 +144,7 @@ export async function listUserSeasons(
   const order = sort === 'name' ? 'lower(title) asc, updated_at desc' : 'updated_at desc'
   const result = await query<Row>(
     'user-seasons:list',
-    `select code, title, content, names, palette, icon_set, updated_at
+    `select code, title, content, names, palette, icon_set, language, updated_at
        from user_seasons
       where account_key = $1
         and ($2 = '' or position(lower($2) in lower(title)) > 0)
@@ -156,12 +167,16 @@ export async function listUserSeasons(
  */
 function toEntry(row: Row): UserSeasonEntry {
   const template = joinSeason(row.content, [])
+  const lang = knownLang(row.language)
   return {
     code: row.code,
     title: row.title,
     savedAt: row.updated_at!,
     palette: knownPalette(row.palette),
-    month: `${monthName(template.theme).toLowerCase()} ${template.theme.year}`,
+    // Месяц — часть самого сезона, поэтому назван его языком, а не языком
+    // списка: русский сезон и в английском кабинете остаётся сентябрьским.
+    month: `${monthInText(monthName(template.theme, lang), lang)} ${template.theme.year}`,
+    lang,
   }
 }
 
@@ -178,6 +193,7 @@ export async function createUserSeason(input: {
   template: Template
   palette: PaletteId
   iconSet: IconSetId
+  lang: Lang
 }): Promise<{ status: LibraryStatus; code?: string }> {
   const session = await auth()
   if (!session?.user) return { status: 'anonymous' }
@@ -198,10 +214,11 @@ export async function createUserSeason(input: {
 
   const result = await query<{ code: string | null }>(
     'user-seasons:create',
-    `with room as (select count(*) < $9 as ok from user_seasons where account_key = $1),
+    `with room as (select count(*) < $10 as ok from user_seasons where account_key = $1),
      added as (
-       insert into user_seasons (id, code, account_key, title, content, names, palette, icon_set)
-       select $2, $3, $1, $4, $5::jsonb, $6::jsonb, $7, $8 where (select ok from room)
+       insert into user_seasons
+         (id, code, account_key, title, content, names, palette, icon_set, language)
+       select $2, $3, $1, $4, $5::jsonb, $6::jsonb, $7, $8, $9 where (select ok from room)
        returning code
      )
      select (select code from added) as code`,
@@ -209,11 +226,12 @@ export async function createUserSeason(input: {
       session.accountKey,
       id,
       code,
-      normalizeTitle(input.title),
+      normalizeTitle(input.title, posterText(input.lang).untitled),
       JSON.stringify(content),
       JSON.stringify(names),
       input.palette,
       input.iconSet,
+      input.lang,
       LIBRARY_LIMIT,
     ],
   )
@@ -265,8 +283,15 @@ export async function saveUserSeason(
  * Переименование. `updated_at` намеренно не трогаем: это дата последней правки
  * сезона, по ней список сортируется, и смена имени не должна поднимать строку
  * наверх — сам сезон от неё не изменился.
+ *
+ * Язык здесь нужен ровно для запасного имени: пустое название заменяется словом
+ * «Сезон» на языке **сезона**, а не того, кто переименовывает.
  */
-export async function renameUserSeason(value: string, title: string): Promise<LibraryStatus> {
+export async function renameUserSeason(
+  value: string,
+  title: string,
+  lang: Lang,
+): Promise<LibraryStatus> {
   const code = codeOrNull(value)
   const session = await auth()
   if (!session?.user) return 'anonymous'
@@ -276,7 +301,7 @@ export async function renameUserSeason(value: string, title: string): Promise<Li
   const result = await query(
     'user-seasons:rename',
     'update user_seasons set title = $3 where code = $1 and account_key = $2',
-    [code, session.accountKey, normalizeTitle(title)],
+    [code, session.accountKey, normalizeTitle(title, posterText(lang).untitled)],
   )
   if (result.status === 'ok') return 'ok'
   logger.error('season not renamed', { code, reason: result.status })
@@ -316,7 +341,7 @@ export async function readSharedSeason(value: string): Promise<UserSeasonState> 
 
   const result = await query<Row>(
     'user-seasons:shared',
-    `select code, title, content, names, palette, icon_set, share_token
+    `select code, title, content, names, palette, icon_set, language, share_token
        from user_seasons where share_token = $1`,
     [token],
   )
@@ -335,6 +360,7 @@ export async function readSharedSeason(value: string): Promise<UserSeasonState> 
       template: joinSeason(row.content, row.names),
       palette: knownPalette(row.palette),
       iconSet: knownIconSet(row.icon_set),
+      lang: knownLang(row.language),
       shareToken: token,
     },
   }

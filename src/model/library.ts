@@ -1,12 +1,16 @@
-import { monthName } from './calendar'
-import { PLACEHOLDERS } from './labels'
+import { monthInText, monthName } from './calendar'
+import { posterText } from './labels'
+import type { Lang } from './lang'
 import type { Template } from './types'
+import { DICTS } from '../i18n/dict'
+import { fill } from '../i18n/fill'
 
 /**
  * Общее для всех сезонов: пределы, название, статусы.
  *
  * Файл намеренно без серверных зависимостей: им пользуются и постер, и серверные
- * действия, и страница «Мои сезоны».
+ * действия, и страница «Мои сезоны». Слова живут в словаре — здесь только числа,
+ * типы и то, что из них считается.
  */
 
 /** Сколько строк каждого вида держим на аккаунт. Предел держит приложение, а не схема. */
@@ -39,12 +43,13 @@ export type LibrarySort = 'date' | 'name'
  * постера («Семейный сезон»), одинаковое у всех, а сезоны друг от друга
  * отличает как раз тема месяца.
  *
- * Пустых полей на бланке не бывает: незаполненная тема печатается подсказкой,
- * ей же сезон и называется в списке.
+ * Язык здесь — язык **сезона**: название пишется в колонку `title` один раз, при
+ * заведении, и потом живёт своей жизнью. Смена языка в кабинете его не трогает,
+ * ровно как не трогает и сам бланк.
  */
-export function defaultSeasonTitle(template: Template): string {
-  const name = template.theme.subtitle.trim() || PLACEHOLDERS.subtitle
-  return `${monthName(template.theme)} ${template.theme.year}, ${name}`.slice(0, TITLE_LIMIT)
+export function defaultSeasonTitle(template: Template, lang: Lang): string {
+  const name = template.theme.subtitle.trim() || posterText(lang).placeholders.subtitle
+  return `${monthName(template.theme, lang)} ${template.theme.year}, ${name}`.slice(0, TITLE_LIMIT)
 }
 
 /**
@@ -54,62 +59,40 @@ export function defaultSeasonTitle(template: Template): string {
  * помогает найти нужный. На витрине он не значит ничего — идею берут ради того,
  * чем занять месяц, а какой месяц был у автора, к делу не относится.
  */
-export function ideaTitle(template: Template): string {
-  return (template.theme.subtitle.trim() || PLACEHOLDERS.subtitle).slice(0, TITLE_LIMIT)
+export function ideaTitle(template: Template, lang: Lang): string {
+  return (template.theme.subtitle.trim() || posterText(lang).placeholders.subtitle).slice(
+    0,
+    TITLE_LIMIT,
+  )
 }
 
 /**
- * Слова, которыми сезоны объясняют отказ. Живут в модели, а не рядом с кнопкой:
- * заводить сезон умеют три разные панели, и вторая копия этих строк разошлась бы
- * с первой при первой же правке.
- *
- * `anonymous` сюда не попадает: «войдите» — не отказ, а предложение, и показывает
- * его окно входа.
+ * Слова, которыми сезоны объясняют отказ. `anonymous` сюда не попадает:
+ * «войдите» — не отказ, а предложение, и показывает его окно входа.
  */
-export const LIBRARY_TEXT: Record<Exclude<LibraryStatus, 'ok' | 'anonymous'>, string> = {
-  limit: `Больше ${LIBRARY_LIMIT} сезонов мы не храним — удалите лишние в «Моих сезонах».`,
-  stale: 'Не удалось сохранить. Обновите страницу и войдите заново.',
-  error: 'Не удалось сохранить — ошибка на сервере. Попробуйте ещё раз.',
+export function libraryText(lang: Lang, status: Exclude<LibraryStatus, 'ok' | 'anonymous'>): string {
+  const text = DICTS[lang].status.library[status]
+  return status === 'limit' ? fill(text, { n: LIBRARY_LIMIT }) : text
 }
-
-/**
- * Пустой список сезонов — одна фраза на обе роли: у вошедшего пуста коллекция в
- * базе, у невошедшего нет черновика в браузере, а человеку это одно и то же —
- * сезонов пока нет. Вторая копия текста разошлась бы с первой, а рисуют список
- * разные компоненты: серверная страница и клиентская строка черновика.
- */
-export const EMPTY_LIST = 'Сезонов пока нет. Заведите новый.'
 
 /** Название приходит из браузера: однострочное, обрезанное, без хвостовых пробелов. */
-export function normalizeTitle(input: unknown, fallback = 'Сезон'): string {
+export function normalizeTitle(input: unknown, fallback: string): string {
   if (typeof input !== 'string') return fallback
   return input.replace(/\s+/g, ' ').trim().slice(0, TITLE_LIMIT) || fallback
 }
 
-/** Родительный падеж: «27 августа», а не «27 август». */
-const MONTHS_OF = [
-  'января',
-  'февраля',
-  'марта',
-  'апреля',
-  'мая',
-  'июня',
-  'июля',
-  'августа',
-  'сентября',
-  'октября',
-  'ноября',
-  'декабря',
-]
-
 /**
  * «27 августа 2026». Своими руками, а не `Intl`: тот дописывает «г.», и рядом с
- * месяцем самого постера строка начинает рябить. Названия месяцев в проекте и так
- * есть — второму списку взяться неоткуда.
+ * месяцем самого постера строка начинает рябить. Названия месяцев в проекте и
+ * так есть — второму списку взяться неоткуда.
  *
- * Живёт здесь, а не на странице списка: дату показывают и строки из базы, и
- * черновик в браузере, а рисуют их разные компоненты.
+ * Падеж свой у каждого языка: русскому и польскому нужен родительный
+ * (`poster.monthsOf`), английскому — тот же именительный, и это не небрежность.
+ *
+ * Дата — часть списка, то есть интерфейса, и язык у неё соответственно язык
+ * интерфейса, а не сезона.
  */
-export function savedOn(date: Date): string {
-  return `${date.getDate()} ${MONTHS_OF[date.getMonth()]} ${date.getFullYear()}`
+export function savedOn(date: Date, lang: Lang): string {
+  const months = posterText(lang).monthsOf
+  return `${date.getDate()} ${monthInText(months[date.getMonth()], lang)} ${date.getFullYear()}`
 }

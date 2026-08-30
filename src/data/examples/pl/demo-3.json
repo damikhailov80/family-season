@@ -1,0 +1,97 @@
+{
+  "name": "Miesiąc pierwszych razów",
+  "summary": "Lepimy pierogi, jedziemy do sąsiedniego miasta, hodujemy kryształ i piszemy list.",
+  "note": "w piątkę · sezon dopiero się zaczął",
+  "palette": "wet-forest",
+  "icons": "forest",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasz dom. Nasza drużyna. Nasza droga."
+    },
+    "theme": {
+      "subtitle": "Miesiąc pierwszy raz",
+      "question": "Co z nowych rzeczy chcemy powtórzyć?"
+    },
+    "weeksNote": "4 tygodnie – 4 pierwsze razy",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Lepimy pierogi całą rodziną — nikt nie umie"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Pociąg do sąsiedniego miasta bez planu"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Hodujemy kryształ z soli na parapecie"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "List do siebie za rok — i chowamy go"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Spróbować tego, czego nigdy nie robiliśmy, i zostawić sobie choć jedno.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Dalej biegam",
+        "description": "Trzy razy w tygodniu, bez rekordów",
+        "goal": "Nie rzucić do końca miesiąca"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Znowu za gitarę",
+        "description": "Pół godziny wieczorami, stare akordy",
+        "goal": "Przypomnieć sobie trzy piosenki"
+      },
+      {
+        "id": "p3",
+        "name": "Kirył",
+        "face": "son",
+        "project": "Poprawiam charakter",
+        "description": "Pół strony ćwiczeń przed snem",
+        "goal": "Pisać tak, żebym sam odczytał"
+      },
+      {
+        "id": "p4",
+        "name": "Sonia",
+        "face": "daughter",
+        "project": "Dalej pływam",
+        "description": "Basen we wtorki, tak jak wcześniej",
+        "goal": "Przepłynąć o dwie długości więcej"
+      },
+      {
+        "id": "p5",
+        "name": "Grzesiek",
+        "face": "son",
+        "project": "Wiążę sznurówki",
+        "description": "Próbuję każdego ranka, nie spieszę się",
+        "goal": "Poradzić sobie sam choć raz"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 10,
+      "p3": 15,
+      "p5": 5
+    },
+    "moods": {
+      "p1": "ggy",
+      "p2": "gg",
+      "p3": "gggy",
+      "p4": "gy",
+      "p5": "ggg"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {}
+  }
+}

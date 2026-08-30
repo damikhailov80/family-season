@@ -243,3 +243,36 @@
   border-color: var(--accent-deep);
   background: color-mix(in srgb, var(--accent-deep) 6%, var(--surface));
 }
+
+/* Список языков — тот же прибор, что поле имени рядом: рамка, отступы и фокус
+   общие с остальными полями кабинета. */
+.langSelect {
+  padding: 10px 12px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.langSelect:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* Подпись у списка есть, но на экране её место занимает заголовок «Язык» над
+   ним: две подписи подряд читались бы как заикание. Скринридеру она нужна. */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

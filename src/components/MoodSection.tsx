@@ -1,23 +1,25 @@
 import { moodValues } from '../model/fill'
-import { LABELS, MOOD_LEGEND, PLACEHOLDERS } from '../model/labels'
-import { useDoc } from '../state/docContext'
+import { moodLegend } from '../model/labels'
+import { useDoc, usePoster } from '../state/docContext'
 import { AvatarFace } from './AvatarFace'
 import { Badge } from './Badge'
 import { MoodFace } from './MoodFace'
 import styles from './MoodSection.module.css'
 
 export function MoodSection() {
-  const { template, fill, days } = useDoc()
+  const { template, fill, days, lang } = useDoc()
+  const { labels, placeholders } = usePoster()
+  const legend = moodLegend(lang)
   const dayNumbers = Array.from({ length: days }, (_, index) => index + 1)
 
   return (
     <section aria-labelledby="mood-label" className={styles.section}>
       <div className={styles.head}>
         <Badge accent="theme">
-          <span id="mood-label">{LABELS.mood}</span>
+          <span id="mood-label">{labels.mood}</span>
         </Badge>
         <ul className={styles.legend}>
-          {MOOD_LEGEND.map((item) => (
+          {legend.map((item) => (
             <li key={item.mood} className={styles.legendItem}>
               <MoodFace mood={item.mood} size={22} />
               <span>{item.label}</span>
@@ -28,11 +30,11 @@ export function MoodSection() {
 
       <div className={styles.tableWrap}>
         <table className={styles.table}>
-          <caption className={styles.caption}>{LABELS.moodCaption}</caption>
+          <caption className={styles.caption}>{labels.moodCaption}</caption>
           <thead>
             <tr>
               <th scope="col" className={styles.whoHead}>
-                {LABELS.moodWho}
+                {labels.moodWho}
               </th>
               {dayNumbers.map((day) => (
                 <th key={day} scope="col" className={styles.dayHead}>
@@ -52,7 +54,7 @@ export function MoodSection() {
                   }
                 >
                   <AvatarFace variant={person.face} size={20} className={styles.whoFace} />
-                  <span>{person.name || PLACEHOLDERS.name}</span>
+                  <span>{person.name || placeholders.name}</span>
                 </th>
                 {moodValues(fill.moods[person.id], days).map((mood, index) => (
                   <td key={index} className={styles.cell}>

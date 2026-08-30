@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { ROUTES } from '../../model/site'
+import { getDict, getLang } from '../../i18n/server'
+import { ROUTES, withLang } from '../../model/site'
 import { HeartDoodle } from '../doodles'
 import { LoginButtons } from './LoginButtons'
 import { NewSeasonAction } from './NewSeasonAction'
@@ -18,25 +19,28 @@ import styles from './SiteHeader.module.css'
  * `NewSeasonAction`, каждый для себя. Маршрут от этого динамическим быть не
  * перестал — читатели те же, просто ниже.
  */
-export function SiteHeader() {
+export async function SiteHeader() {
+  const lang = await getLang()
+  const { site } = await getDict()
+
   return (
     <header className={styles.header}>
-      <Link className={styles.brand} href={ROUTES.home}>
+      <Link className={styles.brand} href={withLang(lang, ROUTES.home)}>
         <HeartDoodle className={styles.brandHeart} size={22} />
-        <span className={styles.brandName}>Семейный сезон</span>
+        <span className={styles.brandName}>{site.brand}</span>
       </Link>
 
-      <nav className={styles.nav} aria-label="Разделы сайта">
-        <Link className={styles.link} href={ROUTES.home}>
-          Главная
+      <nav className={styles.nav} aria-label={site.navAria}>
+        <Link className={styles.link} href={withLang(lang, ROUTES.home)}>
+          {site.home}
         </Link>
-        <Link className={styles.link} href={ROUTES.ideas}>
-          Идеи сообщества
+        <Link className={styles.link} href={withLang(lang, ROUTES.ideas)}>
+          {site.ideas}
         </Link>
-        <Link className={styles.link} href={ROUTES.seasons}>
-          Мои сезоны
+        <Link className={styles.link} href={withLang(lang, ROUTES.seasons)}>
+          {site.seasons}
         </Link>
-        <NewSeasonAction className={styles.action}>Новый сезон</NewSeasonAction>
+        <NewSeasonAction className={styles.action}>{site.newSeason}</NewSeasonAction>
       </nav>
 
       <LoginButtons />

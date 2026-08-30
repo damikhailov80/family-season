@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { LinkDoodle, PrinterDoodle } from '../../../components/doodles'
-import { ForkButton } from '../../../components/edit/ForkButton'
-import { Toast } from '../../../components/site/Toast'
-import styles from '../../../components/edit/Bar.module.css'
+import { LinkDoodle, PrinterDoodle } from '../../../../components/doodles'
+import { ForkButton } from '../../../../components/edit/ForkButton'
+import { Toast } from '../../../../components/site/Toast'
+import { useDict } from '../../../../i18n/context'
+import styles from '../../../../components/edit/Bar.module.css'
 
 /**
  * Панель сезона, присланного по личной ссылке.
@@ -17,24 +18,23 @@ import styles from '../../../components/edit/Bar.module.css'
  * этот адрес устроен и кто может его отозвать, человеку тут знать незачем.
  */
 export function SharedBar({ signedIn }: { signedIn: boolean }) {
+  const { bars } = useDict()
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
 
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(location.href)
-      setNotice({ text: 'Ссылка скопирована', at: Date.now() })
+      setNotice({ text: bars.linkCopied, at: Date.now() })
     } catch {
       // Без разрешения на буфер — показываем ссылку, скопирует руками.
-      prompt('Ссылка на сезон:', location.href)
+      prompt(bars.linkPrompt, location.href)
     }
   }
 
   return (
     <>
-      <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
-        <span className={styles.hint}>
-          Сезон по ссылке
-        </span>
+      <div className={styles.bar} role="toolbar" aria-label={bars.toolbarAria}>
+        <span className={styles.hint}>{bars.placeShared}</span>
         <span className={styles.actions}>
           <ForkButton
             signedIn={signedIn}
@@ -44,8 +44,8 @@ export function SharedBar({ signedIn }: { signedIn: boolean }) {
             type="button"
             className={styles.icon}
             onClick={() => void copyLink()}
-            title="Скопировать ссылку"
-            aria-label="Скопировать ссылку"
+            title={bars.copyLinkShort}
+            aria-label={bars.copyLinkShort}
           >
             <LinkDoodle size={19} strokeWidth={3.4} />
           </button>
@@ -53,8 +53,8 @@ export function SharedBar({ signedIn }: { signedIn: boolean }) {
             type="button"
             className={styles.icon}
             onClick={() => print()}
-            title="Печать / PDF"
-            aria-label="Печать / PDF"
+            title={bars.printTitle}
+            aria-label={bars.printTitle}
           >
             <PrinterDoodle size={19} strokeWidth={3.4} />
           </button>

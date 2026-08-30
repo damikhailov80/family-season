@@ -1,6 +1,6 @@
-import { LONGEST_MONTH_RU, monthName } from '../model/calendar'
-import { LABELS, PLACEHOLDERS } from '../model/labels'
-import { useDoc } from '../state/docContext'
+import { longestMonth, monthName } from '../model/calendar'
+import { useDict } from '../i18n/context'
+import { useDoc, usePoster } from '../state/docContext'
 import { Badge } from './Badge'
 import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
@@ -8,13 +8,15 @@ import { SectionBox } from './SectionBox'
 import styles from './MonthTheme.module.css'
 
 export function MonthTheme() {
-  const { template, fill, field, editing, stepMonth } = useDoc()
+  const { template, fill, field, editing, stepMonth, lang } = useDoc()
+  const { labels, placeholders } = usePoster()
+  const dict = useDict()
 
   return (
     <section aria-labelledby="theme-label" className={styles.section}>
       <SectionBox
         accent="theme"
-        label={LABELS.theme}
+        label={labels.theme}
         labelId="theme-label"
         bodyClassName={styles.body}
       >
@@ -33,7 +35,7 @@ export function MonthTheme() {
               type="button"
               className={styles.monthNav}
               onClick={() => stepMonth(-1)}
-              aria-label="Предыдущий месяц"
+              aria-label={dict.editor.prevMonth}
             >
               ‹
             </button>
@@ -44,16 +46,16 @@ export function MonthTheme() {
           */}
           <p className={styles.month}>
             <span className={styles.monthSizer} aria-hidden="true">
-              {LONGEST_MONTH_RU}
+              {longestMonth(lang)}
             </span>
-            <span>{monthName(template.theme)}</span>
+            <span>{monthName(template.theme, lang)}</span>
           </p>
           {editing && (
             <button
               type="button"
               className={styles.monthNav}
               onClick={() => stepMonth(1)}
-              aria-label="Следующий месяц"
+              aria-label={dict.editor.nextMonth}
             >
               ›
             </button>
@@ -64,19 +66,19 @@ export function MonthTheme() {
         <EditableText
           as="p"
           className={styles.subtitle}
-          placeholder={PLACEHOLDERS.subtitle}
+          placeholder={placeholders.subtitle}
           {...field('theme.subtitle')}
         />
 
         {/* Итоги месяца: вопрос из шаблона, ответ вписывают руками (слой заполнения). */}
         <div className={styles.answerBox}>
           <Badge accent="theme" size="sm" className={styles.answerBadge}>
-            {LABELS.themeSummary}
+            {labels.themeSummary}
           </Badge>
           <EditableText
             as="p"
             className={styles.question}
-            placeholder={PLACEHOLDERS.question}
+            placeholder={placeholders.question}
             {...field('theme.question')}
           />
           <p className={styles.answer}>{fill.summaryAnswer}</p>

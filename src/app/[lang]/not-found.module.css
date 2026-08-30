@@ -1,0 +1,39 @@
+.section {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.text {
+  margin-top: 8px;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 12px 20px;
+  border: 1.5px solid var(--accent-deep);
+  border-radius: 8px;
+  background: var(--accent-deep);
+  color: var(--on-accent);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
+}
+
+/* Правило «сайтовая обвязка на бумагу не идёт»: печатать 404 незачем. */
+@media print {
+  .section {
+    display: none;
+  }
+}

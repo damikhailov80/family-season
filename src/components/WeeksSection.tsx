@@ -1,5 +1,4 @@
-import { LABELS, PLACEHOLDERS } from '../model/labels'
-import { useDoc } from '../state/docContext'
+import { useDoc, usePoster } from '../state/docContext'
 import { EditableText } from './edit/EditableText'
 import { Polaroid } from './Polaroid'
 import { SectionBox } from './SectionBox'
@@ -7,15 +6,16 @@ import styles from './WeeksSection.module.css'
 
 export function WeeksSection() {
   const { template, field } = useDoc()
+  const { labels, placeholders } = usePoster()
 
   return (
     <section aria-labelledby="weeks-label" className={styles.section}>
       <SectionBox
         accent="weeks"
-        label={LABELS.weeks}
+        label={labels.weeks}
         labelId="weeks-label"
         note={
-          <EditableText placeholder={PLACEHOLDERS.weeksNote} {...field('weeksNote')} />
+          <EditableText placeholder={placeholders.weeksNote} {...field('weeksNote')} />
         }
         bodyClassName={styles.grid}
       >
@@ -24,13 +24,13 @@ export function WeeksSection() {
             <EditableText
               as="h3"
               className={styles.cardTitle}
-              placeholder={`${PLACEHOLDERS.weekTitle} ${index + 1}`}
+              placeholder={`${placeholders.weekTitle} ${index + 1}`}
               {...field(`weeks.${index}.title`)}
             />
             <EditableText
               as="p"
               className={styles.cardText}
-              placeholder={PLACEHOLDERS.weekText}
+              placeholder={placeholders.weekText}
               {...field(`weeks.${index}.text`)}
             />
             <Polaroid index={index} />

@@ -2,6 +2,8 @@ import { createContext, useContext } from 'react'
 import type { IconSetId, PaletteId } from '../types'
 import type { FillState, Template } from '../model/types'
 import type { FamilyPreset } from '../model/family'
+import type { Lang } from '../model/lang'
+import { posterText, type PosterText } from '../model/labels'
 
 export type DocMode = 'view' | 'edit'
 
@@ -25,6 +27,12 @@ export interface DocValue {
   palette: PaletteId
   /** Набор рисунков. Тоже не бланк, и хранится так же, как тема. */
   iconSet: IconSetId
+  /**
+   * Язык **сезона**, а не интерфейса. Им подписан сам лист: месяц, подписи
+   * секций, подсказки пустых полей — всё это печатается, и переключение языка
+   * сайта его не трогает. Лежит рядом с бланком, как тема и набор рисунков.
+   */
+  lang: Lang
   fill: FillState
   mode: DocMode
   /** Число дней месяца — считается из темы, отдельного поля в модели нет. */
@@ -51,4 +59,12 @@ export function useDoc(): DocValue {
   const value = useContext(DocContext)
   if (!value) throw new Error('useDoc вызван вне провайдера постера')
   return value
+}
+
+/**
+ * Подписи листа — языком сезона. Отдельный хук рядом с `useDoc`, чтобы секции
+ * не путали его с `useDict()`: тот отдаёт язык интерфейса и на бумагу не идёт.
+ */
+export function usePoster(): PosterText {
+  return posterText(useDoc().lang)
 }

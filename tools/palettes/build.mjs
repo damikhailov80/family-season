@@ -138,6 +138,24 @@ function buildPalette(colors) {
 
 const source = JSON.parse(readFileSync(resolve(here, 'source.json'), 'utf8'))
 
+/*
+ * Подпись темы переводится: её видно на плавающей кнопке и в полосе тем на
+ * лендинге. В source.json она объект `{ru, en, pl}`; сборка проверяет, что ни
+ * один язык не забыт, — проглядеть такое в ста наборах руками нельзя.
+ */
+const LANGS = ['ru', 'en', 'pl']
+
+for (const { id, label } of source) {
+  if (!label || typeof label !== 'object') {
+    throw new Error(`тема «${id}»: подпись должна быть объектом {ru, en, pl}`)
+  }
+  const missing = LANGS.filter((lang) => !label[lang])
+  if (missing.length) throw new Error(`тема «${id}»: нет подписи на ${missing.join(', ')}`)
+}
+
+/** Строка для TypeScript: подписи набраны руками и апострофы в них бывают. */
+const quote = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+
 const cssBlocks = source.map(({ id, label, colors }) => {
   const { paints, onPaints, darks } = buildPalette(colors)
   const lines = [
@@ -145,7 +163,7 @@ const cssBlocks = source.map(({ id, label, colors }) => {
     ...onPaints.map((value, i) => `  --on-c${i + 1}: ${value};`),
     ...darks.map((hex, i) => `  --d${i + 1}: ${hex};`),
   ]
-  return `/* ${label} */\n[data-palette='${id}'] {\n${lines.join('\n')}\n}`
+  return `/* ${label.ru} */\n[data-palette='${id}'] {\n${lines.join('\n')}\n}`
 })
 
 const css = `/*
@@ -172,11 +190,16 @@ const ts = `/**
  *
  * Здесь только id и подписи: краски живут в src/styles/palettes.css, а логика
  * выбора темы — в src/model/palettes.ts.
+ *
+ * Подпись у темы на всех трёх языках сайта: её видно на кнопке переключателя.
  */
 
 export const PALETTES = [
-${source.map(({ id, label }) => `  ['${id}', '${label}'],`).join('\n')}
-] as const satisfies readonly (readonly [id: string, label: string])[]
+${source.map(({ id, label }) => `  ['${id}', { ${LANGS.map((lang) => `${lang}: ${quote(label[lang])}`).join(', ')} }],`).join('\n')}
+] as const satisfies readonly (readonly [
+  id: string,
+  label: Readonly<Record<'ru' | 'en' | 'pl', string>>,
+])[]
 `
 
 writeFileSync(resolve(root, 'src/styles/palettes.css'), css)

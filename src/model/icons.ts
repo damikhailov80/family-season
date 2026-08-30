@@ -1,4 +1,5 @@
 import { ICON_SETS, ICON_SLOTS } from './icons.data'
+import type { Lang } from './lang'
 import type { IconName } from '../components/doodles/icons.generated'
 import type { IconSetId } from '../types'
 
@@ -22,9 +23,18 @@ export type IconSlot = (typeof ICON_SLOTS)[number]
 
 export const ICON_SET_ORDER: IconSetId[] = ICON_SETS.map(([id]) => id)
 
-export const ICON_SET_LABELS: Record<IconSetId, string> = Object.fromEntries(
-  ICON_SETS.map(([id, label]) => [id, label]),
-) as Record<IconSetId, string>
+/**
+ * Подписи наборов на всех трёх языках — по той же причине, что и у тем: их
+ * видно на кнопке переключателя. Собираются `tools/icons/build.mjs`.
+ */
+const LABELS = Object.fromEntries(ICON_SETS.map(([id, label]) => [id, label])) as Record<
+  IconSetId,
+  Record<Lang, string>
+>
+
+export function iconSetLabel(iconSet: IconSetId, lang: Lang): string {
+  return LABELS[iconSet][lang]
+}
 
 /** Раздача рисунков по слотам: этим и отличается один набор от другого. */
 export const ICON_SET_ICONS: Record<IconSetId, Record<IconSlot, IconName>> = Object.fromEntries(

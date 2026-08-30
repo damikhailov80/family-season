@@ -3,7 +3,9 @@
 import { useRef } from 'react'
 import { Dialog } from '../dialog/Dialog'
 import styles from '../dialog/Dialog.module.css'
-import { PUBLISH_TEXT, type PublishStatus } from '../../model/community'
+import { useDict, useLang } from '../../i18n/context'
+import { publishText, type PublishStatus } from '../../model/community'
+import { LANG_LABELS, LANGS, type Lang } from '../../model/lang'
 import { publicSeasonHref } from '../../model/site'
 
 /**
@@ -25,36 +27,49 @@ import { publicSeasonHref } from '../../model/site'
  *
  * Своей беды проверка не показывает: не ответила база — окно ведёт себя как
  * раньше, а отказ, если он будет, объяснит сама публикация.
+ *
+ * **Язык выбирают здесь.** Умолчание — язык самого сезона: им подписан лист, и
+ * менять его при публикации обычно незачем. Но сезон, собранный по-русски для
+ * англоязычной витрины, — законный случай, и списка ради него довольно.
+ * Смена языка **пересчитывает проверку**: уникальность считается вместе с
+ * языком, и тот же бланк в другом языке дублем уже не будет.
  */
 export function PublishDialog({
   check,
   busy,
+  seasonLang,
+  onLangChange,
   onDismiss,
   onSubmit,
 }: {
   /** Что показала проверка витрины; `null` — ещё проверяем. */
   check: { status: PublishStatus; code?: string } | null
   busy: boolean
+  /** Язык, с которым сезон уедет на витрину. Изначально — язык самого сезона. */
+  seasonLang: Lang
+  onLangChange: (lang: Lang) => void
   onDismiss: () => void
   onSubmit: (anonymize: boolean) => void
 }) {
   const anonymize = useRef<HTMLInputElement>(null)
+  const { dialogs } = useDict()
+  const lang = useLang()
 
   const refusal =
     check?.status === 'duplicate' || check?.status === 'blocked' || check?.status === 'limit'
-      ? PUBLISH_TEXT[check.status]
+      ? publishText(lang, check.status)
       : null
 
   if (refusal) {
     return (
       <Dialog
-        title="Выложить на витрину"
+        title={dialogs.publish}
         onDismiss={onDismiss}
         actions={
           // Отменять тут нечего: ничего не случится в любом случае, и кнопка
           // остаётся одна.
           <button type="button" className={styles.primary} onClick={onDismiss}>
-            Закрыть
+            {dialogs.close}
           </button>
         }
       >
@@ -62,8 +77,8 @@ export function PublishDialog({
         {/* Ссылка есть не всегда: у снятого с витрины сезона места нет, и
             вести туда незачем — на витрине его не увидят. */}
         {check.code && (
-          <a className={styles.link} href={publicSeasonHref(check.code)}>
-            Посмотреть на витрине
+          <a className={styles.link} href={publicSeasonHref(lang, check.code)}>
+            {dialogs.publishSeeIt}
           </a>
         )}
       </Dialog>
@@ -72,12 +87,12 @@ export function PublishDialog({
 
   return (
     <Dialog
-      title="Выложить на витрину"
+      title={dialogs.publish}
       onDismiss={onDismiss}
       actions={
         <>
           <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
-            Отмена
+            {dialogs.cancel}
           </button>
           <button
             type="button"
@@ -85,16 +100,33 @@ export function PublishDialog({
             onClick={() => onSubmit(Boolean(anonymize.current?.checked))}
             disabled={busy || !check}
           >
-            {busy ? 'Выкладываем…' : check ? 'Выложить' : 'Проверяем…'}
+            {busy ? dialogs.publishing : check ? dialogs.publishAction : dialogs.publishChecking}
           </button>
         </>
       }
     >
-      <p className={styles.text}>Копия сезона появится в «Идеях сообщества».</p>
+      <p className={styles.text}>{dialogs.publishHint}</p>
+
+      <label className={styles.label} htmlFor="publish-lang">
+        {dialogs.publishLangLabel}
+      </label>
+      <select
+        className={styles.select}
+        id="publish-lang"
+        value={seasonLang}
+        onChange={(event) => onLangChange(event.target.value as Lang)}
+        disabled={busy}
+      >
+        {LANGS.map((item) => (
+          <option key={item} value={item}>
+            {LANG_LABELS[item]}
+          </option>
+        ))}
+      </select>
 
       <label className={styles.check}>
         <input className={styles.checkBox} ref={anonymize} type="checkbox" />
-        <span>Заменить имена на случайные</span>
+        <span>{dialogs.publishAnonymize}</span>
       </label>
     </Dialog>
   )

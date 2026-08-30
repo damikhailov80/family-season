@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Toast } from '../../../components/site/Toast'
-import { saveSeason } from '../../../server/actions'
-import { useDoc } from '../../../state/docContext'
+import { Toast } from '../../../../components/site/Toast'
+import { useDict } from '../../../../i18n/context'
+import { saveSeason } from '../../../../server/actions'
+import { useDoc } from '../../../../state/docContext'
 
 /** Столько же, сколько ждала запись адреса, пока лист жил в ссылке. */
 const SAVE_DELAY = 400
@@ -21,6 +22,7 @@ const SAVE_DELAY = 400
  * каждое нажатие клавиши создаёт новый объект.
  */
 export function Autosave({ code }: { code: string }) {
+  const { pages } = useDict()
   const { template, palette, iconSet } = useDoc()
   const saved = useRef<string | null>(null)
   const latest = useRef({ template, palette, iconSet })
@@ -75,6 +77,6 @@ export function Autosave({ code }: { code: string }) {
   }, [code])
 
   return failed ? (
-    <Toast key={failed} message="Не удалось сохранить правки — ошибка на сервере." />
+    <Toast key={failed} message={pages.autosaveFailed} />
   ) : null
 }

@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Dialog } from '../../components/dialog/Dialog'
-import dialogStyles from '../../components/dialog/Dialog.module.css'
-import { dropEntry } from '../../server/actions'
+import { Dialog } from '../../../components/dialog/Dialog'
+import dialogStyles from '../../../components/dialog/Dialog.module.css'
+import { useDict, useLang } from '../../../i18n/context'
+import { fill } from '../../../i18n/fill'
+import { dropEntry } from '../../../server/actions'
 import styles from './page.module.css'
 
 /**
@@ -26,6 +28,8 @@ export function DeleteEntry({
   back: string
 }) {
   const [open, setOpen] = useState(false)
+  const lang = useLang()
+  const { seasons, dialogs } = useDict()
 
   return (
     <>
@@ -33,14 +37,14 @@ export function DeleteEntry({
         type="button"
         className={styles.rowButton}
         onClick={() => setOpen(true)}
-        aria-label={`Удалить «${title}»`}
+        aria-label={fill(seasons.removeOne, { title })}
       >
         ×
       </button>
 
       {open && (
         <Dialog
-          title="Подтверждение удаления"
+          title={seasons.removeHeading}
           onDismiss={() => setOpen(false)}
           actions={
             <>
@@ -49,19 +53,19 @@ export function DeleteEntry({
                 className={dialogStyles.ghost}
                 onClick={() => setOpen(false)}
               >
-                Отмена
+                {dialogs.cancel}
               </button>
               {/* Действие серверное: аргументы привязаны, но проверяются заново —
                   привязка уезжает в браузер и возвращается оттуда. */}
-              <form action={dropEntry.bind(null, code, back)}>
+              <form action={dropEntry.bind(null, code, back, lang)}>
                 <button type="submit" className={dialogStyles.primary}>
-                  Удалить
+                  {seasons.removeAction}
                 </button>
               </form>
             </>
           }
         >
-          <p className={dialogStyles.text}>Вы уверены, что хотите удалить сезон «{title}»?</p>
+          <p className={dialogStyles.text}>{fill(seasons.removeAskOne, { title })}</p>
         </Dialog>
       )}
     </>

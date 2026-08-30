@@ -1,14 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  draftWillBeLost,
-  readDraft,
-  writeDraft,
-  type Draft,
-} from '../../model/draft'
-import { defaultSeasonTitle, LIBRARY_TEXT } from '../../model/library'
-import { ROUTES, seasonHref } from '../../model/site'
+import { useDict, useLang } from '../../i18n/context'
+import { fill } from '../../i18n/fill'
+import { readDraft, writeDraft, type Draft } from '../../model/draft'
+import { defaultSeasonTitle, libraryText } from '../../model/library'
+import { seasonHref, sheetHref } from '../../model/site'
 import { storeSeason } from '../../server/actions'
 import { useDoc } from '../../state/docContext'
 import { NewSeasonDialog } from './NewSeasonDialog'
@@ -48,29 +45,36 @@ export function ForkButton({
   from?: string
   onFailure: (text: string) => void
 }) {
-  const { template, palette, iconSet } = useDoc()
+  const { template, palette, iconSet, lang } = useDoc()
+  const uiLang = useLang()
+  const { dialogs } = useDict()
   /* Черновик читаем при открытии окна, а не в рендере: на сервере хранилища нет,
      и в первом проходе ответ был бы неправдой. */
   const [asking, setAsking] = useState<{ draft: Draft | null } | null>(null)
   const [busy, setBusy] = useState(false)
 
   const fork = async (title: string) => {
+    /*
+      * Язык копируется вместе с бланком: форкают то, что видят на экране, а
+      * подписи листа — часть увиденного. Язык интерфейса тут ни при чём: он
+      * решает, на каком языке идёт разговор, а не каким будет постер.
+      */
     if (!signedIn) {
-      writeDraft({ title, template, palette, iconSet })
-      location.assign(ROUTES.sheetEdit)
+      writeDraft({ title, template, palette, iconSet, lang })
+      location.assign(sheetHref(uiLang, 'edit'))
       return
     }
 
     setBusy(true)
-    const result = await storeSeason({ title, template, palette, iconSet, from })
+    const result = await storeSeason({ title, template, palette, iconSet, lang, from })
     setBusy(false)
     setAsking(null)
     if (result.status === 'ok' && result.code) {
-      location.assign(seasonHref(result.code, 'edit'))
+      location.assign(seasonHref(uiLang, result.code, 'edit'))
       return
     }
     // `anonymous` сюда не приходит: вход у страницы спрошен заранее.
-    onFailure(LIBRARY_TEXT[result.status as 'limit' | 'stale' | 'error'])
+    onFailure(libraryText(uiLang, result.status as 'limit' | 'stale' | 'error'))
   }
 
   return (
@@ -81,14 +85,16 @@ export function ForkButton({
         disabled={busy}
         onClick={() => setAsking({ draft: signedIn ? null : readDraft() })}
       >
-        Форкнуть
+        {dialogs.forkAction}
       </button>
 
       {asking && (
         <NewSeasonDialog
-          heading="Форкнуть сезон"
-          warning={asking.draft ? draftWillBeLost(asking.draft.title) : undefined}
-          initialTitle={defaultSeasonTitle(template)}
+          heading={dialogs.fork}
+          warning={
+            asking.draft ? fill(dialogs.draftWillBeLost, { title: asking.draft.title }) : undefined
+          }
+          initialTitle={defaultSeasonTitle(template, lang)}
           busy={busy}
           onDismiss={() => setAsking(null)}
           onSubmit={(title) => void fork(title)}

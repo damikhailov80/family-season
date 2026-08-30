@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useDict } from '../../i18n/context'
 import styles from './Toast.module.css'
 
 /**
@@ -17,6 +18,7 @@ import styles from './Toast.module.css'
  */
 export function Toast({ message, timeout = 7000 }: { message: string; timeout?: number }) {
   const [visible, setVisible] = useState(true)
+  const { site } = useDict()
 
   useEffect(() => {
     const id = setTimeout(() => setVisible(false), timeout)
@@ -34,7 +36,7 @@ export function Toast({ message, timeout = 7000 }: { message: string; timeout?: 
         type="button"
         className={styles.close}
         onClick={() => setVisible(false)}
-        aria-label="Закрыть сообщение"
+        aria-label={site.toastClose}
       >
         ×
       </button>

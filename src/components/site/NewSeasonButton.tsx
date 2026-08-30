@@ -2,14 +2,10 @@
 
 import { useState, useTransition } from 'react'
 import { NewSeasonDialog } from '../edit/NewSeasonDialog'
-import {
-  draftWillBeLost,
-  emptyDraft,
-  readDraft,
-  writeDraft,
-  type Draft,
-} from '../../model/draft'
-import { ROUTES } from '../../model/site'
+import { useDict, useLang } from '../../i18n/context'
+import { fill } from '../../i18n/fill'
+import { emptyDraft, readDraft, writeDraft, type Draft } from '../../model/draft'
+import { sheetHref } from '../../model/site'
 import { createSeason } from '../../server/actions'
 
 /**
@@ -41,6 +37,8 @@ export function NewSeasonButton({
 }) {
   const [asking, setAsking] = useState<{ draft: Draft | null; title: string } | null>(null)
   const [busy, start] = useTransition()
+  const lang = useLang()
+  const { dialogs } = useDict()
 
   /*
    * И черновик, и умолчание имени берутся в обработчике, а не в рендере.
@@ -50,18 +48,20 @@ export function NewSeasonButton({
    * то есть `emptyDraft()` в рендере была бы нечистой функцией.
    */
   const ask = () =>
-    setAsking({ draft: signedIn ? null : readDraft(), title: emptyDraft().title })
+    setAsking({ draft: signedIn ? null : readDraft(), title: emptyDraft(lang).title })
 
   const create = (title: string) => {
     if (!signedIn) {
-      writeDraft({ ...emptyDraft(), title })
-      location.assign(ROUTES.sheetEdit)
+      // Новый черновик собирается языком интерфейса: другого у него взяться
+      // неоткуда — заводят его прямо сейчас и на том языке, что перед глазами.
+      writeDraft({ ...emptyDraft(lang), title })
+      location.assign(sheetHref(lang, 'edit'))
       return
     }
     // Действие кончается редиректом в любом случае, поэтому окно не закрываем:
     // `useTransition` держит ожидание сам, а свой флажок залип бы — маршрут
     // перерисовывается на месте, компонент не перемонтируется.
-    start(() => createSeason(title))
+    start(() => createSeason(title, lang))
   }
 
   return (
@@ -72,8 +72,10 @@ export function NewSeasonButton({
 
       {asking && (
         <NewSeasonDialog
-          heading="Новый сезон"
-          warning={asking.draft ? draftWillBeLost(asking.draft.title) : undefined}
+          heading={dialogs.newSeason}
+          warning={
+            asking.draft ? fill(dialogs.draftWillBeLost, { title: asking.draft.title }) : undefined
+          }
           initialTitle={asking.title}
           busy={busy}
           onDismiss={() => setAsking(null)}

@@ -1,4 +1,6 @@
 import { pickTargetMonth } from './calendar'
+import { posterText } from './labels'
+import type { Lang } from './lang'
 import { pack, unpack, type Packed, type PackedPerson } from './codec'
 import type { Template } from './types'
 
@@ -74,26 +76,12 @@ export function withTargetMonth(template: Template): Template {
  * показывать семью. Подменяются ровно `names`: бланк от этого не меняется, и на
  * уникальность публикации замена не влияет (имена в сравнении не участвуют).
  *
- * Имена берутся без повторов: две «Ани» в одной семье читались бы как ошибка,
- * а не как анонимность.
+ * Имена берутся из словаря языка **сезона** и без повторов: две «Ани» в одной
+ * семье читались бы как ошибка, а не как анонимность, а русские имена в
+ * польском сезоне выдавали бы не то, что человек прятал.
  */
-const ANON_NAMES = [
-  'Аня',
-  'Боря',
-  'Вера',
-  'Гриша',
-  'Даша',
-  'Егор',
-  'Женя',
-  'Зина',
-  'Ира',
-  'Костя',
-  'Лена',
-  'Миша',
-]
-
-export function anonymousNames(count: number): string[] {
-  const pool = [...ANON_NAMES]
+export function anonymousNames(count: number, lang: Lang): string[] {
+  const pool = [...posterText(lang).anonNames]
   return Array.from({ length: count }, () => {
     const index = Math.floor(Math.random() * pool.length)
     return pool.splice(index, 1)[0] ?? ''

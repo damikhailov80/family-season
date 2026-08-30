@@ -1,9 +1,10 @@
 import { auth } from './auth'
 import { query } from './db'
 import { logger } from './logger'
-import { monthName } from '../model/calendar'
+import { monthInText, monthName } from '../model/calendar'
 import { IDEAS_PAGE, PUBLISH_LIMIT, type PublishStatus, type ReactionStatus } from '../model/community'
 import { knownIconSet } from '../model/icons'
+import { knownLang, type Lang } from '../model/lang'
 import { defaultSeasonTitle, ideaTitle, LIBRARY_LIMIT, type LibrarySort } from '../model/library'
 import { knownPalette } from '../model/palettes'
 import { anonymousNames, joinSeason, withTargetMonth } from '../model/season'
@@ -25,6 +26,12 @@ export interface PublicSeasonView {
   template: Template
   palette: PaletteId
   iconSet: IconSetId
+  /**
+   * Язык сезона: им подписан лист. Языком витрины не фильтруется — прямая
+   * ссылка обязана открываться из любого языка, и русскую идею в польском
+   * интерфейсе показываем русской, а не переписанной.
+   */
+  lang: Lang
   /** Набор заполнения — только у системных сезонов, у людских его не бывает. */
   fillId: string | null
   /** Это выложил тот, кто сейчас смотрит: ему можно убрать сезон с витрины. */
@@ -51,6 +58,7 @@ interface Row {
   names: unknown
   palette: string
   icon_set: string
+  language: string
   fill_id: string | null
   rolling_month: boolean
   author_key: string | null
@@ -79,7 +87,7 @@ export async function readPublicSeason(value: string): Promise<PublicSeasonState
   const me = session?.accountKey ?? ''
   const result = await query<Row>(
     'public:read',
-    `select p.code, p.content, p.names, p.palette, p.icon_set, p.fill_id, p.rolling_month,
+    `select p.code, p.content, p.names, p.palette, p.icon_set, p.language, p.fill_id, p.rolling_month,
             p.author_key, p.hidden_at, p.blocked_at,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes,
             exists(select 1 from public_likes l
@@ -114,6 +122,7 @@ export async function readPublicSeason(value: string): Promise<PublicSeasonState
       template: row.rolling_month ? withTargetMonth(template) : template,
       palette: knownPalette(row.palette),
       iconSet: knownIconSet(row.icon_set),
+      lang: knownLang(row.language),
       fillId: row.fill_id,
       // Системный сезон ничей: убрать его с витрины нельзя никому.
       mine: Boolean(row.author_key) && row.author_key === session?.accountKey,
@@ -171,6 +180,7 @@ export async function noteFork(value: string): Promise<void> {
  */
 export async function previewPublish(
   value: string,
+  lang: Lang,
 ): Promise<{ status: PublishStatus; code?: string }> {
   const code = codeOrNull(value)
   const session = await auth()
@@ -191,7 +201,7 @@ export async function previewPublish(
      existing as (
        select code, hidden_at, blocked_at, author_key = $2 as own
          from public_seasons
-        where content_key = md5((select content from mine)::text)
+        where content_key = md5($4 || (select content from mine)::text)
      ),
      room as (
        select count(*) < $3 as ok from public_seasons
@@ -203,7 +213,7 @@ export async function previewPublish(
             coalesce((select blocked_at is not null from existing), false) as blocked,
             coalesce((select own from existing), false) as own,
             (select ok from room) as room`,
-    [code, session.accountKey, PUBLISH_LIMIT],
+    [code, session.accountKey, PUBLISH_LIMIT, lang],
   )
   if (result.status !== 'ok') {
     logger.error('publish not previewed', { code, reason: result.status })
@@ -256,6 +266,7 @@ export async function previewPublish(
 export async function publishSeason(
   value: string,
   anonymize: boolean,
+  lang: Lang,
 ): Promise<{ status: PublishStatus; code?: string; fresh?: boolean }> {
   const code = codeOrNull(value)
   const session = await auth()
@@ -283,7 +294,7 @@ export async function publishSeason(
   if (!row) return { status: 'error' }
 
   const names = Array.isArray(row.names) ? row.names : []
-  const shown = anonymize ? anonymousNames(names.length) : names
+  const shown = anonymize ? anonymousNames(names.length, lang) : names
   const id = Number(row.id)
 
   const result = await query<{
@@ -299,7 +310,7 @@ export async function publishSeason(
     `with mine as (
        select content, palette, icon_set from user_seasons where code = $1 and account_key = $2
      ),
-     key as (select md5((select content from mine)::text) as value),
+     key as (select md5($7 || (select content from mine)::text) as value),
      existing as (
        select code, blocked_at, hidden_at
          from public_seasons where content_key = (select value from key)
@@ -323,8 +334,9 @@ export async function publishSeason(
        returning code
      ),
      added as (
-       insert into public_seasons (id, code, author_key, content, names, palette, icon_set)
-       select $3, $4, $2, m.content, $5::jsonb, m.palette, m.icon_set from mine m
+       insert into public_seasons
+         (id, code, author_key, content, names, palette, icon_set, language)
+       select $3, $4, $2, m.content, $5::jsonb, m.palette, m.icon_set, $7 from mine m
         where (select ok from room) and not exists (select 1 from existing)
        returning code
      )
@@ -334,7 +346,15 @@ export async function publishSeason(
             (select code from existing) as existing,
             (select blocked_at is not null from existing) as blocked,
             (select hidden_at is not null from existing) as off`,
-    [code, session.accountKey, id, shortCode('public', id), JSON.stringify(shown), PUBLISH_LIMIT],
+    [
+      code,
+      session.accountKey,
+      id,
+      shortCode('public', id),
+      JSON.stringify(shown),
+      PUBLISH_LIMIT,
+      lang,
+    ],
   )
   if (result.status !== 'ok') {
     logger.error('season not published', { code, reason: result.status })
@@ -479,12 +499,22 @@ export async function republishPublic(value: string): Promise<PublishStatus> {
   return row.room === false ? 'limit' : 'error'
 }
 
+/**
+ * «сентябрь 2026» — месяц строки списка, языком **сезона**: месяц часть самого
+ * сезона, и в чужом языке он не переименовывается.
+ */
+function monthOf(template: Template, lang: Lang): string {
+  return `${monthInText(monthName(template.theme, lang), lang)} ${template.theme.year}`
+}
+
 /** Строка витрины: мини-постер, его название и то, чем он оброс у людей. */
 export interface Idea {
   code: string
   title: string
   palette: PaletteId
   template: Template
+  /** Язык сезона: им подписаны подсказки пустых полей на мини-постере. */
+  lang: Lang
   likes: number
   /** Ничей системный сезон — наш пример: флажка жалобы у него нет. */
   system: boolean
@@ -506,29 +536,35 @@ export type IdeasState = { status: 'ok'; ideas: Idea[] } | { status: 'error' }
  * Автоматический порог тут стоял раньше и был плох двумя вещами сразу: сезон
  * пропадал молча, а шестеро сговорившихся убирали чужое без всякого разбора.
  * Снятые с витрины сюда не попадают тоже.
+ *
+ * Язык — условие выборки, а не украшение: идею берут, чтобы её прочитать, и
+ * витрина, полная непонятных постеров, бесполезна. Прямая ссылка при этом
+ * работает из любого языка (`readPublicSeason` языком не фильтрует): пришедшему
+ * по ссылке сезон уже показали, и прятать его поздно.
  */
-export async function randomIdeas(): Promise<IdeasState> {
+export async function randomIdeas(lang: Lang): Promise<IdeasState> {
   const result = await query<{
     code: string
     content: unknown
     names: unknown
     palette: string
+    language: string
     rolling_month: boolean
     likes: number
     system: boolean
   }>(
     'public:ideas',
-    `select p.code, p.content, p.names, p.palette, p.rolling_month,
+    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_month,
             p.author_key is null as system,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes
        from public_seasons p
-      where p.hidden_at is null and p.blocked_at is null
+      where p.hidden_at is null and p.blocked_at is null and p.language = $2
       order by power(
                  random(),
                  1.0 / (1 + (select count(*) from public_likes l where l.public_id = p.id))
                ) desc
       limit $1`,
-    [IDEAS_PAGE],
+    [IDEAS_PAGE, lang],
   )
 
   if (result.status !== 'ok') {
@@ -546,8 +582,9 @@ export async function randomIdeas(): Promise<IdeasState> {
         // Название выводится из содержимого, а не хранится колонкой: публикацию
         // не называют руками, и второй копии этой строки быть не должно.
         // Месяца с годом в нём нет: идее они цены не добавляют (см. `ideaTitle`).
-        title: ideaTitle(shown),
+        title: ideaTitle(shown, knownLang(row.language)),
         palette: knownPalette(row.palette),
+        lang: knownLang(row.language),
         template: shown,
         likes: row.likes,
         system: row.system,
@@ -728,15 +765,16 @@ export async function addReport(value: string, comment: string): Promise<Reactio
   const result = await query<Verdict & { room: boolean }>(
     'public:report',
     `with post as (
-       select code, author_key, blocked_at, content from public_seasons where code = $1
+       select code, author_key, blocked_at, content, language
+         from public_seasons where code = $1
      ),
      room as (
        select count(*) < $4 as ok from public_reports
         where reporter_key = $2 and code is distinct from $1
      ),
      added as (
-       insert into public_reports (code, author_key, reporter_key, comment, content)
-       select code, author_key, $2, $3, content from post
+       insert into public_reports (code, author_key, reporter_key, comment, content, language)
+       select code, author_key, $2, $3, content, language from post
         where author_key is not null and author_key <> $2
           and blocked_at is null and (select ok from room)
        on conflict (code, reporter_key)
@@ -789,6 +827,8 @@ export interface FavoriteEntry {
   savedAt: Date
   palette: PaletteId
   month: string
+  /** Язык сезона: им названы и месяц, и сам сезон в строке списка. */
+  lang: Lang
   /** Сезон сняли с витрины: по ссылке он открывается, в «Идеях» его нет. */
   hidden: boolean
 }
@@ -808,6 +848,7 @@ export type FavoritesState =
 export async function listFavorites(
   search: string,
   sort: LibrarySort,
+  lang: Lang,
 ): Promise<FavoritesState> {
   const session = await auth()
   if (!session?.user) return { status: 'anonymous' }
@@ -818,12 +859,14 @@ export async function listFavorites(
     content: unknown
     names: unknown
     palette: string
+    language: string
     rolling_month: boolean
     hidden_at: Date | null
     created_at: Date
   }>(
     'public:favorites',
-    `select p.code, p.content, p.names, p.palette, p.rolling_month, p.hidden_at, f.created_at
+    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_month, p.hidden_at,
+            f.created_at
        from public_favorites f
        join public_seasons p on p.id = f.public_id
       where f.account_key = $1 and p.blocked_at is null
@@ -841,10 +884,11 @@ export async function listFavorites(
     const shown = row.rolling_month ? withTargetMonth(template) : template
     return {
       code: row.code,
-      title: defaultSeasonTitle(shown),
+      title: defaultSeasonTitle(shown, knownLang(row.language)),
       savedAt: row.created_at,
       palette: knownPalette(row.palette),
-      month: `${monthName(shown.theme).toLowerCase()} ${shown.theme.year}`,
+      month: monthOf(shown, knownLang(row.language)),
+      lang: knownLang(row.language),
       hidden: Boolean(row.hidden_at),
     }
   })
@@ -852,7 +896,7 @@ export async function listFavorites(
   const found = search
     ? entries.filter((entry) => entry.title.toLowerCase().includes(search.toLowerCase()))
     : entries
-  if (sort === 'name') found.sort((a, b) => a.title.localeCompare(b.title, 'ru'))
+  if (sort === 'name') found.sort((a, b) => a.title.localeCompare(b.title, lang))
   return { status: 'ok', entries: found }
 }
 
@@ -863,6 +907,8 @@ export interface PublishedEntry {
   savedAt: Date
   palette: PaletteId
   month: string
+  /** Язык публикации: он выбран при выкладывании и больше не меняется. */
+  lang: Lang
   /** Снята с витрины: живёт по ссылке, в «Идеях» её нет. */
   hidden: boolean
   /** Закрыта после разбора жалоб: не открывается нигде. */
@@ -889,6 +935,7 @@ export type PublishedState =
 export async function listPublished(
   search: string,
   sort: LibrarySort,
+  lang: Lang,
 ): Promise<PublishedState> {
   const session = await auth()
   if (!session?.user) return { status: 'anonymous' }
@@ -899,6 +946,7 @@ export async function listPublished(
     content: unknown
     names: unknown
     palette: string
+    language: string
     rolling_month: boolean
     hidden_at: Date | null
     blocked_at: Date | null
@@ -908,8 +956,8 @@ export async function listPublished(
     forks: number
   }>(
     'public:mine',
-    `select p.code, p.content, p.names, p.palette, p.rolling_month, p.hidden_at, p.blocked_at,
-            p.created_at,
+    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_month,
+            p.hidden_at, p.blocked_at, p.created_at,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes,
             (select count(*) from public_favorites f where f.public_id = p.id)::int as favorites,
             (select count(*) from public_forks k where k.public_id = p.id)::int as forks
@@ -929,10 +977,11 @@ export async function listPublished(
     const shown = row.rolling_month ? withTargetMonth(template) : template
     return {
       code: row.code,
-      title: defaultSeasonTitle(shown),
+      title: defaultSeasonTitle(shown, knownLang(row.language)),
       savedAt: row.created_at,
       palette: knownPalette(row.palette),
-      month: `${monthName(shown.theme).toLowerCase()} ${shown.theme.year}`,
+      month: monthOf(shown, knownLang(row.language)),
+      lang: knownLang(row.language),
       hidden: Boolean(row.hidden_at),
       blocked: Boolean(row.blocked_at),
       likes: row.likes,
@@ -944,6 +993,6 @@ export async function listPublished(
   const found = search
     ? entries.filter((entry) => entry.title.toLowerCase().includes(search.toLowerCase()))
     : entries
-  if (sort === 'name') found.sort((a, b) => a.title.localeCompare(b.title, 'ru'))
+  if (sort === 'name') found.sort((a, b) => a.title.localeCompare(b.title, lang))
   return { status: 'ok', entries: found }
 }

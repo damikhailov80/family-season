@@ -2,11 +2,12 @@
 
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Poster } from '../../components/Poster'
-import { FloatingControls } from '../../components/edit/FloatingControls'
-import { emptyDraft, readDraft } from '../../model/draft'
-import { modeFromPath } from '../../model/site'
-import { SeasonProvider } from '../../state/SeasonProvider'
+import { Poster } from '../../../components/Poster'
+import { FloatingControls } from '../../../components/edit/FloatingControls'
+import { useLang } from '../../../i18n/context'
+import { emptyDraft, readDraft } from '../../../model/draft'
+import { modeFromPath } from '../../../model/site'
+import { SeasonProvider } from '../../../state/SeasonProvider'
 import { DraftBar } from './DraftBar'
 import { DraftStore } from './DraftStore'
 
@@ -21,7 +22,14 @@ import { DraftStore } from './DraftStore'
  * доступно уже в первом рендере: паузы на чтение нет.
  */
 export default function Sheet({ signedIn }: { signedIn: boolean }) {
-  const [boot] = useState(() => readDraft() ?? emptyDraft())
+  const lang = useLang()
+  /*
+   * Язык нового черновика — язык интерфейса: другого у него взяться неоткуда,
+   * его собирают прямо сейчас и на том языке, что перед глазами. У готового
+   * черновика язык свой, записанный при заведении, и переключение сайта его не
+   * трогает — ровно как у строки в базе.
+   */
+  const [boot] = useState(() => readDraft() ?? emptyDraft(lang))
   /*
    * Путь берём у роутера, а не из `location`: при мягком переходе между
    * `/sheet` и `/sheet/edit` лист не перемонтируется (тот же элемент на том же
@@ -37,7 +45,7 @@ export default function Sheet({ signedIn }: { signedIn: boolean }) {
       <DraftBar editing={editing} title={boot.title} signedIn={signedIn} />
       <FloatingControls />
       <Poster />
-      <DraftStore title={boot.title} />
+      <DraftStore title={boot.title} lang={boot.lang} />
     </SeasonProvider>
   )
 }

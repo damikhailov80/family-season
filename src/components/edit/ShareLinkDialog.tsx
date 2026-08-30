@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { Dialog } from '../dialog/Dialog'
 import styles from '../dialog/Dialog.module.css'
+import { useDict, useLang } from '../../i18n/context'
 import { sharedHref } from '../../model/site'
 
 /**
@@ -46,49 +47,49 @@ export function ShareLinkDialog({
   onCopy: (url: string) => void
 }) {
   const field = useRef<HTMLInputElement>(null)
+  const { dialogs } = useDict()
+  const lang = useLang()
 
   useEffect(() => {
     if (token) field.current?.select()
   }, [token])
 
-  const url = token ? `${location.origin}${sharedHref(token)}` : ''
+  const url = token ? `${location.origin}${sharedHref(lang, token)}` : ''
 
   return (
     <Dialog
-      title="Поделиться ссылкой"
+      title={dialogs.share}
       onDismiss={onDismiss}
       actions={
         token ? (
           <>
             <button type="button" className={styles.ghost} onClick={onRevoke} disabled={busy}>
-              Отозвать
+              {dialogs.shareRevoke}
             </button>
             <button type="button" className={styles.primary} onClick={onDismiss} disabled={busy}>
-              Закрыть
+              {dialogs.close}
             </button>
           </>
         ) : (
           <>
             <button type="button" className={styles.ghost} onClick={onDismiss} disabled={busy}>
-              Закрыть
+              {dialogs.close}
             </button>
             <button type="button" className={styles.primary} onClick={onIssue} disabled={busy}>
-              Создать ссылку
+              {dialogs.shareCreate}
             </button>
           </>
         )
       }
     >
       <p className={styles.text}>
-        {token
-          ? 'Отправьте ссылку тому, кому хотите показать сезон.'
-          : 'Создайте ссылку, чтобы поделиться сезоном.'}
+        {token ? dialogs.shareHave : dialogs.shareNone}
       </p>
 
       {token && (
         <>
           <label className={styles.label} htmlFor="share-url">
-            Ссылка
+            {dialogs.shareLabel}
           </label>
           <div className={styles.field}>
             <input
@@ -105,7 +106,7 @@ export function ShareLinkDialog({
               onClick={() => onCopy(url)}
               disabled={busy}
             >
-              Скопировать
+              {dialogs.shareCopy}
             </button>
           </div>
         </>

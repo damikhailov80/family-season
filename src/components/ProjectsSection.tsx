@@ -1,8 +1,9 @@
-import { FACE_LABELS } from '../model/accents'
+import { faceLabels } from '../model/accents'
 import { percentFor } from '../model/fill'
-import { LABELS, PLACEHOLDERS } from '../model/labels'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
-import { useDoc } from '../state/docContext'
+import { useDict } from '../i18n/context'
+import { fill as insert } from '../i18n/fill'
+import { useDoc, usePoster } from '../state/docContext'
 import { AvatarFace } from './AvatarFace'
 import { Badge } from './Badge'
 import { PosterIcon } from './doodles/PosterIcon'
@@ -12,18 +13,23 @@ import { ProgressBar } from './ProgressBar'
 import styles from './ProjectsSection.module.css'
 
 export function ProjectsSection() {
-  const { template, fill, field, editing, addPerson, removePerson, cycleFace } = useDoc()
+  const { template, fill, field, editing, addPerson, removePerson, cycleFace, lang } = useDoc()
+  const { labels, placeholders } = usePoster()
+  const dict = useDict()
+  // Подпись рисунка — часть листа, поэтому языком сезона; сама кнопка вокруг
+  // неё экранная, и её слова приходят из словаря интерфейса.
+  const faces = faceLabels(lang)
   const people = template.people
 
   return (
     <section aria-labelledby="projects-label" className={styles.section}>
       <div className={styles.head}>
         <Badge accent="projects">
-          <span id="projects-label">{LABELS.projects}</span>
+          <span id="projects-label">{labels.projects}</span>
         </Badge>
         <EditableText
           className={styles.note}
-          placeholder={PLACEHOLDERS.projectsNote}
+          placeholder={placeholders.projectsNote}
           {...field('projectsNote')}
         />
         <PosterIcon slot="path" className={styles.rocket} size={48} />
@@ -44,8 +50,8 @@ export function ProjectsSection() {
                     type="button"
                     className={`${styles.avatarRing} ${styles.avatarButton}`}
                     onClick={() => cycleFace(person.id)}
-                    title="Сменить рисунок"
-                    aria-label={`Рисунок: ${FACE_LABELS[person.face]}. Сменить`}
+                    title={dict.editor.changeFace}
+                    aria-label={insert(dict.editor.faceAria, { face: faces[person.face] })}
                   >
                     <AvatarFace variant={person.face} size={48} />
                   </button>
@@ -56,7 +62,7 @@ export function ProjectsSection() {
                 )}
                 <EditableText
                   className={styles.role}
-                  placeholder={PLACEHOLDERS.name}
+                  placeholder={placeholders.name}
                   {...field(`people.${index}.name`)}
                 />
               </div>
@@ -64,36 +70,36 @@ export function ProjectsSection() {
               <div className={styles.content}>
                 <div className={styles.main}>
                   <p className={styles.projectLine}>
-                    <span className={styles.fieldLabel}>{LABELS.fieldProject}</span>
+                    <span className={styles.fieldLabel}>{labels.fieldProject}</span>
                     <EditableText
                       className={styles.projectName}
-                      placeholder={PLACEHOLDERS.project}
+                      placeholder={placeholders.project}
                       {...field(`people.${index}.project`)}
                     />
                   </p>
                   <EditableText
                     as="p"
                     className={styles.description}
-                    placeholder={PLACEHOLDERS.description}
+                    placeholder={placeholders.description}
                     {...field(`people.${index}.description`)}
                   />
                 </div>
 
                 <div className={styles.progress}>
-                  <span className={styles.fieldLabel}>{LABELS.fieldProgress}</span>
+                  <span className={styles.fieldLabel}>{labels.fieldProgress}</span>
                   <div className={styles.progressRow}>
                     <ProgressBar
                       percent={percent}
-                      label={person.project || person.name || PLACEHOLDERS.project}
+                      label={person.project || person.name || placeholders.project}
                     />
                   </div>
                 </div>
 
                 <p className={styles.goal}>
-                  <span className={styles.fieldLabel}>{LABELS.fieldGoal}</span>
+                  <span className={styles.fieldLabel}>{labels.fieldGoal}</span>
                   <EditableText
                     className={styles.goalText}
-                    placeholder={PLACEHOLDERS.personGoal}
+                    placeholder={placeholders.personGoal}
                     {...field(`people.${index}.goal`)}
                   />
                 </p>
@@ -104,8 +110,8 @@ export function ProjectsSection() {
                   type="button"
                   className={styles.remove}
                   onClick={() => removePerson(person.id)}
-                  aria-label={`Убрать: ${person.name || FACE_LABELS[person.face]}`}
-                  title="Убрать из листа"
+                  aria-label={insert(dict.editor.removePerson, { name: person.name || faces[person.face] })}
+                  title={dict.editor.removePersonTitle}
                 >
                   ×
                 </button>
@@ -118,7 +124,7 @@ export function ProjectsSection() {
           <div className={styles.actions}>
             {people.length < MAX_PEOPLE && (
               <button type="button" className={styles.add} onClick={addPerson}>
-                + Добавить человека
+                {dict.editor.addPerson}
               </button>
             )}
             {/* Кнопки нет, пока состав семьи не задан в кабинете, — см. FamilySwap. */}

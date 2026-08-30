@@ -1,5 +1,4 @@
-import { LABELS } from '../model/labels'
-import { useDoc } from '../state/docContext'
+import { useDoc, usePoster } from '../state/docContext'
 import { PosterIcon } from './doodles/PosterIcon'
 import { SectionBox } from './SectionBox'
 import styles from './NextMonthIdeas.module.css'
@@ -10,6 +9,7 @@ import styles from './NextMonthIdeas.module.css'
  */
 export function NextMonthIdeas() {
   const { fill } = useDoc()
+  const { labels } = usePoster()
 
   return (
     <section aria-labelledby="ideas-label" className={styles.wrap}>
@@ -17,7 +17,7 @@ export function NextMonthIdeas() {
 
       <SectionBox
         accent="theme"
-        label={LABELS.nextIdeas}
+        label={labels.nextIdeas}
         labelId="ideas-label"
         className={styles.box}
         bodyClassName={styles.body}

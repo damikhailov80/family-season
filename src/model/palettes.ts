@@ -1,4 +1,5 @@
 import { PALETTES } from './palettes.data'
+import type { Lang } from './lang'
 import type { PaletteId } from '../types'
 
 /**
@@ -16,10 +17,16 @@ import type { PaletteId } from '../types'
 
 export const PALETTE_ORDER: PaletteId[] = PALETTES.map(([id]) => id)
 
-export const PALETTE_LABELS: Record<PaletteId, string> = Object.fromEntries(PALETTES) as Record<
-  PaletteId,
-  string
->
+/**
+ * Подписи тем на всех трёх языках: их видно на кнопке переключателя и в полосе
+ * тем на лендинге, значит, они часть интерфейса и переводятся вместе с ним.
+ * Собираются `tools/palettes/build.mjs` — руками их не правят.
+ */
+const LABELS = Object.fromEntries(PALETTES) as Record<PaletteId, Record<Lang, string>>
+
+export function paletteLabel(palette: PaletteId, lang: Lang): string {
+  return LABELS[palette][lang]
+}
 
 /** «Янтарь и лазурь» — тот же тёмно-синий с охрой, что и до появления ста тем. */
 export const DEFAULT_PALETTE: PaletteId = 'amber-azure'

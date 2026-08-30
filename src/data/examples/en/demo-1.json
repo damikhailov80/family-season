@@ -1,0 +1,92 @@
+{
+  "name": "Spider-Man Month",
+  "summary": "Eight films back to back, three eras and one argument: whose Spider-Man is ours?",
+  "note": "four of us · season lived to the end",
+  "palette": "greece",
+  "icons": "classic",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our family. Our evenings. Our stories."
+    },
+    "theme": {
+      "subtitle": "Spider-Man Month",
+      "question": "Whose Spider-Man turned out to be ours?"
+    },
+    "weeksNote": "4 weeks – 8 films – one hero",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Tobey Maguire: three films, evening by evening"
+      },
+      {
+        "title": "Week 2",
+        "text": "Andrew Garfield: both parts over a weekend"
+      },
+      {
+        "title": "Week 3",
+        "text": "Tom Holland: two parts on weeknights"
+      },
+      {
+        "title": "Week 4",
+        "text": "Tom Holland: the finale with all three"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Watch every Spider-Man film and pick the one that is ours.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Clearing the garage",
+        "description": "One shelf every weekend",
+        "goal": "Get to the far corner"
+      },
+      {
+        "id": "p2",
+        "name": "Mom",
+        "face": "mom",
+        "project": "Reading at night",
+        "description": "Twenty pages instead of the feed",
+        "goal": "Finish what I started in spring"
+      },
+      {
+        "id": "p3",
+        "name": "Alex",
+        "face": "son",
+        "project": "Pull-up bar outside",
+        "description": "Every other day, no records",
+        "goal": "Two more than when I started"
+      },
+      {
+        "id": "p4",
+        "name": "Lisa",
+        "face": "daughter",
+        "project": "Drawing every day",
+        "description": "One sketch before bed",
+        "goal": "Skip no more than three days"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 40,
+      "p2": 60,
+      "p3": 70,
+      "p4": 50
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggyg",
+      "p2": "gygggyygggryggygg",
+      "p3": "ggggyggyggggyyggg",
+      "p4": "gyrggygggyryggygg"
+    },
+    "summaryAnswer": "— We watched the 2000s trilogy three evenings running and argued about the scariest villain.\n— Lisa fell asleep halfway through the second film and demanded the whole plot at breakfast.\n— Alex climbed the hallway wall and brought down the coat rack: the suit was a bedsheet.\n— On the last evening everyone picked their own: three of us agreed, Dad held his ground.",
+    "nextIdeas": "— Board game month: a new game every Friday, the winner picks dessert.\n— A walk in the woods for mushrooms, with a thermos and sandwiches in the backpack.\n— Put together a photo album for the month and caption every picture by hand.\n— Bake grandma's pie — all of us together, no hints.",
+    "photos": {
+      "0": "/examples/demo-1/week-1.svg",
+      "1": "/examples/demo-1/week-2.svg"
+    }
+  }
+}

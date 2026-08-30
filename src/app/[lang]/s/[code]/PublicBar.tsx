@@ -7,30 +7,32 @@ import {
   MegaphoneDoodle,
   PrinterDoodle,
   SparkStar,
-} from '../../../components/doodles'
-import { LikeCount } from '../../../components/community/LikeCount'
-import { ForkButton } from '../../../components/edit/ForkButton'
-import { LoginDialog } from '../../../components/edit/LoginDialog'
-import { ReportDialog } from '../../../components/edit/ReportDialog'
-import { WithdrawDialog } from '../../../components/edit/WithdrawDialog'
-import { Toast } from '../../../components/site/Toast'
+} from '../../../../components/doodles'
+import { LikeCount } from '../../../../components/community/LikeCount'
+import { ForkButton } from '../../../../components/edit/ForkButton'
+import { LoginDialog } from '../../../../components/edit/LoginDialog'
+import { ReportDialog } from '../../../../components/edit/ReportDialog'
+import { WithdrawDialog } from '../../../../components/edit/WithdrawDialog'
+import { Toast } from '../../../../components/site/Toast'
+import { useDict, useLang } from '../../../../i18n/context'
+import { fill } from '../../../../i18n/fill'
 import {
-  PUBLISH_TEXT,
-  REACTION_TEXT,
+  publishText,
+  reactionText,
   type LoginReason,
   type ReactionStatus,
-} from '../../../model/community'
-import { ideaTitle } from '../../../model/library'
-import { ROUTES } from '../../../model/site'
+} from '../../../../model/community'
+import { ideaTitle } from '../../../../model/library'
+import { ROUTES, withLang } from '../../../../model/site'
 import {
   favoriteSeason,
   likeSeason,
   reportSeason,
   republishSeason,
   withdrawSeason,
-} from '../../../server/actions'
-import { useDoc } from '../../../state/docContext'
-import styles from '../../../components/edit/Bar.module.css'
+} from '../../../../server/actions'
+import { useDoc } from '../../../../state/docContext'
+import styles from '../../../../components/edit/Bar.module.css'
 
 /** Толщина обводки рисунков из библиотеки в размере кнопки — см. `Icon`. */
 const ICON_STROKE = 4
@@ -50,7 +52,12 @@ const ICON_STROKE = 4
  * в ответ услышать «сначала войдите», нельзя — там вход спрошен заранее.
  *
  * Окно входа одно, но разговор у каждой кнопки свой: причина едет в него
- * состоянием (`login`), а слова лежат в `LOGIN_TEXT`.
+ * состоянием (`login`), а слова — в словаре (`status.login`).
+ *
+ * Языков здесь два. Подсказка называет сезон его собственным названием, и оно
+ * выводится из содержимого языком **сезона**; всё остальное — кнопки, окна,
+ * тосты — говорит языком интерфейса. Прямая ссылка открывается из любого языка,
+ * и русский сезон в польском интерфейсе — обычное дело.
  */
 export function PublicBar({
   code,
@@ -78,7 +85,9 @@ export function PublicBar({
 }) {
   // Название берётся из содержимого, а не из строки: колонка рядом была бы
   // второй копией того, что уже лежит в `content`.
-  const { template } = useDoc()
+  const { template, lang } = useDoc()
+  const uiLang = useLang()
+  const { bars } = useDict()
   const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
   /** Открытое окно входа помнит, ради чего его открыли: слова у трёх кнопок разные. */
@@ -107,7 +116,7 @@ export function PublicBar({
   /** «Войдите» — не отказ сервера, а предложение: его показывает окно, не тост. */
   const react = (status: ReactionStatus, reason: LoginReason) => {
     if (status === 'anonymous') setLogin(reason)
-    else if (status !== 'ok') setNotice({ text: REACTION_TEXT[status], at: Date.now() })
+    else if (status !== 'ok') setNotice({ text: reactionText(uiLang, status), at: Date.now() })
     return status === 'ok'
   }
 
@@ -137,7 +146,7 @@ export function PublicBar({
     setReportOpen(false)
     if (!react(status, 'report')) return
     setMarks({ ...marks, reported: true })
-    setNotice({ text: 'Жалоба отправлена', at: Date.now() })
+    setNotice({ text: bars.reportDone, at: Date.now() })
   }
 
   const copyLink = async () => {
@@ -146,10 +155,10 @@ export function PublicBar({
     const url = location.href
     try {
       await navigator.clipboard.writeText(url)
-      setNotice({ text: 'Ссылка скопирована', at: Date.now() })
+      setNotice({ text: bars.linkCopied, at: Date.now() })
     } catch {
       // Без разрешения на буфер — показываем ссылку, скопирует руками.
-      prompt('Ссылка на сезон:', url)
+      prompt(bars.linkPrompt, url)
     }
   }
 
@@ -160,7 +169,7 @@ export function PublicBar({
     setWithdrawOpen(false)
     if (result.status !== 'ok') {
       setNotice({
-        text: PUBLISH_TEXT[result.status as 'duplicate' | 'limit' | 'stale' | 'error'],
+        text: publishText(uiLang, result.status as 'duplicate' | 'limit' | 'stale' | 'error'),
         at: Date.now(),
       })
       return
@@ -168,7 +177,7 @@ export function PublicBar({
     // Осталась скрытой — страница по-прежнему открывается, и её надо перечитать;
     // ушла совсем — открывать больше нечего, уводим в кабинет.
     if (result.hidden) location.reload()
-    else location.assign(ROUTES.seasons)
+    else location.assign(withLang(uiLang, ROUTES.seasons))
   }
 
   /*
@@ -185,14 +194,14 @@ export function PublicBar({
       return
     }
     setNotice({
-      text: PUBLISH_TEXT[status as 'duplicate' | 'limit' | 'stale' | 'error'],
+      text: publishText(uiLang, status as 'duplicate' | 'limit' | 'stale' | 'error'),
       at: Date.now(),
     })
   }
 
   return (
     <>
-      <div className={styles.bar} role="toolbar" aria-label="Действия с сезоном">
+      <div className={styles.bar} role="toolbar" aria-label={bars.toolbarAria}>
         {/* Своё не откладывают и не лайкают: оно и так лежит в кабинете, а
             избранное вдобавок держало бы собственную публикацию от снятия. */}
         {!mine && (
@@ -203,8 +212,8 @@ export function PublicBar({
               onClick={() => void switchFavorite()}
               disabled={busy}
               aria-pressed={marks.favorited}
-              title={marks.favorited ? 'Убрать из избранного' : 'Отложить в избранное'}
-              aria-label={marks.favorited ? 'Убрать из избранного' : 'Отложить в избранное'}
+              title={marks.favorited ? bars.favoriteOff : bars.favoriteOn}
+              aria-label={marks.favorited ? bars.favoriteOff : bars.favoriteOn}
             >
               <SparkStar size={18} filled={marks.favorited} />
             </button>
@@ -217,12 +226,24 @@ export function PublicBar({
               onClick={() => void switchLike()}
               disabled={busy}
               aria-pressed={marks.liked}
-              title={marks.liked ? 'Убрать лайк' : 'Поставить лайк'}
-              aria-label={`${marks.liked ? 'Убрать лайк' : 'Поставить лайк'}${
-                marks.likes > 0 ? `, сейчас лайков: ${marks.likes}` : ''
-              }`}
+              title={marks.liked ? bars.likeOff : bars.likeOn}
+              aria-label={
+                marks.likes > 0
+                  ? fill(bars.likeAriaCount, {
+                      action: marks.liked ? bars.likeOff : bars.likeOn,
+                      n: marks.likes,
+                    })
+                  : marks.liked
+                    ? bars.likeOff
+                    : bars.likeOn
+              }
             >
-              <LikeCount likes={marks.likes} filled={marks.liked} hideZero />
+              <LikeCount
+                likes={marks.likes}
+                filled={marks.liked}
+                hideZero
+                label={fill(bars.likesAria, { n: marks.likes })}
+              />
             </button>
             {/* На наши примеры не жалуются: шестеро недовольных иначе убрали бы
                 их с витрины. */}
@@ -233,8 +254,8 @@ export function PublicBar({
                 onClick={() => (signedIn ? setReportOpen(true) : setLogin('report'))}
                 disabled={busy}
                 aria-pressed={marks.reported}
-                title={marks.reported ? 'Жалоба отправлена' : 'Пожаловаться'}
-                aria-label={marks.reported ? 'Жалоба отправлена' : 'Пожаловаться'}
+                title={marks.reported ? bars.reportDone : bars.reportOpen}
+                aria-label={marks.reported ? bars.reportDone : bars.reportOpen}
               >
                 <FlagDoodle size={18} filled={marks.reported} strokeWidth={ICON_STROKE} />
               </button>
@@ -248,7 +269,7 @@ export function PublicBar({
         {mine && (
           <LikeCount
             likes={marks.likes}
-            label={`Лайков на витрине: ${marks.likes}`}
+            label={fill(bars.likesOnShowcase, { n: marks.likes })}
             className={styles.score}
           />
         )}
@@ -258,8 +279,11 @@ export function PublicBar({
             витрины места нет — остаётся одно название. */}
         <span className={styles.hint}>
           {hidden
-            ? ideaTitle(template)
-            : `${demo ? 'Наш пример' : 'Сезон сообщества'}: ${ideaTitle(template)}`}
+            ? ideaTitle(template, lang)
+            : fill(bars.withTitle, {
+                place: demo ? bars.placeExample : bars.placePublic,
+                title: ideaTitle(template, lang),
+              })}
         </span>
 
         <span className={styles.actions}>
@@ -280,8 +304,8 @@ export function PublicBar({
               disabled={busy}
               aria-pressed={!hidden}
               onClick={() => (hidden ? void republish() : setWithdrawOpen(true))}
-              title={hidden ? 'Вернуть на витрину' : 'Убрать с витрины'}
-              aria-label={hidden ? 'Вернуть на витрину' : 'Убрать с витрины'}
+              title={hidden ? bars.republish : bars.withdraw}
+              aria-label={hidden ? bars.republish : bars.withdraw}
             >
               <MegaphoneDoodle size={19} strokeWidth={ICON_STROKE} />
             </button>
@@ -290,8 +314,8 @@ export function PublicBar({
             type="button"
             className={styles.icon}
             onClick={() => void copyLink()}
-            title="Скопировать ссылку на сезон"
-            aria-label="Скопировать ссылку на сезон"
+            title={bars.copyLink}
+            aria-label={bars.copyLink}
           >
             <LinkDoodle size={19} strokeWidth={3.4} />
           </button>
@@ -299,8 +323,8 @@ export function PublicBar({
             type="button"
             className={styles.icon}
             onClick={() => print()}
-            title="Печать / PDF"
-            aria-label="Печать / PDF"
+            title={bars.printTitle}
+            aria-label={bars.printTitle}
           >
             <PrinterDoodle size={19} strokeWidth={3.4} />
           </button>
@@ -327,11 +351,7 @@ export function PublicBar({
       {login && <LoginDialog reason={login} onClose={() => setLogin(null)} />}
       {published && (
         <Toast
-          message={
-            published === 'new'
-              ? 'Сезон на витрине'
-              : 'Такой сезон уже был на витрине'
-          }
+          message={published === 'new' ? bars.published : bars.publishedAgain}
         />
       )}
       {notice && <Toast key={notice.at} message={notice.text} />}

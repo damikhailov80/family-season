@@ -1,7 +1,11 @@
 [
   {
     "id": "desert",
-    "label": "Пустыня",
+    "label": {
+      "ru": "Пустыня",
+      "en": "Desert",
+      "pl": "Pustynia"
+    },
     "colors": [
       "#46211A",
       "#693D3D",
@@ -11,7 +15,11 @@
   },
   {
     "id": "autumn",
-    "label": "Осень",
+    "label": {
+      "ru": "Осень",
+      "en": "Autumn",
+      "pl": "Jesień"
+    },
     "colors": [
       "#8D230F",
       "#1E434C",
@@ -21,7 +29,11 @@
   },
   {
     "id": "foliage",
-    "label": "Тёплая листва",
+    "label": {
+      "ru": "Тёплая листва",
+      "en": "Warm Foliage",
+      "pl": "Ciepłe listowie"
+    },
     "colors": [
       "#2E2300",
       "#6E6702",
@@ -31,7 +43,11 @@
   },
   {
     "id": "spice",
-    "label": "Пряность",
+    "label": {
+      "ru": "Пряность",
+      "en": "Spice",
+      "pl": "Przyprawa"
+    },
     "colors": [
       "#AF4425",
       "#662E1C",
@@ -41,7 +57,11 @@
   },
   {
     "id": "rustic",
-    "label": "Тёплый рустик",
+    "label": {
+      "ru": "Тёплый рустик",
+      "en": "Warm Rustic",
+      "pl": "Ciepły rustykalny"
+    },
     "colors": [
       "#FEF2E4",
       "#FD974F",
@@ -51,7 +71,11 @@
   },
   {
     "id": "jewel",
-    "label": "Ювелирные тона",
+    "label": {
+      "ru": "Ювелирные тона",
+      "en": "Jewel Tones",
+      "pl": "Tony klejnotów"
+    },
     "colors": [
       "#7F152E",
       "#D61800",
@@ -61,7 +85,11 @@
   },
   {
     "id": "brownie",
-    "label": "Шоколадный брауни",
+    "label": {
+      "ru": "Шоколадный брауни",
+      "en": "Chocolate Brownie",
+      "pl": "Czekoladowe brownie"
+    },
     "colors": [
       "#301B28",
       "#523634",
@@ -71,7 +99,11 @@
   },
   {
     "id": "cozy",
-    "label": "Уют и тепло",
+    "label": {
+      "ru": "Уют и тепло",
+      "en": "Cosy and Warm",
+      "pl": "Ciepło i przytulnie"
+    },
     "colors": [
       "#662225",
       "#B51D0A",
@@ -81,7 +113,11 @@
   },
   {
     "id": "vineyard",
-    "label": "Винный покой",
+    "label": {
+      "ru": "Винный покой",
+      "en": "Wine and Quiet",
+      "pl": "Winny spokój"
+    },
     "colors": [
       "#1E0000",
       "#500805",
@@ -91,7 +127,11 @@
   },
   {
     "id": "sunny-town",
-    "label": "Солнечный городок",
+    "label": {
+      "ru": "Солнечный городок",
+      "en": "Sunny Town",
+      "pl": "Słoneczne miasteczko"
+    },
     "colors": [
       "#D24136",
       "#EB8A3E",
@@ -101,7 +141,11 @@
   },
   {
     "id": "mediterranean",
-    "label": "Средиземноморский полдень",
+    "label": {
+      "ru": "Средиземноморский полдень",
+      "en": "Mediterranean Noon",
+      "pl": "Śródziemnomorskie południe"
+    },
     "colors": [
       "#8C0004",
       "#C8000A",
@@ -111,7 +155,11 @@
   },
   {
     "id": "autumn-orange",
-    "label": "Осенний оранж",
+    "label": {
+      "ru": "Осенний оранж",
+      "en": "Autumn Orange",
+      "pl": "Jesienny pomarańcz"
+    },
     "colors": [
       "#D55448",
       "#FFA577",
@@ -121,7 +169,11 @@
   },
   {
     "id": "golden-noon",
-    "label": "Золотой полдень",
+    "label": {
+      "ru": "Золотой полдень",
+      "en": "Golden Noon",
+      "pl": "Złote południe"
+    },
     "colors": [
       "#882426",
       "#CDBEA7",
@@ -131,7 +183,11 @@
   },
   {
     "id": "scholar",
-    "label": "Сила знаний",
+    "label": {
+      "ru": "Сила знаний",
+      "en": "Power of Knowledge",
+      "pl": "Siła wiedzy"
+    },
     "colors": [
       "#42313A",
       "#6C2D2C",
@@ -141,7 +197,11 @@
   },
   {
     "id": "warm-cool",
-    "label": "Тёплая и стильная",
+    "label": {
+      "ru": "Тёплая и стильная",
+      "en": "Warm and Stylish",
+      "pl": "Ciepła i stylowa"
+    },
     "colors": [
       "#444C5C",
       "#CE5A57",
@@ -151,7 +211,11 @@
   },
   {
     "id": "sea-wave",
-    "label": "Морская волна",
+    "label": {
+      "ru": "Морская волна",
+      "en": "Sea Wave",
+      "pl": "Morska fala"
+    },
     "colors": [
       "#003B46",
       "#06575B",
@@ -161,7 +225,11 @@
   },
   {
     "id": "green-mist",
-    "label": "Зелёный туман",
+    "label": {
+      "ru": "Зелёный туман",
+      "en": "Green Mist",
+      "pl": "Zielona mgła"
+    },
     "colors": [
       "#04202C",
       "#304040",
@@ -171,7 +239,11 @@
   },
   {
     "id": "aqua",
-    "label": "Водная синева",
+    "label": {
+      "ru": "Водная синева",
+      "en": "Water Blue",
+      "pl": "Wodny błękit"
+    },
     "colors": [
       "#004D47",
       "#128277",
@@ -181,7 +253,11 @@
   },
   {
     "id": "city-fog",
-    "label": "Туман мегаполиса",
+    "label": {
+      "ru": "Туман мегаполиса",
+      "en": "Metropolis Fog",
+      "pl": "Mgła metropolii"
+    },
     "colors": [
       "#2C4A52",
       "#537072",
@@ -191,7 +267,11 @@
   },
   {
     "id": "arctic-dawn",
-    "label": "Арктический рассвет",
+    "label": {
+      "ru": "Арктический рассвет",
+      "en": "Arctic Dawn",
+      "pl": "Arktyczny świt"
+    },
     "colors": [
       "#FFCCBB",
       "#6EB5C0",
@@ -201,7 +281,11 @@
   },
   {
     "id": "ice",
-    "label": "Голубые и серые льды",
+    "label": {
+      "ru": "Голубые и серые льды",
+      "en": "Blue and Grey Ice",
+      "pl": "Błękitne i szare lody"
+    },
     "colors": [
       "#F1F1F2",
       "#BCBABE",
@@ -211,7 +295,11 @@
   },
   {
     "id": "iceland",
-    "label": "Яркая Исландия",
+    "label": {
+      "ru": "Яркая Исландия",
+      "en": "Bright Iceland",
+      "pl": "Jasna Islandia"
+    },
     "colors": [
       "#505160",
       "#68829E",
@@ -221,7 +309,11 @@
   },
   {
     "id": "wet-forest",
-    "label": "Лес после дождя",
+    "label": {
+      "ru": "Лес после дождя",
+      "en": "Forest After Rain",
+      "pl": "Las po deszczu"
+    },
     "colors": [
       "#2E4600",
       "#486B00",
@@ -231,7 +323,11 @@
   },
   {
     "id": "modern",
-    "label": "Современность",
+    "label": {
+      "ru": "Современность",
+      "en": "Modernity",
+      "pl": "Nowoczesność"
+    },
     "colors": [
       "#0F1B07",
       "#FFFFFF",
@@ -241,7 +337,11 @@
   },
   {
     "id": "fresh-green",
-    "label": "Свежая зелень",
+    "label": {
+      "ru": "Свежая зелень",
+      "en": "Fresh Greens",
+      "pl": "Świeża zieleń"
+    },
     "colors": [
       "#011C1D",
       "#004445",
@@ -251,7 +351,11 @@
   },
   {
     "id": "mountain-lake",
-    "label": "Горное озеро",
+    "label": {
+      "ru": "Горное озеро",
+      "en": "Mountain Lake",
+      "pl": "Górskie jezioro"
+    },
     "colors": [
       "#324851",
       "#86AC41",
@@ -261,7 +365,11 @@
   },
   {
     "id": "energy",
-    "label": "Свежесть и энергия",
+    "label": {
+      "ru": "Свежесть и энергия",
+      "en": "Freshness and Energy",
+      "pl": "Świeżość i energia"
+    },
     "colors": [
       "#4CB5F5",
       "#B7B8B6",
@@ -271,7 +379,11 @@
   },
   {
     "id": "young-green",
-    "label": "Молодая зелень",
+    "label": {
+      "ru": "Молодая зелень",
+      "en": "Young Green",
+      "pl": "Młoda zieleń"
+    },
     "colors": [
       "#265C00",
       "#68A225",
@@ -281,7 +393,11 @@
   },
   {
     "id": "green-fields",
-    "label": "Зелёные поля",
+    "label": {
+      "ru": "Зелёные поля",
+      "en": "Green Fields",
+      "pl": "Zielone pola"
+    },
     "colors": [
       "#919636",
       "#524A3A",
@@ -291,7 +407,11 @@
   },
   {
     "id": "citrus-grass",
-    "label": "Цитрус и трава",
+    "label": {
+      "ru": "Цитрус и трава",
+      "en": "Citrus and Grass",
+      "pl": "Cytrus i trawa"
+    },
     "colors": [
       "#EB8A44",
       "#F9DC24",
@@ -301,7 +421,11 @@
   },
   {
     "id": "garden",
-    "label": "Садовая свежесть",
+    "label": {
+      "ru": "Садовая свежесть",
+      "en": "Garden Freshness",
+      "pl": "Ogrodowa świeżość"
+    },
     "colors": [
       "#EE693F",
       "#F69454",
@@ -311,7 +435,11 @@
   },
   {
     "id": "fiesta",
-    "label": "Летняя фиеста",
+    "label": {
+      "ru": "Летняя фиеста",
+      "en": "Summer Fiesta",
+      "pl": "Letnia fiesta"
+    },
     "colors": [
       "#C7DB00",
       "#7AA802",
@@ -321,7 +449,11 @@
   },
   {
     "id": "elegant-nature",
-    "label": "Природная элегантность",
+    "label": {
+      "ru": "Природная элегантность",
+      "en": "Natural Elegance",
+      "pl": "Naturalna elegancja"
+    },
     "colors": [
       "#EBDF00",
       "#7E7B15",
@@ -331,7 +463,11 @@
   },
   {
     "id": "dusk",
-    "label": "От заката до сумерек",
+    "label": {
+      "ru": "От заката до сумерек",
+      "en": "Sunset to Dusk",
+      "pl": "Od zachodu do zmierzchu"
+    },
     "colors": [
       "#363237",
       "#2D4262",
@@ -341,7 +477,11 @@
   },
   {
     "id": "salmon-rye",
-    "label": "Лосось и ржаной хлеб",
+    "label": {
+      "ru": "Лосось и ржаной хлеб",
+      "en": "Salmon and Rye",
+      "pl": "Łosoś i żytni chleb"
+    },
     "colors": [
       "#4B4345",
       "#102A49",
@@ -351,7 +491,11 @@
   },
   {
     "id": "bird-view",
-    "label": "С высоты полёта",
+    "label": {
+      "ru": "С высоты полёта",
+      "en": "From Above",
+      "pl": "Z lotu ptaka"
+    },
     "colors": [
       "#335252",
       "#D4DDE1",
@@ -361,7 +505,11 @@
   },
   {
     "id": "amber-azure",
-    "label": "Янтарь и лазурь",
+    "label": {
+      "ru": "Янтарь и лазурь",
+      "en": "Amber and Azure",
+      "pl": "Bursztyn i lazur"
+    },
     "colors": [
       "#90AFC5",
       "#336B87",
@@ -371,7 +519,11 @@
   },
   {
     "id": "neon-sign",
-    "label": "Неоновая вывеска",
+    "label": {
+      "ru": "Неоновая вывеска",
+      "en": "Neon Sign",
+      "pl": "Neonowy szyld"
+    },
     "colors": [
       "#262F34",
       "#F34A4A",
@@ -381,7 +533,11 @@
   },
   {
     "id": "exotic",
-    "label": "Экзотика и прочность",
+    "label": {
+      "ru": "Экзотика и прочность",
+      "en": "Exotic and Sturdy",
+      "pl": "Egzotyka i trwałość"
+    },
     "colors": [
       "#0F1F38",
       "#8E7970",
@@ -391,7 +547,11 @@
   },
   {
     "id": "sun-sky",
-    "label": "Солнце и небо",
+    "label": {
+      "ru": "Солнце и небо",
+      "en": "Sun and Sky",
+      "pl": "Słońce i niebo"
+    },
     "colors": [
       "#217CA3",
       "#E29930",
@@ -401,7 +561,11 @@
   },
   {
     "id": "meadow",
-    "label": "Цветочный луг",
+    "label": {
+      "ru": "Цветочный луг",
+      "en": "Flower Meadow",
+      "pl": "Kwietna łąka"
+    },
     "colors": [
       "#375E97",
       "#FB6542",
@@ -411,7 +575,11 @@
   },
   {
     "id": "morning",
-    "label": "Утренняя свежесть",
+    "label": {
+      "ru": "Утренняя свежесть",
+      "en": "Morning Freshness",
+      "pl": "Poranna świeżość"
+    },
     "colors": [
       "#F98866",
       "#FF420E",
@@ -421,7 +589,11 @@
   },
   {
     "id": "tropic-flower",
-    "label": "Тропический цветок",
+    "label": {
+      "ru": "Тропический цветок",
+      "en": "Tropical Flower",
+      "pl": "Tropikalny kwiat"
+    },
     "colors": [
       "#F52549",
       "#FA6775",
@@ -431,7 +603,11 @@
   },
   {
     "id": "sunflower",
-    "label": "Летний подсолнечник",
+    "label": {
+      "ru": "Летний подсолнечник",
+      "en": "Summer Sunflower",
+      "pl": "Letni słonecznik"
+    },
     "colors": [
       "#4E84BD",
       "#7CAA2D",
@@ -441,7 +617,11 @@
   },
   {
     "id": "veggies",
-    "label": "Корзинка овощей",
+    "label": {
+      "ru": "Корзинка овощей",
+      "en": "Basket of Vegetables",
+      "pl": "Koszyk warzyw"
+    },
     "colors": [
       "#258039",
       "#F5BE41",
@@ -451,7 +631,11 @@
   },
   {
     "id": "lemonade",
-    "label": "Стойка с лимонадом",
+    "label": {
+      "ru": "Стойка с лимонадом",
+      "en": "Lemonade Stand",
+      "pl": "Stoisko z lemoniadą"
+    },
     "colors": [
       "#F70025",
       "#F7EFE2",
@@ -461,7 +645,11 @@
   },
   {
     "id": "tropic-fun",
-    "label": "Весёлая и тропическая",
+    "label": {
+      "ru": "Весёлая и тропическая",
+      "en": "Cheerful and Tropical",
+      "pl": "Wesoła i tropikalna"
+    },
     "colors": [
       "#4897D8",
       "#FFDB5C",
@@ -471,7 +659,11 @@
   },
   {
     "id": "figs-basil",
-    "label": "Сыр, инжир и базилик",
+    "label": {
+      "ru": "Сыр, инжир и базилик",
+      "en": "Cheese, Fig and Basil",
+      "pl": "Ser, figa i bazylia"
+    },
     "colors": [
       "#4C3F54",
       "#D13525",
@@ -481,7 +673,11 @@
   },
   {
     "id": "citrus-sun",
-    "label": "Солнечный цитрус",
+    "label": {
+      "ru": "Солнечный цитрус",
+      "en": "Sunny Citrus",
+      "pl": "Słoneczny cytrus"
+    },
     "colors": [
       "#FAAF08",
       "#FA812F",
@@ -491,7 +687,11 @@
   },
   {
     "id": "apple",
-    "label": "Яблочный контраст",
+    "label": {
+      "ru": "Яблочный контраст",
+      "en": "Apple Contrast",
+      "pl": "Jabłkowy kontrast"
+    },
     "colors": [
       "#F4EC6A",
       "#BBCF4A",
@@ -501,7 +701,11 @@
   },
   {
     "id": "neon-night",
-    "label": "Неоновая ночь",
+    "label": {
+      "ru": "Неоновая ночь",
+      "en": "Neon Night",
+      "pl": "Neonowa noc"
+    },
     "colors": [
       "#F77604",
       "#B8D20B",
@@ -511,7 +715,11 @@
   },
   {
     "id": "graffiti",
-    "label": "Дерзость граффити",
+    "label": {
+      "ru": "Дерзость граффити",
+      "en": "Graffiti Nerve",
+      "pl": "Zuchwałość graffiti"
+    },
     "colors": [
       "#F47D4A",
       "#E1315B",
@@ -521,7 +729,11 @@
   },
   {
     "id": "nightlife",
-    "label": "Ночная жизнь",
+    "label": {
+      "ru": "Ночная жизнь",
+      "en": "Night Life",
+      "pl": "Nocne życie"
+    },
     "colors": [
       "#00CFFA",
       "#FF0038",
@@ -531,7 +743,11 @@
   },
   {
     "id": "pool-party",
-    "label": "Вечеринка с бассейном",
+    "label": {
+      "ru": "Вечеринка с бассейном",
+      "en": "Pool Party",
+      "pl": "Impreza przy basenie"
+    },
     "colors": [
       "#344D90",
       "#5CC5EF",
@@ -541,7 +757,11 @@
   },
   {
     "id": "painting",
-    "label": "Живопись",
+    "label": {
+      "ru": "Живопись",
+      "en": "Painting",
+      "pl": "Malarstwo"
+    },
     "colors": [
       "#061283",
       "#FD3C3C",
@@ -551,7 +771,11 @@
   },
   {
     "id": "cappuccino",
-    "label": "Чашка капучино",
+    "label": {
+      "ru": "Чашка капучино",
+      "en": "Cup of Cappuccino",
+      "pl": "Filiżanka cappuccino"
+    },
     "colors": [
       "#626D71",
       "#CDCDC0",
@@ -561,7 +785,11 @@
   },
   {
     "id": "berry-blue",
-    "label": "Ягодная синева",
+    "label": {
+      "ru": "Ягодная синева",
+      "en": "Berry Blue",
+      "pl": "Jagodowy błękit"
+    },
     "colors": [
       "#1E1F26",
       "#283655",
@@ -571,7 +799,11 @@
   },
   {
     "id": "simple-chic",
-    "label": "Изысканная простота",
+    "label": {
+      "ru": "Изысканная простота",
+      "en": "Refined Simplicity",
+      "pl": "Wykwintna prostota"
+    },
     "colors": [
       "#EAE2D6",
       "#D5C3AA",
@@ -581,7 +813,11 @@
   },
   {
     "id": "tech-nature",
-    "label": "Технология и природа",
+    "label": {
+      "ru": "Технология и природа",
+      "en": "Technology and Nature",
+      "pl": "Technologia i natura"
+    },
     "colors": [
       "#FBCD4B",
       "#A3A599",
@@ -591,7 +827,11 @@
   },
   {
     "id": "urban-life",
-    "label": "Городская жизнь",
+    "label": {
+      "ru": "Городская жизнь",
+      "en": "City Life",
+      "pl": "Miejskie życie"
+    },
     "colors": [
       "#DDDEDE",
       "#232122",
@@ -601,7 +841,11 @@
   },
   {
     "id": "urban-oasis",
-    "label": "Городской оазис",
+    "label": {
+      "ru": "Городской оазис",
+      "en": "Urban Oasis",
+      "pl": "Miejska oaza"
+    },
     "colors": [
       "#506D2F",
       "#2A2922",
@@ -611,7 +855,11 @@
   },
   {
     "id": "modern-gloss",
-    "label": "Современный лоск",
+    "label": {
+      "ru": "Современный лоск",
+      "en": "Modern Polish",
+      "pl": "Nowoczesny połysk"
+    },
     "colors": [
       "#2F2E33",
       "#D5D6D2",
@@ -621,7 +869,11 @@
   },
   {
     "id": "shabby-chic",
-    "label": "Нейтральный шебби-шик",
+    "label": {
+      "ru": "Нейтральный шебби-шик",
+      "en": "Neutral Shabby Chic",
+      "pl": "Neutralny shabby chic"
+    },
     "colors": [
       "#6C5F5B",
       "#CDAB81",
@@ -631,7 +883,11 @@
   },
   {
     "id": "metallic",
-    "label": "Классический металлик",
+    "label": {
+      "ru": "Классический металлик",
+      "en": "Classic Metallic",
+      "pl": "Klasyczny metalik"
+    },
     "colors": [
       "#070706",
       "#F0F0EF",
@@ -641,7 +897,11 @@
   },
   {
     "id": "winter",
-    "label": "Зимние краски",
+    "label": {
+      "ru": "Зимние краски",
+      "en": "Winter Colours",
+      "pl": "Zimowe barwy"
+    },
     "colors": [
       "#A10115",
       "#D72C16",
@@ -651,7 +911,11 @@
   },
   {
     "id": "sea-wheat",
-    "label": "Море и пшеница",
+    "label": {
+      "ru": "Море и пшеница",
+      "en": "Sea and Wheat",
+      "pl": "Morze i pszenica"
+    },
     "colors": [
       "#00293C",
       "#1E656D",
@@ -661,7 +925,11 @@
   },
   {
     "id": "offbeat",
-    "label": "Самобытная и неожиданная",
+    "label": {
+      "ru": "Самобытная и неожиданная",
+      "en": "Distinct and Unexpected",
+      "pl": "Odrębna i nieoczekiwana"
+    },
     "colors": [
       "#B1D7D2",
       "#E5E2CA",
@@ -671,7 +939,11 @@
   },
   {
     "id": "cityscape",
-    "label": "Городские виды",
+    "label": {
+      "ru": "Городские виды",
+      "en": "City Views",
+      "pl": "Miejskie widoki"
+    },
     "colors": [
       "#C5001A",
       "#E4E3DB",
@@ -681,7 +953,11 @@
   },
   {
     "id": "industrial",
-    "label": "Индустриальная строгость",
+    "label": {
+      "ru": "Индустриальная строгость",
+      "en": "Industrial Rigour",
+      "pl": "Industrialna surowość"
+    },
     "colors": [
       "#20232A",
       "#ACBEBE",
@@ -691,7 +967,11 @@
   },
   {
     "id": "authority",
-    "label": "Профессионализм и власть",
+    "label": {
+      "ru": "Профессионализм и власть",
+      "en": "Professional and Powerful",
+      "pl": "Profesjonalizm i władza"
+    },
     "colors": [
       "#962715",
       "#FFFFFF",
@@ -701,7 +981,11 @@
   },
   {
     "id": "tulips",
-    "label": "Нежные тюльпаны",
+    "label": {
+      "ru": "Нежные тюльпаны",
+      "en": "Tender Tulips",
+      "pl": "Delikatne tulipany"
+    },
     "colors": [
       "#98DBC6",
       "#5BC8AC",
@@ -711,7 +995,11 @@
   },
   {
     "id": "birds-berries",
-    "label": "Птицы и ягоды",
+    "label": {
+      "ru": "Птицы и ягоды",
+      "en": "Birds and Berries",
+      "pl": "Ptaki i jagody"
+    },
     "colors": [
       "#9A9EAB",
       "#5D535E",
@@ -721,7 +1009,11 @@
   },
   {
     "id": "retro",
-    "label": "Стильное ретро",
+    "label": {
+      "ru": "Стильное ретро",
+      "en": "Stylish Retro",
+      "pl": "Stylowe retro"
+    },
     "colors": [
       "#75B1A9",
       "#D9B44A",
@@ -731,7 +1023,11 @@
   },
   {
     "id": "barbecue",
-    "label": "Летнее барбекю",
+    "label": {
+      "ru": "Летнее барбекю",
+      "en": "Summer Barbecue",
+      "pl": "Letni grill"
+    },
     "colors": [
       "#5C8F22",
       "#752A07",
@@ -741,7 +1037,11 @@
   },
   {
     "id": "spa",
-    "label": "Безмятежность СПА",
+    "label": {
+      "ru": "Безмятежность СПА",
+      "en": "Spa Serenity",
+      "pl": "Spokój SPA"
+    },
     "colors": [
       "#A1BE95",
       "#E2DFA2",
@@ -751,7 +1051,11 @@
   },
   {
     "id": "pastel",
-    "label": "Пастель",
+    "label": {
+      "ru": "Пастель",
+      "en": "Pastel",
+      "pl": "Pastele"
+    },
     "colors": [
       "#C1E1DC",
       "#FFCCAC",
@@ -761,7 +1065,11 @@
   },
   {
     "id": "strawberry",
-    "label": "Клубника со сливками",
+    "label": {
+      "ru": "Клубника со сливками",
+      "en": "Strawberries and Cream",
+      "pl": "Truskawki ze śmietaną"
+    },
     "colors": [
       "#D8412F",
       "#FE7A47",
@@ -771,7 +1079,11 @@
   },
   {
     "id": "antique",
-    "label": "Приглушённая античность",
+    "label": {
+      "ru": "Приглушённая античность",
+      "en": "Muted Antiquity",
+      "pl": "Przygaszony antyk"
+    },
     "colors": [
       "#A4CABC",
       "#EAB364",
@@ -781,7 +1093,11 @@
   },
   {
     "id": "metropolis",
-    "label": "Мегаполис",
+    "label": {
+      "ru": "Мегаполис",
+      "en": "Metropolis",
+      "pl": "Metropolia"
+    },
     "colors": [
       "#8593AE",
       "#5A4E4D",
@@ -791,7 +1107,11 @@
   },
   {
     "id": "city-sun",
-    "label": "Солнце в городе",
+    "label": {
+      "ru": "Солнце в городе",
+      "en": "Sun in the City",
+      "pl": "Słońce w mieście"
+    },
     "colors": [
       "#2B616D",
       "#B2DBD5",
@@ -801,7 +1121,11 @@
   },
   {
     "id": "coast",
-    "label": "Побережье",
+    "label": {
+      "ru": "Побережье",
+      "en": "Coastline",
+      "pl": "Wybrzeże"
+    },
     "colors": [
       "#A5C3CF",
       "#F3D3B8",
@@ -811,7 +1135,11 @@
   },
   {
     "id": "vintage",
-    "label": "Винтаж",
+    "label": {
+      "ru": "Винтаж",
+      "en": "Vintage",
+      "pl": "Vintage"
+    },
     "colors": [
       "#FCC875",
       "#BAA896",
@@ -821,7 +1149,11 @@
   },
   {
     "id": "easy-retro",
-    "label": "Расслабляющее ретро",
+    "label": {
+      "ru": "Расслабляющее ретро",
+      "en": "Relaxing Retro",
+      "pl": "Relaksujące retro"
+    },
     "colors": [
       "#D35C37",
       "#BF9A77",
@@ -831,7 +1163,11 @@
   },
   {
     "id": "refined",
-    "label": "Утончённость",
+    "label": {
+      "ru": "Утончённость",
+      "en": "Refinement",
+      "pl": "Wytworność"
+    },
     "colors": [
       "#5F968E",
       "#BFDCCF",
@@ -841,7 +1177,11 @@
   },
   {
     "id": "romance",
-    "label": "Романтическая прогулка",
+    "label": {
+      "ru": "Романтическая прогулка",
+      "en": "Romantic Walk",
+      "pl": "Romantyczny spacer"
+    },
     "colors": [
       "#688B8A",
       "#58C8B2",
@@ -851,7 +1191,11 @@
   },
   {
     "id": "soft-contrast",
-    "label": "Нежный контраст",
+    "label": {
+      "ru": "Нежный контраст",
+      "en": "Gentle Contrast",
+      "pl": "Delikatny kontrast"
+    },
     "colors": [
       "#FFBEBD",
       "#FDFCFA",
@@ -861,7 +1205,11 @@
   },
   {
     "id": "school",
-    "label": "Снова в школу",
+    "label": {
+      "ru": "Снова в школу",
+      "en": "Back to School",
+      "pl": "Znów do szkoły"
+    },
     "colors": [
       "#81715E",
       "#FAAE3D",
@@ -871,7 +1219,11 @@
   },
   {
     "id": "smoky-purple",
-    "label": "Дымчатый пурпур",
+    "label": {
+      "ru": "Дымчатый пурпур",
+      "en": "Smoky Purple",
+      "pl": "Dymny purpur"
+    },
     "colors": [
       "#A49592",
       "#727077",
@@ -881,7 +1233,11 @@
   },
   {
     "id": "hygge",
-    "label": "Хюгге",
+    "label": {
+      "ru": "Хюгге",
+      "en": "Hygge",
+      "pl": "Hygge"
+    },
     "colors": [
       "#488A99",
       "#DBAE58",
@@ -891,7 +1247,11 @@
   },
   {
     "id": "day-night",
-    "label": "День и ночь",
+    "label": {
+      "ru": "День и ночь",
+      "en": "Day and Night",
+      "pl": "Dzień i noc"
+    },
     "colors": [
       "#001A27",
       "#053852",
@@ -901,7 +1261,11 @@
   },
   {
     "id": "quiet-chic",
-    "label": "Шик без вульгарности",
+    "label": {
+      "ru": "Шик без вульгарности",
+      "en": "Chic Without Vulgarity",
+      "pl": "Szyk bez wulgarności"
+    },
     "colors": [
       "#16253D",
       "#002C54",
@@ -911,7 +1275,11 @@
   },
   {
     "id": "wild-berry",
-    "label": "Ягоды земляники",
+    "label": {
+      "ru": "Ягоды земляники",
+      "en": "Wild Strawberries",
+      "pl": "Poziomki"
+    },
     "colors": [
       "#50312F",
       "#CB0000",
@@ -921,7 +1289,11 @@
   },
   {
     "id": "bright-night",
-    "label": "Яркая ночь",
+    "label": {
+      "ru": "Яркая ночь",
+      "en": "Bright Night",
+      "pl": "Jasna noc"
+    },
     "colors": [
       "#000B29",
       "#D70026",
@@ -931,7 +1303,11 @@
   },
   {
     "id": "fifties",
-    "label": "Кухня 1950-х",
+    "label": {
+      "ru": "Кухня 1950-х",
+      "en": "1950s Kitchen",
+      "pl": "Kuchnia lat 50."
+    },
     "colors": [
       "#B3DBC0",
       "#FE0000",
@@ -941,7 +1317,11 @@
   },
   {
     "id": "city-contrast",
-    "label": "Городские контрасты",
+    "label": {
+      "ru": "Городские контрасты",
+      "en": "Urban Contrasts",
+      "pl": "Miejskie kontrasty"
+    },
     "colors": [
       "#F9BA32",
       "#426E86",
@@ -951,7 +1331,11 @@
   },
   {
     "id": "orange-accent",
-    "label": "Оранжевый акцент",
+    "label": {
+      "ru": "Оранжевый акцент",
+      "en": "Orange Accent",
+      "pl": "Pomarańczowy akcent"
+    },
     "colors": [
       "#756867",
       "#D5D6D2",
@@ -961,7 +1345,11 @@
   },
   {
     "id": "beyond-bw",
-    "label": "По ту сторону чёрного и белого",
+    "label": {
+      "ru": "По ту сторону чёрного и белого",
+      "en": "Beyond Black and White",
+      "pl": "Po drugiej stronie czerni i bieli"
+    },
     "colors": [
       "#31A2AC",
       "#AF1C1C",
@@ -971,7 +1359,11 @@
   },
   {
     "id": "surf",
-    "label": "Прибой у песчаного берега",
+    "label": {
+      "ru": "Прибой у песчаного берега",
+      "en": "Surf on Sandy Shore",
+      "pl": "Fale na piaszczystym brzegu"
+    },
     "colors": [
       "#F4CC70",
       "#DE7A22",
@@ -981,7 +1373,11 @@
   },
   {
     "id": "greece",
-    "label": "Греческие каникулы",
+    "label": {
+      "ru": "Греческие каникулы",
+      "en": "Greek Holidays",
+      "pl": "Greckie wakacje"
+    },
     "colors": [
       "#2988BC",
       "#2F496E",
@@ -991,7 +1387,11 @@
   },
   {
     "id": "sea-lights",
-    "label": "Морские огни",
+    "label": {
+      "ru": "Морские огни",
+      "en": "Sea Lights",
+      "pl": "Morskie światła"
+    },
     "colors": [
       "#257985",
       "#5EA8A7",
