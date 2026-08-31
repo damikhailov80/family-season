@@ -4,6 +4,7 @@ import { getDict, getLang } from '../../../../i18n/server'
 import { fill } from '../../../../i18n/fill'
 import { posterText } from '../../../../model/labels'
 import { ROUTES, withLang } from '../../../../model/site'
+import { sharedLink } from '../../../../server/qr'
 import { readUserSeason } from '../../../../server/userSeasons'
 import { OwnSeason } from './OwnSeason'
 
@@ -26,7 +27,8 @@ export async function OwnSeasonPage({ code, editing }: { code: string; editing: 
     const { pages } = await getDict()
     return <Toast message={pages.ownError} />
   }
-  return <OwnSeason season={state.season} editing={editing} />
+  /* Личная ссылка приезжает уже кодом: собирает его сервер, а печатает лист. */
+  return <OwnSeason season={state.season} editing={editing} share={sharedLink(state.season)} />
 }
 
 /** Название сезона в заголовке вкладки: у человека их сто, и они разные. */
@@ -34,7 +36,6 @@ export async function seasonMetadata(code: string) {
   const state = await readUserSeason(code)
   const { pages } = await getDict()
   // Запасное имя — на языке интерфейса: сезона мы не нашли, и его языка не знаем.
-  const title =
-    state.status === 'ok' ? state.season.title : posterText(await getLang()).untitled
+  const title = state.status === 'ok' ? state.season.title : posterText(await getLang()).untitled
   return { title: fill(pages.ownTitle, { title }) }
 }

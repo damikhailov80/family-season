@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
+import { shareQr } from './qr'
 import { readFamily, writeFamily, writeLanguage, type FamilyStatus } from './settings'
 import {
   addReport,
@@ -23,16 +24,13 @@ import {
   saveUserSeason,
 } from './userSeasons'
 import { normalizeTemplate } from '../model/codec'
-import {
-  normalizeComment,
-  type PublishStatus,
-  type ReactionStatus,
-} from '../model/community'
+import { normalizeComment, type PublishStatus, type ReactionStatus } from '../model/community'
 import { normalizeFamily, templateForFamily } from '../model/family'
 import { DEFAULT_ICON_SET, knownIconSet } from '../model/icons'
 import { knownLang, LANG_COOKIE, LANG_COOKIE_MAX_AGE } from '../model/lang'
 import { posterText } from '../model/labels'
 import { defaultSeasonTitle, normalizeTitle, type LibraryStatus } from '../model/library'
+import type { SharedLink } from '../model/qr'
 import { DEFAULT_PALETTE, knownPalette } from '../model/palettes'
 import { ROUTES, seasonHref, stripLang, withLang } from '../model/site'
 
@@ -232,10 +230,7 @@ export async function createSeason(title: unknown, value: unknown) {
  * не доверяем ровно так же, как всему остальному: бланк прогоняется через
  * `normalizeTemplate`, оформление — через свои проверки.
  */
-export async function saveSeason(
-  code: unknown,
-  input: unknown,
-): Promise<LibraryStatus> {
+export async function saveSeason(code: unknown, input: unknown): Promise<LibraryStatus> {
   if (typeof code !== 'string') return 'error'
   const raw = (input ?? {}) as { template?: unknown; palette?: unknown; iconSet?: unknown }
   return saveUserSeason(code, {
@@ -289,7 +284,9 @@ export async function previewShare(
 }
 
 /** Убрать свою публикацию с витрины. Что с ней станет — решает `withdrawPublic`. */
-export async function withdrawSeason(code: unknown): Promise<{ status: PublishStatus; hidden?: boolean }> {
+export async function withdrawSeason(
+  code: unknown,
+): Promise<{ status: PublishStatus; hidden?: boolean }> {
   if (typeof code !== 'string') return { status: 'error' }
   return withdrawPublic(code)
 }
@@ -306,9 +303,18 @@ export async function republishSeason(code: unknown): Promise<PublishStatus> {
  * Статус возвращается **значением**: постер под кнопкой никуда не уходит, а
  * новую ссылку человеку надо тут же показать и скопировать.
  */
-export async function shareLink(code: unknown): Promise<{ status: LibraryStatus; token?: string }> {
+export async function shareLink(
+  code: unknown,
+  lang: unknown,
+): Promise<{ status: LibraryStatus; link?: SharedLink }> {
   if (typeof code !== 'string') return { status: 'error' }
-  return refreshShareToken(code)
+  const result = await refreshShareToken(code)
+  if (result.status !== 'ok' || !result.token) return { status: result.status }
+  /*
+   * Код собирается тут же, вместе с токеном: его печатает лист, а лист под
+   * кнопкой никуда не уходит — перерисовывать страницу ради одного QR незачем.
+   */
+  return { status: 'ok', link: { token: result.token, qr: shareQr(knownLang(lang), result.token) } }
 }
 
 export async function revokeLink(code: unknown): Promise<LibraryStatus> {
@@ -348,12 +354,7 @@ export async function reportSeason(code: unknown, comment: unknown): Promise<Rea
  * компоненте, но привязанные аргументы уезжают в браузер и возвращаются оттуда —
  * поэтому проверяются наравне со всем остальным, включая адрес возврата.
  */
-export async function renameEntry(
-  code: unknown,
-  back: unknown,
-  title: unknown,
-  lang: unknown,
-) {
+export async function renameEntry(code: unknown, back: unknown, title: unknown, lang: unknown) {
   const seasonLang = knownLang(lang)
   if (typeof code === 'string') {
     await renameUserSeason(code, normalizeTitle(title, posterText(seasonLang).untitled), seasonLang)

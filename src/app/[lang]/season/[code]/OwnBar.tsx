@@ -14,6 +14,7 @@ import { publishText, type PublishStatus } from '../../../../model/community'
 import type { Lang } from '../../../../model/lang'
 import { posterText } from '../../../../model/labels'
 import { defaultSeasonTitle, libraryText, normalizeTitle } from '../../../../model/library'
+import type { SharedLink } from '../../../../model/qr'
 import { publicSeasonHref, seasonHref } from '../../../../model/site'
 import {
   previewShare,
@@ -55,14 +56,20 @@ export function OwnBar({
   code,
   editing,
   title,
-  token,
+  link,
+  onLink,
 }: {
   code: string
   editing: boolean
   /** Название строки — то же, что в списке «Мои сезоны». */
   title: string
-  /** Токен приватной ссылки; `null` — её не выдавали. */
-  token: string | null
+  /** Приватная ссылка с готовым QR; `null` — её не выдавали. */
+  link: SharedLink | null
+  /**
+   * Ссылку выдали или отозвали. Состояние держит страница: тот же QR печатает
+   * лист, а он живёт рядом с панелью, а не внутри неё.
+   */
+  onLink: (link: SharedLink | null) => void
 }) {
   const { template, palette, iconSet, lang } = useDoc()
   const uiLang = useLang()
@@ -79,8 +86,6 @@ export function OwnBar({
   /** Номер проверки: ответ на закрытое окно не должен попасть в следующее. */
   const checkRun = useRef(0)
   const [linkOpen, setLinkOpen] = useState(false)
-  // Ответ известен из самого действия — переспрашивать сервер незачем.
-  const [link, setLink] = useState(token)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
   // Ответ известен из самого действия: страница не перерисовывается, имя в ряду
@@ -119,9 +124,10 @@ export function OwnBar({
 
   const issueLink = async () => {
     setBusy(true)
-    const result = await shareLink(code)
+    // Язык — сезона: им подписан лист, и код на нём ведёт на тот же язык.
+    const result = await shareLink(code, lang)
     setBusy(false)
-    if (result.status === 'ok' && result.token) setLink(result.token)
+    if (result.status === 'ok' && result.link) onLink(result.link)
     else
       setNotice({
         text: libraryText(uiLang, result.status as 'limit' | 'stale' | 'error'),
@@ -133,7 +139,7 @@ export function OwnBar({
     setBusy(true)
     const status = await revokeLink(code)
     setBusy(false)
-    if (status === 'ok') setLink(null)
+    if (status === 'ok') onLink(null)
     else
       setNotice({
         text: libraryText(uiLang, status as 'limit' | 'stale' | 'error'),
@@ -283,7 +289,7 @@ export function OwnBar({
       )}
       {linkOpen && (
         <ShareLinkDialog
-          token={link}
+          token={link?.token ?? null}
           busy={busy}
           onDismiss={() => setLinkOpen(false)}
           onIssue={() => void issueLink()}

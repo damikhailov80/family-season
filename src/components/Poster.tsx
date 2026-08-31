@@ -8,6 +8,7 @@ import { PrintPage } from './PrintPage'
 import { ProjectsSection } from './ProjectsSection'
 import { WeeksSection } from './WeeksSection'
 import { IconSetContext } from './doodles/iconSetContext'
+import type { QrMatrix } from '../model/qr'
 import { useDoc } from '../state/docContext'
 
 /**
@@ -18,8 +19,12 @@ import { useDoc } from '../state/docContext'
  * Оформление читается уже внутри провайдера: тему CSS раздаёт атрибутом
  * (`PaperSheet`), а набор рисунков — контекстом, потому что геометрию SVG
  * атрибутом не подменишь.
+ *
+ * Пропом приходит только QR: код с личной ссылкой знает не постер, а страница,
+ * которая эту ссылку выдаёт (см. `MonthGoal`). Без пропа на листе стоит
+ * постоянный код сайта — так печатаются черновик, выложенный сезон и пример.
  */
-export function Poster() {
+export function Poster({ qr }: { qr?: QrMatrix }) {
   const { palette, iconSet } = useDoc()
 
   return (
@@ -30,7 +35,7 @@ export function Poster() {
           <Header />
           <MonthTheme />
           <WeeksSection />
-          <MonthGoal />
+          <MonthGoal qr={qr} />
         </PrintPage>
         <PrintPage>
           <ProjectsSection />

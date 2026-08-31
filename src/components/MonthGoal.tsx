@@ -1,3 +1,4 @@
+import type { QrMatrix } from '../model/qr'
 import { useDoc, usePoster } from '../state/docContext'
 import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
@@ -6,12 +7,18 @@ import { SectionBox } from './SectionBox'
 import styles from './MonthGoal.module.css'
 
 /**
- * Цель месяца, а справа от рамки — QR на сайт. Код ведёт не на этот лист, а на
- * адрес сайта: постер висит на холодильнике, и по коду приходят собирать свой
- * сезон, а не смотреть чужой. Заодно данных в коде мало, и он остаётся мелким
- * и спокойным — длинная ссылка на лист рябила бы полотном модулей.
+ * Цель месяца, а справа от рамки — QR.
+ *
+ * По умолчанию код ведёт на сайт, а не на этот лист: постер висит на
+ * холодильнике, и по коду приходят собирать свой сезон, а не разглядывать
+ * чужой. Исключение одно — свой сезон, у которого выдана личная ссылка: она и
+ * заведена затем, чтобы показать лист тем, кто его увидит, а с бумаги
+ * шестнадцать знаков токена руками никто не наберёт.
+ *
+ * Какой из двух кодов печатать, лист не решает — матрица приходит пропсом от
+ * страницы: ссылку выдаёт и отзывает не постер.
  */
-export function MonthGoal() {
+export function MonthGoal({ qr }: { qr?: QrMatrix }) {
   const { field } = useDoc()
   const { labels, placeholders } = usePoster()
 
@@ -33,7 +40,7 @@ export function MonthGoal() {
         />
         <PosterIcon slot="care" className={styles.heart} size={38} />
       </SectionBox>
-      <QrCode className={styles.qr} />
+      <QrCode code={qr} className={styles.qr} />
     </section>
   )
 }
