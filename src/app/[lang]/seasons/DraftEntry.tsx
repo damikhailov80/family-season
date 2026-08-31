@@ -7,7 +7,13 @@ import { PenDoodle } from '../../../components/doodles'
 import { useDict, useLang } from '../../../i18n/context'
 import { fill } from '../../../i18n/fill'
 import { monthInText, monthName } from '../../../model/calendar'
-import { clearDraft, draftSnapshot, parseDraft, subscribeDraft, writeDraft } from '../../../model/draft'
+import {
+  clearDraft,
+  draftSnapshot,
+  parseDraft,
+  subscribeDraft,
+  writeDraft,
+} from '../../../model/draft'
 import { savedOn, TITLE_LIMIT } from '../../../model/library'
 import { paletteLabel } from '../../../model/palettes'
 import { sheetHref } from '../../../model/site'

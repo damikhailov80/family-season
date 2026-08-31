@@ -56,11 +56,7 @@ export function FamilySwap() {
           onDismiss={() => setOpen(false)}
           actions={
             <>
-              <button
-                type="button"
-                className={dialogStyles.ghost}
-                onClick={() => setOpen(false)}
-              >
+              <button type="button" className={dialogStyles.ghost} onClick={() => setOpen(false)}>
                 {dialogs.cancel}
               </button>
               <button type="button" className={dialogStyles.primary} onClick={apply}>
@@ -116,9 +112,7 @@ export function FamilySwap() {
               предупреждение о потере, и цвет светофора у него один. */}
           {dropped > 0 && (
             <p className={dialogStyles.warning}>
-              {dropped === 1
-                ? dialogs.familyDropOne
-                : fill(dialogs.familyDropMany, { n: dropped })}
+              {dropped === 1 ? dialogs.familyDropOne : fill(dialogs.familyDropMany, { n: dropped })}
             </p>
           )}
         </Dialog>

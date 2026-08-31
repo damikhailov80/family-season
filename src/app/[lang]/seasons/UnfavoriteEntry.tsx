@@ -25,12 +25,7 @@ export async function UnfavoriteEntry({
 
   return (
     <form action={unfavoriteEntry.bind(null, code, back, lang)}>
-      <button
-        type="submit"
-        className={styles.rowButton}
-        title={label}
-        aria-label={label}
-      >
+      <button type="submit" className={styles.rowButton} title={label} aria-label={label}>
         ×
       </button>
     </form>

@@ -31,9 +31,7 @@ function getPool(): Pool | null {
 }
 
 export type QueryResult<Row> =
-  | { status: 'ok'; rows: Row[] }
-  | { status: 'unconfigured' }
-  | { status: 'failed' }
+  { status: 'ok'; rows: Row[] } | { status: 'unconfigured' } | { status: 'failed' }
 
 /**
  * Запрос, который не бросает. Разметка строкой, а не `ok: boolean`: в `tsconfig`

@@ -80,7 +80,9 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
 
   const cycle = (index: number) =>
     setPeople((current) =>
-      current.map((person, i) => (i === index ? { ...person, face: nextFace(person.face) } : person)),
+      current.map((person, i) =>
+        i === index ? { ...person, face: nextFace(person.face) } : person,
+      ),
     )
 
   const rename = (index: number, name: string) =>

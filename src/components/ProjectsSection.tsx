@@ -110,7 +110,9 @@ export function ProjectsSection() {
                   type="button"
                   className={styles.remove}
                   onClick={() => removePerson(person.id)}
-                  aria-label={insert(dict.editor.removePerson, { name: person.name || faces[person.face] })}
+                  aria-label={insert(dict.editor.removePerson, {
+                    name: person.name || faces[person.face],
+                  })}
                   title={dict.editor.removePersonTitle}
                 >
                   ×

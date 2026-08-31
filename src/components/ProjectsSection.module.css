@@ -126,7 +126,6 @@
   background: color-mix(in srgb, var(--accent-deep) 8%, transparent);
 }
 
-
 .content {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);

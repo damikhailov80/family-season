@@ -287,8 +287,7 @@ export const en: Dict = {
     unfavoriteOne: 'Remove “{title}” from favourites',
     showcaseOnOne: 'Take “{title}” off the showcase',
     showcaseOffOne: 'Put “{title}” back on the showcase',
-    withdrawAskOne:
-      'Are you sure you want to take the season “{title}” out of Community Ideas?',
+    withdrawAskOne: 'Are you sure you want to take the season “{title}” out of Community Ideas?',
   },
 
   account: {
@@ -340,7 +339,8 @@ export const en: Dict = {
     heading: 'Community Ideas',
     lead: 'The hardest part of the poster is deciding what to fill the month with. It is easier when you see how others did it: somebody’s “Month of Water”, somebody’s “Month Without Screens”, somebody’s storylines for four. Any season here can be opened and forked for your own family.',
     note: 'Families put the seasons here themselves — with the megaphone button on their own season. We show a random set every time: that way a new one has a chance to catch your eye instead of drowning under the ones already visible. If you see an ad, rudeness or someone else’s personal data, press the flag: we take such seasons off the showcase.',
-    emptyHand: 'The showcase is empty so far — nobody has published a season yet. Want to be first?',
+    emptyHand:
+      'The showcase is empty so far — nobody has published a season yet. Want to be first?',
     emptyNote:
       'Create a season in “My seasons”, open it and press the megaphone — it will show up here.',
     seeExamples: 'See the examples',
@@ -411,8 +411,7 @@ export const en: Dict = {
     sheetEditDescription:
       'Rewrite the season for your family: characters, weeks, projects and the goal of the month.',
     publicTitle: 'A season — Family Season',
-    publicDescription:
-      'A published season: somebody’s month in full, with storylines and a goal.',
+    publicDescription: 'A published season: somebody’s month in full, with storylines and a goal.',
     publicError: 'Could not open the season — a server error.',
     sharedTitle: 'A season by link — Family Season',
     sharedDescription: 'A family season shared with you: take a look and take it for yourself.',
@@ -456,7 +455,8 @@ export const en: Dict = {
       'An important consequence: **everything printed on the poster is with us** — the name of the month, the names and projects of the family, goals, plans for the weeks. Typing the names is not required. What you write by hand on the printout we do not have at all. The site does not upload or store photographs: the poster has an empty frame for gluing one in on paper.',
 
     othersHead: 'What other people see',
-    othersIntro: 'Nothing — until you invite somebody yourself. There are two ways, and they differ.',
+    othersIntro:
+      'Nothing — until you invite somebody yourself. There are two ways, and they differ.',
     othersLink:
       '**Share a link** — you issue it yourself, and the season opens for anyone you send it to, with no sign-in and no account. They cannot edit anything. The link can be revoked or replaced by a new one: the previous one stops working that instant.',
     othersShowcase:

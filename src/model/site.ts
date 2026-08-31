@@ -83,7 +83,6 @@ export function modeFromPath(pathname: string): 'view' | 'edit' {
   return stripLang(pathname).replace(/\/+$/, '') === ROUTES.sheetEdit ? 'edit' : 'view'
 }
 
-
 /**
  * Постоянный адрес выложенного сезона. Код — перестановка id строки
  * (`src/model/shortcode.ts`), поэтому адрес считается и без похода в базу:

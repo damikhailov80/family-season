@@ -9,9 +9,7 @@
  * интерфейсе заметна, а «Больше  сезонов» читается как опечатка и живёт годами.
  */
 export function fill(text: string, vars: Record<string, string | number>): string {
-  return text.replace(/\{(\w+)\}/g, (whole, key) =>
-    key in vars ? String(vars[key]) : whole,
-  )
+  return text.replace(/\{(\w+)\}/g, (whole, key) => (key in vars ? String(vars[key]) : whole))
 }
 
 /**

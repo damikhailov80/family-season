@@ -155,7 +155,11 @@ export function EditableText({
         // Длину отмерит beforeinput — он ловит и этот insertText тоже.
         // execCommand устарел, но это единственный способ вставить текст,
         // не потеряв историю отмены contentEditable.
-        document.execCommand('insertText', false, singleLine(event.clipboardData.getData('text/plain')))
+        document.execCommand(
+          'insertText',
+          false,
+          singleLine(event.clipboardData.getData('text/plain')),
+        )
       }}
       onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => {
         if (event.key === 'Escape') event.currentTarget.blur()

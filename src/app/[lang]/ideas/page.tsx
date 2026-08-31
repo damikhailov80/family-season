@@ -95,10 +95,7 @@ export default async function IdeasPage({
               <div className={styles.actions}>
                 {/* Пометка обязана меняться: без неё вторая такая же ссылка была
                     бы переходом «сюда же» и ничего не перетасовала. */}
-                <Link
-                  className={styles.primary}
-                  href={`${withLang(lang, ROUTES.ideas)}?r=${next}`}
-                >
+                <Link className={styles.primary} href={`${withLang(lang, ROUTES.ideas)}?r=${next}`}>
                   {dict.ideas.another}
                 </Link>
                 <NewSeasonAction className={styles.ghost}>{dict.ideas.newSeason}</NewSeasonAction>

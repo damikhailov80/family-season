@@ -349,11 +349,7 @@ export function PublicBar({
         />
       )}
       {login && <LoginDialog reason={login} onClose={() => setLogin(null)} />}
-      {published && (
-        <Toast
-          message={published === 'new' ? bars.published : bars.publishedAgain}
-        />
-      )}
+      {published && <Toast message={published === 'new' ? bars.published : bars.publishedAgain} />}
       {notice && <Toast key={notice.at} message={notice.text} />}
     </>
   )

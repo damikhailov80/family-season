@@ -2,7 +2,12 @@ import { auth } from './auth'
 import { query } from './db'
 import { logger } from './logger'
 import { monthInText, monthName } from '../model/calendar'
-import { IDEAS_PAGE, PUBLISH_LIMIT, type PublishStatus, type ReactionStatus } from '../model/community'
+import {
+  IDEAS_PAGE,
+  PUBLISH_LIMIT,
+  type PublishStatus,
+  type ReactionStatus,
+} from '../model/community'
 import { knownIconSet } from '../model/icons'
 import { knownLang, type Lang } from '../model/lang'
 import { defaultSeasonTitle, ideaTitle, LIBRARY_LIMIT, type LibrarySort } from '../model/library'
@@ -48,9 +53,7 @@ export interface PublicSeasonView {
 }
 
 export type PublicSeasonState =
-  | { status: 'ok'; season: PublicSeasonView }
-  | { status: 'missing' }
-  | { status: 'error' }
+  { status: 'ok'; season: PublicSeasonView } | { status: 'missing' } | { status: 'error' }
 
 interface Row {
   code: string
@@ -401,7 +404,9 @@ export async function publishSeason(
  * Снятое — не удалённое: сезон открывается по ссылке, принимает лайки и форки, а
  * автор возвращает его на витрину `republishPublic`.
  */
-export async function withdrawPublic(value: string): Promise<{ status: PublishStatus; hidden?: boolean }> {
+export async function withdrawPublic(
+  value: string,
+): Promise<{ status: PublishStatus; hidden?: boolean }> {
   const code = codeOrNull(value)
   const session = await auth()
   if (!session?.user) return { status: 'anonymous' }
@@ -424,11 +429,9 @@ export async function withdrawPublic(value: string): Promise<{ status: PublishSt
   if (!row) return { status: 'error' }
 
   const result = row.held
-    ? await query(
-        'public:hide',
-        'update public_seasons set hidden_at = now() where id = $1',
-        [row.id],
-      )
+    ? await query('public:hide', 'update public_seasons set hidden_at = now() where id = $1', [
+        row.id,
+      ])
     : await query('public:drop', 'delete from public_seasons where id = $1', [row.id])
 
   if (result.status !== 'ok') {
@@ -839,8 +842,7 @@ export interface FavoriteEntry {
 }
 
 export type FavoritesState =
-  | { status: 'ok'; entries: FavoriteEntry[] }
-  | { status: 'anonymous' | 'stale' | 'error' }
+  { status: 'ok'; entries: FavoriteEntry[] } | { status: 'anonymous' | 'stale' | 'error' }
 
 /**
  * Отложенное. Поиск и порядок считаются **здесь, а не в запросе**, и это не
@@ -926,8 +928,7 @@ export interface PublishedEntry {
 }
 
 export type PublishedState =
-  | { status: 'ok'; entries: PublishedEntry[] }
-  | { status: 'anonymous' | 'stale' | 'error' }
+  { status: 'ok'; entries: PublishedEntry[] } | { status: 'anonymous' | 'stale' | 'error' }
 
 /**
  * Свои публикации со счётчиками.

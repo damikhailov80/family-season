@@ -61,7 +61,10 @@ export function langFromAccept(header: string | null | undefined): Lang | null {
       const [tag, ...params] = part.trim().split(';')
       const q = params.map((p) => p.trim()).find((p) => p.startsWith('q='))
       const weight = q ? Number.parseFloat(q.slice(2)) : 1
-      return { tag: tag.trim().toLowerCase().split('-')[0], weight: Number.isFinite(weight) ? weight : 0 }
+      return {
+        tag: tag.trim().toLowerCase().split('-')[0],
+        weight: Number.isFinite(weight) ? weight : 0,
+      }
     })
     // Сортировка обязана быть устойчивой: при равных весах побеждает тот, кто
     // стоит раньше в заголовке. `Array#sort` в ES2019 устойчив, поэтому хватает

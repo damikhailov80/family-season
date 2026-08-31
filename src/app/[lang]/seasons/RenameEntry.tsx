@@ -81,12 +81,7 @@ export function RenameEntry({
               >
                 {dialogs.cancel}
               </button>
-              <button
-                type="button"
-                className={dialogStyles.primary}
-                disabled={busy}
-                onClick={save}
-              >
+              <button type="button" className={dialogStyles.primary} disabled={busy} onClick={save}>
                 {dialogs.save}
               </button>
             </>

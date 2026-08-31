@@ -83,10 +83,7 @@ export function DraftBar({
             делом, а не прочитает в панели. */}
         <span className={styles.hint}>{bars.placeDraft}</span>
         <span className={styles.actions}>
-          <Link
-            className={styles.primary}
-            href={sheetHref(uiLang, editing ? 'view' : 'edit')}
-          >
+          <Link className={styles.primary} href={sheetHref(uiLang, editing ? 'view' : 'edit')}>
             {editing ? bars.ready : bars.edit}
           </Link>
           {signedIn && (

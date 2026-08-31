@@ -56,9 +56,7 @@ export function ReportDialog({
         </>
       }
     >
-      <p className={styles.text}>
-        {sent ? dialogs.reportAgainHint : dialogs.reportHint}
-      </p>
+      <p className={styles.text}>{sent ? dialogs.reportAgainHint : dialogs.reportHint}</p>
 
       <label className={styles.label} htmlFor="report-comment">
         {dialogs.reportLabel}

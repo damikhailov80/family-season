@@ -40,16 +40,119 @@ Next.js (App Router, бандлер Turbopack) + TypeScript, стили — CSS 
 кнопки входа это `<form>` с серверным действием. Сам постер целиком клиентский: он живёт
 в хэше и до сервера не доходит.
 
-## Запуск
+## Шпаргалка
 
 ```bash
-npm install
+npm install       # заодно ставит git-хуки (husky)
 npm run dev       # http://localhost:3000
-npm run build     # прод-сборка в .next/
-npm run start     # прод-сервер на собранном
-npm run lint
-npm run typecheck
 ```
+
+**Каждый день**
+
+| Команда | Что делает |
+| --- | --- |
+| `npm run dev` | Дев-сервер на 3000 |
+| `npm run build` | Прод-сборка в `.next/` |
+| `npm run start` | Прод-сервер на собранном |
+
+**Проверки** — те же, что стоят на хуках
+
+| Команда | Что делает |
+| --- | --- |
+| `npm run lint` | oxlint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run format` | Prettier по всему проекту |
+| `npm run format:check` | Проверить формат, ничего не меняя |
+| `npm run e2e` | **Слепок базы + сборка + тесты.** Полный прогон |
+| `npm run e2e:only` | Только тесты, по прошлой сборке — для правки самих спеков |
+| `npm run e2e:db` | Только привести тестовую базу к слепку |
+| `npx playwright test --ui` | Интерактивный режим: удобно писать новые тесты |
+| `npx playwright test -g "смена языка"` | Один тест или группа |
+| `npx playwright show-report` | Отчёт о последнем прогоне |
+
+**База**
+
+| Команда | Что делает |
+| --- | --- |
+| `npm run db:status` | Что накатано, что осталось |
+| `npm run db:migrate` | Накатить миграции (на дев; про прод — «Деплой») |
+| `npm run db:seed` | Положить примеры в `public_seasons` |
+| `npm run db:reports` | Очередь жалоб; `-- --block <code> «почему»` закрывает публикацию |
+| `docker start family-season-db` | Поднять локальный postgres |
+
+**Собираемое** — правится исходник, потом пересборка
+
+| Команда | Из чего | Во что |
+| --- | --- | --- |
+| `npm run palettes` | `tools/palettes/source.json` | `src/styles/palettes.css`, `src/model/palettes.data.ts` |
+| `npm run icons` | `tools/icons/source.json` | `src/components/doodles/icons.generated.ts`, `src/model/icons.data.ts` |
+| `npm run qr` | `tools/qr/source.json` | `src/model/qr.data.ts` |
+| `npm run logo` | `tools/logo/` | `public/favicon.svg`, `logo-120.png` |
+
+**Что запускается само**
+
+| Когда | Что | Сколько |
+| --- | --- | --- |
+| `git commit` | `prettier` и `oxlint` по тому, что коммитится | доли секунды |
+| `git push` | `lint` и `typecheck` | ~5 с |
+| Деплой на Vercel | Ничего сверх сборки: ни миграций, ни тестов | — |
+
+**E2E автоматически не запускаются нигде** — пока их гоняют руками, `npm run e2e`.
+Причина в разделе «Хуки».
+
+Разово пропустить хук — `git push --no-verify`. Тестам нужна поднятая база и строка
+`E2E_DATABASE_URL` в `.env.local` — см. «Тесты».
+
+## Тесты
+
+E2E на Playwright. Заголовок теста — утверждение о том, как продукт должен себя вести,
+поэтому тесты заодно служат описанием сценариев: что гарантировано, видно из `e2e/`.
+
+Тестам нужна **отдельная** база: перед каждым прогоном её схема сносится и собирается
+заново из миграций и посева примеров. Заводится она рядом с дев-базой:
+
+```bash
+docker exec family-season-db createdb -U postgres family_season_e2e
+# и строка в .env.local, см. .env.example:
+# E2E_DATABASE_URL=postgres://postgres:local@localhost:5432/family_season_e2e
+```
+
+```bash
+npm run e2e       # слепок + сборка + тесты — полный прогон
+npm run e2e:only  # только тесты, по уже собранному: когда правишь сами спеки
+npm run e2e:db    # только привести тестовую базу к слепку
+npx playwright show-report
+```
+
+`e2e` пересобирает проект намеренно: `e2e:only` гоняет тесты по **прошлой** сборке, и
+поправив код приложения, вы молча проверили бы старое. Быстрый он только для правки самих
+спеков.
+
+Тесты идут против `next start` на порту 3100, а не против дев-сервера: дев смотрит в
+рабочую базу, да и второй `next dev` в одном проекте не поднять. Сборка занимает секунд
+десять. Скрипт слепка откажется работать, если `E2E_DATABASE_URL` совпала с `DATABASE_URL`, —
+он сносит схему целиком, и промахнуться базой тут стоит слишком дорого.
+
+## Хуки
+
+Ставятся сами при `npm install` (husky):
+
+| Хук | Что делает |
+| --- | --- |
+| `pre-commit` | `prettier` и `oxlint` по тому, что коммитится |
+| `pre-push` | `npm run lint`, `npm run typecheck` |
+
+**E2E в `pre-push` пока нет, и это решение, а не пробел.** Набор из одного теста не стоит
+ожидания, а хук, который тормозит без пользы, начинают обходить `--no-verify` — и дальше
+обходят уже по привычке. Когда сценариев наберётся достаточно, в `.husky/pre-push`
+добавляется строка `npm run e2e`: она сама приводит базу к слепку и собирает проект.
+
+Не проходит по делу — чините. Не проходит некстати — `git push --no-verify`. Хук, который
+нельзя обойти, однажды заставит обходить себя правкой самого хука.
+
+Форматирование — Prettier с настройками под сложившийся стиль (без точек с запятой,
+одинарные кавычки, ширина 100). Собираемые файлы и `*.md` в `.prettierignore`: первые
+разошлись бы со сборкой, вторые свёрстаны по ширине руками.
 
 ## Вход
 
@@ -327,7 +430,7 @@ node --env-file=.env.production.local --import tsx tools/db/seed-examples.ts
 | Короткие коды и токены | `src/model/shortcode.ts` |
 | Содержимое сезона и имена отдельно | `src/model/season.ts` |
 | Черновик невошедшего | `src/model/draft.ts` |
-| Примеры сезонов (бланк + заполнение) | `src/data/examples/<id>.json`, реестр `src/model/examples.ts` |
+| Примеры сезонов (бланк + заполнение) | `src/data/examples/<язык>/<id>.json`, реестр `src/model/examples.ts` |
 | Фото недель в примерах | `public/examples/<id>/week-N.svg` |
 | Постоянные подписи бланка | `src/model/labels.ts` |
 | Состояние листа и режим правки | `src/state/SeasonProvider.tsx`, `src/state/useTemplateState.ts` |
@@ -341,6 +444,7 @@ node --env-file=.env.production.local --import tsx tools/db/seed-examples.ts
 | Настройки аккаунта в базе | `src/server/settings.ts`, схема — `tools/db/migrations/` |
 | Свои сезоны | `src/model/library.ts`, `src/server/userSeasons.ts` |
 | Витрина, лайки, жалобы, избранное | `src/server/publicSeasons.ts` |
-| Панели постера | `src/app/sheet/DraftBar.tsx`, `src/app/season/[code]/OwnBar.tsx`, `src/app/s/[code]/PublicBar.tsx` |
-| Кабинет: свои, избранное, опубликованные | `src/app/seasons/page.tsx` |
+| Панели постера | `src/app/[lang]/sheet/DraftBar.tsx`, `src/app/[lang]/season/[code]/OwnBar.tsx`, `src/app/[lang]/s/[code]/PublicBar.tsx` |
+| Кабинет: свои, избранное, опубликованные | `src/app/[lang]/seasons/page.tsx` |
 | Печать | `src/styles/print.css` и блоки `@media print` в модулях |
+| E2E-тесты и слепок базы | `e2e/`, `playwright.config.ts`, `tools/db/reset-e2e.mjs` |

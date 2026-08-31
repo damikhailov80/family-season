@@ -85,7 +85,9 @@ try {
     if (!rows.length) {
       console.log('Жалоб нет.')
     } else {
-      console.log(`Публикаций с жалобами: ${rows.length}. Порог для разбора — ${REPORTS_TO_REVIEW}.\n`)
+      console.log(
+        `Публикаций с жалобами: ${rows.length}. Порог для разбора — ${REPORTS_TO_REVIEW}.\n`,
+      )
       for (const row of rows) {
         const state = !row.alive
           ? 'удалена'
@@ -99,7 +101,9 @@ try {
           row.alive && !row.blocked_at && row.reporters >= REPORTS_TO_REVIEW
             ? ' ← порог пройден'
             : ''
-        console.log(`/s/${row.code}  жалоб: ${row.reporters}  избранное: ${row.favorites}  ${state}${mark}`)
+        console.log(
+          `/s/${row.code}  жалоб: ${row.reporters}  избранное: ${row.favorites}  ${state}${mark}`,
+        )
         // Тема из снимка: у удалённой публикации это единственное, по чему
         // вообще видно, о чём шла речь.
         console.log(`  тема: ${ideaTitle(joinSeason(row.content, []), knownLang(row.language))}`)

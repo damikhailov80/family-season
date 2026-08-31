@@ -14,9 +14,7 @@ export function WeeksSection() {
         accent="weeks"
         label={labels.weeks}
         labelId="weeks-label"
-        note={
-          <EditableText placeholder={placeholders.weeksNote} {...field('weeksNote')} />
-        }
+        note={<EditableText placeholder={placeholders.weeksNote} {...field('weeksNote')} />}
         bodyClassName={styles.grid}
       >
         {template.weeks.map((_week, index) => (

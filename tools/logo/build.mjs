@@ -70,14 +70,18 @@ writeFileSync(
 )
 
 const png = join(root, 'public', `logo-${SIZE}.png`)
-execFileSync(CHROME, [
-  '--headless=new',
-  '--disable-gpu',
-  '--hide-scrollbars',
-  '--default-background-color=ffffff',
-  `--window-size=${SIZE},${SIZE}`,
-  `--screenshot=${png}`,
-  join(work, 'page.html'),
-], { stdio: 'ignore' })
+execFileSync(
+  CHROME,
+  [
+    '--headless=new',
+    '--disable-gpu',
+    '--hide-scrollbars',
+    '--default-background-color=ffffff',
+    `--window-size=${SIZE},${SIZE}`,
+    `--screenshot=${png}`,
+    join(work, 'page.html'),
+  ],
+  { stdio: 'ignore' },
+)
 
 console.log(`logo: public/favicon.svg, public/logo-${SIZE}.png (${SIZE}×${SIZE})`)

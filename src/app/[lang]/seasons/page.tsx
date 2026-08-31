@@ -157,12 +157,7 @@ function Row({
       <span className={styles.rowTools}>
         {kind === 'seasons' && (
           <>
-            <RenameEntry
-              code={entry.code}
-              title={entry.title}
-              back={back}
-              lang={entry.lang}
-            />
+            <RenameEntry code={entry.code} title={entry.title} back={back} lang={entry.lang} />
             <DeleteEntry code={entry.code} title={entry.title} back={back} />
           </>
         )}
@@ -217,7 +212,6 @@ export default async function SeasonsPage({
     return (
       <PaperSheet>
         <SectionBox accent="deep" label={seasons.heading} className={styles.section}>
-
           {/* Список у невошедшего тот же самый, просто короткий: черновик здесь
               один. Про вход разговор ведёт окно заведения сезона — оно и так
               всегда говорит, что без входа сезон живёт только в этом браузере,
@@ -235,8 +229,7 @@ export default async function SeasonsPage({
 
   const flags = await searchParams
   // Вкладка приходит из адреса: неизвестная — как будто её не называли.
-  const kind: Tab =
-    flags.tab === 'favorites' || flags.tab === 'published' ? flags.tab : 'seasons'
+  const kind: Tab = flags.tab === 'favorites' || flags.tab === 'published' ? flags.tab : 'seasons'
   const sort: LibrarySort = flags.sort === 'name' ? 'name' : 'date'
   // Строку поиска режем по тому же пределу, что и название: искать длиннее нечего.
   const search = typeof flags.q === 'string' ? flags.q.slice(0, TITLE_LIMIT) : ''
@@ -252,7 +245,6 @@ export default async function SeasonsPage({
   return (
     <PaperSheet>
       <SectionBox accent="deep" label={seasons.heading} className={styles.section}>
-
         <nav className={styles.tabs} aria-label={seasons.tabsAria}>
           {TABS.map((tab) => (
             <Link
@@ -305,7 +297,14 @@ export default async function SeasonsPage({
           (entries.length ? (
             <ul className={styles.entries}>
               {entries.map((entry) => (
-                <Row key={entry.code} entry={entry} kind={kind} back={here} lang={lang} dict={dict} />
+                <Row
+                  key={entry.code}
+                  entry={entry}
+                  kind={kind}
+                  back={here}
+                  lang={lang}
+                  dict={dict}
+                />
               ))}
             </ul>
           ) : (
@@ -335,9 +334,7 @@ export default async function SeasonsPage({
 
         {/* Сюда возвращается неудача «Нового сезона»: строку завести не вышло, и
             человек оказался здесь вместо своего сезона — молчать об этом нельзя. */}
-        {flags.add === 'limit' && (
-          <Toast message={fill(seasons.addLimit, { n: LIBRARY_LIMIT })} />
-        )}
+        {flags.add === 'limit' && <Toast message={fill(seasons.addLimit, { n: LIBRARY_LIMIT })} />}
         {flags.add && flags.add !== 'limit' && <Toast message={seasons.addError} />}
       </SectionBox>
     </PaperSheet>

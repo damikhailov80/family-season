@@ -14,7 +14,11 @@ export function ProgressBar({ percent, label }: ProgressBarProps) {
   const dict = useDict()
 
   return (
-    <div className={styles.track} role="img" aria-label={fill(dict.editor.progressAria, { label, percent: clamped })}>
+    <div
+      className={styles.track}
+      role="img"
+      aria-label={fill(dict.editor.progressAria, { label, percent: clamped })}
+    >
       <div className={styles.fill} style={{ width: `${clamped}%` }} />
       {/*
        * Деления — настоящие ячейки, а не градиент в процентах: на печати

@@ -32,9 +32,17 @@ export function SeasonPreview({ idea }: { idea: Idea }) {
   const shown = (value: string, fallback: string) => value.trim() || fallback
 
   return (
-    <a className={styles.paper} data-palette={idea.palette} href={publicSeasonHref(idea.lang, idea.code)}>
-      <span className={styles.headline}>{shown(template.theme.subtitle, placeholders.subtitle)}</span>
-      <span className={styles.question}>{shown(template.theme.question, placeholders.question)}</span>
+    <a
+      className={styles.paper}
+      data-palette={idea.palette}
+      href={publicSeasonHref(idea.lang, idea.code)}
+    >
+      <span className={styles.headline}>
+        {shown(template.theme.subtitle, placeholders.subtitle)}
+      </span>
+      <span className={styles.question}>
+        {shown(template.theme.question, placeholders.question)}
+      </span>
 
       <span className={styles.weeks}>
         {template.weeks.map((week, index) => (

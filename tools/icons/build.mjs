@@ -98,7 +98,8 @@ const shapes = icons.map((icon) => {
   if (icon.fill) fields.push('fill: true')
   if (icon.stroke) fields.push(`stroke: ${icon.stroke}`)
   if (icon.circles) fields.push(`circles: ${list(icon.circles.map((c) => list(c)))}`)
-  if (icon.paths) fields.push(`paths: [\n      ${icon.paths.map((d) => `'${d}'`).join(',\n      ')},\n    ]`)
+  if (icon.paths)
+    fields.push(`paths: [\n      ${icon.paths.map((d) => `'${d}'`).join(',\n      ')},\n    ]`)
   return `  '${icon.name}': {\n    ${fields.join(',\n    ')},\n  },`
 })
 

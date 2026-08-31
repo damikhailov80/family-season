@@ -70,7 +70,10 @@ export function ideaTitle(template: Template, lang: Lang): string {
  * Слова, которыми сезоны объясняют отказ. `anonymous` сюда не попадает:
  * «войдите» — не отказ, а предложение, и показывает его окно входа.
  */
-export function libraryText(lang: Lang, status: Exclude<LibraryStatus, 'ok' | 'anonymous'>): string {
+export function libraryText(
+  lang: Lang,
+  status: Exclude<LibraryStatus, 'ok' | 'anonymous'>,
+): string {
   const text = DICTS[lang].status.library[status]
   return status === 'limit' ? fill(text, { n: LIBRARY_LIMIT }) : text
 }

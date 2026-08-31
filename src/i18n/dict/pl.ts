@@ -239,7 +239,8 @@ export const pl: Dict = {
     communityNote: 'cudze sezony w całości',
     communityText:
       'Nie trzeba wymyślać miesiąca od zera. Rodziny wystawiają swoje sezony na wspólną witrynę: czyjś „Miesiąc wody”, czyjeś projekty na czworo, czyjeś podsumowanie z pytaniem, na które odpowiadała cała rodzina. Każdy sezon stamtąd otwiera się w całości — można go przymierzyć w swoim motywie i skopiować pod swoich bohaterów, zostawiając sobie tylko to, co się spodobało.',
-    communityHand: 'Pokazujemy za każdym razem losowe — zaglądajcie, gdy własne pomysły się skończą.',
+    communityHand:
+      'Pokazujemy za każdym razem losowe — zaglądajcie, gdy własne pomysły się skończą.',
     communityAction: 'Zobacz pomysły społeczności',
   },
 
@@ -339,7 +340,8 @@ export const pl: Dict = {
     heading: 'Pomysły społeczności',
     lead: 'Najtrudniejsze w plakacie jest wymyślić, czym zająć miesiąc. Łatwiej, gdy widzisz, jak zrobili to inni: czyjś „Miesiąc wody”, czyjś „Miesiąc bez ekranów”, czyjeś projekty na czworo. Każdy sezon stąd można otworzyć i skopiować pod swoją rodzinę.',
     note: 'Sezony wystawiają same rodziny — przyciskiem z megafonem na swoim sezonie. Pokazujemy za każdym razem losowe: tak nowy ma szansę wpaść w oko, a nie utonąć pod tymi, które już widać. Zobaczyłeś reklamę, grubiaństwo albo cudze dane osobowe — naciśnij flagę: takie sezony zdejmujemy z witryny.',
-    emptyHand: 'Na razie witryna jest pusta — nikt jeszcze nie wystawił swojego sezonu. Będziecie pierwsi?',
+    emptyHand:
+      'Na razie witryna jest pusta — nikt jeszcze nie wystawił swojego sezonu. Będziecie pierwsi?',
     emptyNote:
       'Utwórz sezon w „Moich”, otwórz go i naciśnij przycisk z megafonem — pojawi się tutaj.',
     seeExamples: 'Zobacz przykłady',

@@ -82,9 +82,7 @@ export function ShareLinkDialog({
         )
       }
     >
-      <p className={styles.text}>
-        {token ? dialogs.shareHave : dialogs.shareNone}
-      </p>
+      <p className={styles.text}>{token ? dialogs.shareHave : dialogs.shareNone}</p>
 
       {token && (
         <>

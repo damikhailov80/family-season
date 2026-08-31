@@ -18,15 +18,7 @@ import styles from './page.module.css'
  * Спрашиваем не для порядка: другой копии сезона у сайта нет, и если ссылка на
  * него больше нигде не осталась, постер пропадает совсем.
  */
-export function DeleteEntry({
-  code,
-  title,
-  back,
-}: {
-  code: string
-  title: string
-  back: string
-}) {
+export function DeleteEntry({ code, title, back }: { code: string; title: string; back: string }) {
   const [open, setOpen] = useState(false)
   const lang = useLang()
   const { seasons, dialogs } = useDict()
@@ -48,11 +40,7 @@ export function DeleteEntry({
           onDismiss={() => setOpen(false)}
           actions={
             <>
-              <button
-                type="button"
-                className={dialogStyles.ghost}
-                onClick={() => setOpen(false)}
-              >
+              <button type="button" className={dialogStyles.ghost} onClick={() => setOpen(false)}>
                 {dialogs.cancel}
               </button>
               {/* Действие серверное: аргументы привязаны, но проверяются заново —

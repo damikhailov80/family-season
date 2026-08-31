@@ -34,7 +34,14 @@ export function LangSwitcher({ lang, path, label }: { lang: Lang; path: string; 
       <summary className={styles.current} aria-label={label} title={label}>
         <span aria-hidden="true" className={styles.globe}>
           {/* Глобус — inline SVG: растровых картинок в проекте нет. */}
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <circle cx="12" cy="12" r="9" />
             <path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" />
           </svg>

@@ -76,7 +76,5 @@ export function Autosave({ code }: { code: string }) {
     }
   }, [code])
 
-  return failed ? (
-    <Toast key={failed} message={pages.autosaveFailed} />
-  ) : null
+  return failed ? <Toast key={failed} message={pages.autosaveFailed} /> : null
 }

@@ -1,0 +1,21 @@
+# Сборка и статика
+.next
+out
+public
+node_modules
+
+# Рукописная вёрстка по ширине: CLAUDE.md и README свёрстаны абзацами вручную,
+# и переносы в них — часть текста, а не форматирование.
+*.md
+
+# Собираемые файлы. Отформатируй их — и следующий `npm run palettes` / `icons` /
+# `qr` молча даст расхождение: сборка пишет свой формат, а не prettier'овский.
+src/styles/palettes.css
+src/model/palettes.data.ts
+src/model/icons.data.ts
+src/model/qr.data.ts
+src/components/doodles/icons.generated.ts
+
+# Отчёты и артефакты тестов
+playwright-report
+test-results

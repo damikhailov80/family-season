@@ -65,8 +65,7 @@ export interface UserSeasonEntry {
 }
 
 export type UserSeasonsState =
-  | { status: 'ok'; entries: UserSeasonEntry[] }
-  | { status: 'anonymous' | 'stale' | 'error' }
+  { status: 'ok'; entries: UserSeasonEntry[] } | { status: 'anonymous' | 'stale' | 'error' }
 
 interface Row {
   code: string
@@ -153,7 +152,10 @@ export async function listUserSeasons(
     [session.accountKey, search],
   )
   if (result.status !== 'ok') {
-    logger.error('user seasons not listed', { accountKey: session.accountKey, reason: result.status })
+    logger.error('user seasons not listed', {
+      accountKey: session.accountKey,
+      reason: result.status,
+    })
     return { status: 'error' }
   }
 

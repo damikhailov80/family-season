@@ -20,7 +20,14 @@ import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
 /** id человека не печатается: его длину диктует не макет, а компактность ссылки. */
 const ID_LIMIT = 8
 
-export type PackedPerson = [id: string, name: string, face: number, project: string, description: string, goal: string]
+export type PackedPerson = [
+  id: string,
+  name: string,
+  face: number,
+  project: string,
+  description: string,
+  goal: string,
+]
 
 export type Packed = [
   version: 2,
@@ -158,16 +165,3 @@ export function normalizeTemplate(input: unknown): Template {
     people: normalizedPeople,
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

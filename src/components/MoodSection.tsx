@@ -49,9 +49,7 @@ export function MoodSection() {
                 <th
                   scope="row"
                   className={styles.who}
-                  style={
-                    { '--accent': `var(--person-${person.face})` } as React.CSSProperties
-                  }
+                  style={{ '--accent': `var(--person-${person.face})` } as React.CSSProperties}
                 >
                   <AvatarFace variant={person.face} size={20} className={styles.whoFace} />
                   <span>{person.name || placeholders.name}</span>
