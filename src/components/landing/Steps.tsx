@@ -3,7 +3,6 @@ import { SectionBox } from '../SectionBox'
 import { FamilyIcon, FridgeDoodle, PenDoodle, PrinterDoodle } from '../doodles'
 import styles from './Steps.module.css'
 
-/** Рисунки здесь, а слова в словаре: перевод не имеет права переставить доодлы. */
 const DOODLES = [
   { Doodle: FamilyIcon, size: 54 },
   { Doodle: PrinterDoodle, size: 50 },

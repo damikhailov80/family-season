@@ -24,7 +24,6 @@ export function Header() {
         <SparkleRays className={`${styles.rays} ${styles.raysRight}`} />
       </div>
 
-      {/* Лента пустой не бывает: без своего девиза печатается девиз по умолчанию. */}
       <EditableText
         as="p"
         className={styles.ribbon}

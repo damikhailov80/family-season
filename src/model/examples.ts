@@ -19,18 +19,6 @@ import { normalizeFill } from './fill'
 import type { FillState, Template } from './types'
 import { EMPTY_FILL } from './types'
 
-/**
- * Один пример — один файл `src/data/examples/<язык>/<id>.json` и одна строка в
- * реестре ниже; посев кладёт их в `public_seasons` системными сезонами.
- *
- * Месяца в JSON нет: `normalizeTemplate` подставляет его от «сегодня», поэтому
- * шаблон собирается лениво, при открытии примера, а не при загрузке модуля —
- * иначе пример «протух» бы на этапе сборки статических страниц.
- *
- * Языков у примера три, и это три разные строки витрины, а не один сезон с тремя
- * подписями. Фотографии недель при этом общие — в них нет ни слова.
- */
-
 interface RawExample {
   name: string
   summary: string
@@ -42,27 +30,17 @@ interface RawExample {
 }
 
 export interface Example {
-  /** `ru/demo-1` — язык и файл. Он же лежит в колонке `fill_id` строки посева. */
   key: string
-  /** `demo-1` — сам пример, общий у трёх языков. */
   id: string
   lang: Lang
-  /**
-   * Id фиксирован таблицей `PUBLIC_IDS`, а не порядком реестра: короткий адрес —
-   * перестановка id, он обещан постоянным, и новый язык не имеет права сдвинуть
-   * выданные коды. Оттого адрес считается здесь и не требует похода в базу:
-   * лендинг обязан работать и при мёртвой базе.
-   */
   publicId: number
   href: string
-  /** Название примера — для карточек лендинга; в бланке его нет. */
   name: string
   summary: string
   note: string
   template: () => Template
   fill: FillState
   faces: FaceVariant[]
-  /** Тема и набор рисунков примера; `p=` и `i=` в адресе их перебивают. */
   palette: PaletteId
   iconSet: IconSetId
 }
@@ -73,10 +51,6 @@ const RAW: Record<Lang, Record<string, RawExample>> = {
   pl: { 'demo-1': plDemo1, 'demo-2': plDemo2, 'demo-3': plDemo3 },
 }
 
-/**
- * Номера строк в `public_seasons`. Проставлены руками и меняться не могут: из них
- * считается короткий адрес, а он обещан постоянным.
- */
 const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
   ru: { 'demo-1': 1, 'demo-2': 2, 'demo-3': 3 },
   en: { 'demo-1': 4, 'demo-2': 5, 'demo-3': 6 },

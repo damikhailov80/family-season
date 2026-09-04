@@ -10,27 +10,15 @@ import type { PublicSeasonView } from '../../../../server/publicSeasons'
 import type { IconSetId, PaletteId } from '../../../../types'
 import { PublicBar } from './PublicBar'
 
-/**
- * Примеренное оформление уезжает в адрес перебивкой `?p=&i=`, чтобы ссылку на
- * увиденное можно было отослать. Строку в базе это не трогает.
- */
 export function PublicSeason({
   season,
   signedIn,
   published,
 }: {
   season: PublicSeasonView
-  /** От входа зависит, куда ляжет форк. */
   signedIn: boolean
-  /** Пришли прямо с публикации — панель скажет, что случилось, и почистит адрес. */
   published: 'new' | 'again' | null
 }) {
-  /*
-   * `replaceState`, а не переход роутера: содержимое от адреса не зависит,
-   * перерисовывать страницу незачем, а лишняя запись в истории превратила бы
-   * «назад» в перебор примеренных тем. `history.state` передаём обязательно —
-   * иначе патченный Next-ом вызов пойдёт мимо короткого пути (см. «Каркас»).
-   */
   const lang = useLang()
   const rememberDecor = useCallback(
     (decor: { palette: PaletteId; iconSet: IconSetId }) => {

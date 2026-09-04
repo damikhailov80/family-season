@@ -10,14 +10,6 @@ import type { Lang } from '../../../model/lang'
 import { republishEntry, withdrawEntry } from '../../../server/actions'
 import styles from './page.module.css'
 
-/**
- * Значок и повадка те же, что на самом сезоне: мегафон нажат, пока сезон на
- * витрине. Спрашиваем только про снятие — там сезон может исчезнуть совсем, а
- * возврат терять нечему.
- *
- * Ожидание держит `useTransition` — та же ловушка с редиректом, что в
- * `RenameEntry`.
- */
 export function ShowcaseEntry({
   code,
   title,
@@ -27,7 +19,6 @@ export function ShowcaseEntry({
 }: {
   code: string
   title: string
-  /** Снят с витрины: кнопка отжата и возвращает сезон обратно. */
   hidden: boolean
   back: string
   lang: Lang
@@ -80,7 +71,6 @@ export function ShowcaseEntry({
           }
         >
           <p className={dialogStyles.text}>{fill(seasons.withdrawAskOne, { title })}</p>
-          {/* Приписка та же, что в окне у самого сезона, и оттуда же. */}
           <p className={dialogStyles.text}>{dialogs.withdrawNote}</p>
         </Dialog>
       )}

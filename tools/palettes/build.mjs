@@ -1,14 +1,3 @@
-/*
- * Сборка тем постера: source.json -> src/styles/palettes.css + palettes.data.ts
- * (`npm run palettes`).
- *
- * Сто наборов Canva как есть для листа не годятся: в наборе может оказаться и
- * белый, и почти чёрный. Поэтому здесь считается ровно то, чего CSS не умеет:
- * сортировка красок по светлоте (лестница «тёмная → светлая» постоянна, и
- * «глубокая» роль везде самая тёмная), цвет текста на плашке по контрасту и
- * тёмный оттенок каждой краски для рамок и заголовков.
- */
-
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -16,11 +5,8 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../..')
 
-/** Самая светлая допустимая краска: белую плашку на белой бумаге не видно. */
 const MAX_PAINT_L = 0.95
-/** Тёмный оттенок: с такой светлотой краска читается текстом на белом. */
 const MAX_DARK_L = 0.45
-/** Ниже этого контраста белый текст на плашке нечитаем — берём чернила. */
 const MIN_WHITE_CONTRAST = 4
 
 const toLinear = (v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
@@ -75,7 +61,6 @@ function oklchToRgb({ L, C, h }) {
 
 const inGamut = (rgb) => rgb.every((v) => v >= -0.001 && v <= 1.001)
 
-/** Цвет вне sRGB гасим по цветности: светлота и тон важнее насыщенности. */
 function toRgbInGamut(color) {
   if (inGamut(oklchToRgb(color))) return oklchToRgb(color)
   let lo = 0
@@ -113,7 +98,6 @@ function buildPalette(colors) {
 
   const darks = sorted.map((color) => {
     if (color.L <= MAX_DARK_L) return color.hex
-    // У светлой краски цветность мала: при подтемнении она выцветает в серый.
     const C = color.L > 0.7 ? color.C * 1.6 : color.C
     return hexOf({ L: MAX_DARK_L, C, h: color.h })
   })
@@ -123,7 +107,6 @@ function buildPalette(colors) {
 
 const source = JSON.parse(readFileSync(resolve(here, 'source.json'), 'utf8'))
 
-// Подпись темы переводится: сборка проверяет, что ни один язык не забыт.
 const LANGS = ['ru', 'en', 'pl']
 
 for (const { id, label } of source) {
@@ -134,7 +117,6 @@ for (const { id, label } of source) {
   if (missing.length) throw new Error(`тема «${id}»: нет подписи на ${missing.join(', ')}`)
 }
 
-/** Подписи набраны руками, и апострофы в них бывают. */
 const quote = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 
 const cssBlocks = source.map(({ id, label, colors }) => {
@@ -147,33 +129,12 @@ const cssBlocks = source.map(({ id, label, colors }) => {
   return `/* ${label.ru} */\n[data-palette='${id}'] {\n${lines.join('\n')}\n}`
 })
 
-const css = `/*
- * Краски тем постера. Файл собирается: tools/palettes/build.mjs (npm run palettes),
- * руками его не правят — правят tools/palettes/source.json и пересобирают.
- *
- * Сто наборов из подборки Canva «100 цветовых сочетаний». В наборе четыре краски,
- * отсортированные от тёмной к светлой:
- *
- *   --c1..--c4    краски набора (плашки, заливки, свотчи);
- *   --on-c1..4    цвет текста на такой плашке — белый или чернила;
- *   --d1..--d4    тёмный оттенок краски: рамки, заголовки, чернила.
- *
- * Роли («глубокий акцент», «тема месяца», «недели», «цель») раздаются в
- * src/styles/tokens.css — там же выводятся линии, подложки и чернила.
- */
+const css = `/* Собирается tools/palettes/build.mjs (npm run palettes) из tools/palettes/source.json. */
 
 ${cssBlocks.join('\n\n')}
 `
 
-const ts = `/**
- * Реестр тем постера. Файл собирается: tools/palettes/build.mjs (npm run palettes),
- * руками его не правят — правят tools/palettes/source.json и пересобирают.
- *
- * Здесь только id и подписи: краски живут в src/styles/palettes.css, а логика
- * выбора темы — в src/model/palettes.ts.
- *
- * Подпись у темы на всех трёх языках сайта: её видно на кнопке переключателя.
- */
+const ts = `/* Собирается tools/palettes/build.mjs (npm run palettes) из tools/palettes/source.json. */
 
 export const PALETTES = [
 ${source.map(({ id, label }) => `  ['${id}', { ${LANGS.map((lang) => `${lang}: ${quote(label[lang])}`).join(', ')} }],`).join('\n')}

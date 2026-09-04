@@ -6,10 +6,6 @@ import styles from '../dialog/Dialog.module.css'
 import { useDict } from '../../i18n/context'
 import { TITLE_LIMIT } from '../../model/library'
 
-/**
- * Окно, а не поле в ряду: поле, растущее вместе с набранным, дёргало кнопки на
- * каждом знаке. Значение читается с узла при отправке, как в окне заведения.
- */
 export function RenameDialog({
   title,
   busy,

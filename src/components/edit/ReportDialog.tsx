@@ -6,14 +6,6 @@ import styles from '../dialog/Dialog.module.css'
 import { useDict } from '../../i18n/context'
 import { COMMENT_LIMIT } from '../../model/community'
 
-/**
- * Окно нужно ради комментария, а не подтверждения: жалоба без слов бесполезна
- * тому, кто будет в ней разбираться, поэтому поле контролируемое и кнопка
- * погашена, пока оно пусто.
- *
- * Порог, после которого сезон уходит на разбор, в тексте не назван намеренно:
- * названное число — готовая инструкция, как убрать чужой сезон.
- */
 export function ReportDialog({
   busy,
   sent,
@@ -21,7 +13,6 @@ export function ReportDialog({
   onSubmit,
 }: {
   busy: boolean
-  /** На сезон уже жаловались с этого аккаунта: жалоба не вторая, а уточнённая. */
   sent: boolean
   onDismiss: () => void
   onSubmit: (comment: string) => void

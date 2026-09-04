@@ -39,8 +39,6 @@ export function MonthTheme() {
               ‹
             </button>
           )}
-          {/* Ширину держит самое длинное название: без распорки строка при
-              переключении месяцев меняет длину и стрелки скачут. */}
           <p className={styles.month}>
             <span className={styles.monthSizer} aria-hidden="true">
               {longestMonth(lang)}

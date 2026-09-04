@@ -3,10 +3,6 @@ import { PaperSheet } from '../PaperSheet'
 import { SectionBox } from '../SectionBox'
 import styles from './NotFoundBox.module.css'
 
-/**
- * Одна рамка на все 404 сайта: слова у каждого случая свои, а вид один — заводить
- * второй облик у того же ответа незачем.
- */
 export function NotFoundBox({
   heading,
   text,

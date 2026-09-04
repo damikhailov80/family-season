@@ -23,10 +23,8 @@ export interface PublicSeasonView {
   palette: PaletteId
   iconSet: IconSetId
   lang: Lang
-  /** Набор заполнения — только у системных сезонов, у людских его не бывает. */
   fillId: string | null
   mine: boolean
-  /** Ничей системный сезон — наш пример. На такой не жалуются. */
   system: boolean
   hidden: boolean
   likes: number
@@ -56,20 +54,11 @@ interface Row {
   favorited: boolean
 }
 
-/**
- * `missing` и `error` разведены намеренно: первое — честный 404, второе — наша
- * беда, и показывать вместо сезона выдуманное содержимое нельзя. Скрытые с
- * витрины сезоны открываются как обычные: прямую ссылку уже кому-то отправили.
- *
- * Язык — условие выборки: сезон живёт только в своём языке, и `/en/s/<код
- * русского сезона>` отвечает `missing` (см. `publicSeasonHref`).
- */
 export async function readPublicSeason(value: string, lang: Lang): Promise<PublicSeasonState> {
   const code = codeOrNull(value)
   if (!code) return { status: 'missing' }
 
   const session = await auth()
-  // Пустая строка вместо ключа: сравнение с ней не совпадёт ни с одним аккаунтом.
   const me = session?.accountKey ?? ''
   const result = await query<Row>(
     'public:read',
@@ -92,7 +81,6 @@ export async function readPublicSeason(value: string, lang: Lang): Promise<Publi
 
   const row = result.rows[0]
   if (!row) return { status: 'missing' }
-  // Закрытая не открывается никому, включая автора; в базе остаётся ради разбора.
   if (row.blocked_at) return { status: 'missing' }
 
   const template = joinSeason(row.content, row.names)
@@ -105,7 +93,6 @@ export async function readPublicSeason(value: string, lang: Lang): Promise<Publi
       iconSet: knownIconSet(row.icon_set),
       lang: knownLang(row.language),
       fillId: row.fill_id,
-      // Системный сезон ничей: убрать его с витрины нельзя никому.
       mine: Boolean(row.author_key) && row.author_key === session?.accountKey,
       system: !row.author_key,
       hidden: Boolean(row.hidden_at),
@@ -117,11 +104,6 @@ export async function readPublicSeason(value: string, lang: Lang): Promise<Publi
   }
 }
 
-/**
- * Считаем людей: повторный форк тем же человеком, форк невошедшего и свой же
- * форк не считаются. Форку эта запись не нужна — он уже случился, — поэтому
- * отказ базы наружу не выходит.
- */
 export async function noteFork(value: string): Promise<void> {
   const code = codeOrNull(value)
   if (!code) return
@@ -139,11 +121,6 @@ export async function noteFork(value: string): Promise<void> {
   )
 }
 
-/**
- * Сухой прогон проверок `publishSeason` для окна публикации. Отличие одно: своя
- * снятая строка — это `ok`, публикация её вернёт (см. `taken`). Рубежом защиты
- * прогон не является, решает по-прежнему `publishSeason`.
- */
 export async function previewPublish(
   value: string,
   lang: Lang,
@@ -187,26 +164,14 @@ export async function previewPublish(
   }
 
   const row = result.rows[0]
-  // Сезона нет или он чужой — это испорченный запрос, а не «мест не осталось».
   if (!row?.found) return { status: 'error' }
   if (row.blocked) return { status: 'blocked' }
-  // Витрину видно — отдаём код: окно предложит посмотреть, что там уже лежит.
   if (row.existing && !row.off) return { status: 'duplicate', code: row.existing }
-  // Чужая снятая: выложить нельзя, а вести туда некуда — её нет на витрине.
   if (row.existing && !row.own) return { status: 'duplicate' }
   if (row.room === false) return { status: 'limit' }
   return { status: 'ok' }
 }
 
-/**
- * Публикация — копия, а не указатель; одинакового контента на витрине не бывает,
- * и держит это уникальный `content_key` в базе.
- *
- * Отсюда ветка `taken`: своя же снятая строка с таким контентом возвращается на
- * витрину со своим кодом и лайками, а не заводится второй. Чужую строку не
- * перехватывает никто, закрытую — тем более: иначе блокировка не стоила бы
- * ничего (форкнул, выложил заново — и тот же постер снова на витрине).
- */
 export async function publishSeason(
   value: string,
   anonymize: boolean,
@@ -218,11 +183,6 @@ export async function publishSeason(
   if (!session.accountKey) return { status: 'stale' }
   if (!code) return { status: 'error' }
 
-  /*
-   * Имена нужны здесь, а не в самом операторе: обезличивание — дело случая, а
-   * случайность в SQL городить незачем. Заодно берём id будущей строки: код —
-   * перестановка его битов, и посчитать его надо до вставки.
-   */
   const mine = await query<{ names: unknown; id: string }>(
     'public:publish:mine',
     `select names, nextval(pg_get_serial_sequence('public_seasons', 'id')) as id
@@ -234,7 +194,6 @@ export async function publishSeason(
     return { status: 'error' }
   }
   const row = mine.rows[0]
-  // Сезона нет или он чужой — это не «мест не осталось», а испорченный запрос.
   if (!row) return { status: 'error' }
 
   const names = Array.isArray(row.names) ? row.names : []
@@ -247,7 +206,6 @@ export async function publishSeason(
     taken: string | null
     existing: string | null
     blocked: boolean | null
-    /** Дубль лежит снятым с витрины: не «уже есть», а «есть, но не видно». */
     off: boolean | null
   }>(
     'public:publish',
@@ -309,21 +267,11 @@ export async function publishSeason(
   const fresh = outcome?.added ?? outcome?.taken
   if (fresh) return { status: 'ok', code: fresh, fresh: true }
   if (outcome?.blocked) return { status: 'blocked' }
-  /*
-   * Порядок веток важен. Видимый дубль сильнее нехватки мест: освободи человек
-   * хоть все пять, выложить это он всё равно не сможет. А снятый слабее: снятая
-   * строка бывает и своя, и тогда настоящая причина отказа — именно места.
-   */
   if (outcome?.existing && !outcome.off) return { status: 'duplicate', code: outcome.existing }
   if (outcome?.room === false) return { status: 'limit' }
   return { status: outcome?.existing ? 'duplicate' : 'error' }
 }
 
-/**
- * Строка остаётся (и лишь помечается скрытой), если её отложили в избранное: у
- * людей не должно пропадать отложенное, а прямая ссылка уже разошлась. Не держит
- * ничего — удаляем совсем; жалоба не держит тоже, у неё свой снимок.
- */
 export async function withdrawPublic(
   value: string,
 ): Promise<{ status: PublishStatus; hidden?: boolean }> {
@@ -361,12 +309,6 @@ export async function withdrawPublic(
   return { status: 'ok', hidden: row.held }
 }
 
-/**
- * Пара к `withdrawPublic`: возвращается **та же строка**, со своим кодом, лайками
- * и избранным. Предел тот же, что у публикации — возврат занимает место на
- * витрине. Строка уже на витрине — это `ok`, а не отказ: повторное нажатие в
- * соседней вкладке ничего ломать не должно.
- */
 export async function republishPublic(value: string): Promise<PublishStatus> {
   const code = codeOrNull(value)
   const session = await auth()
@@ -411,14 +353,12 @@ export async function republishPublic(value: string): Promise<PublishStatus> {
   }
 
   const row = result.rows[0]
-  // Чужой и выдуманный код неразличимы: строка ищется вместе с автором.
   if (!row?.found) return 'error'
   if (row.back || row.shown) return 'ok'
   if (row.blocked) return 'blocked'
   return row.room === false ? 'limit' : 'error'
 }
 
-/** Месяц строки списка — языком сезона: в чужом языке он не переименовывается. */
 function monthOf(template: Template, lang: Lang): string {
   return `${monthInText(monthName(template.theme, lang), lang)} ${template.theme.year}`
 }
@@ -430,18 +370,11 @@ export interface Idea {
   template: Template
   lang: Lang
   likes: number
-  /** Ничей системный сезон — наш пример: флажка жалобы у него нет. */
   system: boolean
 }
 
 export type IdeasState = { status: 'ok'; ideas: Idea[] } | { status: 'error' }
 
-/**
- * Взвешенная выборка без повторов (Эфраимидис — Спиракис): ключ строки —
- * `random()^(1/вес)`, берём наибольшие. Вес — лайки плюс единица, поэтому
- * залайканный попадается чаще, но места себе не гарантирует. Сортировка по
- * лайкам такого не умеет: она заперла бы витрину на первой десятке навсегда.
- */
 export async function randomIdeas(lang: Lang): Promise<IdeasState> {
   const result = await query<{
     code: string
@@ -490,12 +423,6 @@ export async function randomIdeas(lang: Lang): Promise<IdeasState> {
   }
 }
 
-/**
- * Желаемое состояние приходит от клиента, а не вычисляется здесь, и это не лень:
- * «переключить» одним запросом не выходит — удаление и вставка в одном операторе
- * не видят работы друг друга и дерутся за первичный ключ. Так запрос один и
- * идемпотентен: повторное нажатие в другой вкладке ничего не ломает.
- */
 export async function setLike(value: string, on: boolean): Promise<ReactionStatus> {
   const code = codeOrNull(value)
   const session = await auth()
@@ -504,7 +431,6 @@ export async function setLike(value: string, on: boolean): Promise<ReactionStatu
   if (!code) return 'error'
 
   if (!on) {
-    // Снятие проверки «не своё» не требует: своего лайка там и не могло быть.
     const removed = await query(
       'public:unlike',
       `delete from public_likes
@@ -534,12 +460,6 @@ export async function setLike(value: string, on: boolean): Promise<ReactionStatu
   return verdict(result.rows[0])
 }
 
-/**
- * Избранное — единственное, что удерживает снятую публикацию от удаления (см.
- * `withdrawPublic`), поэтому своё сюда не кладут: автор запер бы себе снятие с
- * витрины. Отсюда же уборка: убравший закладку последним уносит скрытую строку
- * совсем. Видимой это не касается — её держит витрина.
- */
 export async function setFavorite(value: string, on: boolean): Promise<ReactionStatus> {
   const code = codeOrNull(value)
   const session = await auth()
@@ -548,16 +468,6 @@ export async function setFavorite(value: string, on: boolean): Promise<ReactionS
   if (!code) return 'error'
 
   if (!on) {
-    /*
-     * Один оператор: между отдельными «убрать закладку» и «а не осталось ли
-     * держателей» есть окно, в которое влезет чужая закладка. Все ветки видят
-     * один снимок, поэтому «моей закладки больше нет» в условии удаления не
-     * видно — и не должно быть: пишем то, что в снимке правда, — моя закладка
-     * есть (`mine`), а чужих нет вовсе.
-     *
-     * Закрытую строку не удаляем никогда: на ней держится запрет выкладывать тот
-     * же контент заново.
-     */
     const removed = await query(
       'public:unfavorite',
       `with post as (
@@ -615,19 +525,9 @@ export async function setFavorite(value: string, on: boolean): Promise<ReactionS
   const row = result.rows[0]
   const gate = verdict(row)
   if (gate !== 'ok') return gate
-  // Уже лежало — это удача, а не переполнение: предел мог упереться в него самого.
   return row.held || row.room ? 'ok' : 'limit'
 }
 
-/**
- * Повторная жалоба уточняет прежнюю, а не заводит вторую, поэтому порог
- * `REPORTS_TO_REVIEW` считает авторов, а не нажатия.
- *
- * Жалоба живёт дольше публикации, поэтому носит снимок — код, автора и копию
- * контента: снятый сезон исчезает, как только его убирает из избранного
- * последний, а разбирают жалобу по тексту, и взять его после этого негде.
- * Копию повторная жалоба не переписывает: контент публикации не правится.
- */
 export async function addReport(value: string, comment: string): Promise<ReactionStatus> {
   const code = codeOrNull(value)
   const session = await auth()
@@ -670,12 +570,10 @@ export async function addReport(value: string, comment: string): Promise<Reactio
 
 interface Verdict {
   found: number
-  /** Своё — или ничьё системное: и то и другое трогать нечего. */
   own: boolean
   blocked: boolean
 }
 
-/** Проверка стоит на сервере: кнопки — удобство, а не рубеж защиты. */
 function verdict(row: Verdict | undefined): ReactionStatus {
   if (!row?.found) return 'error'
   if (row.blocked) return 'blocked'
@@ -700,11 +598,6 @@ export interface FavoriteEntry {
 export type FavoritesState =
   { status: 'ok'; entries: FavoriteEntry[] } | { status: 'anonymous' | 'stale' | 'error' }
 
-/**
- * Поиск и порядок считаются здесь, а не в запросе: названия у публикации нет —
- * оно выводится из содержимого, и искать по нему в SQL нечего. Закрытых в списке
- * нет, но закладка на них остаётся — вернут сезон, вернётся и она.
- */
 export async function listFavorites(
   search: string,
   sort: LibrarySort,
@@ -767,12 +660,9 @@ export interface PublishedEntry {
   palette: PaletteId
   month: string
   lang: Lang
-  /** Снята с витрины: живёт по ссылке, в «Идеях» её нет. */
   hidden: boolean
-  /** Закрыта после разбора жалоб: не открывается нигде. */
   blocked: boolean
   likes: number
-  /** Сколько людей отложило её себе — они же держат её от удаления. */
   favorites: number
   forks: number
 }
@@ -780,10 +670,6 @@ export interface PublishedEntry {
 export type PublishedState =
   { status: 'ok'; entries: PublishedEntry[] } | { status: 'anonymous' | 'stale' | 'error' }
 
-/**
- * Все три числа считаются рядами, а не хранятся колонками: колонка была бы
- * второй копией и однажды разошлась бы с рядами.
- */
 export async function listPublished(
   search: string,
   sort: LibrarySort,

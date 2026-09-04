@@ -4,17 +4,9 @@ import { paletteLabel, randomPalette } from '../../model/palettes'
 import { useDoc } from '../../state/docContext'
 import styles from './PaletteSwitcher.module.css'
 
-/**
- * Тем сто, поэтому списка нет: кнопка бросает постер в случайную другую тему.
- * Плавающая, а не в тулбаре: ни от одного состояния постера она не зависит.
- *
- * `data-palette` висит на кружке-образце внутри кнопки, а не на самой кнопке:
- * краски показывает образец, а рамка и подпись остаются цветами сайта.
- */
 export function PaletteSwitcher() {
   const { palette, setPalette } = useDoc()
   const dict = useDict()
-  // Подпись темы — интерфейс, а не лист: на бумаге тема не подписана.
   const label = paletteLabel(palette, useLang())
 
   return (

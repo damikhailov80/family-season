@@ -18,18 +18,12 @@ import { codeOrNull, shareToken, shortCode, tokenOrNull } from '../model/shortco
 import type { Template } from '../model/types'
 import type { IconSetId, PaletteId } from '../types'
 
-/**
- * Уникальности содержимого здесь нет и быть не должно: форк своего же сезона —
- * законная вторая строка, как и два сезона с одинаковым названием.
- */
-
 export interface UserSeason {
   code: string
   title: string
   template: Template
   palette: PaletteId
   iconSet: IconSetId
-  /** Ставится при заведении и не правится: подписи листа печатаются. */
   lang: Lang
   shareToken: string | null
 }
@@ -45,7 +39,6 @@ export interface UserSeasonEntry {
   title: string
   savedAt: Date
   palette: PaletteId
-  /** Выводится из содержимого, отдельной колонкой не лежит. */
   month: string | null
   lang: Lang
 }
@@ -65,14 +58,6 @@ interface Row {
   share_token?: string | null
 }
 
-/**
- * Строка ищется вместе с владельцем: чужой код неотличим от выдуманного — по
- * ответу не должно быть видно, существует ли чужой сезон.
- *
- * `cache()` из React: за один запрос сезон спрашивают и заголовок страницы, и
- * сама страница. Между запросами кэш не живёт — сезон могли поправить в соседней
- * вкладке.
- */
 export const readUserSeason = cache(async function readUserSeason(
   value: string,
 ): Promise<UserSeasonState> {
@@ -110,11 +95,6 @@ export const readUserSeason = cache(async function readUserSeason(
   }
 })
 
-/**
- * Список для кабинета. Поиск идёт через `position`, а не `ilike`: не приходится
- * экранировать `%` и `_`, которые в строке поиска напечатают запросто. Порядок
- * подставляется в текст запроса, но из закрытого союза, а не от человека.
- */
 export async function listUserSeasons(
   search: string,
   sort: LibrarySort,
@@ -153,19 +133,11 @@ function toEntry(row: Row): UserSeasonEntry {
     title: row.title,
     savedAt: row.updated_at!,
     palette: knownPalette(row.palette),
-    // Месяц назван языком сезона: русский и в английском кабинете сентябрьский.
     month: `${monthInText(monthName(template.theme, lang), lang)} ${template.theme.year}`,
     lang,
   }
 }
 
-/**
- * Код считается из id, а id берётся заранее: `insert ... returning` отдал бы его,
- * когда строка уже записана, и код пришлось бы дописывать вторым запросом.
- *
- * Предел проверяется тем же оператором, что и вставка: между отдельными `count`
- * и `insert` есть окно.
- */
 export async function createUserSeason(input: {
   title: string
   template: Template
@@ -251,11 +223,6 @@ export async function saveUserSeason(
   return 'error'
 }
 
-/**
- * `updated_at` намеренно не трогаем: это дата правки сезона, по ней сортируется
- * список, и смена имени не должна поднимать строку наверх. Язык нужен только
- * запасному имени — оно берётся языком сезона, а не переименовывающего.
- */
 export async function renameUserSeason(
   value: string,
   title: string,
@@ -277,7 +244,6 @@ export async function renameUserSeason(
   return 'error'
 }
 
-/** Не нашлось — тоже `ok`: повторное удаление не беда. */
 export async function removeUserSeason(value: string): Promise<LibraryStatus> {
   const code = codeOrNull(value)
   const session = await auth()
@@ -295,10 +261,6 @@ export async function removeUserSeason(value: string): Promise<LibraryStatus> {
   return 'error'
 }
 
-/**
- * Читается без входа и без владельца: в том и смысл ссылки — её отправляют тому,
- * у кого аккаунта нет. Отозванная ссылка неотличима от выдуманной.
- */
 export async function readSharedSeason(value: string): Promise<UserSeasonState> {
   const token = tokenOrNull(value)
   if (!token) return { status: 'missing' }
@@ -330,11 +292,6 @@ export async function readSharedSeason(value: string): Promise<UserSeasonState> 
   }
 }
 
-/**
- * Одно действие на «создать» и «выдать новую»: прежний токен в обоих случаях
- * перестаёт работать. Отозвать ссылку можно ровно потому, что токен не выведен
- * из id, а лежит в своей колонке.
- */
 export async function refreshShareToken(
   value: string,
 ): Promise<{ status: LibraryStatus; token?: string }> {

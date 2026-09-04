@@ -19,22 +19,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: ideas.title, description: ideas.description }
 }
 
-/**
- * Десяток случайных сезонов, а не первая десятка по лайкам: сортировка по
- * рейтингу заперла бы витрину навсегда (см. `randomIdeas`).
- *
- * «Показать другие» — обычная ссылка с новой пометкой в адресе, а не кнопка на
- * JS: меняющийся адрес честно заводит запись в истории и работает без JS.
- */
 export default async function IdeasPage({
   searchParams,
 }: {
   searchParams: Promise<{ r?: string }>
 }) {
-  // Пометка — счётчик, а не `Date.now()`: время в рендере это нечистая функция.
   const flags = await searchParams
   const next = (Number(flags.r) || 0) + 1
-  // Вход нужен флажку жалобы: он решает, окно с текстом или предложение войти.
   const lang = await getLang()
   const dict = await getDict()
   const [state, session] = await Promise.all([randomIdeas(lang), auth()])
@@ -52,8 +43,6 @@ export default async function IdeasPage({
                 {ideas.map((idea) => (
                   <li className={styles.card} key={idea.code}>
                     <SeasonPreview idea={idea} />
-                    {/* Названия под превью нет: оно и есть тема месяца, крупно
-                        написанная на самом превью. */}
                     <div className={styles.meta}>
                       <LikeCount
                         likes={idea.likes}
@@ -61,8 +50,6 @@ export default async function IdeasPage({
                         className={styles.likes}
                         label={fill(dict.ideas.likesAria, { n: idea.likes })}
                       />
-                      {/* На наши примеры не жалуются: сервер такую жалобу и так
-                          не примет, а кнопка, кончающаяся отказом, — не кнопка. */}
                       {!idea.system && (
                         <ReportEntry
                           code={idea.code}
@@ -76,7 +63,6 @@ export default async function IdeasPage({
               </ul>
 
               <div className={styles.actions}>
-                {/* Пометка обязана меняться: иначе это переход «сюда же». */}
                 <Link className={styles.primary} href={`${withLang(lang, ROUTES.ideas)}?r=${next}`}>
                   {dict.ideas.another}
                 </Link>

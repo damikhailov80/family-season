@@ -11,20 +11,11 @@ import { useDoc, usePoster } from '../../state/docContext'
 import { useFamilyPreset } from '../../state/useFamilyPreset'
 import styles from './FamilySwap.module.css'
 
-/**
- * Кнопки нет, пока состав не задан: молчание сервера значит «кнопки не будет», и
- * постер работает без него по-прежнему.
- *
- * Подтверждение обязательно: замена затирает имена с рисунками, а при меньшей
- * семье отбрасывает карточки вместе с проектами. Ради этого окно и заведено —
- * показать, что именно изменится.
- */
 export function FamilySwap() {
   const { template, editing, replacePeople, lang } = useDoc()
   const family = useFamilyPreset(editing)
   const [open, setOpen] = useState(false)
   const { dialogs } = useDict()
-  // Имя и подпись рисунка — часть листа, поэтому языком сезона.
   const { placeholders } = usePoster()
   const faces = faceLabels(lang)
 
@@ -101,8 +92,6 @@ export function FamilySwap() {
 
           <p className={dialogStyles.text}>{dialogs.familyNote}</p>
 
-          {/* Потерю карточек надо видеть заранее; рамка та же, что у «черновик
-              будет затёрт» — это одно и то же предупреждение о потере. */}
           {dropped > 0 && (
             <p className={dialogStyles.warning}>
               {dropped === 1 ? dialogs.familyDropOne : fill(dialogs.familyDropMany, { n: dropped })}

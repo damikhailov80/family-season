@@ -9,11 +9,6 @@ import { saveConsentSetting } from '../../../server/actions'
 import type { FamilyStatus } from '../../../server/settings'
 import styles from './page.module.css'
 
-/**
- * Отзыв обязан даваться так же легко, как согласие, — поэтому решение живёт не
- * только в баннере, который человек однажды закрыл. Устроен близнецом
- * `LanguageEditor` и по тем же причинам.
- */
 interface Failure {
   status: Exclude<FamilyStatus, 'ok'>
   at: number

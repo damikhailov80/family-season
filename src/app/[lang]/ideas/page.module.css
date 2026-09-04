@@ -75,7 +75,6 @@
   outline-offset: 2px;
 }
 
-/* `auto-fill`, а не подобранное число колонок: брейкпоинтам тут делать нечего. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -85,8 +84,6 @@
   padding-inline-start: 0px;
 }
 
-/* Строка вне превью: превью носит тему постера, а счёт лайков и кнопка жалобы —
-   часть сайта и красятся его цветами. */
 .card {
   display: flex;
   flex-direction: column;
@@ -108,7 +105,6 @@
   color: var(--ink-muted);
 }
 
-/* Приглушённая: яркая кнопка читалась бы как основное действие карточки. */
 .report {
   display: inline-flex;
   align-items: center;
@@ -155,7 +151,6 @@
   color: var(--ink-muted);
 }
 
-/* Витрина на бумагу не идёт — как и вся обвязка сайта. */
 @media print {
   .grid,
   .actions,

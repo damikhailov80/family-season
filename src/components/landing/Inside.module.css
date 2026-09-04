@@ -2,8 +2,6 @@
   position: relative;
 }
 
-/* Звёздочка «приколота» к верхней рамке, как плашка слева. Отодвинута от угла:
-   на скруглении она наезжала на обе стороны рамки и выглядела случайной. */
 .star {
   position: absolute;
   right: 44px;
@@ -33,7 +31,6 @@
   color: var(--accent-theme);
 }
 
-/* Рукописный шрифт — как заполненный от руки текст на самом листе. */
 .text {
   font-family: var(--font-script);
   font-size: 17px;
@@ -64,7 +61,6 @@
   color: var(--accent-theme);
 }
 
-/* Полоса образцов: имён тут нет — их сто, а полоса должна читаться как палитра. */
 .swatches {
   display: flex;
   flex-wrap: wrap;
@@ -78,7 +74,6 @@
   display: flex;
 }
 
-/* Четыре сектора — ровно четыре краски набора. */
 .swatch {
   width: 26px;
   height: 26px;

@@ -1,25 +1,12 @@
-/**
- * Библиотека рисунков постера. Файл собирается: tools/icons/build.mjs (npm run icons),
- * руками его не правят — правят tools/icons/source.json и пересобирают.
- *
- * Все рисунки лежат на одной сетке 64×64: слот в макете задаёт размер,
- * и любой рисунок обязан вставать в чужое место, не меняя пропорций.
- *
- * Рисует их `Icon.tsx`, раздаёт слотам `PosterIcon.tsx`, а какой рисунок в каком
- * слоте — в наборах (src/model/icons.data.ts).
- */
+/* Собирается tools/icons/build.mjs (npm run icons) из tools/icons/source.json. */
 
 export const ICON_VIEWBOX = 64
 
-/** Общая обводка. Мелкие рисунки перебивают её своей — им нужна жирнее. */
 export const ICON_STROKE = 2.3
 
 export interface IconShape {
-  /** Рисунок залит краской, а не только обведён: мелким без заливки не выжить. */
   fill?: boolean
-  /** Своя толщина обводки вместо общей. */
   stroke?: number
-  /** Круги: [cx, cy, r]. Отдельно от путей — так их проще читать и держать в сетке. */
   circles?: readonly (readonly number[])[]
   paths?: readonly string[]
 }

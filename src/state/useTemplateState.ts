@@ -9,10 +9,6 @@ import type { Template } from '../model/types'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../model/types'
 import type { FieldBinding } from './docContext'
 
-/**
- * Отдельным хуком, а не куском провайдера: правки бланка одинаковы везде, а
- * страниц, которые его ставят, три — разное у них только хранилище.
- */
 export interface TemplateState {
   template: Template
   setTemplate: React.Dispatch<React.SetStateAction<Template>>
@@ -25,7 +21,6 @@ export interface TemplateState {
   stepMonth: (delta: number) => void
 }
 
-/** Документ маленький, клон дешёвый. */
 function setByPath(template: Template, path: string, value: string): Template {
   const keys = path.split('.')
   const clone = structuredClone(template)
@@ -52,11 +47,6 @@ export function useTemplateState(initial: Template): TemplateState {
     setTemplate((current) => recipe(current))
   }, [])
 
-  /*
-   * Предел едет вместе с привязкой, поэтому секциям про него знать нечего.
-   * Обрезка здесь — сеть под саму модель: ввод останавливает `EditableText`, но
-   * добраться до `onChange` можно и мимо него.
-   */
   const field = useCallback(
     (path: string): FieldBinding => {
       const maxLength = limitFor(path)
@@ -104,12 +94,6 @@ export function useTemplateState(initial: Template): TemplateState {
     [update],
   )
 
-  /*
-   * Карточка на каждом месте берётся прежняя, меняются ровно рисунок и имя:
-   * форкают ради идей, а меняют актёрский состав. Id пересобираем `p1..pN` —
-   * старый список выбрасывается целиком. `templateForFamily` не годится: она
-   * вернула бы весь пустой бланк и затёрла тему, недели и цель месяца.
-   */
   const replacePeople = useCallback(
     (members: FamilyPreset) =>
       update((current) => ({

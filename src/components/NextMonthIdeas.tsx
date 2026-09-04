@@ -3,7 +3,6 @@ import { PosterIcon } from './doodles/PosterIcon'
 import { SectionBox } from './SectionBox'
 import styles from './NextMonthIdeas.module.css'
 
-/** На печати пустая: забирает всю свободную высоту второй страницы. */
 export function NextMonthIdeas() {
   const { fill } = useDoc()
   const { labels } = usePoster()

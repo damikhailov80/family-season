@@ -2,8 +2,6 @@
   display: inline-block;
   background: var(--badge-color);
   color: var(--badge-ink);
-  /* Рамка тёмного оттенка той же краски: у светлых плашек она единственное,
-     что отделяет их от бумаги, у тёмных — просто уплотняет край. */
   border: 1.5px solid var(--badge-line);
   font-family: var(--font-ui);
   font-weight: 800;

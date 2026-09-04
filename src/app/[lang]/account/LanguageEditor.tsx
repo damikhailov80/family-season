@@ -9,13 +9,6 @@ import { saveLanguage } from '../../../server/actions'
 import type { FamilyStatus } from '../../../server/settings'
 import styles from './page.module.css'
 
-/**
- * Клиентский по той же причине, что и `FamilyEditor`: успех уводит редиректом, а
- * неудача возвращается значением и показывается тостом, не теряя выбранного.
- *
- * Уже заведённых сезонов настройка не трогает: язык листа лежит колонкой рядом с
- * содержимым и ставится при заведении.
- */
 interface Failure {
   status: Exclude<FamilyStatus, 'ok'>
   at: number

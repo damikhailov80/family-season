@@ -10,14 +10,6 @@ import { modeFromPath, ROUTES, seasonHref, stripLang } from '../../model/site'
 import { storeSeason } from '../../server/actions'
 import { Toast } from './Toast'
 
-/**
- * Черновик уезжает в коллекцию сам, как только человек вошёл: у вошедшего
- * черновика не бывает, поэтому запись в браузере означает ровно одно — её
- * собрали до входа, и согласия спрашивать не о чем.
- *
- * Флажок `taken` нужен из-за двойного вызова эффектов в dev: две попытки подряд
- * завели бы две строки. Неудача черновик не трогает — стирать нечего.
- */
 let taken = false
 
 export function DraftClaimer() {
@@ -43,22 +35,14 @@ export function DraftClaimer() {
 
       if (result.status !== 'ok' || !result.code) {
         taken = false
-        // `anonymous` приходит с протухшей кукой: предлагать вход тому, кто
-        // только что вошёл, вздор — молчим.
         if (result.status !== 'ok' && result.status !== 'anonymous') {
           setNotice({ text: libraryText(lang, result.status), at: Date.now() })
         }
         return
       }
 
-      // Запираем, а не просто стираем: отложенная запись `DraftStore` вернула бы
-      // вычищенное обратно.
       sealDraft()
 
-      /*
-       * С самого черновика уходим в новую строку: иначе человек остался бы на
-       * постере, за которым больше нет хранилища. Режим сохраняем.
-       */
       if (stripLang(location.pathname).startsWith(ROUTES.sheet)) {
         location.assign(seasonHref(lang, result.code, modeFromPath(location.pathname)))
         return
@@ -68,7 +52,6 @@ export function DraftClaimer() {
         text: fill(site.draftClaimed, { title: draft.title }),
         at: Date.now(),
       })
-      // Списку «Моих сезонов» надо показать новую строку.
       router.refresh()
     })()
   }, [router, lang, site])

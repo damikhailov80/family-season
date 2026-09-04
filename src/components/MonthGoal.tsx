@@ -6,10 +6,6 @@ import { QrCode } from './QrCode'
 import { SectionBox } from './SectionBox'
 import styles from './MonthGoal.module.css'
 
-/**
- * Какой из двух кодов печатать, лист не решает: матрица приходит пропом от
- * страницы — ссылку выдаёт и отзывает не постер (см. `model/qr.ts`).
- */
 export function MonthGoal({ qr }: { qr?: QrMatrix }) {
   const { field } = useDoc()
   const { labels, placeholders } = usePoster()

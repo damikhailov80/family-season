@@ -8,11 +8,6 @@ import { fill } from '../../../i18n/fill'
 import { dropEntry } from '../../../server/actions'
 import styles from './page.module.css'
 
-/**
- * Клиентский по той же причине, что и `FamilyEditor`: без JS подтверждение стоило
- * бы отдельного экрана. Спрашиваем не для порядка — другой копии сезона нет ни у
- * нас, ни у человека.
- */
 export function DeleteEntry({ code, title, back }: { code: string; title: string; back: string }) {
   const [open, setOpen] = useState(false)
   const lang = useLang()
@@ -38,7 +33,6 @@ export function DeleteEntry({ code, title, back }: { code: string; title: string
               <button type="button" className={dialogStyles.ghost} onClick={() => setOpen(false)}>
                 {dialogs.cancel}
               </button>
-              {/* Привязанные аргументы уезжают в браузер и проверяются заново. */}
               <form action={dropEntry.bind(null, code, back, lang)}>
                 <button type="submit" className={dialogStyles.primary}>
                   {seasons.removeAction}

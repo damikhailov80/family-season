@@ -5,13 +5,6 @@ import { DEFAULT_LANG, type Lang } from '../model/lang'
 import type { Dict } from './types'
 import { ru } from './dict/ru'
 
-/**
- * Контекст и хуки вынесены из файла провайдера, как и в `docContext.ts`: oxlint
- * не даёт экспортировать из файла с компонентом ничего, кроме компонентов.
- *
- * Значение по умолчанию настоящее, а не заглушка: клиентские кусочки бывают и
- * вне провайдера, и падать им незачем.
- */
 export interface LangValue {
   lang: Lang
   dict: Dict

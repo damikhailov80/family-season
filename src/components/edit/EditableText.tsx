@@ -5,9 +5,7 @@ import styles from './EditableText.module.css'
 interface EditableTextProps {
   value: string
   onChange: (value: string) => void
-  /** Сколько символов помещается в это место на бумаге (`src/model/limits.ts`). */
   maxLength: number
-  /** Классы просмотра — в правке они те же, поэтому текст не «прыгает». */
   className?: string
   placeholder?: string
   as?: 'span' | 'p' | 'div' | 'h1' | 'h3'
@@ -16,12 +14,10 @@ interface EditableTextProps {
 
 const FLASH_MS = 220
 
-/** Переносы строк в поля бланка не попадают: схлопываем их в пробел. */
 function singleLine(value: string): string {
   return value.replace(/\n+$/, '').replace(/\s*\n+\s*/g, ' ')
 }
 
-/** Набранное поверх выделения места не занимает. */
 function selectionLength(node: HTMLElement): number {
   const selection = getSelection()
   if (!selection || selection.rangeCount === 0) return 0
@@ -38,14 +34,6 @@ function caretToEnd(node: HTMLElement) {
   selection?.addRange(range)
 }
 
-/**
- * Поле неконтролируемое: React не переписывает текст, пока узел в фокусе, —
- * иначе на каждом вводе символа каретка прыгала бы в начало строки.
- *
- * Все поля бланка однострочные, у каждого свой предел длины (`limits.ts`), и
- * предел жёсткий: ввод сверх него не проходит, а поле на мгновение вспыхивает
- * подчёркиванием — иначе отказ выглядит поломкой клавиатуры.
- */
 export function EditableText({
   value,
   onChange,
@@ -60,6 +48,8 @@ export function EditableText({
   const [full, setFull] = useState(false)
   const Tag = as as React.ElementType
 
+  // Узел неконтролируемый: пиши React текст в children — каретка прыгала бы
+  // в начало на каждом символе.
   useEffect(() => {
     const node = ref.current
     if (!node || !editing) return
@@ -68,7 +58,6 @@ export function EditableText({
     }
   }, [value, editing])
 
-  // Таймер снимается, иначе он дёрнет размонтированный узел.
   useEffect(() => {
     if (!full) return
     const timer = setTimeout(() => setFull(false), FLASH_MS)
@@ -88,10 +77,7 @@ export function EditableText({
   }
 
   const commit = (node: HTMLElement) => {
-    // innerText нормализует переводы строк contentEditable в обычные '\n'.
     const next = singleLine(node.innerText).slice(0, maxLength)
-    // Сеть под редкие пути мимо beforeinput — перетаскивание, автозамена, IME.
-    // Только здесь мы трогаем узел в фокусе: иначе экран разошёлся бы с моделью.
     if (node.innerText !== next) {
       node.innerText = next
       if (document.activeElement === node) caretToEnd(node)
@@ -112,28 +98,20 @@ export function EditableText({
       aria-label={placeholder}
       data-placeholder={placeholder}
       tabIndex={0}
-      // Единственная проверка длины: сюда приходит и набор, и вставка, и IME.
       onBeforeInput={(event: React.InputEvent<HTMLElement>) => {
         const node = event.currentTarget
-        // Удаления данных не несут и проходят всегда; считаем только вставляемое.
         const inserted = event.data ? event.data.length : 0
         if (!inserted) return
         const room = maxLength - node.innerText.length + selectionLength(node)
         if (inserted <= room) return
         event.preventDefault()
         setFull(true)
-        // Кладём то, что влезает, а не отбрасываем всё. Вложенный insertText
-        // придёт сюда же, но он уже по размеру — рекурсии не будет.
         if (room > 0) document.execCommand('insertText', false, event.data.slice(0, room))
       }}
       onInput={(event: React.InputEvent<HTMLElement>) => commit(event.currentTarget)}
       onBlur={(event: React.FocusEvent<HTMLElement>) => commit(event.currentTarget)}
       onPaste={(event: React.ClipboardEvent<HTMLElement>) => {
-        // Кладём текст одной строкой сразу, иначе узел вырастет на экране,
-        // хотя модель переносы всё равно схлопнет.
         event.preventDefault()
-        // execCommand устарел, но это единственный способ вставить текст,
-        // не потеряв историю отмены contentEditable.
         document.execCommand(
           'insertText',
           false,

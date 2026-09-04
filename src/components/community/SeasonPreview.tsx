@@ -4,21 +4,10 @@ import type { Idea } from '../../server/publicSeasons'
 
 import styles from './SeasonPreview.module.css'
 
-/**
- * Не карточка сайта, а миниатюра листа — отсюда `data-palette` на самом превью
- * (единственное исключение из «карточки сайта тему не носят»).
- *
- * Личных проектов, настроений и итогов здесь нет: это и есть то, ради чего сезон
- * открывают, — витрина заманивает, а не заменяет постер.
- *
- * Язык здесь один — язык сезона: им берутся подсказки пустых полей и им же
- * собирается адрес, ведь публикация живёт только в своём языке.
- */
 export function SeasonPreview({ idea }: { idea: Idea }) {
   const { template } = idea
   const placeholders = posterText(idea.lang).placeholders
 
-  // Пустых полей на бланке не бывает: незаполненное показывает свою подсказку.
   const shown = (value: string, fallback: string) => value.trim() || fallback
 
   return (

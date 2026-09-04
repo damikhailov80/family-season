@@ -1,14 +1,7 @@
-/**
- * Реестр наборов рисунков. Файл собирается: tools/icons/build.mjs (npm run icons),
- * руками его не правят — правят tools/icons/source.json и пересобирают.
- *
- * Здесь id, подписи и раздача рисунков по слотам; сама геометрия —
- * в src/components/doodles/icons.generated.ts, а логика выбора — в src/model/icons.ts.
- */
+/* Собирается tools/icons/build.mjs (npm run icons) из tools/icons/source.json. */
 
 import type { IconName } from '../components/doodles/icons.generated'
 
-/** Места в макете постера. Порядок — порядок слотов в source.json. */
 export const ICON_SLOTS = ['mark', 'love', 'voice', 'spark', 'path', 'goal', 'care', 'idea'] as const
 
 export const ICON_SETS = [

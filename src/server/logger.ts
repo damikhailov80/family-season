@@ -1,22 +1,10 @@
-/**
- * В проде — JSON-строки: сборщик логов парсит их сам. В деве — читаемая строка,
- * потому что JSON в терминале не читается глазами.
- */
-
 type Level = 'error' | 'warn' | 'info'
 
 interface Fields {
-  /** Ошибка; сериализуется отдельно — у `Error` свои поля не перечисляемые. */
   err?: unknown
   [key: string]: unknown
 }
 
-/**
- * `code` у ошибок Postgres и Node несёт больше, чем текст (`42P01` — нет
- * таблицы, `28P01` — пароль, `ECONNREFUSED` — база не слушает), а упавшее
- * соединение приезжает `AggregateError`-ом с пустым `message` и настоящими
- * причинами в `errors`.
- */
 function serializeError(error: unknown): Record<string, unknown> {
   if (!(error instanceof Error)) return { message: String(error) }
 

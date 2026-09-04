@@ -19,15 +19,6 @@ import { paletteLabel } from '../../../model/palettes'
 import { sheetHref } from '../../../model/site'
 import styles from './page.module.css'
 
-/**
- * Черновик лежит в `localStorage`, а страница серверная — взять его серверу негде.
- * Хранилище внешнее, поэтому читаем его `useSyncExternalStore`, а не эффектом:
- * строка сама обновляется после переименования и не врёт, если черновик сменили в
- * соседней вкладке.
- *
- * Серверный снимок — `undefined`, и это не то же самое, что «черновика нет»: пока
- * браузер не ответил, фраза «черновика нет» мигала бы неправдой на кадр.
- */
 export function DraftEntry() {
   const lang = useLang()
   const dict = useDict()
@@ -41,14 +32,12 @@ export function DraftEntry() {
   if (raw === undefined) return null
 
   if (!draft) {
-    // Фраза общая со списком вошедшего: для человека это одно и то же.
     return <p className={styles.hand}>{dict.status.emptyList}</p>
   }
 
   const rename = () => {
     const title = input.current?.value ?? draft.title
     setRenaming(false)
-    // Перерисовки не просим: запись сама будит подписку на хранилище.
     writeDraft({ ...draft, title })
   }
 

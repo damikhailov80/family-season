@@ -6,7 +6,6 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  /* Кружки с номерами наезжают на верх карточек — иначе они упираются в плашку секции. */
   margin: 10px 0 0;
   padding: 0;
   list-style: none;
@@ -25,7 +24,6 @@
   text-align: center;
 }
 
-/* Номер шага «наезжает» на рамку — тот же приём, что у плашек секций. */
 .number {
   position: absolute;
   top: 0;
@@ -43,7 +41,6 @@
 }
 
 .doodleSlot {
-  /* Фиксированная высота: у доодлов разные пропорции, иначе заголовки съезжают. */
   display: grid;
   place-items: center;
   height: 52px;
@@ -57,11 +54,6 @@
   font-size: 23px;
   line-height: 1.1;
   color: var(--accent-deep);
-  /*
-   * Место под две строки, чтобы тексты карточек начинались на одной высоте.
-   * Прижимаем к низу слота: у однострочных заголовков запас уходит наверх,
-   * к доодлу, а не повисает дырой между заголовком и текстом.
-   */
   display: flex;
   align-items: flex-end;
   justify-content: center;

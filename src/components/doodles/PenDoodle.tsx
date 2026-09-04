@@ -1,7 +1,6 @@
 interface DoodleProps {
   size?: number
   className?: string
-  /** Своя толщина для мелкого размера — см. `PrinterDoodle`, причина та же. */
   strokeWidth?: number
 }
 

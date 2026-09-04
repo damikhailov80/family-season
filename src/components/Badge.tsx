@@ -8,10 +8,6 @@ interface BadgeProps {
   className?: string
 }
 
-/**
- * Заливка — краска темы как есть, поэтому плашка бывает и тёмной, и светлой: цвет
- * текста подобран при сборке тем, а тонкая рамка держит светлую плашку на бумаге.
- */
 export function Badge({ children, accent, size = 'md', className }: BadgeProps) {
   return (
     <span

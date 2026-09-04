@@ -3,10 +3,6 @@ import { fill } from '../../../i18n/fill'
 import { unfavoriteEntry } from '../../../server/actions'
 import styles from './page.module.css'
 
-/**
- * Серверный компонент, в отличие от соседей по строке: подтверждать нечего — сам
- * сезон чужой и никуда не денется, а форма с действием работает и без JS.
- */
 export async function UnfavoriteEntry({
   code,
   title,

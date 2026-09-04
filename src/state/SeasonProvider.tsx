@@ -7,19 +7,11 @@ import type { DocMode, DocValue } from './docContext'
 import { DocContext } from './docContext'
 import { useTemplateState } from './useTemplateState'
 
-/**
- * Постер, пришедший строкой из базы. Куда уезжают правки, провайдер не знает —
- * это дело страницы (`Autosave`, `DraftStore`).
- *
- * Куда деть переключённое оформление, решает тоже не он, а поставивший его
- * (`onDecorChange`): у выложенного сезона примерка уезжает пометками в адрес.
- */
 export interface SeasonBoot {
   template: Template
   palette: PaletteId
   iconSet: IconSetId
   lang: Lang
-  /** Набор заполнения — только у системных сезонов. */
   fillId: string | null
 }
 
@@ -31,7 +23,6 @@ export function SeasonProvider({
 }: {
   boot: SeasonBoot
   mode?: DocMode
-  /** Зовётся с новой парой целиком: у оформления один смысл. */
   onDecorChange?: (decor: { palette: PaletteId; iconSet: IconSetId }) => void
   children: React.ReactNode
 }) {
@@ -42,10 +33,6 @@ export function SeasonProvider({
 
   const fill = fillOf(boot.fillId)
 
-  /*
-   * Обёртки, а не эффект на изменение: эффект сработал бы и на первом рендере,
-   * дописав перебивку в адрес, которого никто не трогал.
-   */
   const setPalette = useCallback(
     (next: PaletteId) => {
       setPaletteState(next)

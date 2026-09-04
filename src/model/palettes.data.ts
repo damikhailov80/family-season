@@ -1,12 +1,4 @@
-/**
- * Реестр тем постера. Файл собирается: tools/palettes/build.mjs (npm run palettes),
- * руками его не правят — правят tools/palettes/source.json и пересобирают.
- *
- * Здесь только id и подписи: краски живут в src/styles/palettes.css, а логика
- * выбора темы — в src/model/palettes.ts.
- *
- * Подпись у темы на всех трёх языках сайта: её видно на кнопке переключателя.
- */
+/* Собирается tools/palettes/build.mjs (npm run palettes) из tools/palettes/source.json. */
 
 export const PALETTES = [
   ['desert', { ru: 'Пустыня', en: 'Desert', pl: 'Pustynia' }],

@@ -8,17 +8,6 @@ import { publishText, type PublishStatus } from '../../model/community'
 import { LANG_LABELS, LANGS, type Lang } from '../../model/lang'
 import { publicSeasonHref } from '../../model/site'
 
-/**
- * Галочка обезличивания стоит здесь, а не в настройках: решение принимают про
- * конкретный сезон, а не вообще.
- *
- * Ответ витрины приходит до нажатия, а не после: пока идёт проверка
- * (`check === null`), кнопка ждёт. Своей беды проверка не показывает — не
- * ответила база, и отказ, если он будет, объяснит сама публикация.
- *
- * Смена языка пересчитывает проверку: уникальность считается вместе с языком, и
- * тот же бланк в другом языке дублем уже не будет.
- */
 export function PublishDialog({
   check,
   busy,
@@ -27,7 +16,6 @@ export function PublishDialog({
   onDismiss,
   onSubmit,
 }: {
-  /** Что показала проверка витрины; `null` — ещё проверяем. */
   check: { status: PublishStatus; code?: string } | null
   busy: boolean
   seasonLang: Lang
@@ -50,15 +38,12 @@ export function PublishDialog({
         title={dialogs.publish}
         onDismiss={onDismiss}
         actions={
-          // Отменять нечего: ничего не случится, и кнопка остаётся одна.
           <button type="button" className={styles.primary} onClick={onDismiss}>
             {dialogs.close}
           </button>
         }
       >
         <p className={styles.text}>{refusal}</p>
-        {/* Ссылка есть не всегда: у снятого с витрины места нет, вести туда
-            незачем. Язык в адресе — выкладываемого сезона. */}
         {check.code && (
           <a className={styles.link} href={publicSeasonHref(seasonLang, check.code)}>
             {dialogs.publishSeeIt}

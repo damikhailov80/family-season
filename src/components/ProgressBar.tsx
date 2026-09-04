@@ -20,10 +20,8 @@ export function ProgressBar({ percent, label }: ProgressBarProps) {
       aria-label={fill(dict.editor.progressAria, { label, percent: clamped })}
     >
       <div className={styles.fill} style={{ width: `${clamped}%` }} />
-      {/*
-       * Деления — настоящие ячейки, а не градиент в процентах: на печати
-       * дробные позиции градиента округляются и линии расползаются.
-       */}
+      {/* Деления — отдельные ячейки, а не градиент: градиент сглаживается
+          принтером, и шкала на бумаге теряет отметки. */}
       <div className={styles.ticks} aria-hidden="true">
         {Array.from({ length: SEGMENTS }, (_, index) => (
           <span key={index} className={styles.tick} />

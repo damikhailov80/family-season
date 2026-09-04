@@ -3,17 +3,6 @@ import { LANG_LABELS, LANGS, type Lang } from '../../model/lang'
 import { withLang } from '../../model/site'
 import styles from './LangSwitcher.module.css'
 
-/**
- * Стоял в подвале и оказался ненаходимым: у невошедшего это единственный способ
- * сменить язык, а до подвала попавший не на свой язык просто не доходит.
- *
- * `<details>`, а не кнопка с меню: раскрытие умеет сам браузер, и клиентским
- * компонентом в обвязке сайта становиться не приходится.
- *
- * На кнопке один глобус, без названия языка, и на десктопе тоже: свободного места
- * в шапке около девяноста пикселей, а с «Русский» и `Polski` кнопка входа
- * сваливалась на вторую строку и ряд прыгал при смене языка.
- */
 export function LangSwitcher({ lang, path, label }: { lang: Lang; path: string; label: string }) {
   return (
     <details className={styles.wrap}>

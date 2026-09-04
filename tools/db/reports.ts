@@ -1,25 +1,3 @@
-/*
- * Разбор жалоб — руками.
- *
- * Витрина ничего не прячет сама: порог `REPORTS_TO_REVIEW` — это повод
- * посмотреть, а не действие. Закрывает публикацию человек, и вот чем:
- *
- *   npm run db:reports                      # очередь: на что жаловались
- *   npm run db:reports -- --block <code> «мат в описании»
- *   npm run db:reports -- --unblock <code>
- *
- * Закрытая публикация остаётся в базе, но не показывается нигде — ни в «Идеях
- * сообщества», ни по прямой ссылке; выложить такой же контент заново нельзя.
- * Автор видит пометку «закрыт после жалоб» в своём списке опубликованных.
- *
- * Жалоба живёт дольше публикации: у неё свой снимок — код и копия контента, — и
- * очередь показывает её даже тогда, когда самой строки уже нет («удалена»).
- * Закрывать в этом случае нечего: `blocked_at` живёт на строке. Вернётся тот же
- * контент — разбирать придётся заново, зато снимок покажет, что это уже видели.
- *
- * На прод — как и миграции, с явным файлом окружения:
- *   node --env-file=.env.production.local --import tsx tools/db/reports.ts
- */
 import pg from 'pg'
 import { REPORTS_TO_REVIEW } from '../../src/model/community'
 import { knownLang } from '../../src/model/lang'
@@ -43,7 +21,6 @@ if (flag && !code) {
   process.exit(1)
 }
 
-// Куда едем: очередь жалоб и `--block` зовут и на проде, руками.
 console.log(`База ${dbTarget(url)}.`)
 
 const client = new pg.Client({ connectionString: url })
@@ -58,16 +35,12 @@ try {
       flag === '--block' ? [code, note] : [code],
     )
     if (!result.rowCount) {
-      // Строки нет — жалобы на неё могут быть, а закрывать нечего: `blocked_at`
-      // живёт на строке и вместе с ней исчез.
       console.error(`Нет публикации с кодом ${code} — закрывать нечего.`)
       process.exitCode = 1
     } else {
       console.log(flag === '--block' ? `Закрыта /s/${code}.` : `Открыта заново /s/${code}.`)
     }
   } else {
-    // Ведёт жалоба, а не публикация: строки может уже не быть, а разбирать надо.
-    // Автор и контент берутся из снимка — у живой строки они те же самые.
     const { rows } = await client.query(`
       select r.code, p.id is not null as alive, p.hidden_at, p.blocked_at, p.block_note,
              max(r.author_key) as author_key,
@@ -96,7 +69,6 @@ try {
             : row.hidden_at
               ? 'снята автором'
               : 'на витрине'
-        // Порог — повод посмотреть, а у удалённой смотреть уже нечего.
         const mark =
           row.alive && !row.blocked_at && row.reporters >= REPORTS_TO_REVIEW
             ? ' ← порог пройден'
@@ -104,8 +76,6 @@ try {
         console.log(
           `/s/${row.code}  жалоб: ${row.reporters}  избранное: ${row.favorites}  ${state}${mark}`,
         )
-        // Тема из снимка: у удалённой публикации это единственное, по чему
-        // вообще видно, о чём шла речь.
         console.log(`  тема: ${ideaTitle(joinSeason(row.content, []), knownLang(row.language))}`)
         console.log(`  автор: ${row.author_key}`)
         console.log(`  последняя: ${row.last_report.toISOString().slice(0, 16).replace('T', ' ')}`)

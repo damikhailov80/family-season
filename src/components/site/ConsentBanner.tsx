@@ -8,12 +8,6 @@ import { ROUTES, withLang } from '../../model/site'
 import { saveConsent } from '../../server/actions'
 import styles from './ConsentBanner.module.css'
 
-/**
- * Полоса, а не модальное окно: запирать сайт до ответа нельзя — согласие обязано
- * быть свободным. По той же причине обе кнопки одного веса, и роли окон
- * (`.primary`/`.ghost`) здесь не годятся: они разводят действие и отказ, а тут
- * два равных ответа на один вопрос.
- */
 export function ConsentBanner({ initial }: { initial: Consent | null }) {
   const [open, setOpen] = useState(initial === null)
   const { consent } = useDict()
@@ -26,10 +20,6 @@ export function ConsentBanner({ initial }: { initial: Consent | null }) {
   function answer(value: Consent) {
     setOpen(false)
     void saveConsent(value)
-    /*
-     * Режим меняем на месте, не дожидаясь ни ответа сервера, ни перезагрузки: в
-     * этом и весь смысл Consent Mode. `gtag` может и не быть — тогда молчим.
-     */
     window.gtag?.('consent', 'update', {
       analytics_storage: value === 'granted' ? 'granted' : 'denied',
     })

@@ -8,10 +8,6 @@ import { sharedLink } from '../../../../server/qr'
 import { readUserSeason } from '../../../../server/userSeasons'
 import { OwnSeason } from './OwnSeason'
 
-/**
- * Невошедшего уводим в кабинет: там объяснено, зачем вход. Чужой и выдуманный код
- * неразличимы намеренно — по ответу не должно быть видно, существует ли сезон.
- */
 export async function OwnSeasonPage({ code, editing }: { code: string; editing: boolean }) {
   const state = await readUserSeason(code)
 
@@ -27,7 +23,6 @@ export async function OwnSeasonPage({ code, editing }: { code: string; editing: 
 export async function seasonMetadata(code: string) {
   const state = await readUserSeason(code)
   const { pages } = await getDict()
-  // Запасное имя — языком интерфейса: сезона не нашли, и его языка не знаем.
   const title = state.status === 'ok' ? state.season.title : posterText(await getLang()).untitled
   return { title: fill(pages.ownTitle, { title }) }
 }

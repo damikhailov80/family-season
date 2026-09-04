@@ -13,13 +13,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: pages.publicTitle, description: pages.publicDescription }
 }
 
-/**
- * Нет такого кода — честный 404. Молчит база — пустота и тост, как везде на
- * сайте: показать вместо сезона выдуманное содержимое нельзя.
- *
- * `?p=` и `?i=` перебивают оформление из строки. Пометку могли написать и руками,
- * поэтому обе проходят через свои `*OrNull`.
- */
 export default async function PublicSeasonPage({
   params,
   searchParams,
@@ -28,8 +21,6 @@ export default async function PublicSeasonPage({
   searchParams: Promise<{ p?: string; i?: string; published?: string }>
 }) {
   const { code } = await params
-  // Вход спрашиваем здесь: постер не должен ждать ответа сервера, чтобы
-  // нарисовать кнопку форка.
   const lang = await getLang()
   const [decor, state, session] = await Promise.all([
     searchParams,

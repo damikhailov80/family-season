@@ -17,14 +17,6 @@ import '../../styles/palettes.css'
 import '../../styles/global.css'
 import '../../styles/print.css'
 
-/*
- * Подмножества перечислены явно: css2 подбирал их сам, next/font не догадается.
- * `latin-ext` — ради польского: без него `ą ę ł ń ś ź ż` поедут запасным шрифтом,
- * и лист напечатается двумя гарнитурами сразу.
- *
- * Общей константы у трёх списков нет намеренно: next/font требует литерал — на
- * `[...SUBSETS]` сборка падает.
- */
 const nunito = Nunito({
   subsets: ['cyrillic', 'latin', 'latin-ext'],
   weight: ['400', '600', '700', '800'],
@@ -46,7 +38,6 @@ const marckScript = Marck_Script({
   display: 'swap',
 })
 
-/** Без этого сегментом `[lang]` стало бы что угодно, включая `/favicon.svg`. */
 export function generateStaticParams() {
   return LANGS.map((lang) => ({ lang }))
 }
@@ -64,13 +55,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const lang = await getLang()
   const dict = await getDict()
 
-  /*
-   * Настройка из базы сильнее браузера, но только когда язык подставил `proxy`, а
-   * не выбрал человек: сверка стоит здесь, потому что в базу `proxy` не ходит.
-   *
-   * Уводим на язык настройки — и на этом всё кончается: следующий запрос придёт
-   * без пометки, источником будет `url`, а кука станет равна базе.
-   */
   const incoming = await headers()
   const saved = await readLanguage()
   if (saved && saved !== lang && incoming.get(LANG_SOURCE_HEADER) !== 'url') {
@@ -80,20 +64,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={lang} className={`${nunito.variable} ${caveat.variable} ${marckScript.variable}`}>
       <body>
-        {/* Обёртка #root: на неё завязаны отступы экрана и рецепт проверки печати. */}
         <div id="root">
           <LangProvider value={{ lang, dict }}>
             <SiteHeader />
             <main>{children}</main>
             <SiteFooter />
-            {/* Черновик, собранный до входа, уезжает в коллекцию сам — где бы
-                человек ни нажал «Войти». Отсюда и место в лейауте. */}
             <ClaimDraft />
-            {/* Язык, определённый по браузеру, доезжает до базы отсюда: писать при
-                рендере серверный компонент не имеет права, а действие — да. */}
             <LangSync lang={lang} saved={saved} />
-            {/* Вопрос о согласии один на весь сайт, и задать его надо на той
-                странице, куда человек пришёл, — отсюда место в лейауте. */}
             <ConsentGate />
           </LangProvider>
         </div>

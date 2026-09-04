@@ -4,13 +4,6 @@ import { limitFor } from './limits'
 import type { Person, Template } from './types'
 import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
 
-/**
- * Порядок элементов и есть формат, первым стоит его версия. Меняете состав
- * `Template` — поднимайте версию и учите `unpack` читать прежний вид: в базе
- * лежат сезоны, собранные раньше.
- */
-
-/** id человека не печатается: его длину диктует не макет, а компактность ссылки. */
 const ID_LIMIT = 8
 
 export type PackedPerson = [
@@ -54,7 +47,6 @@ export function pack(template: Template): Packed {
   ]
 }
 
-/** Позиции полей совпадают у всех версий — лишние хвосты игнорируются. */
 export function unpack(packed: Packed): Template {
   const [, header, theme, weeksNote, weeks, projectsNote, goal, people] = packed
   return normalizeTemplate({
@@ -80,13 +72,8 @@ export function unpack(packed: Packed): Template {
   })
 }
 
-/**
- * Предел здесь обязателен: вписанные снаружи три сотни символов в поле на 16
- * разносят вёрстку ровно так же, как набранные в правке.
- */
 function text(value: unknown, limit: number, fallback = ''): string {
   if (typeof value !== 'string') return fallback
-  // Поля бланка однострочные: переводы строк растягивают лист на лишние страницы.
   return value.replace(/\s*\n+\s*/g, ' ').slice(0, limit)
 }
 

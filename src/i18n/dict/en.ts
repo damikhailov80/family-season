@@ -1,10 +1,5 @@
 import type { Dict } from '../types'
 
-/**
- * Домашний словарь продукта переведён одинаково во всех трёх языках: сезон —
- * season, постер — poster, недели — weeks, сюжетные линии — storylines, финал —
- * wrap-up, анонс — next up (см. «Языки» в CLAUDE.md).
- */
 export const en: Dict = {
   poster: {
     labels: {
@@ -61,7 +56,6 @@ export const en: Dict = {
       'November',
       'December',
     ],
-    // У английского падежей нет: список тот же, и это не небрежность.
     monthsOf: [
       'January',
       'February',

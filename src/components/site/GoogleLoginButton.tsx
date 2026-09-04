@@ -28,13 +28,6 @@ function GoogleMark() {
   )
 }
 
-/**
- * Кнопка входа одна на весь сайт, подпись у неё пропом. Клиентская по двум
- * причинам: адрес возврата собирает браузер (`pathname + search + hash` — в нём
- * живёт примеренное оформление), и уводит по нему тоже он — `redirect()` на
- * чужой origin роняет в консоль «Failed to fetch RSC payload» (см.
- * `googleLoginUrl`). Auth.js в браузер при этом не уезжает.
- */
 export function GoogleLoginButton({ label }: { label?: string }) {
   const { site } = useDict()
 
@@ -49,8 +42,6 @@ export function GoogleLoginButton({ label }: { label?: string }) {
         })
       }}
     >
-      {/* На телефоне от подписи остаётся «Войти» (`.provider` скрыт): полное имя
-          провайдера рядом с брендом не помещается, его держит `aria-label`. */}
       <button type="submit" className={styles.button} aria-label={label ?? site.loginFull}>
         <GoogleMark />
         {label ?? (

@@ -12,7 +12,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: privacy.title, description: privacy.description }
 }
 
-/** Абзац с выделением: в словаре оно размечено `**звёздочками**` (см. `marked`). */
 function Text({ children }: { children: string }) {
   return (
     <p className={styles.text}>
@@ -23,11 +22,6 @@ function Text({ children }: { children: string }) {
   )
 }
 
-/**
- * Заведена не для галочки: без её адреса Google не выпускает вход из режима
- * Testing в продакшен. Появилось в базе что-то новое — страница переписывается
- * тем же изменением, иначе она начнёт врать.
- */
 export default async function PrivacyPage() {
   const { privacy } = await getDict()
 

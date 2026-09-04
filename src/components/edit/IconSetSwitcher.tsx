@@ -5,16 +5,8 @@ import { ICON_SET_ICONS, iconSetLabel, randomIconSet } from '../../model/icons'
 import { useDoc } from '../../state/docContext'
 import styles from './IconSetSwitcher.module.css'
 
-/** Три слота из восьми — на образец: крупный знак шапки, звёздочка и цель. */
 const SAMPLE = ['mark', 'spark', 'goal'] as const
 
-/**
- * Устроен как выбор темы и по тем же причинам: наборов двадцать, списка нет —
- * кнопка бросает постер в случайный другой набор.
- *
- * Образец рисуется `Icon`, а не `PosterIcon`: кнопка живёт вне постера, набор из
- * контекста ей брать неоткуда, да и незачем — она сама его и показывает.
- */
 export function IconSetSwitcher() {
   const { iconSet, setIconSet } = useDoc()
   const icons = ICON_SET_ICONS[iconSet]

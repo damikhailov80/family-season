@@ -9,15 +9,9 @@ import { LoginButtons } from './LoginButtons'
 import { NewSeasonAction } from './NewSeasonAction'
 import styles from './SiteHeader.module.css'
 
-/**
- * Намеренно не `sticky`: тулбар листа уже липнет к верху, а два липких слоя
- * наезжают друг на друга. Сессию сама шапка не читает — её спрашивают
- * `LoginButtons` и `NewSeasonAction`, каждый для себя.
- */
 export async function SiteHeader() {
   const lang = await getLang()
   const { site } = await getDict()
-  // Путь приходит заголовком от `proxy`: своего адреса серверный компонент не знает.
   const path = (await headers()).get(LANG_PATH_HEADER) || '/'
 
   return (

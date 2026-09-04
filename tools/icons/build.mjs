@@ -1,14 +1,3 @@
-/*
- * Сборка наборов рисунков: source.json -> icons.generated.ts + icons.data.ts
- * (`npm run icons`).
- *
- * Считать здесь, в отличие от тем, нечего — геометрия рисуется руками. Зато есть
- * что проверять, и ради этого сборка и существует: у каждого набора ровно
- * объявленные слоты, все имена рисунков существуют, ни один рисунок не остался
- * вне наборов, id не повторяются. Проглядеть такое руками в двадцати наборах
- * нельзя, а цена ошибки — пустое место на постере вместо рисунка.
- */
-
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -16,7 +5,6 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const root = resolve(here, '../..')
 
-/** Одна сетка на всю библиотеку: рисунок обязан вставать в чужой слот. */
 const VIEWBOX = 64
 
 const fail = (message) => {
@@ -53,7 +41,6 @@ for (const set of sets) {
   if (!set.label || typeof set.label !== 'object') {
     fail(`у набора «${set.id}» подпись должна быть объектом {ru, en, pl}`)
   }
-  // Подпись набора видно на плавающей кнопке, значит, она переводится.
   const noLabel = LANGS.filter((lang) => !set.label[lang])
   if (noLabel.length) fail(`у набора «${set.id}» нет подписи на ${noLabel.join(', ')}`)
   const keys = Object.keys(set.slots)
@@ -83,28 +70,15 @@ const shapes = icons.map((icon) => {
   return `  '${icon.name}': {\n    ${fields.join(',\n    ')},\n  },`
 })
 
-const geometry = `/**
- * Библиотека рисунков постера. Файл собирается: tools/icons/build.mjs (npm run icons),
- * руками его не правят — правят tools/icons/source.json и пересобирают.
- *
- * Все рисунки лежат на одной сетке ${VIEWBOX}×${VIEWBOX}: слот в макете задаёт размер,
- * и любой рисунок обязан вставать в чужое место, не меняя пропорций.
- *
- * Рисует их \`Icon.tsx\`, раздаёт слотам \`PosterIcon.tsx\`, а какой рисунок в каком
- * слоте — в наборах (src/model/icons.data.ts).
- */
+const geometry = `/* Собирается tools/icons/build.mjs (npm run icons) из tools/icons/source.json. */
 
 export const ICON_VIEWBOX = ${VIEWBOX}
 
-/** Общая обводка. Мелкие рисунки перебивают её своей — им нужна жирнее. */
 export const ICON_STROKE = 2.3
 
 export interface IconShape {
-  /** Рисунок залит краской, а не только обведён: мелким без заливки не выжить. */
   fill?: boolean
-  /** Своя толщина обводки вместо общей. */
   stroke?: number
-  /** Круги: [cx, cy, r]. Отдельно от путей — так их проще держать в сетке. */
   circles?: readonly (readonly number[])[]
   paths?: readonly string[]
 }
@@ -122,13 +96,7 @@ const rows = sets.map(({ id, label, slots: map }) => {
   return `  ['${id}', { ${caption} }, { ${pairs} }],`
 })
 
-const registry = `/**
- * Реестр наборов рисунков. Файл собирается: tools/icons/build.mjs (npm run icons),
- * руками его не правят — правят tools/icons/source.json и пересобирают.
- *
- * Здесь id, подписи и раздача рисунков по слотам; сама геометрия —
- * в src/components/doodles/icons.generated.ts, а логика выбора — в src/model/icons.ts.
- */
+const registry = `/* Собирается tools/icons/build.mjs (npm run icons) из tools/icons/source.json. */
 
 import type { IconName } from '../components/doodles/icons.generated'
 

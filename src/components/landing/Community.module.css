@@ -15,7 +15,6 @@
   color: var(--ink-soft);
 }
 
-/* Как в «Примерах»: приписка слева, кнопка справа. */
 .aside {
   display: grid;
   grid-template-columns: 1fr auto;

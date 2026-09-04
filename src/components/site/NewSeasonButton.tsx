@@ -8,14 +8,6 @@ import { emptyDraft, readDraft, writeDraft, type Draft } from '../../model/draft
 import { sheetHref } from '../../model/site'
 import { createSeason } from '../../server/actions'
 
-/**
- * «Новый сезон» — одна кнопка на весь сайт; имя спрашивается до заведения у обеих
- * ролей. Умолчание считается здесь, на клиенте: так снимается расхождение
- * «сегодня» между сервером и браузером — месяц нового бланка зависит от даты.
- *
- * Цена: у вошедшего кнопка перестала работать без JS (была
- * `<form action={createSeason}>`) — без JS окна с именем не бывает.
- */
 export function NewSeasonButton({
   signedIn,
   className,
@@ -30,23 +22,15 @@ export function NewSeasonButton({
   const lang = useLang()
   const { dialogs } = useDict()
 
-  /*
-   * И черновик, и умолчание имени берутся в обработчике, а не в рендере: в
-   * серверном проходе `localStorage` нет (вышло бы расхождение разметки), а
-   * `emptyDraft()` считает месяц от «сегодня» и в рендере была бы нечистой.
-   */
   const ask = () =>
     setAsking({ draft: signedIn ? null : readDraft(), title: emptyDraft(lang).title })
 
   const create = (title: string) => {
     if (!signedIn) {
-      // Новый черновик собирается языком интерфейса: другого у него нет.
       writeDraft({ ...emptyDraft(lang), title })
       location.assign(sheetHref(lang, 'edit'))
       return
     }
-    // Свой флажок ожидания залип бы: маршрут перерисовывается на месте, и
-    // компонент после редиректа не перемонтируется. Держит его `useTransition`.
     start(() => createSeason(title, lang))
   }
 

@@ -6,11 +6,6 @@ interface AvatarFaceProps {
   className?: string
 }
 
-/**
- * Взрослые и дети должны различаться силуэтом, а не только причёской: в таблице
- * настроений аватар рисуется в 20 px, там читается лишь общая форма.
- * Папа — борода, мама — каре и серьги, дети — головы мельче, вихор и хвостики.
- */
 interface FaceGeometry {
   cy: number
   r: number
@@ -82,7 +77,6 @@ const DETAILS: Record<FaceVariant, React.ReactNode> = {
   ),
 }
 
-/** У папы рот короче — он внутри бороды. */
 const MOUTH: Record<FaceVariant, string> = {
   dad: 'M28.5 42.6c1.6 2.2 5.4 2.2 7 0',
   mom: 'M26.5 45c2.4 3.6 8.6 3.6 11 0',

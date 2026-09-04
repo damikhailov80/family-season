@@ -4,7 +4,6 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 6px 12px;
-  /* См. комментарий в SiteHeader.module.css: auto-margin в flex-колонке. */
   width: 100%;
   max-width: 940px;
   margin: 36px auto 0;
@@ -32,7 +31,6 @@
   font-weight: 700;
   text-decoration: none;
   border-bottom: 1.5px solid color-mix(in srgb, var(--accent-deep) 40%, transparent);
-  /* Длинный адрес не должен распирать страницу на телефоне. */
   overflow-wrap: anywhere;
 }
 
@@ -61,11 +59,6 @@
   outline-offset: 2px;
 }
 
-/*
- * «Куки» — кнопка, а не ссылка: она открывает разговор о согласии заново, а не
- * ведёт на страницу. Выглядеть при этом обязана как соседка, поэтому правила
- * `.link` она делит с ней, а сбрасывает только кнопочные умолчания браузера.
- */
 .linkButton {
   padding: 0;
   border: none;

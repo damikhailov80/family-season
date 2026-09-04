@@ -40,10 +40,6 @@ function tabLabel(kind: Tab, dict: Dict): string {
       : dict.seasons.tabPublished
 }
 
-/**
- * Поиск и сортировка живут в адресе, а не в состоянии React: их можно переслать и
- * перезагрузить, а страница остаётся серверной. Умолчания в адрес не пишем.
- */
 function listHref(lang: Lang, kind: Tab, search: string, sort: LibrarySort): string {
   const params = new URLSearchParams()
   if (kind !== 'seasons') params.set('tab', kind)
@@ -54,18 +50,14 @@ function listHref(lang: Lang, kind: Tab, search: string, sort: LibrarySort): str
   return query ? `${base}?${query}` : base
 }
 
-/** Все три вкладки сводятся к одной строке заранее. */
 interface RowData {
   code: string
   title: string
   savedAt: Date
   palette: PaletteId
   month: string | null
-  /** Язык сезона: им названы месяц и сам сезон. Список от него не зависит. */
   lang: Lang
-  /** У отложенного и выложенного: сезон сняли с витрины, но ссылка работает. */
   hidden?: boolean
-  /** Только у своих публикаций: закрыта после разбора жалоб. */
   blocked?: boolean
   likes?: number
   favorites?: number
@@ -88,7 +80,6 @@ function Row({
   const { seasons } = dict
   return (
     <li className={styles.entry}>
-      {/* Четыре сектора: по одной краске набор не узнать. */}
       <span
         className={styles.ink}
         data-palette={entry.palette}
@@ -96,7 +87,6 @@ function Row({
         aria-hidden="true"
       />
       <span className={styles.entryText}>
-        {/* Закрытый сезон не открывается нигде — ссылка вела бы в 404. */}
         {entry.blocked ? (
           <span className={styles.entryTitle}>{entry.title}</span>
         ) : (
@@ -106,7 +96,6 @@ function Row({
               kind === 'seasons'
                 ? seasonHref(lang, entry.code)
                 : // Публикация живёт только в своём языке: у отложенного и
-                  // выложенного он может отличаться от языка кабинета.
                   publicSeasonHref(entry.lang, entry.code)
             }
           >
@@ -121,8 +110,6 @@ function Row({
               : seasons.publishedAt}{' '}
           {savedOn(entry.savedAt, lang)}
           {entry.month ? ` · ${entry.month}` : ''}
-          {/* Разделитель — снаружи пометки: у `.offStage` `display: inline-flex`,
-              а флекс-контейнер срезает ведущий пробел внутри себя. */}
           {(entry.blocked || entry.hidden) && ' · '}
           {entry.blocked ? (
             <span className={styles.offStage}>{seasons.blocked}</span>
@@ -130,9 +117,6 @@ function Row({
             entry.hidden && <span className={styles.offStage}>{seasons.offStage}</span>
           )}
         </span>
-        {/* Числа автору показываем всегда, включая нули: это его собственные
-            данные, а не оценка. Своей строкой и одинаковыми парами «слово: число» —
-            в общей подписи они собирались в неопрятный хвост. */}
         {kind === 'published' && (
           <span className={styles.entryStats}>
             {fill(seasons.statLikes, { n: entry.likes ?? 0 })} ·{' '}
@@ -148,11 +132,9 @@ function Row({
             <DeleteEntry code={entry.code} title={entry.title} back={back} />
           </>
         )}
-        {/* Убрать закладку — не удаление: подтверждать нечего. */}
         {kind === 'favorites' && (
           <UnfavoriteEntry code={entry.code} title={entry.title} back={back} />
         )}
-        {/* Кнопки нет только у закрытого после жалоб: там решает не автор. */}
         {kind === 'published' && !entry.blocked && (
           <ShowcaseEntry
             code={entry.code}
@@ -167,13 +149,6 @@ function Row({
   )
 }
 
-/**
- * Проверка входа стоит здесь, в серверном компоненте, а не в `proxy.ts`: это и
- * есть проверка у источника данных, а прокси — лишь оптимистичная догадка.
- *
- * Незалогиненного не уводим редиректом: адрес есть в шапке и обязан открываться.
- * Список у него тот же самый, только короткий — черновик в браузере один.
- */
 export default async function SeasonsPage({
   searchParams,
 }: {
@@ -183,16 +158,12 @@ export default async function SeasonsPage({
   const dict = await getDict()
   const { seasons } = dict
   const session = await auth()
-  // Нужен сам факт входа: от него зависит, где лежат сезоны.
   const signedIn = Boolean(session?.user?.name || session?.user?.email)
 
   if (!signedIn) {
     return (
       <PaperSheet>
         <SectionBox accent="deep" label={seasons.heading} className={styles.section}>
-          {/* Про вход разговор ведёт окно заведения сезона: вторая проповедь на
-              пустой странице ничего не добавляет. Вкладок анониму не показываем —
-              избранного и публикаций без входа не бывает. */}
           <DraftEntry />
 
           <NewSeasonAction className={styles.primary}>{seasons.newSeason}</NewSeasonAction>
@@ -230,7 +201,6 @@ export default async function SeasonsPage({
           ))}
         </nav>
 
-        {/* Обычная GET-форма: поиск обязан пережить перезагрузку и пересылку. */}
         <form className={styles.filters} action={withLang(lang, ROUTES.seasons)} method="get">
           {kind !== 'seasons' && <input type="hidden" name="tab" value={kind} />}
           {sort !== 'date' && <input type="hidden" name="sort" value={sort} />}
@@ -299,8 +269,6 @@ export default async function SeasonsPage({
 
         {state.status === 'error' && <Toast message={seasons.listError} />}
 
-        {/* Сюда возвращается неудача «Нового сезона»: человек оказался здесь
-            вместо своего сезона, и молчать об этом нельзя. */}
         {flags.add === 'limit' && <Toast message={fill(seasons.addLimit, { n: LIBRARY_LIMIT })} />}
         {flags.add && flags.add !== 'limit' && <Toast message={seasons.addError} />}
       </SectionBox>

@@ -53,7 +53,6 @@
   color: var(--accent-deep);
 }
 
-/* Правило «сайтовая обвязка на бумагу не идёт»: печатать 404 незачем. */
 @media print {
   .section {
     display: none;

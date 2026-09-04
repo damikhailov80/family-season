@@ -4,7 +4,6 @@ import { SectionBox } from '../SectionBox'
 import { SparkStar } from '../doodles'
 import styles from './Inside.module.css'
 
-/* Каждая четвёртая тема: показать все сто — это уже не полоса, а каталог. */
 const SHOWCASE = PALETTE_ORDER.filter((_, index) => index % 4 === 0)
 
 export async function Inside() {
@@ -27,8 +26,6 @@ export async function Inside() {
           </li>
         ))}
       </ul>
-      {/* Каждый свотч несёт свой data-palette и потому красится своими же
-          красками — цвета набора нигде не дублируются. */}
       <div className={styles.palettes}>
         <h3 className={styles.palettesTitle}>{landing.palettesTitle}</h3>
         <ul className={styles.swatches}>

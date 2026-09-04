@@ -10,11 +10,9 @@ interface SectionBoxProps {
   className?: string
   bodyClassName?: string
   labelId?: string
-  /** Якорь секции: на «Примеры» ссылается кнопка первого экрана. */
   id?: string
 }
 
-/** Каркас почти всех блоков макета — и листа, и лендинга. */
 export function SectionBox({
   accent,
   label,

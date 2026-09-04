@@ -11,14 +11,6 @@ import { reactionText } from '../../../model/community'
 import { reportSeason } from '../../../server/actions'
 import styles from './page.module.css'
 
-/**
- * Лайка здесь нет намеренно: лайкают, посмотрев сезон, а брань видно сразу.
- *
- * Вход спрашивается до окна жалобы, а не после: окно просит написать текст, и
- * заставлять человека сочинять жалобу, чтобы услышать «сначала войдите», нельзя.
- * Ответ `anonymous` при этом всё равно обрабатываем — сессия могла кончиться,
- * пока человек набирал текст.
- */
 export function ReportEntry({
   code,
   title,
@@ -34,7 +26,6 @@ export function ReportEntry({
   const [loginOpen, setLoginOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [sent, setSent] = useState(false)
-  // Отметка времени — чтобы одинаковый отказ подряд перемонтировал тост.
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
 
   const send = async (comment: string) => {
@@ -42,7 +33,6 @@ export function ReportEntry({
     const status = await reportSeason(code, comment)
     setBusy(false)
     setOpen(false)
-    // «Войдите» — не отказ, а предложение: его показывает окно, а не тост.
     if (status === 'anonymous') {
       setLoginOpen(true)
       return

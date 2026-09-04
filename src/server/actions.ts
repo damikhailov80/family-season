@@ -48,31 +48,13 @@ import type { SharedLink } from '../model/qr'
 import { DEFAULT_PALETTE, knownPalette } from '../model/palettes'
 import { ROUTES, seasonHref, stripLang, withLang } from '../model/site'
 
-/**
- * Адрес возврата после входа. Приходит из браузера, поэтому проверяем:
- * пускаем только свой относительный путь. `//host` — это протокол-относительный
- * адрес, то есть чужой сайт, и он бы превратил вход в открытый редирект.
- */
 function safeReturnTo(value: unknown): string | null {
   if (typeof value !== 'string') return null
   if (!value.startsWith('/') || value.startsWith('//')) return null
   return value
 }
 
-/**
- * Действие отдаёт адрес, а не уводит по нему: `redirect()` на чужой origin идёт
- * через роутер Next, тот просит у `accounts.google.com` RSC-ответ, ловит отказ
- * CORS и только потом откатывается к обычному переходу — с «Failed to fetch RSC
- * payload» в консоли на каждый вход. Уводит поэтому браузер (`location.href` в
- * `GoogleLoginButton`); куки `state` и PKCE от этого не страдают, их кладёт сам
- * `signIn` через `cookies()`.
- */
 export async function googleLoginUrl(returnTo?: unknown): Promise<string> {
-  /*
-   * Возвращаемся на ту же страницу, но без языка в адресе: язык в пути `proxy`
-   * считает выбором человека и настройке из базы уступает. Отдаём голый путь —
-   * `proxy` подставит язык сам, пометит `auto`, и настройка победит.
-   */
   return signIn('google', {
     redirect: false,
     redirectTo: stripLang(safeReturnTo(returnTo) ?? ROUTES.seasons),
@@ -80,15 +62,9 @@ export async function googleLoginUrl(returnTo?: unknown): Promise<string> {
 }
 
 export async function logout(lang: unknown) {
-  // Язык переживает выход: он свойство браузера, а не сессии.
   await signOut({ redirectTo: withLang(knownLang(lang), ROUTES.home) })
 }
 
-/**
- * Кука здесь обязательна: ею `proxy` пользуется на пути без языка, и оставить её
- * со старым значением значило бы, что человек сменил язык, а голый `/`
- * по-прежнему уводит его на прежний.
- */
 export async function saveLanguage(value: unknown): Promise<Exclude<FamilyStatus, 'ok'>> {
   const lang = knownLang(value)
   const outcome = await writeLanguage(lang)
@@ -99,24 +75,10 @@ export async function saveLanguage(value: unknown): Promise<Exclude<FamilyStatus
   redirect(`${withLang(lang, ROUTES.account)}?ok=1`)
 }
 
-/**
- * Язык определился по браузеру, а в настройках его ещё нет — записываем. Зовёт
- * клиентский `LangSync`: серверный компонент писать в базу при рендере не имеет
- * права, а действие — имеет.
- */
 export async function rememberLanguage(value: unknown): Promise<void> {
   await writeLanguage(knownLang(value))
 }
 
-/**
- * Кука здесь главная, а не дублирующая: решение принимают в браузере, и у
- * невошедшего другого места нет вовсе. Отказ записывается так же, как согласие:
- * забыть «нет» значило бы спрашивать снова на каждой странице.
- *
- * Редиректа нет — `gtag` переводится в новое состояние на месте, в этом и смысл
- * Consent Mode. Молчание базы кукой не отменяется: переспросим на следующем
- * устройстве, это честнее, чем считать несохранённое сохранённым.
- */
 export async function saveConsent(value: unknown): Promise<void> {
   const consent = consentOrNull(value)
   if (!consent) return
@@ -131,11 +93,6 @@ export async function saveConsent(value: unknown): Promise<void> {
   await writeConsent(consent)
 }
 
-/**
- * То же решение из кабинета. Отличий от `saveConsent` два, и оба из-за страницы:
- * статус нужен значением (не записали — человек обязан узнать), а успех уезжает
- * пометкой `?ok=1`, как у языка и состава, — ему надо пережить перезагрузку.
- */
 export async function saveConsentSetting(
   value: unknown,
   lang: unknown,
@@ -153,15 +110,6 @@ export async function saveConsentSetting(
   redirect(`${withLang(knownLang(lang), ROUTES.account)}?ok=1`)
 }
 
-/**
- * Состав приходит аргументом, а не `FormData`: форму из клиентского компонента
- * React кодирует под своими именами (`_1_name`, …), и разбор по `getAll('name')`
- * молча возвращал бы пустоту.
- *
- * Успех уезжает пометкой в адрес — ему надо пережить перезагрузку. Неудача
- * возвращается значением: редирект перерисовал бы кабинет с нуля, а набранного
- * состава у сервера нет — он молча пропал бы, и повторять было бы нечего.
- */
 export async function saveFamily(family: unknown, lang: unknown): Promise<SaveFamilyStatus> {
   const people = normalizeFamily(family)
   if (!familyNamed(people)) return 'unnamed'
@@ -171,13 +119,6 @@ export async function saveFamily(family: unknown, lang: unknown): Promise<SaveFa
   return outcome
 }
 
-/**
- * Завести сезон из того, что сейчас на экране. Форк — копия, а не ссылка, и
- * повторный форк — просто ещё одна строка.
- *
- * `from` — код выложенного сезона, с которого форкнули: он нужен только
- * статистике автора и на саму строку не влияет.
- */
 export async function storeSeason(
   input: unknown,
 ): Promise<{ status: LibraryStatus; code?: string }> {
@@ -189,7 +130,6 @@ export async function storeSeason(
     lang?: unknown
     from?: unknown
   }
-  // Язык копируется вместе с бланком: подписи листа — часть увиденного.
   const lang = knownLang(raw.lang)
   const created = await createUserSeason({
     title: normalizeTitle(raw.title, posterText(lang).untitled),
@@ -203,11 +143,6 @@ export async function storeSeason(
   return created
 }
 
-/**
- * «Новый сезон» для вошедшего: строка заводится сразу, состав семьи из кабинета
- * подставляется здесь же — постеру про базу знать по-прежнему нечего. Пустое имя
- * не отказ, а умолчание: его подставит `normalizeTitle`.
- */
 export async function createSeason(title: unknown, value: unknown) {
   const lang = knownLang(value)
   const family = await readFamily()
@@ -233,10 +168,6 @@ export async function saveSeason(code: unknown, input: unknown): Promise<Library
   })
 }
 
-/**
- * Отдельно от `renameEntry` потому, что кончается значением, а не редиректом:
- * постер под панелью никуда не уходит, перерисовывать страницу незачем.
- */
 export async function renameSeason(
   code: unknown,
   title: unknown,
@@ -247,10 +178,6 @@ export async function renameSeason(
   return renameUserSeason(code, normalizeTitle(title, posterText(seasonLang).untitled), seasonLang)
 }
 
-/**
- * Уезжает код своего сезона, а не бланк: копию сервер снимет сам, из собственной
- * строки. Иначе на витрину можно было бы положить что угодно.
- */
 export async function shareSeason(
   code: unknown,
   anonymize: unknown,
@@ -280,7 +207,6 @@ export async function republishSeason(code: unknown): Promise<PublishStatus> {
   return republishPublic(code)
 }
 
-/** Выдать (или заменить) приватную ссылку и отозвать её. */
 export async function shareLink(
   code: unknown,
   lang: unknown,
@@ -288,7 +214,6 @@ export async function shareLink(
   if (typeof code !== 'string') return { status: 'error' }
   const result = await refreshShareToken(code)
   if (result.status !== 'ok' || !result.token) return { status: result.status }
-  // Код собирается вместе с токеном: переспрашивать сервер после его же ответа незачем.
   return { status: 'ok', link: { token: result.token, qr: shareQr(knownLang(lang), result.token) } }
 }
 
@@ -297,10 +222,6 @@ export async function revokeLink(code: unknown): Promise<LibraryStatus> {
   return dropShareToken(code)
 }
 
-/**
- * Желаемое состояние приходит от клиента, а не «переключи там сам»: так запрос к
- * базе один и идемпотентен (см. `setLike`).
- */
 export async function likeSeason(code: unknown, on: unknown): Promise<ReactionStatus> {
   if (typeof code !== 'string') return 'error'
   return setLike(code, Boolean(on))
@@ -311,18 +232,12 @@ export async function favoriteSeason(code: unknown, on: unknown): Promise<Reacti
   return setFavorite(code, Boolean(on))
 }
 
-/** Без комментария не принимаем: жалоба без слов бесполезна тому, кто её разбирает. */
 export async function reportSeason(code: unknown, comment: unknown): Promise<ReactionStatus> {
   const text = normalizeComment(comment)
   if (typeof code !== 'string' || !text) return 'error'
   return addReport(code, text)
 }
 
-/**
- * Действия со страницы списка кончаются редиректом, а не значением: списку надо
- * перерисоваться и пережить перезагрузку. Привязанные аргументы уезжают в браузер
- * и возвращаются оттуда, поэтому проверяются наравне со всем остальным.
- */
 export async function renameEntry(code: unknown, back: unknown, title: unknown, lang: unknown) {
   const seasonLang = knownLang(lang)
   if (typeof code === 'string') {

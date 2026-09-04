@@ -1,14 +1,6 @@
 import { Pool } from 'pg'
 import { logger } from './logger'
 
-/**
- * Пул заводится лениво и один на модуль: плодить их на запрос нельзя — кончатся
- * соединения.
- *
- * Главное правило файла: сайт обязан работать при мёртвой базе. Поэтому запросы
- * ходят через `query`, который не бросает, а возвращает причину отказа.
- */
-
 let pool: Pool | null = null
 
 function getPool(): Pool | null {
@@ -18,11 +10,9 @@ function getPool(): Pool | null {
 
   pool = new Pool({
     connectionString,
-    // Страница ждёт настройку — лучше отдать её без состава семьи, чем висеть.
     connectionTimeoutMillis: 4000,
     query_timeout: 4000,
   })
-  // Без обработчика разрыв соединения на стороне базы валит процесс целиком.
   pool.on('error', (error) => logger.error('database pool error', { err: error }))
   return pool
 }
@@ -30,13 +20,6 @@ function getPool(): Pool | null {
 export type QueryResult<Row> =
   { status: 'ok'; rows: Row[] } | { status: 'unconfigured' } | { status: 'failed' }
 
-/**
- * Запрос, который не бросает. Разметка строкой, а не `ok: boolean`: в `tsconfig`
- * выключен `strict`, и по булеву дискриминанту TypeScript такой союз не сужает.
- *
- * `op` — имя операции для логов. Текст SQL в лог не пишем: вместе с ним туда
- * уехали бы значения, а среди них имена людей.
- */
 export async function query<Row>(
   op: string,
   text: string,

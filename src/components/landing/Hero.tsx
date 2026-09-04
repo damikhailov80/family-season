@@ -22,8 +22,6 @@ export async function Hero() {
 
       <p className={styles.hand}>{landing.heroHand}</p>
 
-      {/* Ссылка, а не кнопка: примеры лежат ниже на этой же странице, и прокрутку
-          делает сам браузер — работает и без JS. */}
       <a className={styles.jump} href="#examples">
         {landing.heroJump}
       </a>

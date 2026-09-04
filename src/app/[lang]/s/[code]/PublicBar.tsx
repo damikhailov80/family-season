@@ -34,18 +34,8 @@ import {
 import { useDoc } from '../../../../state/docContext'
 import styles from '../../../../components/edit/Bar.module.css'
 
-/** Толщина обводки рисунков из библиотеки в размере кнопки — см. `Icon`. */
 const ICON_STROKE = 4
 
-/**
- * Про лайк и звёздочку вход заранее не спрашивается: действие уходит на сервер,
- * и `anonymous` в ответе открывает окно входа. У жалобы иначе — её окно просит
- * написать текст, и заставлять человека сочинять жалобу, чтобы в ответ услышать
- * «сначала войдите», нельзя.
- *
- * Языков здесь два: название сезона выводится из содержимого языком сезона,
- * кнопки и окна говорят языком интерфейса.
- */
 export function PublicBar({
   code,
   demo,
@@ -60,31 +50,21 @@ export function PublicBar({
   demo: boolean
   signedIn: boolean
   mine: boolean
-  /** Ничей системный сезон — наш пример: на такой не жалуются. */
   system: boolean
   hidden: boolean
-  /** Пришли сюда прямо с публикации: `new` — выложили сейчас, `again` — уже лежал. */
   published: 'new' | 'again' | null
   state: { likes: number; liked: boolean; reported: boolean; favorited: boolean }
 }) {
-  // Название берётся из содержимого: колонки `title` у публикации нет вовсе.
   const { template, lang } = useDoc()
   const uiLang = useLang()
   const { bars } = useDict()
   const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [reportOpen, setReportOpen] = useState(false)
-  /** Окно входа помнит, ради чего его открыли: слова у трёх кнопок разные. */
   const [login, setLogin] = useState<LoginReason | null>(null)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
-  // Ответ известен из самого действия: переспрашивать сервер незачем.
   const [marks, setMarks] = useState(state)
 
-  /*
-   * Пометка нужна один раз: дальше она мешала бы — этот адрес копируют и
-   * отправляют. `history.state` в `replaceState` передаём обязательно, иначе
-   * вызов пойдёт через `ACTION_RESTORE` и постер перемонтируется (см. «Каркас»).
-   */
   useEffect(() => {
     if (!published) return
     const url = new URL(location.href)
@@ -92,7 +72,6 @@ export function PublicBar({
     history.replaceState(history.state, '', url.pathname + url.search)
   }, [published])
 
-  /** «Войдите» — не отказ сервера, а предложение: его показывает окно, не тост. */
   const react = (status: ReactionStatus, reason: LoginReason) => {
     if (status === 'anonymous') setLogin(reason)
     else if (status !== 'ok') setNotice({ text: reactionText(uiLang, status), at: Date.now() })
@@ -117,7 +96,6 @@ export function PublicBar({
     if (react(status, 'like')) setMarks({ ...marks, liked: on, likes: marks.likes + (on ? 1 : -1) })
   }
 
-  // Окно закрываем при любом исходе: два модальных окна друг на друге — не разговор.
   const sendReport = async (comment: string) => {
     setBusy(true)
     const status = await reportSeason(code, comment)
@@ -129,7 +107,6 @@ export function PublicBar({
   }
 
   const copyLink = async () => {
-    // Ровно то, что в адресной строке: код плюс примеренное оформление.
     const url = location.href
     try {
       await navigator.clipboard.writeText(url)
@@ -151,12 +128,10 @@ export function PublicBar({
       })
       return
     }
-    // Осталась скрытой — перечитываем; ушла совсем — открывать больше нечего.
     if (result.hidden) location.reload()
     else location.assign(withLang(uiLang, ROUTES.seasons))
   }
 
-  // Возврат окна не просит: терять нечего, строка та же самая.
   const republish = async () => {
     setBusy(true)
     const status = await republishSeason(code)
@@ -174,7 +149,6 @@ export function PublicBar({
   return (
     <>
       <div className={styles.bar} role="toolbar" aria-label={bars.toolbarAria}>
-        {/* Своё не откладывают: избранное держало бы свою публикацию от снятия. */}
         {!mine && (
           <>
             <button
@@ -188,8 +162,6 @@ export function PublicBar({
             >
               <SparkStar size={18} filled={marks.favorited} />
             </button>
-            {/* Число внутри кнопки: за рамкой оно читалось как подпись
-                неизвестно к чему. */}
             <button
               type="button"
               className={marks.likes > 0 ? `${styles.icon} ${styles.withCount}` : styles.icon}
@@ -215,7 +187,6 @@ export function PublicBar({
                 label={fill(bars.likesAria, { n: marks.likes })}
               />
             </button>
-            {/* На наши примеры не жалуются: шестеро недовольных убрали бы их с витрины. */}
             {!system && (
               <button
                 type="button"
@@ -232,8 +203,6 @@ export function PublicBar({
           </>
         )}
 
-        {/* Читалка, а не погашенная кнопка: погашенная обещала бы, что
-            когда-нибудь станет доступной, — а она не станет никогда. */}
         {mine && (
           <LikeCount
             likes={marks.likes}
@@ -242,7 +211,6 @@ export function PublicBar({
           />
         )}
 
-        {/* У снятого с витрины места нет — остаётся одно название. */}
         <span className={styles.hint}>
           {hidden
             ? ideaTitle(template, lang)
@@ -258,8 +226,6 @@ export function PublicBar({
             from={code}
             onFailure={(text) => setNotice({ text, at: Date.now() })}
           />
-          {/* Кнопка нажата (`aria-pressed`), пока сезон на витрине, и снимает
-              его; отжатая возвращает обратно. */}
           {mine && (
             <button
               type="button"
@@ -294,8 +260,6 @@ export function PublicBar({
         </span>
       </div>
 
-      {/* Окна и тост — вне бара: у `.bar` есть `backdrop-filter`, а он делает
-          элемент содержащим блоком для `position: fixed`. */}
       {withdrawOpen && (
         <WithdrawDialog
           busy={busy}

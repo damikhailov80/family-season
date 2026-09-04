@@ -7,10 +7,6 @@ import { Toast } from '../../../../components/site/Toast'
 import { useDict } from '../../../../i18n/context'
 import styles from '../../../../components/edit/Bar.module.css'
 
-/**
- * Ни лайка, ни жалобы, ни звёздочки: сезон не на витрине, его показали лично.
- * Остаётся то, ради чего ссылку и присылают: посмотреть, распечатать, форкнуть.
- */
 export function SharedBar({ signedIn }: { signedIn: boolean }) {
   const { bars } = useDict()
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
@@ -54,8 +50,6 @@ export function SharedBar({ signedIn }: { signedIn: boolean }) {
         </span>
       </div>
 
-      {/* Тост — вне бара: у `.bar` есть `backdrop-filter`, а он делает элемент
-          содержащим блоком для `position: fixed`. */}
       {notice && <Toast key={notice.at} message={notice.text} />}
     </>
   )

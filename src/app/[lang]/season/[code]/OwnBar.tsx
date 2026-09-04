@@ -27,15 +27,6 @@ import {
 import { useDoc } from '../../../../state/docContext'
 import styles from '../../../../components/edit/Bar.module.css'
 
-/**
- * «Править» и «Готово» — `next/link`, а не полная навигация: мягкий переход даёт
- * незаписанной правке уйти на сервер из размонтирования.
- *
- * Состояния у мегафона нет, он всегда обычная кнопка: на вопрос «а такой сезон
- * уже выложен?» отвечает окно, когда открывается (`previewPublish`). Нажатость
- * была третьим ответом на тот же вопрос и стоила запроса к базе на каждый показ
- * страницы, да ещё и чужих публикаций того же содержимого не искала.
- */
 export function OwnBar({
   code,
   editing,
@@ -47,7 +38,6 @@ export function OwnBar({
   editing: boolean
   title: string
   link: SharedLink | null
-  /** Состояние ссылки держит страница: тот же QR печатает лист рядом с панелью. */
   onLink: (link: SharedLink | null) => void
 }) {
   const { template, palette, iconSet, lang } = useDoc()
@@ -56,14 +46,11 @@ export function OwnBar({
   const [forkOpen, setForkOpen] = useState(false)
   const [publishOpen, setPublishOpen] = useState(false)
   const [publishLang, setPublishLang] = useState<Lang>(lang)
-  /** Что витрина ответит на «Выложить»; `null` — ещё спрашиваем. */
   const [check, setCheck] = useState<{ status: PublishStatus; code?: string } | null>(null)
-  /** Номер проверки: ответ на закрытое окно не должен попасть в следующее. */
   const checkRun = useRef(0)
   const [linkOpen, setLinkOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState<{ text: string; at: number } | null>(null)
-  // Страница не перерисовывается: имя в ряду меняем сами, на неудаче — прежнее.
   const [name, setName] = useState(title)
   const [renameOpen, setRenameOpen] = useState(false)
 
@@ -97,7 +84,6 @@ export function OwnBar({
 
   const issueLink = async () => {
     setBusy(true)
-    // Язык — сезона: им подписан лист, и QR ведёт на тот же язык.
     const result = await shareLink(code, lang)
     setBusy(false)
     if (result.status === 'ok' && result.link) onLink(result.link)
@@ -126,22 +112,16 @@ export function OwnBar({
       setLinkOpen(false)
       setNotice({ text: bars.linkCopied, at: Date.now() })
     } catch {
-      // Без разрешения на буфер поле со ссылкой и так открыто: скопирует руками.
       setNotice({ text: bars.linkCopyByHand, at: Date.now() })
     }
   }
 
-  // Окно открывается сразу: ждать ответа витрины — оставить нажатие без следа.
   const openPublish = () => {
     setPublishLang(lang)
     askShowcase(lang)
     setPublishOpen(true)
   }
 
-  /*
-   * Уникальность считается вместе с языком, поэтому смена языка в окне — новый
-   * вопрос витрине. Номер прогона отсекает ответ на прежний: он мог прийти позже.
-   */
   const askShowcase = (next: Lang) => {
     const run = ++checkRun.current
     setCheck(null)
@@ -156,9 +136,7 @@ export function OwnBar({
     setBusy(false)
     setPublishOpen(false)
     if (result.code) {
-      // Пометка объясняет, что случилось; адрес страница потом почистит сама.
       location.assign(
-        // Язык — публикации, а не интерфейса: она живёт только в своём.
         `${publicSeasonHref(publishLang, result.code)}?published=${result.fresh ? 'new' : 'again'}`,
       )
       return
@@ -172,8 +150,6 @@ export function OwnBar({
   return (
     <>
       <div className={styles.bar} role="toolbar" aria-label={bars.toolbarAria}>
-        {/* Поле прямо в ряду росло вместе с набранным и дёргало кнопки на
-            каждом знаке — поэтому переименование живёт в окне. */}
         {editing ? (
           <button
             type="button"

@@ -16,13 +16,8 @@ export function OwnSeason({
 }: {
   season: UserSeason
   editing: boolean
-  /** Личная ссылка с готовым кодом; `null` — её не выдавали. */
   share: SharedLink | null
 }) {
-  /*
-   * Ссылка живёт здесь, а не в панели: выдают её окном из панели, а печатает лист —
-   * состояние у них одно на двоих.
-   */
   const [link, setLink] = useState(share)
 
   return (

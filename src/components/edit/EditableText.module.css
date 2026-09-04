@@ -19,11 +19,6 @@
     inset 0 -1px 0 0 transparent;
 }
 
-/*
- * Ввод упёрся в предел поля. Вспышка идёт по подчёркиванию и рамке фокуса,
- * поэтому макет не сдвигается ни на пиксель. Правило стоит после `:focus`:
- * специфичность равная, выигрывает последнее.
- */
 .editable.full {
   background: color-mix(in srgb, var(--mood-bad) 12%, transparent);
   box-shadow:
@@ -31,10 +26,8 @@
     inset 0 -2px 0 0 var(--mood-bad);
 }
 
-/* Пустое поле показывает подсказку — но только в правке и только на экране. */
 .editable:empty::before {
   content: attr(data-placeholder);
-  /* currentColor, а не серый: подсказка читается и на тёмной ленте заголовка. */
   color: currentcolor;
   opacity: 0.45;
 }
