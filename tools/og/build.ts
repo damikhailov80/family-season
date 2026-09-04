@@ -61,8 +61,6 @@ html, body { margin: 0; background: #fff }
 .brand { display: flex; align-items: center; gap: 30px }
 .name { font-family: 'Caveat', cursive; font-weight: 700; font-size: 92px; line-height: 1; white-space: nowrap; color: ${TILE} }
 .text { font-size: 40px; line-height: 1.35; color: #3d3d3d }
-.weeks { display: flex; gap: 22px; margin-top: 8px }
-.week { flex: 1; height: 74px; border: 3px solid ${TILE}; border-radius: 12px; opacity: 0.35 }
 </style>
 <div class="card">
   <div class="brand">
@@ -70,7 +68,6 @@ html, body { margin: 0; background: #fff }
     <div class="name">${brand}</div>
   </div>
   <div class="text">${description}</div>
-  <div class="weeks"><i class="week"></i><i class="week"></i><i class="week"></i><i class="week"></i></div>
 </div>
 `
 }
@@ -78,8 +75,10 @@ html, body { margin: 0; background: #fff }
 const fonts = await inlineFonts()
 
 for (const lang of LANGS) {
-  const { site } = DICTS[lang]
+  const { landing, site } = DICTS[lang]
   const out = join(root, 'public', `og-${lang}.png`)
-  shoot(page(fonts, site.brand, site.description), { width: WIDTH, height: HEIGHT, out })
+  // The hero phrase, not site.description: the card is the first thing a person reads about
+  // the project, and on the landing page that is the phrase written for exactly that job.
+  shoot(page(fonts, site.brand, landing.heroLead), { width: WIDTH, height: HEIGHT, out })
   console.log(`og: public/og-${lang}.png (${WIDTH}×${HEIGHT})`)
 }

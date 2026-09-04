@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { Toast } from '../../../../components/site/Toast'
 import { getDict, getLang } from '../../../../i18n/server'
 import { iconSetOrNull } from '../../../../model/icons'
+import { ideaTitle } from '../../../../model/library'
 import { pageMeta } from '../../../../model/meta'
 import { paletteOrNull } from '../../../../model/palettes'
 import { ROUTES } from '../../../../model/site'
@@ -16,11 +17,15 @@ export async function generateMetadata({
   params: Promise<{ code: string }>
 }): Promise<Metadata> {
   const { code } = await params
-  const { pages, site } = await getDict()
+  const lang = await getLang()
+  const [state, { pages, site }] = await Promise.all([readPublicSeason(code, lang), getDict()])
   return pageMeta({
-    lang: await getLang(),
+    lang,
     path: `${ROUTES.publicSeason}/${code}`,
-    title: pages.publicTitle,
+    // ideaTitle, not defaultSeasonTitle: a publication has no month in its name on purpose -
+    // an idea is taken for what to fill a month with, and whose month it was is beside the
+    // point (see "The showcase: publishing").
+    title: state.status === 'ok' ? ideaTitle(state.season.template, lang) : pages.publicTitle,
     description: pages.publicDescription,
     siteName: site.brand,
     ogAlt: site.ogAlt,

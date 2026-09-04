@@ -261,7 +261,9 @@ export async function removeUserSeason(value: string): Promise<LibraryStatus> {
   return 'error'
 }
 
-export async function readSharedSeason(value: string): Promise<UserSeasonState> {
+// Wrapped in cache() for the same reason readUserSeason is: within one request both
+// generateMetadata and the page ask for the season, and the query must go out once.
+export const readSharedSeason = cache(async (value: string): Promise<UserSeasonState> => {
   const token = tokenOrNull(value)
   if (!token) return { status: 'missing' }
 
@@ -290,7 +292,7 @@ export async function readSharedSeason(value: string): Promise<UserSeasonState> 
       shareToken: token,
     },
   }
-}
+})
 
 export async function refreshShareToken(
   value: string,

@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { auth } from './auth'
 import { query } from './db'
 import { logger } from './logger'
@@ -54,15 +55,16 @@ interface Row {
   favorited: boolean
 }
 
-export async function readPublicSeason(value: string, lang: Lang): Promise<PublicSeasonState> {
-  const code = codeOrNull(value)
-  if (!code) return { status: 'missing' }
+export const readPublicSeason = cache(
+  async (value: string, lang: Lang): Promise<PublicSeasonState> => {
+    const code = codeOrNull(value)
+    if (!code) return { status: 'missing' }
 
-  const session = await auth()
-  const me = session?.accountKey ?? ''
-  const result = await query<Row>(
-    'public:read',
-    `select p.code, p.content, p.names, p.palette, p.icon_set, p.language, p.fill_id, p.rolling_month,
+    const session = await auth()
+    const me = session?.accountKey ?? ''
+    const result = await query<Row>(
+      'public:read',
+      `select p.code, p.content, p.names, p.palette, p.icon_set, p.language, p.fill_id, p.rolling_month,
             p.author_key, p.hidden_at, p.blocked_at,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes,
             exists(select 1 from public_likes l
@@ -72,37 +74,38 @@ export async function readPublicSeason(value: string, lang: Lang): Promise<Publi
             exists(select 1 from public_favorites f
                     where f.public_id = p.id and f.account_key = $2) as favorited
        from public_seasons p where p.code = $1 and p.language = $3`,
-    [code, me, lang],
-  )
-  if (result.status !== 'ok') {
-    logger.error('public season not read', { code, reason: result.status })
-    return { status: 'error' }
-  }
+      [code, me, lang],
+    )
+    if (result.status !== 'ok') {
+      logger.error('public season not read', { code, reason: result.status })
+      return { status: 'error' }
+    }
 
-  const row = result.rows[0]
-  if (!row) return { status: 'missing' }
-  if (row.blocked_at) return { status: 'missing' }
+    const row = result.rows[0]
+    if (!row) return { status: 'missing' }
+    if (row.blocked_at) return { status: 'missing' }
 
-  const template = joinSeason(row.content, row.names)
-  return {
-    status: 'ok',
-    season: {
-      code: row.code,
-      template: row.rolling_month ? withTargetMonth(template) : template,
-      palette: knownPalette(row.palette),
-      iconSet: knownIconSet(row.icon_set),
-      lang: knownLang(row.language),
-      fillId: row.fill_id,
-      mine: Boolean(row.author_key) && row.author_key === session?.accountKey,
-      system: !row.author_key,
-      hidden: Boolean(row.hidden_at),
-      likes: row.likes,
-      liked: row.liked,
-      reported: row.reported,
-      favorited: row.favorited,
-    },
-  }
-}
+    const template = joinSeason(row.content, row.names)
+    return {
+      status: 'ok',
+      season: {
+        code: row.code,
+        template: row.rolling_month ? withTargetMonth(template) : template,
+        palette: knownPalette(row.palette),
+        iconSet: knownIconSet(row.icon_set),
+        lang: knownLang(row.language),
+        fillId: row.fill_id,
+        mine: Boolean(row.author_key) && row.author_key === session?.accountKey,
+        system: !row.author_key,
+        hidden: Boolean(row.hidden_at),
+        likes: row.likes,
+        liked: row.liked,
+        reported: row.reported,
+        favorited: row.favorited,
+      },
+    }
+  },
+)
 
 export async function noteFork(value: string): Promise<void> {
   const code = codeOrNull(value)
