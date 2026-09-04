@@ -11,6 +11,9 @@ interface SectionBoxProps {
   bodyClassName?: string
   labelId?: string
   id?: string
+  // The poster keeps the label a plain span: it prints, and its sections are not a page
+  // outline. Site pages opt in, because there the badge IS the heading of the page.
+  heading?: 'h1' | 'h2'
 }
 
 export function SectionBox({
@@ -22,7 +25,10 @@ export function SectionBox({
   bodyClassName,
   labelId,
   id,
+  heading,
 }: SectionBoxProps) {
+  const Label = heading ?? 'span'
+
   return (
     <div
       id={id}
@@ -33,7 +39,9 @@ export function SectionBox({
         <div className={styles.head}>
           {label && (
             <Badge accent={accent} className={styles.badge}>
-              <span id={labelId}>{label}</span>
+              <Label className={styles.label} id={labelId}>
+                {label}
+              </Label>
             </Badge>
           )}
           {note && <span className={styles.note}>{note}</span>}

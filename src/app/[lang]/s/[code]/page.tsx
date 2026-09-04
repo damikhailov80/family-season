@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Toast } from '../../../../components/site/Toast'
+import { fill } from '../../../../i18n/fill'
 import { getDict, getLang } from '../../../../i18n/server'
 import { iconSetOrNull } from '../../../../model/icons'
-import { ideaTitle } from '../../../../model/library'
+import { ideaDescription, ideaTitle } from '../../../../model/library'
 import { pageMeta } from '../../../../model/meta'
 import { paletteOrNull } from '../../../../model/palettes'
 import { ROUTES } from '../../../../model/site'
@@ -19,14 +20,22 @@ export async function generateMetadata({
   const { code } = await params
   const lang = await getLang()
   const [state, { pages, site }] = await Promise.all([readPublicSeason(code, lang), getDict()])
+  const season = state.status === 'ok' ? state.season : null
+
   return pageMeta({
     lang,
     path: `${ROUTES.publicSeason}/${code}`,
     // ideaTitle, not defaultSeasonTitle: a publication has no month in its name on purpose -
     // an idea is taken for what to fill a month with, and whose month it was is beside the
     // point (see "The showcase: publishing").
-    title: state.status === 'ok' ? ideaTitle(state.season.template, lang) : pages.publicTitle,
-    description: pages.publicDescription,
+    title: season
+      ? fill(pages.publicTitleOf, { title: ideaTitle(season.template, lang) })
+      : pages.publicTitle,
+    // The description is built from the season itself: one shared phrase on every publication
+    // is a duplicate, and search engines throw duplicates away.
+    description: season
+      ? fill(pages.publicDescriptionOf, { text: ideaDescription(season.template, lang) })
+      : pages.publicDescription,
     siteName: site.brand,
     ogAlt: site.ogAlt,
     alternates: 'self',

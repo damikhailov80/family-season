@@ -1405,6 +1405,8 @@ Google puts next to it in search results. The same generated-assets genre as the
 | `metadataBase` and the icon list | `src/app/[lang]/layout.tsx` |
 | robots.txt, sitemap.xml | `src/app/robots.ts`, `src/app/sitemap.ts` |
 | The alt text of the picture | `site.ogAlt` in the dictionaries |
+| The structured data | `src/components/site/StructuredData.tsx` |
+| A publication's own description | `ideaDescription` in `src/model/library.ts` |
 
 - **A dotted address used to serve the landing page with code 200, and that is what left Google
   without an icon.** `proxy` lets any path containing a dot through untouched — static files must
@@ -1435,8 +1437,11 @@ Google puts next to it in search results. The same generated-assets genre as the
   did. A private link travels through a messenger, whose server fetches the page: family names
   have no business in Telegram's cache.
 - **There are three pictures, one per language** (`public/og-<lang>.png`): there is a phrase on
-  the picture, and it is taken from `site.description` — the script imports the dictionaries
-  directly, so a second copy of the strings does not appear.
+  the picture, and it is `landing.heroLead` — **not** `site.description`. The card is the first
+  thing a person reads about the project, and the phrase written for exactly that job is the one
+  on the landing page. The script imports the dictionaries directly, so a second copy of the
+  strings does not appear; change the lead and rerun `npm run og`, then look at the picture —
+  a phrase that no longer fits is visible nowhere else.
 - **The fonts are inlined into the page as data URIs** rather than linked. A linked face loads
   asynchronously, and a screenshot taken a moment early would silently come out in a system font —
   which is not visible in the code, only on the picture. The css2 answer keeps its `unicode-range`
@@ -1454,16 +1459,60 @@ Google puts next to it in search results. The same generated-assets genre as the
   so `/en/s/<code of a Russian season>` is a 404 — and promising a crawler translations that
   answer 404 is not allowed. Everything open on all three (`/`, `/ideas`, `/privacy`) carries
   three `hreflang` plus `x-default` on Russian.
-- **The sitemap does not list published seasons.** That would need the database, and a quiet
-  database must not take a page down — the same rule that keeps the migration out of the build.
-  The way into the showcase is `/ideas`.
+- **The sitemap does not list people's publications, but it does list our examples.** A person's
+  publication would need the database, and a quiet database must not take a page down — the same
+  rule that keeps the migration out of the build; the way to those is `/ideas`. An example is a
+  different matter: its code comes from the `PUBLIC_IDS` table, so the list is assembled without a
+  single query. Such a row carries **no** language alternates, for the same reason its page is
+  built with `alternates: 'self'`.
+- **There is no `lastModified` in the map, and that is a decision.** Nothing on this site carries
+  the date a page was changed, and a date computed while the map is being rendered would say
+  "just now" for ever. A field that always lies is worse than a missing one.
+- **`Disallow` in robots.txt must carry the language.** Every real address is `/ru/seasons`, and
+  robots.txt matches from the root: the old bare `/seasons` matched nothing at all, and the
+  private pages were held out of the index by their `noindex` alone while the crawler kept
+  walking them. Hence `/*/seasons` — the `*` stands for the language segment. Only `/api/` is
+  written plain; it is the one path without a language.
+- **A publication describes itself.** Every `/s/<code>` used to carry one and the same
+  `pages.publicDescription`, and search engines throw duplicates away. The text is now built from
+  the season by `ideaDescription`: the goal of the month and the week lines, empty fields skipped
+  — four copies of one placeholder read as a bug, not as a season. No extra query: the content is
+  already in hand when the metadata is assembled.
+- **The site says in `application/ld+json` that it is an application.** The brand collides head-on
+  with television vocabulary — "season" is *the* word for it, and the search results for both
+  "family season" and "Семейный сезон" are IMDb, Wikipedia and the streaming services. Prose
+  cannot settle that; the graph can: `Organization` and `WebSite` in the root layout, plus
+  `WebApplication` on the landing page with `applicationCategory`, `isAccessibleForFree` and a
+  zero-price `offers`. That is what `site.alternateName` in the dictionaries is for as well — the
+  brand paired with what it actually is.
+- **We do not fight for the brand query itself.** A domain with no age and no links will not
+  displace IMDb, and there is no audience behind that query: whoever types "family season" is
+  looking for a series. The words the site is written in — planner, plan for the month, print,
+  free — are the ones people actually search, and they belong in `title`, `description` and the
+  headings. This does not cancel the product vocabulary from "Conventions": "сезон" and "постер"
+  stay, they simply stopped being the only words on the page.
+- **A page must have an outline, and the badge is not one by itself.** `SectionBox` renders its
+  label as a plain `<span>`, which left the landing page with an `<h1>` and eleven `<h3>`s and
+  `/ideas` with no `<h1>` at all. The label becomes a heading only where a page asks for it —
+  the `heading` prop, `'h1'` on `/ideas`, `'h2'` on the landing sections. **The poster keeps the
+  span**: it prints, its sections are not a page outline, and a heading there would have to be
+  measured against the two-page budget for nothing. `.label { font: inherit }` keeps a heading
+  looking exactly like the span did.
+- **The `<h1>` of the landing page carries meaning, not only the brand.** It was the bare
+  `heroTitle`, i.e. the strongest signal on the page spent on a word we are not competing for.
+  It is now two spans — the brand in the hand font as before, and `heroTitleTail` under it in the
+  interface font. The rays flank the whole block, so they sit a little lower than they did; that
+  is accepted.
 - **The address of the site is not written a second time.** `metadataBase` is built from
   `SITE_URL`, i.e. from the same `tools/qr/source.json` the QR is built from.
 
 Verified by: `e2e/site/meta.spec.ts` — the icon is a picture and not a page, an address that is
 not a language is not the landing page, a link carries a preview, a page knows its canonical
-address and its translations, and a personal page stays out of the index without losing its
-preview.
+address and its translations, a personal page stays out of the index without losing its preview
+and is closed to the crawler together with its language, the map lists our examples in their own
+language only, the landing page names itself an application rather than a television season, a
+publication describes itself rather than publications in general, and both the landing page and
+the showcase have a heading of their own.
 
 ## Inline editing
 

@@ -13,6 +13,7 @@ export async function Community() {
     <SectionBox
       accent="projects"
       label={landing.communityLabel}
+      heading="h2"
       note={landing.communityNote}
       className={styles.section}
     >

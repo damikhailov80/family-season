@@ -41,7 +41,7 @@ export default async function IdeasPage({
 
   return (
     <PaperSheet>
-      <SectionBox accent="theme" label={dict.ideas.heading} className={styles.section}>
+      <SectionBox accent="theme" label={dict.ideas.heading} heading="h1" className={styles.section}>
         <p className={styles.text}>{dict.ideas.lead}</p>
 
         {state.status === 'ok' &&

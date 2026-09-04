@@ -40,6 +40,13 @@
 }
 
 .title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand {
   font-family: var(--font-hand);
   font-weight: 700;
   font-size: clamp(38px, 7vw, 66px);
@@ -47,6 +54,14 @@
   color: var(--accent-deep);
   text-transform: uppercase;
   letter-spacing: 0.01em;
+}
+
+.tail {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: clamp(15px, 2.2vw, 20px);
+  line-height: 1.2;
+  color: var(--ink-soft);
 }
 
 .ribbon {

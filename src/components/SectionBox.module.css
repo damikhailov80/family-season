@@ -22,6 +22,11 @@
   pointer-events: auto;
 }
 
+/* The label may be a heading on site pages; a heading must look exactly like the span did. */
+.label {
+  font: inherit;
+}
+
 .note {
   font-family: var(--font-hand);
   font-size: 19px;

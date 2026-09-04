@@ -12,6 +12,11 @@ import { DICTS } from '../../src/i18n/dict'
 
 const content = (html: string, pattern: RegExp) => html.match(pattern)?.[1]
 
+// A short code is a permutation of the row id and is promised to be permanent, so the address
+// of our first example is written out rather than computed: a test that recomputes the answer
+// with the function under test asserts nothing.
+const RU_EXAMPLE = '/ru/s/ydkgax'
+
 test.describe('the site says what it is to a crawler', () => {
   test('the icon is served as a picture, not as a page', async ({ request }) => {
     const response = await request.get('/favicon.ico')
@@ -64,5 +69,70 @@ test.describe('the site says what it is to a crawler', () => {
     expect(xml).toContain('<loc>https://www.familyseason.online/en/ideas</loc>')
     expect(xml).toContain('<loc>https://www.familyseason.online/pl/ideas</loc>')
     expect(xml).not.toContain('/seasons')
+  })
+
+  test('the map of the site lists our examples, and only in their own language', async ({
+    request,
+  }) => {
+    const xml = await (await request.get('/sitemap.xml')).text()
+
+    expect(xml).toContain(`<loc>https://www.familyseason.online${RU_EXAMPLE}</loc>`)
+    expect(xml).toContain('<loc>https://www.familyseason.online/pl/s/tab14z</loc>')
+    expect(xml).not.toContain('https://www.familyseason.online/en/s/ydkgax')
+  })
+
+  test('a personal page is closed to a crawler together with its language', async ({ request }) => {
+    const txt = await (await request.get('/robots.txt')).text()
+
+    expect(txt).toContain('Disallow: /*/seasons')
+    expect(txt).toContain('Disallow: /*/account')
+    expect(txt).toContain('Disallow: /*/sheet')
+    expect(txt).toContain('Disallow: /*/p/')
+    expect(txt).toContain('Disallow: /*/season/')
+  })
+
+  test('the landing page names itself an application, not a television season', async ({
+    request,
+  }) => {
+    const html = await (await request.get('/ru')).text()
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(
+      (found) => JSON.parse(found[1]),
+    )
+
+    const graph = blocks.flatMap((block) => block['@graph'] ?? [block])
+    const app = graph.find((node) => node['@type'] === 'WebApplication')
+    const site = graph.find((node) => node['@type'] === 'WebSite')
+
+    expect(app.applicationCategory).toBe('LifestyleApplication')
+    expect(app.isAccessibleForFree).toBe(true)
+    expect(app.offers.price).toBe('0')
+    expect(site.alternateName).toBe(DICTS.ru.site.alternateName)
+  })
+
+  test('a publication describes itself, not publications in general', async ({ request }) => {
+    const html = await (await request.get(RU_EXAMPLE)).text()
+
+    const description = content(html, /name="description" content="([^"]+)"/)!
+    expect(description).not.toBe(DICTS.ru.pages.publicDescription)
+    expect(description.startsWith('План месяца для семьи: ')).toBe(true)
+    expect(content(html, /<title>([^<]+)<\/title>/)).toContain('план месяца | Семейный сезон')
+  })
+})
+
+test.describe('the page has a readable outline', () => {
+  test('the landing page is headed by what the site is, not only by its name', async ({ page }) => {
+    await page.goto('/ru')
+
+    const h1 = page.getByRole('heading', { level: 1 })
+    await expect(h1).toHaveCount(1)
+    await expect(h1).toContainText(DICTS.ru.landing.heroTitle)
+    await expect(h1).toContainText(DICTS.ru.landing.heroTitleTail)
+    await expect(page.getByRole('heading', { level: 2 })).not.toHaveCount(0)
+  })
+
+  test('the showcase has a heading of its own', async ({ page }) => {
+    await page.goto('/ru/ideas')
+
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(DICTS.ru.ideas.heading)
   })
 })

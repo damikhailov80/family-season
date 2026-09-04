@@ -8,6 +8,7 @@ import { Hero } from '../../components/landing/Hero'
 import { Inside } from '../../components/landing/Inside'
 import { Steps } from '../../components/landing/Steps'
 import { PaperSheet } from '../../components/PaperSheet'
+import { AppSchema } from '../../components/site/StructuredData'
 
 export async function generateMetadata(): Promise<Metadata> {
   const { landing, site } = await getDict()
@@ -29,6 +30,7 @@ export default function Page() {
       <Inside />
       <Examples />
       <Community />
+      <AppSchema />
     </PaperSheet>
   )
 }

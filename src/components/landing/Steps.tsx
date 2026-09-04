@@ -17,6 +17,7 @@ export async function Steps() {
     <SectionBox
       accent="weeks"
       label={landing.stepsLabel}
+      heading="h2"
       note={landing.stepsNote}
       className={styles.section}
     >

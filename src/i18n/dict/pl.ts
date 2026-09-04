@@ -153,18 +153,19 @@ export const pl: Dict = {
   },
 
   landing: {
-    title: 'Sezon rodzinny — plakat przyszłego miesiąca twojej rodziny',
+    title: 'Planer rodzinny na miesiąc do druku — za darmo | Sezon rodzinny',
     description:
-      'Co czeka was w przyszłym miesiącu: złóżcie plakat nowego sezonu rodzinnego, wydrukujcie na dwóch kartkach A4 i powieście na lodówce.',
+      'Darmowy planer rodzinny na miesiąc: co robicie razem, kto się czym zajmuje, cel miesiąca. Złóżcie online, wydrukujcie na A4 i powieście na lodówce.',
 
     heroTitle: 'Sezon rodzinny',
+    heroTitleTail: 'planer na miesiąc dla całej rodziny',
     heroRibbon: 'Nowy sezon co miesiąc',
     heroLead:
-      'Plakat przyszłego miesiąca waszej rodziny: czym się zajmiecie, czego spróbujecie, dokąd pójdziecie i kto się czego podjął. Złóżcie go wcześniej, wydrukujcie i powieście na lodówce.',
+      'Zaplanujcie przyszły miesiąc razem: co zrobicie, czego spróbujecie, dokąd pójdziecie i kto się czym zajmie. Wydrukujcie na dwóch kartkach A4 i powieście na lodówce — za darmo, bez rejestracji.',
     heroHand: 'Nie lista zadań, a afisz: miesiąc, który chce się przeżyć.',
     heroJump: 'Zobacz przykłady ↓',
 
-    stepsLabel: 'Jak złożyć sezon',
+    stepsLabel: 'Jak złożyć plan miesiąca',
     stepsNote: 'cztery kroki',
     steps: [
       {
@@ -185,7 +186,7 @@ export const pl: Dict = {
       },
     ],
 
-    insideLabel: 'Co jest na plakacie',
+    insideLabel: 'Co jest w planerze',
     insideNote: 'dwie strony A4',
     parts: [
       {
@@ -215,7 +216,7 @@ export const pl: Dict = {
     insideFootnote:
       'Drukuje się zawsze czysty plakat: skale na zerze, kratki nastrojów puste, pola na notatki wolne. Resztę wpisze sam miesiąc, odręcznie.',
 
-    examplesLabel: 'Przykłady',
+    examplesLabel: 'Przykłady planów rodzinnych',
     examplesNote: 'trzy sezony, każdy inny',
     exampleOpen: 'Otwórz przykład →',
     examplesAsideTitle: 'Weźcie za podstawę',
@@ -325,9 +326,9 @@ export const pl: Dict = {
   },
 
   ideas: {
-    title: 'Pomysły społeczności — Sezon rodzinny',
+    title: 'Pomysły: co robić z rodziną w tym miesiącu | Sezon rodzinny',
     description:
-      'Witryna sezonów, którymi podzieliły się rodziny: cudze miesiące, pomysły i wątki.',
+      'Gotowe plany miesiąca od innych rodzin: „Miesiąc wody”, „Miesiąc bez ekranów”, projekty na czworo. Otwórzcie, zmieńcie pod siebie i wydrukujcie.',
     heading: 'Pomysły społeczności',
     lead: 'Najtrudniejsze w plakacie jest wymyślić, czym zająć miesiąc. Łatwiej, gdy widzisz, jak zrobili to inni: czyjś „Miesiąc wody”, czyjś „Miesiąc bez ekranów”, czyjeś projekty na czworo. Każdy sezon stąd można otworzyć i skopiować pod swoją rodzinę.',
     note: 'Sezony wystawiają same rodziny — przyciskiem z megafonem na swoim sezonie. Pokazujemy za każdym razem losowe: tak nowy ma szansę wpaść w oko, a nie utonąć pod tymi, które już widać. Zobaczyłeś reklamę, grubiaństwo albo cudze dane osobowe — naciśnij flagę: takie sezony zdejmujemy z witryny.',
@@ -404,6 +405,8 @@ export const pl: Dict = {
       'Przepisz sezon pod swoją rodzinę: bohaterowie, tygodnie, projekty i cel miesiąca.',
     publicTitle: 'Sezon — Sezon rodzinny',
     publicDescription: 'Wystawiony sezon: cudzy miesiąc w całości, z wątkami i celem.',
+    publicTitleOf: '{title} — plan miesiąca | Sezon rodzinny',
+    publicDescriptionOf: 'Plan miesiąca dla rodziny: {text}',
     publicError: 'Nie udało się otworzyć sezonu — błąd serwera.',
     sharedTitle: 'Sezon z linku — Sezon rodzinny',
     sharedDescription: 'Sezon rodzinny, którym się z tobą podzielono: obejrzyj i weź dla siebie.',
@@ -476,9 +479,10 @@ export const pl: Dict = {
 
   site: {
     brand: 'Sezon rodzinny',
+    alternateName: 'Sezon rodzinny — planer na miesiąc dla rodziny',
     ogAlt: 'Plakat sezonu rodzinnego: znak i nazwa strony',
     description:
-      'Plakat rodzinnego miesiąca: drukuje się na dwóch kartkach A4 i żyje w twojej kolekcji.',
+      'Planer na miesiąc dla całej rodziny: złóżcie, wydrukujcie na dwóch kartkach A4 i powieście na lodówce.',
     navAria: 'Sekcje strony',
     home: 'Główna',
     ideas: 'Pomysły społeczności',

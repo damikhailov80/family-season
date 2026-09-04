@@ -13,6 +13,7 @@ export async function Examples() {
     <SectionBox
       accent="goal"
       label={landing.examplesLabel}
+      heading="h2"
       note={landing.examplesNote}
       id="examples"
       className={styles.section}

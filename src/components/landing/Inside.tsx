@@ -14,6 +14,7 @@ export async function Inside() {
     <SectionBox
       accent="theme"
       label={landing.insideLabel}
+      heading="h2"
       note={landing.insideNote}
       className={styles.section}
     >

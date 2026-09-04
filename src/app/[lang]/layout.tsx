@@ -8,6 +8,7 @@ import { ConsentGate } from '../../components/site/ConsentGate'
 import { LangSync } from '../../components/site/LangSync'
 import { SiteFooter } from '../../components/site/SiteFooter'
 import { SiteHeader } from '../../components/site/SiteHeader'
+import { SiteSchema } from '../../components/site/StructuredData'
 import { LangProvider } from '../../i18n/LangProvider'
 import { getDict, getLang } from '../../i18n/server'
 import { LANG_PATH_HEADER, LANG_SOURCE_HEADER, LANGS, langOrNull } from '../../model/lang'
@@ -98,6 +99,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <ClaimDraft />
             <LangSync lang={lang} saved={saved} />
             <ConsentGate />
+            <SiteSchema />
           </LangProvider>
         </div>
       </body>

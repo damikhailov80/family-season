@@ -25,6 +25,21 @@ export function ideaTitle(template: Template, lang: Lang): string {
   )
 }
 
+const DESCRIPTION_LIMIT = 130
+
+// Every publication used to carry one and the same description from the dictionary, and search
+// engines drop duplicates. The season itself has plenty to say: the goal of the month and what
+// happens in the weeks. Empty fields are skipped rather than filled with placeholders - four
+// copies of one placeholder read as a bug, not as a season.
+export function ideaDescription(template: Template, lang: Lang): string {
+  const parts = [template.goal, ...template.weeks.map((week) => week.text)]
+    .map((one) => one.trim())
+    .filter(Boolean)
+
+  const line = (parts.length ? parts : [posterText(lang).placeholders.goal]).join(' · ')
+  return line.length > DESCRIPTION_LIMIT ? `${line.slice(0, DESCRIPTION_LIMIT).trimEnd()}…` : line
+}
+
 export function libraryText(
   lang: Lang,
   status: Exclude<LibraryStatus, 'ok' | 'anonymous'>,

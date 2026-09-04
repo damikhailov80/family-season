@@ -153,18 +153,19 @@ export const en: Dict = {
   },
 
   landing: {
-    title: 'Family Season — next month’s poster for your family',
+    title: 'Printable family planner for the month — free | Family Season',
     description:
-      'What is ahead for you and your family next month: build the poster of a new family season, print it on two A4 sheets and put it on the fridge.',
+      'A free printable family planner for the month: what you’ll do together, who takes what, the goal of the month. Build it online, print on A4, put it on the fridge.',
 
     heroTitle: 'Family Season',
+    heroTitleTail: 'a printable family planner for the month',
     heroRibbon: 'A new season every month',
     heroLead:
-      'Next month’s poster for your family: what you will do, what you will try, where you will go and who has taken on what. Build it ahead of time, print it and put it on the fridge.',
+      'Plan next month together: what you will do, what you will try, where you will go and who has taken on what. Print it on two A4 sheets and put it on the fridge — free, no sign-up.',
     heroHand: 'Not a to-do list but a playbill: a month worth living.',
     heroJump: 'See the examples ↓',
 
-    stepsLabel: 'How to build a season',
+    stepsLabel: 'How to build the plan',
     stepsNote: 'four steps',
     steps: [
       {
@@ -185,7 +186,7 @@ export const en: Dict = {
       },
     ],
 
-    insideLabel: 'What is on the poster',
+    insideLabel: 'What is in the planner',
     insideNote: 'two A4 pages',
     parts: [
       {
@@ -215,7 +216,7 @@ export const en: Dict = {
     insideFootnote:
       'What prints is always a clean poster: scales at zero, mood cells empty, note fields free. The month itself fills in the rest, by hand.',
 
-    examplesLabel: 'Examples',
+    examplesLabel: 'Family plan examples',
     examplesNote: 'three seasons, all different',
     exampleOpen: 'Open the example →',
     examplesAsideTitle: 'Take one as a starting point',
@@ -325,9 +326,9 @@ export const en: Dict = {
   },
 
   ideas: {
-    title: 'Community Ideas — Family Season',
+    title: 'Ideas: what to do as a family this month | Family Season',
     description:
-      'A showcase of seasons families have shared: other people’s months, ideas and storylines.',
+      'Ready-made month plans from other families: a “Month of Water”, a “Month with No Screens”, projects for four. Open one, change it for you and print it.',
     heading: 'Community Ideas',
     lead: 'The hardest part of the poster is deciding what to fill the month with. It is easier when you see how others did it: somebody’s “Month of Water”, somebody’s “Month Without Screens”, somebody’s storylines for four. Any season here can be opened and forked for your own family.',
     note: 'Families put the seasons here themselves — with the megaphone button on their own season. We show a random set every time: that way a new one has a chance to catch your eye instead of drowning under the ones already visible. If you see an ad, rudeness or someone else’s personal data, press the flag: we take such seasons off the showcase.',
@@ -404,6 +405,8 @@ export const en: Dict = {
       'Rewrite the season for your family: characters, weeks, projects and the goal of the month.',
     publicTitle: 'A season — Family Season',
     publicDescription: 'A published season: somebody’s month in full, with storylines and a goal.',
+    publicTitleOf: '{title} — a family month plan | Family Season',
+    publicDescriptionOf: 'A family plan for the month: {text}',
     publicError: 'Could not open the season — a server error.',
     sharedTitle: 'A season by link — Family Season',
     sharedDescription: 'A family season shared with you: take a look and take it for yourself.',
@@ -477,9 +480,10 @@ export const en: Dict = {
 
   site: {
     brand: 'Family Season',
+    alternateName: 'Family Season — printable family planner',
     ogAlt: 'Family Season poster: the mark and the site name',
     description:
-      'A poster of your family month: prints on two A4 sheets and lives in your collection.',
+      'A family planner for the month: build it, print it on two A4 sheets and put it on the fridge.',
     navAria: 'Site sections',
     home: 'Home',
     ideas: 'Community Ideas',
