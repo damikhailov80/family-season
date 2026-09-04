@@ -71,6 +71,9 @@ export default async function PrivacyPage() {
         <h2 className={styles.head}>{privacy.cookiesHead}</h2>
         <Text>{privacy.cookiesText}</Text>
 
+        <h2 className={styles.head}>{privacy.analyticsHead}</h2>
+        <Text>{privacy.analyticsText}</Text>
+
         <h2 className={styles.head}>{privacy.deleteHead}</h2>
         <Text>{privacy.deleteText}</Text>
 

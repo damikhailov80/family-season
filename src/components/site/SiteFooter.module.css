@@ -61,6 +61,31 @@
   outline-offset: 2px;
 }
 
+/*
+ * «Куки» — кнопка, а не ссылка: она открывает разговор о согласии заново, а не
+ * ведёт на страницу. Выглядеть при этом обязана как соседка, поэтому правила
+ * `.link` она делит с ней, а сбрасывает только кнопочные умолчания браузера.
+ */
+.linkButton {
+  padding: 0;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink-muted) 35%, transparent);
+  background: none;
+  font: inherit;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.linkButton:hover {
+  color: var(--ink-soft);
+  border-bottom-color: var(--ink-soft);
+}
+
+.linkButton:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
 @media print {
   .footer {
     display: none;

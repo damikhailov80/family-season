@@ -1,0 +1,95 @@
+/*
+ * Полоса во всю ширину внизу окна.
+ *
+ * `z-index: 36` — своё место в общей лестнице слоёв сайта: липкий тулбар
+ * постера 20, плавающие кнопки 30, меню языков 35, **баннер 36**, тост 40.
+ * Выше меню языков, потому что вопрос задан и загораживать его выпадающим
+ * списком незачем; ниже тоста намеренно — тост говорит о том, что случилось
+ * только что, и он важнее вопроса, который висит и подождёт.
+ */
+.banner {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 36;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 14px 16px;
+  border-top: var(--border-w) solid var(--accent-deep);
+  background: var(--surface);
+  font-family: var(--font-ui);
+}
+
+.text {
+  flex: 1 1 320px;
+  max-width: 620px;
+}
+
+.title {
+  margin: 0 0 2px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent-deep);
+}
+
+.note {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.more {
+  color: var(--accent-deep);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--accent-deep) 40%, transparent);
+  white-space: nowrap;
+}
+
+.more:hover {
+  border-bottom-color: var(--accent-deep);
+}
+
+.actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 10px;
+}
+
+/*
+ * Кнопки одинаковые, и это правило, а не оформление: отказ обязан быть не
+ * труднее согласия. Разведи мы их на «действие» и «отказ», как в окнах, —
+ * согласие перестало бы быть свободным.
+ */
+.button {
+  padding: 9px 18px;
+  border: var(--border-w) solid var(--accent-deep);
+  border-radius: var(--radius-box);
+  background: var(--surface);
+  color: var(--accent-deep);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: color-mix(in srgb, var(--accent-deep) 10%, transparent);
+}
+
+.button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+}
+
+/* Экранный контрол на бумагу не идёт — общее правило обвязки сайта. */
+@media print {
+  .banner {
+    display: none;
+  }
+}

@@ -3,6 +3,7 @@ import { Caveat, Marck_Script, Nunito } from 'next/font/google'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { ClaimDraft } from '../../components/site/ClaimDraft'
+import { ConsentGate } from '../../components/site/ConsentGate'
 import { LangSync } from '../../components/site/LangSync'
 import { SiteFooter } from '../../components/site/SiteFooter'
 import { SiteHeader } from '../../components/site/SiteHeader'
@@ -110,6 +111,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {/* Язык, определённый по браузеру, доезжает до базы отсюда: писать
                 при рендере серверный компонент не имеет права, а действие — да. */}
             <LangSync lang={lang} saved={saved} />
+            {/* Согласие на аналитику: сам счётчик и разговор о нём. Место ему
+                здесь по той же причине, что и `ClaimDraft`, — вопрос один на
+                весь сайт, и задать его надо на той странице, куда человек
+                пришёл, а не на какой-то одной. */}
+            <ConsentGate />
           </LangProvider>
         </div>
       </body>

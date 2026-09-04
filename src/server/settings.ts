@@ -2,6 +2,7 @@ import { cache } from 'react'
 import { auth } from './auth'
 import { query } from './db'
 import { logger } from './logger'
+import { CONSENT_VERSION, consentFromRow, type Consent } from '../model/consent'
 import { DEFAULT_FAMILY, normalizeFamily, type FamilyPreset } from '../model/family'
 import { langOrNull, type Lang } from '../model/lang'
 
@@ -20,9 +21,12 @@ import { langOrNull, type Lang } from '../model/lang'
 interface Row {
   family: unknown
   language: unknown
+  consent: unknown
+  consent_version: unknown
 }
 
-const SELECT = 'select family, language from user_settings where account_key = $1'
+const SELECT =
+  'select family, language, consent, consent_version from user_settings where account_key = $1'
 
 /**
  * Строка настроек читается **одна на запрос** и разными потребителями: шапке
@@ -64,6 +68,19 @@ export const readLanguage = cache(async (): Promise<Lang | null> => {
 })
 
 /**
+ * Согласие на аналитику — или `null`, если его ещё не спрашивали.
+ *
+ * `null` здесь, как и у языка, значит **«не спрашивали»**, а не «запрещено»: по
+ * нему баннер понимает, что вопрос ещё не задан. Записанная версия старше
+ * текущей читается тем же `null` — согласие на прежний набор целей новым целям
+ * не указ (см. `CONSENT_VERSION`).
+ */
+export const readConsentSetting = cache(async (): Promise<Consent | null> => {
+  const row = await readSettings()
+  return row ? consentFromRow(row.consent, row.consent_version) : null
+})
+
+/**
  * Почему настроек может не быть.
  *
  * `stale` — человек вошёл, но в его токене нет `accountKey`: сессия выпущена
@@ -79,7 +96,7 @@ export type FamilyStatus = 'anonymous' | 'stale' | 'error' | 'ok'
 
 export type FamilyState =
   | { status: 'anonymous' | 'stale' | 'error' }
-  | { status: 'ok'; family: FamilyPreset | null; language: Lang | null }
+  | { status: 'ok'; family: FamilyPreset | null; language: Lang | null; consent: Consent | null }
 
 /** То же чтение, но с причиной пустоты — для кабинета. */
 export async function familyState(): Promise<FamilyState> {
@@ -96,6 +113,7 @@ export async function familyState(): Promise<FamilyState> {
     status: 'ok',
     family: row ? normalizeFamily(row.family) : null,
     language: row ? langOrNull(row.language) : null,
+    consent: row ? consentFromRow(row.consent, row.consent_version) : null,
   }
 }
 
@@ -147,6 +165,39 @@ export async function writeLanguage(language: Lang): Promise<FamilyStatus> {
   if (result.status === 'ok') return 'ok'
 
   logger.error('language setting not saved', {
+    accountKey: session.accountKey,
+    reason: result.status,
+  })
+  return 'error'
+}
+
+/**
+ * Записывает согласие — тем же складом, что и язык, и по той же причине:
+ * общий upsert затирал бы соседнюю настройку значением, прочитанным до правки.
+ *
+ * Пишутся все три колонки разом: ответ без версии и даты — не доказательство
+ * согласия, а просто слово. `consent_at` берётся из `now()` базы, а не из
+ * браузера: дату согласия нельзя брать с часов того, кто соглашается.
+ */
+export async function writeConsent(consent: Consent): Promise<FamilyStatus> {
+  const session = await auth()
+  if (!session?.user) return 'anonymous'
+  if (!session.accountKey) return 'stale'
+
+  const result = await query(
+    'settings:write:consent',
+    `insert into user_settings (account_key, family, consent, consent_version, consent_at, updated_at)
+     values ($1, $2::jsonb, $3, $4, now(), now())
+     on conflict (account_key) do update set
+       consent = excluded.consent,
+       consent_version = excluded.consent_version,
+       consent_at = excluded.consent_at,
+       updated_at = now()`,
+    [session.accountKey, JSON.stringify(DEFAULT_FAMILY), consent, CONSENT_VERSION],
+  )
+  if (result.status === 'ok') return 'ok'
+
+  logger.error('consent not saved', {
     accountKey: session.accountKey,
     reason: result.status,
   })

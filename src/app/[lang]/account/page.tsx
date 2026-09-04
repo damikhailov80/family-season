@@ -5,6 +5,7 @@ import { GoogleLoginButton } from '../../../components/site/GoogleLoginButton'
 import { NewSeasonAction } from '../../../components/site/NewSeasonAction'
 import { getDict, getLang } from '../../../i18n/server'
 import { fill } from '../../../i18n/fill'
+import { analyticsId } from '../../../server/consent'
 import { DEFAULT_FAMILY } from '../../../model/family'
 import { DEFAULT_LANG } from '../../../model/lang'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../../model/types'
@@ -12,6 +13,7 @@ import { auth } from '../../../server/auth'
 import { logout } from '../../../server/actions'
 import { familyState } from '../../../server/settings'
 import { Toast } from '../../../components/site/Toast'
+import { ConsentEditor } from './ConsentEditor'
 import { FamilyEditor } from './FamilyEditor'
 import { LanguageEditor } from './LanguageEditor'
 import styles from './page.module.css'
@@ -95,6 +97,19 @@ export default async function AccountPage({
             что человек видит, и `LangSync` уже записал его в базу. */}
         {state.status === 'ok' && (
           <LanguageEditor initial={state.language ?? lang} key={state.language ?? DEFAULT_LANG} />
+        )}
+
+        {/* Аналитика — настройка аккаунта, а не разовый вопрос: баннер человек
+            однажды закрыл и больше не увидит, а отзывать согласие он вправе так
+            же легко, как давал. Без счётчика отзывать нечего, и раздела нет.
+            Умолчание здесь честное, в отличие от языка и состава: `null` значит
+            «не отвечал», а не отвечал — значит, не разрешал. */}
+        {analyticsId() && state.status === 'ok' && (
+          <>
+            <h2 className={styles.head}>{dict.consent.head}</h2>
+            <p className={styles.text}>{dict.consent.text}</p>
+            <ConsentEditor initial={state.consent ?? 'denied'} key={state.consent ?? 'denied'} />
+          </>
         )}
 
         <h2 className={styles.head}>{account.familyHead}</h2>

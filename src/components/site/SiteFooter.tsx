@@ -1,5 +1,7 @@
 import Link from 'next/link'
+import { ConsentLink } from './ConsentLink'
 import { getDict, getLang } from '../../i18n/server'
+import { analyticsId } from '../../server/consent'
 import { CONTACT_EMAIL, ROUTES, withLang } from '../../model/site'
 import { HeartDoodle } from '../doodles'
 import styles from './SiteFooter.module.css'
@@ -23,6 +25,9 @@ export async function SiteFooter() {
       <Link className={styles.link} href={withLang(lang, ROUTES.privacy)}>
         {site.privacy}
       </Link>
+      {/* Отзыв согласия — единственный способ передумать для невошедшего.
+          Без счётчика отзывать нечего, и строки нет. */}
+      {analyticsId() && <ConsentLink />}
     </footer>
   )
 }

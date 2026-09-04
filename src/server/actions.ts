@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { signIn, signOut } from './auth'
 import { shareQr } from './qr'
-import { readFamily, writeFamily, writeLanguage, type FamilyStatus } from './settings'
+import { readFamily, writeConsent, writeFamily, writeLanguage, type FamilyStatus } from './settings'
 import {
   addReport,
   noteFork,
@@ -25,6 +25,13 @@ import {
 } from './userSeasons'
 import { normalizeTemplate } from '../model/codec'
 import { normalizeComment, type PublishStatus, type ReactionStatus } from '../model/community'
+import {
+  CONSENT_COOKIE,
+  CONSENT_COOKIE_MAX_AGE,
+  consentCookieValue,
+  consentOrNull,
+  type Consent,
+} from '../model/consent'
 import { normalizeFamily, templateForFamily } from '../model/family'
 import { DEFAULT_ICON_SET, knownIconSet } from '../model/icons'
 import { knownLang, LANG_COOKIE, LANG_COOKIE_MAX_AGE } from '../model/lang'
@@ -121,6 +128,62 @@ export async function saveLanguage(value: unknown): Promise<Exclude<FamilyStatus
  */
 export async function rememberLanguage(value: unknown): Promise<void> {
   await writeLanguage(knownLang(value))
+}
+
+/**
+ * Ответ на баннер согласия: кука всегда, настройка аккаунта — если человек вошёл.
+ *
+ * Кука здесь главная, а не дублирующая: решение принимают в браузере, и у
+ * невошедшего другого места нет вовсе. Ставится она отсюда, потому что действия —
+ * единственное место, кроме `proxy`, где куку можно поставить; в `document.cookie`
+ * проект не лезет нигде, и заводить это ради согласия незачем.
+ *
+ * Отказ записывается ровно так же, как согласие. «Нет» — это тоже ответ, и
+ * забыть его значило бы спрашивать снова на каждой странице, то есть давить.
+ *
+ * Редиректа нет: баннер закрывается сам, а страницу перерисовывать не за чем —
+ * `gtag` переводится в новое состояние на месте, в этом и смысл Consent Mode.
+ * Молчание базы у вошедшего кукой не отменяется: в браузере ответ сохранён, а
+ * в настройках его не оказалось — переспросим на следующем устройстве, и это
+ * честнее, чем считать несохранённое сохранённым.
+ */
+export async function saveConsent(value: unknown): Promise<void> {
+  const consent = consentOrNull(value)
+  if (!consent) return
+
+  const jar = await cookies()
+  jar.set(CONSENT_COOKIE, consentCookieValue(consent), {
+    path: '/',
+    maxAge: CONSENT_COOKIE_MAX_AGE,
+    sameSite: 'lax',
+  })
+
+  await writeConsent(consent)
+}
+
+/**
+ * То же решение, но из кабинета: там оно пересматривается, а не даётся впервые.
+ *
+ * Отличий от `saveConsent` два, и оба из-за страницы. Статус нужен значением:
+ * не записали — человек обязан узнать, иначе кабинет покажет новое значение
+ * поверх непрочитанного. А успех уезжает пометкой `?ok=1`, как у языка и
+ * состава: ему надо пережить перезагрузку.
+ */
+export async function saveConsentSetting(
+  value: unknown,
+  lang: unknown,
+): Promise<Exclude<FamilyStatus, 'ok'>> {
+  const consent: Consent = consentOrNull(value) ?? 'denied'
+  const outcome = await writeConsent(consent)
+  if (outcome !== 'ok') return outcome
+
+  const jar = await cookies()
+  jar.set(CONSENT_COOKIE, consentCookieValue(consent), {
+    path: '/',
+    maxAge: CONSENT_COOKIE_MAX_AGE,
+    sameSite: 'lax',
+  })
+  redirect(`${withLang(knownLang(lang), ROUTES.account)}?ok=1`)
 }
 
 /**

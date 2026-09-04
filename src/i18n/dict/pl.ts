@@ -443,7 +443,7 @@ export const pl: Dict = {
     dbIntro:
       'Wszystko, co tam jest, oznaczone jest nieprzejrzystym numerem twojego konta Google — w rodzaju „google:1234567890”. Ani twojego imienia z Google, ani adresu e-mail nie ma w bazie nigdzie. Rodzajów wierszy jest kilka i wszystkie pojawiają się tylko wtedy, gdy sam coś zrobiłeś.',
     dbSettings:
-      '**Ustawienia konta** — język strony i rodzina do nowych plakatów: do pięciu par „rysunek i imię”, na przykład „dorosły — Denis”. Imiona wpisujesz sam i wpisywać ich nie trzeba: bez nich ustawienie działa dokładnie tak samo.',
+      '**Ustawienia konta** — język strony i rodzina do nowych plakatów: do pięciu par „rysunek i imię”, na przykład „dorosły — Denis”. Imiona wpisujesz sam i wpisywać ich nie trzeba: bez nich ustawienie działa dokładnie tak samo. Leży tam też twoja odpowiedź o analityce, data odpowiedzi i to, o co dokładnie wtedy pytaliśmy — inaczej nie moglibyśmy pokazać, na co się zgodziłeś.',
     dbSeasons:
       '**Twoje sezony** — sam plakat: wszystko, co na nim wydrukowane, plus nazwa, którą mu nadałeś, motyw kolorystyczny, zestaw rysunków i język, w którym podpisany jest arkusz. Do stu sztuk. Imiona członków rodziny przechowywane są osobno od reszty — dzięki temu można je zamienić przy publikacji, nie ruszając samego sezonu. Obok leży data ostatniej poprawki, według niej sortuje się lista.',
     dbPublic:
@@ -464,7 +464,11 @@ export const pl: Dict = {
 
     cookiesHead: 'Ciasteczka',
     cookiesText:
-      'Ciasteczko z twoją sesją — to jest całe logowanie — i ciasteczko z wybranym językiem, żeby strona otwierała się w nim. Plus kilka tymczasowych, technicznych, które żyją parę sekund na czas samego logowania. Nie ma na stronie ani analityki, ani liczników, ani reklamowych trackerów.',
+      'Ciasteczko z twoją sesją — to jest całe logowanie — ciasteczko z wybranym językiem, żeby strona otwierała się w nim, i ciasteczko z twoją odpowiedzią o analityce. Plus kilka tymczasowych, technicznych, które żyją parę sekund na czas samego logowania. Wszystko to jest potrzebne samej stronie i bez tego ona nie działa. Reklamowych trackerów na stronie nie ma.',
+
+    analyticsHead: 'Analityka',
+    analyticsText:
+      'Liczymy odwiedziny przez Google Analytics — żeby widzieć, z których stron się korzysta, a które można usunąć. To jedyna rzecz, którą strona zbiera **nie dla twojego plakatu**, i dlatego pytamy o zgodę: dopóki nie odpowiesz „Akceptuję”, Google nie dostaje ani jednego zapytania i nie stawia ani jednego ciasteczka. Odpowiesz „Akceptuję” — pojawią się ciasteczka **_ga** i **_ga_…**: odróżniają one wejścia od siebie i żyją do dwóch lat. Nie trafia tam ani imię, ani adres poczty, ani to, co napisane na twoich plakatach. Decyzję zmieniasz w każdej chwili — linkiem „Ciasteczka” na dole każdej strony, a po zalogowaniu także na koncie; nie zapytamy ponownie wcześniej niż za pół roku.',
 
     deleteHead: 'Jak wszystko usunąć',
     deleteText:
@@ -475,7 +479,7 @@ export const pl: Dict = {
       'Obiecaliśmy miejsce na sezony — i zrobiliśmy je. Obiecaliśmy, że witryna „Pomysły społeczności” nie pojawi się po cichu — i nie pojawiła się. Gdy sezony przeniosły się z adresu do bazy, ten tekst przepisaliśmy tą samą zmianą; gdy strona dostała trzy języki — również. Tak będzie i dalej.',
 
     contact: 'Pytania — na adres',
-    updated: 'Zaktualizowano 30 sierpnia 2026',
+    updated: 'Zaktualizowano 4 września 2026',
     newSeason: 'Złóż swój sezon',
   },
 
@@ -491,6 +495,7 @@ export const pl: Dict = {
     accountTitle: '{who} — konto i ustawienia',
     footerNote: 'Bardzo czekamy na uwagi i pomysły — napiszcie do nas',
     privacy: 'Prywatność',
+    cookies: 'Ciasteczka',
     langsAria: 'Język strony',
     login: 'Zaloguj się',
     loginProvider: '\u00a0przez Google',
@@ -498,6 +503,23 @@ export const pl: Dict = {
     loginAgain: 'Zaloguj się ponownie',
     toastClose: 'Zamknij komunikat',
     draftClaimed: 'Szkic „{title}” został zapisany w twojej kolekcji.',
+  },
+
+  consent: {
+    bannerTitle: 'Analityka',
+    bannerText:
+      'Chcemy liczyć odwiedziny przez Google Analytics, żeby widzieć, z czego się na stronie korzysta. Dopóki nie pozwolisz, licznik nie działa.',
+    accept: 'Akceptuję',
+    decline: 'Odrzucam',
+    more: 'Szczegóły',
+    bannerAria: 'Zgoda na analitykę',
+
+    head: 'Analityka',
+    text: 'Czy liczyć twoje odwiedziny. Decyzję możesz zmienić w każdej chwili.',
+    label: 'Analityka',
+    on: 'Dozwolona',
+    off: 'Zabroniona',
+    save: 'Zapisz wybór',
   },
 
   editor: {

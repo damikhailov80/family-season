@@ -442,7 +442,7 @@ export const en: Dict = {
     dbIntro:
       'Everything there is tagged with the opaque number of your Google account — something like “google:1234567890”. Neither your name from Google nor your email is anywhere in the database. There are several kinds of rows, and every one of them appears only if you did something yourself.',
     dbSettings:
-      '**Account settings** — the site language and the family for new posters: up to five pairs of “a drawing and a name”, for example “grown-up — Denis”. You type the names yourself, and typing them is not required: the setting works exactly the same without them.',
+      '**Account settings** — the site language and the family for new posters: up to five pairs of “a drawing and a name”, for example “grown-up — Denis”. You type the names yourself, and typing them is not required: the setting works exactly the same without them. Your answer about analytics lives there too, along with the date you gave it and what exactly we asked back then — otherwise we could not show you what you agreed to.',
     dbSeasons:
       '**Your seasons** — the poster itself: everything printed on it, plus the name you gave it, the colour theme, the drawing set and the language the sheet is captioned in. Up to a hundred of them. The family names are kept separately from the rest — that is how they can be replaced on publication without touching the season itself. Next to it lies the date of the last edit; the list is sorted by it.',
     dbPublic:
@@ -464,7 +464,11 @@ export const en: Dict = {
 
     cookiesHead: 'Cookies',
     cookiesText:
-      'A cookie with your session — that is the whole of signing in — and a cookie with the language you chose, so the site opens in it. Plus a few temporary technical ones that live a couple of seconds during the sign-in itself. There is no analytics, no counters and no advertising trackers on the site.',
+      'A cookie with your session — that is the whole of signing in — a cookie with the language you chose, so the site opens in it, and a cookie with your answer about analytics. Plus a few temporary technical ones that live a couple of seconds during the sign-in itself. All of these are needed by the site itself, and without them it does not work. There are no advertising trackers on the site.',
+
+    analyticsHead: 'Analytics',
+    analyticsText:
+      'We count visits with Google Analytics — to see which pages get used and which ones can go. This is the only thing the site collects **not for the sake of your poster**, which is why we ask permission: until you answer “Accept”, Google receives no requests and sets no cookies at all. Answer “Accept” and the **_ga** and **_ga_…** cookies appear: they tell visits apart and live for up to two years. Neither your name, nor your email, nor anything written on your posters goes there. You can change your mind at any moment — with the “Cookies” link at the bottom of any page, and, once signed in, in your account as well; we will not ask again for at least six months.',
 
     deleteHead: 'How to delete everything',
     deleteText:
@@ -475,7 +479,7 @@ export const en: Dict = {
       'We promised a place to keep seasons — and we made it. We promised that the Community Ideas showcase would not appear silently — and it did not. When the seasons moved from the address into the database, this text was rewritten in the same change; when the site got three languages, so was it. That is how it will be from now on.',
 
     contact: 'Questions — by email:',
-    updated: 'Updated 30 August 2026',
+    updated: 'Updated 4 September 2026',
     newSeason: 'Build my own season',
   },
 
@@ -491,6 +495,7 @@ export const en: Dict = {
     accountTitle: '{who} — account and settings',
     footerNote: 'We would love your ideas and feedback — write to us',
     privacy: 'Privacy',
+    cookies: 'Cookies',
     langsAria: 'Site language',
     login: 'Sign in',
     loginProvider: '\u00a0with Google',
@@ -498,6 +503,23 @@ export const en: Dict = {
     loginAgain: 'Sign in again',
     toastClose: 'Close the message',
     draftClaimed: 'The draft “{title}” has been saved to your collection.',
+  },
+
+  consent: {
+    bannerTitle: 'Analytics',
+    bannerText:
+      'We would like to count visits with Google Analytics, to see what the site is used for. Until you allow it, the counter does not run.',
+    accept: 'Accept',
+    decline: 'Decline',
+    more: 'Details',
+    bannerAria: 'Analytics consent',
+
+    head: 'Analytics',
+    text: 'Whether to count your visits. You can change this at any time.',
+    label: 'Analytics',
+    on: 'Allowed',
+    off: 'Not allowed',
+    save: 'Save the choice',
   },
 
   editor: {
