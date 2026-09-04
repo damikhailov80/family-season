@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Банки варенья с подписями</title>
+
+  <!-- Кухонный стол -->
+  <rect width="200" height="200" fill="#fef2e4"/>
+  <rect y="150" width="200" height="50" fill="#e3cdab"/>
+  <path d="M0 150 L200 150" stroke="#c9ab80" stroke-width="2"/>
+
+  <!-- Банка слева: сливовое -->
+  <g transform="translate(48 150)">
+    <path d="M-24 -74 L24 -74 L24 0 L-24 0 Z" fill="#7a2740"/>
+    <path d="M-24 -74 L24 -74 L24 -60 L-24 -60 Z" fill="#5e1c30"/>
+    <rect x="-27" y="-84" width="54" height="11" rx="3" fill="#9aa7ad"/>
+    <rect x="-18" y="-46" width="36" height="22" rx="2" fill="#fdf6e8"/>
+    <g stroke="#805a3b" stroke-width="1.6" stroke-linecap="round">
+      <path d="M-12 -38 L12 -38"/>
+      <path d="M-12 -32 L6 -32"/>
+    </g>
+  </g>
+
+  <!-- Банка по центру: яблочное -->
+  <g transform="translate(100 150)">
+    <path d="M-27 -88 L27 -88 L27 0 L-27 0 Z" fill="#fd974f"/>
+    <path d="M-27 -88 L27 -88 L27 -72 L-27 -72 Z" fill="#e07a2f"/>
+    <rect x="-30" y="-99" width="60" height="12" rx="3" fill="#9aa7ad"/>
+    <rect x="-20" y="-54" width="40" height="24" rx="2" fill="#fdf6e8"/>
+    <g stroke="#805a3b" stroke-width="1.6" stroke-linecap="round">
+      <path d="M-13 -45 L13 -45"/>
+      <path d="M-13 -38 L7 -38"/>
+    </g>
+  </g>
+
+  <!-- Банка справа: смородина -->
+  <g transform="translate(152 150)">
+    <path d="M-22 -66 L22 -66 L22 0 L-22 0 Z" fill="#c60000"/>
+    <path d="M-22 -66 L22 -66 L22 -54 L-22 -54 Z" fill="#9e0505"/>
+    <rect x="-25" y="-76" width="50" height="11" rx="3" fill="#9aa7ad"/>
+    <rect x="-16" y="-40" width="32" height="20" rx="2" fill="#fdf6e8"/>
+    <g stroke="#805a3b" stroke-width="1.6" stroke-linecap="round">
+      <path d="M-10 -33 L10 -33"/>
+      <path d="M-10 -27 L4 -27"/>
+    </g>
+  </g>
+
+  <!-- Ложка -->
+  <g transform="translate(28 168) rotate(-14)">
+    <ellipse cx="0" cy="0" rx="8" ry="11" fill="#9aa7ad"/>
+    <path d="M0 11 L0 34" stroke="#9aa7ad" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

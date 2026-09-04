@@ -1,0 +1,82 @@
+{
+  "name": "Miesiąc zbiorów",
+  "summary": "Zbiory u babci, kiszenie, konfitury — i stół, na który zapraszamy gości.",
+  "note": "we troje · sezon przeżyty do końca",
+  "palette": "rustic",
+  "icons": "kitchen",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasz ogród. Nasza kuchnia. Nasz wrzesień."
+    },
+    "theme": {
+      "subtitle": "Miesiąc zbiorów",
+      "question": "Co z tego stanie się naszym jesiennym zwyczajem?"
+    },
+    "weeksNote": "4 tygodnie – od grządki do stołu",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Jedziemy do babci — zbieramy plony"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Kisimy ogórki i pomidory, zakręcamy słoiki"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Robimy konfitury i podpisujemy słoiki"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Nakrywamy stół i zapraszamy gości"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Zrobić własnymi rękami coś, co dotrwa do zimy.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Uczę się kisić",
+        "description": "Najpierw ogórki, potem pomidory — z zapisku babci",
+        "goal": "Żeby słoik dotrwał do Nowego Roku"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Nowe przepisy",
+        "description": "Jeden na tydzień i zapisuję, co z tego wyszło",
+        "goal": "Nauczyć swoich dwóch z nich"
+      },
+      {
+        "id": "p3",
+        "name": "Marek",
+        "face": "son",
+        "project": "Robię konfitury",
+        "description": "Własny słoik od początku do końca, bez podpowiedzi",
+        "goal": "Ugotować swój i podpisać własną ręką"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 80,
+      "p2": 70,
+      "p3": 100
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggygggyggyggggyg",
+      "p2": "gggyggggyggggygygggyggyggggyg",
+      "p3": "ggyggggyrggygggggyggggyggyggg"
+    },
+    "summaryAnswer": "— Od babci przywieźliśmy trzy wiadra pomidorów i połowę zjedliśmy prosto z grządki.\n— Pierwszy słoik ogórków tata przesolił, drugi wyszedł tak, że pytali o przepis.\n— Marek robił konfitury sam i nikomu nie dał mieszać: śliwkowe, lekko gorzkie, ale własne.\n— Przy stole zebrało się dziewięć osób, słoiki rozdaliśmy gościom na drogę.",
+    "nextIdeas": "— Miesiąc naszej okolicy: obejść wszystkie ulice i narysować własną mapę.\n— Upiec chleb na własnym zakwasie i zanieść babci.\n— Uporządkować piwnicę i podpisać wszystko, co stoi tam od zeszłego roku.\n— Tydzień gotowania tylko z tego, co sami zrobiliśmy.",
+    "photos": {
+      "0": "/examples/demo-5/week-1.svg",
+      "2": "/examples/demo-5/week-3.svg"
+    }
+  }
+}

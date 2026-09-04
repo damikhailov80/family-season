@@ -1,0 +1,82 @@
+{
+  "name": "Harvest Month",
+  "summary": "Grandma's garden, pickling, jam — and a table we invite guests to.",
+  "note": "three of us · season lived to the end",
+  "palette": "rustic",
+  "icons": "kitchen",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our garden. Our kitchen. Our September."
+    },
+    "theme": {
+      "subtitle": "Harvest Month",
+      "question": "Which of these will become our autumn habit?"
+    },
+    "weeksNote": "4 weeks – from the bed to the table",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Off to grandma's — bringing in the crop"
+      },
+      {
+        "title": "Week 2",
+        "text": "Pickling cucumbers and tomatoes, jars sealed"
+      },
+      {
+        "title": "Week 3",
+        "text": "Making jam and labelling the jars"
+      },
+      {
+        "title": "Week 4",
+        "text": "Laying the table and inviting guests"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Make something with our own hands that lasts into winter.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Learning to pickle",
+        "description": "Cucumbers first, then tomatoes — by grandma's note",
+        "goal": "A jar that keeps till New Year"
+      },
+      {
+        "id": "p2",
+        "name": "Mom",
+        "face": "mom",
+        "project": "New recipes",
+        "description": "One a week, and I write down how it turned out",
+        "goal": "Teach my family two of them"
+      },
+      {
+        "id": "p3",
+        "name": "Mark",
+        "face": "son",
+        "project": "Making jam",
+        "description": "My own jar start to finish, with no prompting",
+        "goal": "Cook mine and label it in my own hand"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 80,
+      "p2": 70,
+      "p3": 100
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggygggyggyggggyg",
+      "p2": "gggyggggyggggygygggyggyggggyg",
+      "p3": "ggyggggyrggygggggyggggyggyggg"
+    },
+    "summaryAnswer": "— We came back from grandma's with three buckets of tomatoes and ate half of them in the garden.\n— Dad over-salted the first jar of cucumbers; the second was good enough that people asked for the recipe.\n— Mark made the jam himself and let nobody stir it: plum, a little bitter, but his own.\n— Nine of us sat down at the table, and the guests took jars home.",
+    "nextIdeas": "— Month of our own neighbourhood: walk every street and draw our own map.\n— Bake bread on our own starter and take it to grandma.\n— Sort out the cellar and label everything that has stood there since last year.\n— A week of cooking only from what we put up ourselves.",
+    "photos": {
+      "0": "/examples/demo-5/week-1.svg",
+      "2": "/examples/demo-5/week-3.svg"
+    }
+  }
+}
