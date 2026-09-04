@@ -3,14 +3,29 @@ import { notFound } from 'next/navigation'
 import { Toast } from '../../../../components/site/Toast'
 import { getDict, getLang } from '../../../../i18n/server'
 import { iconSetOrNull } from '../../../../model/icons'
+import { pageMeta } from '../../../../model/meta'
 import { paletteOrNull } from '../../../../model/palettes'
+import { ROUTES } from '../../../../model/site'
 import { auth } from '../../../../server/auth'
 import { readPublicSeason } from '../../../../server/publicSeasons'
 import { PublicSeason } from './PublicSeason'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { pages } = await getDict()
-  return { title: pages.publicTitle, description: pages.publicDescription }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ code: string }>
+}): Promise<Metadata> {
+  const { code } = await params
+  const { pages, site } = await getDict()
+  return pageMeta({
+    lang: await getLang(),
+    path: `${ROUTES.publicSeason}/${code}`,
+    title: pages.publicTitle,
+    description: pages.publicDescription,
+    siteName: site.brand,
+    ogAlt: site.ogAlt,
+    alternates: 'self',
+  })
 }
 
 export default async function PublicSeasonPage({

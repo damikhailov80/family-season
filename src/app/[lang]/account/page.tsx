@@ -8,6 +8,8 @@ import { fill } from '../../../i18n/fill'
 import { analyticsId } from '../../../server/consent'
 import { DEFAULT_FAMILY } from '../../../model/family'
 import { DEFAULT_LANG } from '../../../model/lang'
+import { pageMeta } from '../../../model/meta'
+import { ROUTES } from '../../../model/site'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../../model/types'
 import { auth } from '../../../server/auth'
 import { logout } from '../../../server/actions'
@@ -19,8 +21,16 @@ import { LanguageEditor } from './LanguageEditor'
 import styles from './page.module.css'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { account } = await getDict()
-  return { title: account.title, description: account.description }
+  const { account, site } = await getDict()
+  return pageMeta({
+    lang: await getLang(),
+    path: ROUTES.account,
+    title: account.title,
+    description: account.description,
+    siteName: site.brand,
+    ogAlt: site.ogAlt,
+    index: false,
+  })
 }
 
 export default async function AccountPage({

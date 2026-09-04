@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
-import { getDict } from '../../i18n/server'
+import { getDict, getLang } from '../../i18n/server'
+import { pageMeta } from '../../model/meta'
+import { ROUTES } from '../../model/site'
 import { Community } from '../../components/landing/Community'
 import { Examples } from '../../components/landing/Examples'
 import { Hero } from '../../components/landing/Hero'
@@ -8,8 +10,15 @@ import { Steps } from '../../components/landing/Steps'
 import { PaperSheet } from '../../components/PaperSheet'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { landing } = await getDict()
-  return { title: landing.title, description: landing.description }
+  const { landing, site } = await getDict()
+  return pageMeta({
+    lang: await getLang(),
+    path: ROUTES.home,
+    title: landing.title,
+    description: landing.description,
+    siteName: site.brand,
+    ogAlt: site.ogAlt,
+  })
 }
 
 export default function Page() {

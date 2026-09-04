@@ -477,6 +477,7 @@ export const en: Dict = {
 
   site: {
     brand: 'Family Season',
+    ogAlt: 'Family Season poster: the mark and the site name',
     description:
       'A poster of your family month: prints on two A4 sheets and lives in your collection.',
     navAria: 'Site sections',

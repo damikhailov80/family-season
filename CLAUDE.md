@@ -1391,6 +1391,80 @@ a season with a private link issued, to that link.
   nothing to check about the private link — the site assembles it from its own address and a
   token.
 
+## Link previews and icons
+
+What the site looks like outside itself: the card a messenger draws for a link, and the icon
+Google puts next to it in search results. The same generated-assets genre as the QR code.
+
+| What | Where |
+| --- | --- |
+| The mark, its sizes, `favicon.ico` | `tools/logo/build.mjs` (`npm run logo`) |
+| The preview picture | `tools/og/build.ts` (`npm run og`) |
+| Headless Chrome, shared by both | `tools/shot.mjs` |
+| Assembling the metadata | `src/model/meta.ts` (`pageMeta`) |
+| `metadataBase` and the icon list | `src/app/[lang]/layout.tsx` |
+| robots.txt, sitemap.xml | `src/app/robots.ts`, `src/app/sitemap.ts` |
+| The alt text of the picture | `site.ogAlt` in the dictionaries |
+
+- **A dotted address used to serve the landing page with code 200, and that is what left Google
+  without an icon.** `proxy` lets any path containing a dot through untouched — static files must
+  not be caught by the language redirect — but there was no such file, the request fell into
+  `[lang]`, and `knownLang` quietly turned `"favicon.ico"` into Russian. Google and browsers ask
+  for exactly `/favicon.ico` by convention, got HTML, and showed nothing. Closed in two places:
+  the matcher now skips only real asset extensions (so junk like `/zzz.foo` still reaches **our**
+  404 page rather than the Next stub), and the root layout refuses an unknown language outright.
+  **`dynamicParams = false` does not work here** and was tried: nothing on this site is
+  prerendered, so the params are never checked against `generateStaticParams`.
+- **`favicon.svg` is not enough, `favicon.ico` is mandatory.** The SVG stays for browsers, but the
+  address every crawler asks for first has to answer with a picture. Chrome cannot write an ICO,
+  and there is no dependency for it: an ICO is a container — a 6-byte header, a 16-byte directory
+  entry per image, then the PNGs as they are (`ico()` in `tools/logo/build.mjs`). It carries
+  16/32/48; 48 is the size Google takes.
+- **The mark is drawn at two scales, and one drawing does not serve both.** In search results the
+  icon is 16–18 px, and there the roomy sheet of the full mark turns the heart into a speck. So
+  `VARIANTS` holds a second geometry — `tight`, paper almost across the whole tile — and the small
+  PNGs are built from it. The SVG and everything from 120 px up keep the original proportions.
+  `apple-icon.png` is rendered with `radius: 0`: iOS applies its own mask, and a rounded tile
+  inside a rounded mask reads as a mistake.
+- **The preview picture is common to the site, and only the text is per page.** A mini-poster of
+  the season was considered and rejected: `next/og` renders through satori, which knows neither
+  CSS Modules, nor `var()`, nor `oklch(from …)`, nor `color-mix` — that is, neither
+  `SeasonPreview.tsx` nor the poster works there at all; the palettes are not reachable from JS
+  (`palettes.data.ts` keeps only ids and labels) and there are no font files in the repository.
+- **The season's content does not go into the preview.** Titles come from the dictionary, as they
+  did. A private link travels through a messenger, whose server fetches the page: family names
+  have no business in Telegram's cache.
+- **There are three pictures, one per language** (`public/og-<lang>.png`): there is a phrase on
+  the picture, and it is taken from `site.description` — the script imports the dictionaries
+  directly, so a second copy of the strings does not appear.
+- **The fonts are inlined into the page as data URIs** rather than linked. A linked face loads
+  asynchronously, and a screenshot taken a moment early would silently come out in a system font —
+  which is not visible in the code, only on the picture. The css2 answer keeps its `unicode-range`
+  blocks, so Cyrillic and `latin-ext` travel along and Polish diacritics stay in the right font.
+- **`og:title` does not fall back to the page's `title`.** Next inherits the whole `openGraph`
+  block from the layout — the layout's heading included — so a page with its own text has to spell
+  `openGraph` out in full. That is what `pageMeta` exists for: twelve hand-written copies would
+  have drifted apart, and the layout's block still covers the pages that set no metadata of their
+  own (404, `[...rest]`).
+- **A personal page is `noindex`, but keeps its preview.** `/p/<token>`, `/season/<code>`,
+  `/seasons`, `/account` and `/sheet` are closed from the index and have no `canonical`, while
+  `og:image` and the text stay: a preview in a messenger has nothing to do with `robots`, and a
+  private link exists precisely to be sent.
+- **A publication is `alternates: 'self'`.** It lives only in its own language (see "Languages"),
+  so `/en/s/<code of a Russian season>` is a 404 — and promising a crawler translations that
+  answer 404 is not allowed. Everything open on all three (`/`, `/ideas`, `/privacy`) carries
+  three `hreflang` plus `x-default` on Russian.
+- **The sitemap does not list published seasons.** That would need the database, and a quiet
+  database must not take a page down — the same rule that keeps the migration out of the build.
+  The way into the showcase is `/ideas`.
+- **The address of the site is not written a second time.** `metadataBase` is built from
+  `SITE_URL`, i.e. from the same `tools/qr/source.json` the QR is built from.
+
+Verified by: `e2e/site/meta.spec.ts` — the icon is a picture and not a page, an address that is
+not a language is not the landing page, a link carries a preview, a page knows its canonical
+address and its translations, and a personal page stays out of the index without losing its
+preview.
+
 ## Inline editing
 
 `src/components/edit/EditableText.tsx` — `contentEditable="plaintext-only"`, an **uncontrolled**
@@ -1704,6 +1778,12 @@ confused:
 
 `PosterIcon` is deliberately not exported from `index.ts`: it reads context, and the barrel is
 imported by the site's server components.
+
+**The site's own raster pictures live in `public/` and are all generated.** `favicon.ico`,
+`icon-*.png`, `apple-icon.png`, `logo-120.png` and `og-*.png` are built by `npm run logo` and
+`npm run og`; they are not edited by hand. The rule "there are no raster images in the layout"
+holds — none of them is in the markup: an icon and a link preview are exactly the places where
+SVG is not accepted, neither by Google nor by messengers (see "Link previews and icons").
 
 The example photographs are the only pictures kept as files: `public/examples/<id>/week-N.svg`, and
 the paths to them lie in the `photos` of the corresponding fill set. They are vector too, but they

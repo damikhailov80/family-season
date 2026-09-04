@@ -8,6 +8,7 @@ import { NewSeasonAction } from '../../../components/site/NewSeasonAction'
 import { Toast } from '../../../components/site/Toast'
 import { getDict, getLang } from '../../../i18n/server'
 import { fill } from '../../../i18n/fill'
+import { pageMeta } from '../../../model/meta'
 import { ROUTES, withLang } from '../../../model/site'
 import { auth } from '../../../server/auth'
 import { randomIdeas } from '../../../server/publicSeasons'
@@ -15,8 +16,15 @@ import { ReportEntry } from './ReportEntry'
 import styles from './page.module.css'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { ideas } = await getDict()
-  return { title: ideas.title, description: ideas.description }
+  const { ideas, site } = await getDict()
+  return pageMeta({
+    lang: await getLang(),
+    path: ROUTES.ideas,
+    title: ideas.title,
+    description: ideas.description,
+    siteName: site.brand,
+    ogAlt: site.ogAlt,
+  })
 }
 
 export default async function IdeasPage({

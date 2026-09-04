@@ -13,6 +13,7 @@
     "qr": "node --import tsx tools/qr/build.ts",
     "db:migrate": "node --env-file-if-exists=.env.local tools/db/migrate.mjs",
     "logo": "node tools/logo/build.mjs",
+    "og": "node --import tsx tools/og/build.ts",
     "typecheck": "tsc --noEmit",
     "db:status": "node --env-file-if-exists=.env.local tools/db/migrate.mjs --status",
     "db:seed": "node --env-file-if-exists=.env.local --import tsx tools/db/seed-examples.ts",

@@ -11,6 +11,7 @@ import type { Dict } from '../../../i18n/types'
 import type { Lang } from '../../../model/lang'
 import { paletteLabel } from '../../../model/palettes'
 import { LIBRARY_LIMIT, savedOn, TITLE_LIMIT, type LibrarySort } from '../../../model/library'
+import { pageMeta } from '../../../model/meta'
 import { publicSeasonHref, ROUTES, seasonHref, withLang } from '../../../model/site'
 import { auth } from '../../../server/auth'
 import { listFavorites, listPublished } from '../../../server/publicSeasons'
@@ -24,8 +25,16 @@ import { RenameEntry } from './RenameEntry'
 import styles from './page.module.css'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { seasons } = await getDict()
-  return { title: seasons.title, description: seasons.description }
+  const { seasons, site } = await getDict()
+  return pageMeta({
+    lang: await getLang(),
+    path: ROUTES.seasons,
+    title: seasons.title,
+    description: seasons.description,
+    siteName: site.brand,
+    ogAlt: site.ogAlt,
+    index: false,
+  })
 }
 
 type Tab = 'seasons' | 'favorites' | 'published'

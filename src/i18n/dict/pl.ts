@@ -476,6 +476,7 @@ export const pl: Dict = {
 
   site: {
     brand: 'Sezon rodzinny',
+    ogAlt: 'Plakat sezonu rodzinnego: znak i nazwa strony',
     description:
       'Plakat rodzinnego miesiąca: drukuje się na dwóch kartkach A4 i żyje w twojej kolekcji.',
     navAria: 'Sekcje strony',

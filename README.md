@@ -88,7 +88,8 @@ npm run dev       # http://localhost:3000
 | `npm run palettes` | `tools/palettes/source.json` | `src/styles/palettes.css`, `src/model/palettes.data.ts` |
 | `npm run icons` | `tools/icons/source.json` | `src/components/doodles/icons.generated.ts`, `src/model/icons.data.ts` |
 | `npm run qr` | `tools/qr/source.json` | `src/model/qr.data.ts` |
-| `npm run logo` | `tools/logo/` | `public/favicon.svg`, `logo-120.png` |
+| `npm run logo` | `tools/logo/` | `public/favicon.svg`, `favicon.ico`, `icon-*.png`, `apple-icon.png`, `logo-120.png` |
+| `npm run og` | `tools/og/`, the dictionaries | `public/og-{ru,en,pl}.png` — the link preview |
 
 **What runs on its own**
 

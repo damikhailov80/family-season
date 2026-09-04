@@ -55,5 +55,7 @@ function remember(response: NextResponse, lang: Lang) {
 }
 
 export const config = {
-  matcher: ['/((?!_next|api|.*\\.).*)'],
+  matcher: [
+    '/((?!_next|api|.*\\.(?:ico|svg|png|jpg|jpeg|gif|webp|txt|xml|webmanifest|woff2?)$).*)',
+  ],
 }

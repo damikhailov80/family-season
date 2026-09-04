@@ -1,15 +1,30 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { Toast } from '../../../../components/site/Toast'
-import { getDict } from '../../../../i18n/server'
+import { getDict, getLang } from '../../../../i18n/server'
+import { pageMeta } from '../../../../model/meta'
+import { ROUTES } from '../../../../model/site'
 import { auth } from '../../../../server/auth'
 import { shareQr } from '../../../../server/qr'
 import { readSharedSeason } from '../../../../server/userSeasons'
 import { SharedSeason } from './SharedSeason'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { pages } = await getDict()
-  return { title: pages.sharedTitle, description: pages.sharedDescription }
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ token: string }>
+}): Promise<Metadata> {
+  const { token } = await params
+  const { pages, site } = await getDict()
+  return pageMeta({
+    lang: await getLang(),
+    path: `${ROUTES.shared}/${token}`,
+    title: pages.sharedTitle,
+    description: pages.sharedDescription,
+    siteName: site.brand,
+    ogAlt: site.ogAlt,
+    index: false,
+  })
 }
 
 export default async function SharedSeasonPage({ params }: { params: Promise<{ token: string }> }) {

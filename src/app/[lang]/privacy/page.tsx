@@ -1,15 +1,23 @@
 import type { Metadata } from 'next'
 import { PaperSheet } from '../../../components/PaperSheet'
 import { SectionBox } from '../../../components/SectionBox'
-import { CONTACT_EMAIL } from '../../../model/site'
+import { pageMeta } from '../../../model/meta'
+import { CONTACT_EMAIL, ROUTES } from '../../../model/site'
 import { NewSeasonAction } from '../../../components/site/NewSeasonAction'
-import { getDict } from '../../../i18n/server'
+import { getDict, getLang } from '../../../i18n/server'
 import { marked } from '../../../i18n/fill'
 import styles from './page.module.css'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { privacy } = await getDict()
-  return { title: privacy.title, description: privacy.description }
+  const { privacy, site } = await getDict()
+  return pageMeta({
+    lang: await getLang(),
+    path: ROUTES.privacy,
+    title: privacy.title,
+    description: privacy.description,
+    siteName: site.brand,
+    ogAlt: site.ogAlt,
+  })
 }
 
 function Text({ children }: { children: string }) {
