@@ -15,18 +15,18 @@ const fail = (message) => {
 const source = JSON.parse(readFileSync(resolve(here, 'source.json'), 'utf8'))
 const { slots, icons, sets } = source
 
-if (!Array.isArray(slots) || slots.length === 0) fail('в source.json нет списка слотов')
+if (!Array.isArray(slots) || slots.length === 0) fail('source.json has no list of slots')
 
 const names = new Set()
 for (const icon of icons) {
-  if (names.has(icon.name)) fail(`рисунок «${icon.name}» объявлен дважды`)
+  if (names.has(icon.name)) fail(`icon "${icon.name}" is declared twice`)
   names.add(icon.name)
   const circles = icon.circles ?? []
   const paths = icon.paths ?? []
-  if (circles.length + paths.length === 0) fail(`у рисунка «${icon.name}» нет геометрии`)
+  if (circles.length + paths.length === 0) fail(`icon "${icon.name}" has no geometry`)
   for (const [cx, cy, r] of circles) {
     if (cx - r < 0 || cy - r < 0 || cx + r > VIEWBOX || cy + r > VIEWBOX) {
-      fail(`рисунок «${icon.name}»: круг вылезает за сетку ${VIEWBOX}×${VIEWBOX}`)
+      fail(`icon "${icon.name}": a circle sticks out of the ${VIEWBOX}×${VIEWBOX} grid`)
     }
   }
 }
@@ -36,27 +36,27 @@ const LANGS = ['ru', 'en', 'pl']
 const used = new Set()
 const ids = new Set()
 for (const set of sets) {
-  if (ids.has(set.id)) fail(`набор «${set.id}» объявлен дважды`)
+  if (ids.has(set.id)) fail(`set "${set.id}" is declared twice`)
   ids.add(set.id)
   if (!set.label || typeof set.label !== 'object') {
-    fail(`у набора «${set.id}» подпись должна быть объектом {ru, en, pl}`)
+    fail(`set "${set.id}": the label must be an object {ru, en, pl}`)
   }
   const noLabel = LANGS.filter((lang) => !set.label[lang])
-  if (noLabel.length) fail(`у набора «${set.id}» нет подписи на ${noLabel.join(', ')}`)
+  if (noLabel.length) fail(`set "${set.id}": no label in ${noLabel.join(', ')}`)
   const keys = Object.keys(set.slots)
   const extra = keys.filter((slot) => !slots.includes(slot))
   const missing = slots.filter((slot) => !keys.includes(slot))
-  if (extra.length) fail(`у набора «${set.id}» лишние слоты: ${extra.join(', ')}`)
-  if (missing.length) fail(`у набора «${set.id}» нет слотов: ${missing.join(', ')}`)
+  if (extra.length) fail(`set "${set.id}": extra slots: ${extra.join(', ')}`)
+  if (missing.length) fail(`set "${set.id}": missing slots: ${missing.join(', ')}`)
   for (const slot of slots) {
     const name = set.slots[slot]
-    if (!names.has(name)) fail(`набор «${set.id}», слот «${slot}»: нет рисунка «${name}»`)
+    if (!names.has(name)) fail(`set "${set.id}", slot "${slot}": no icon "${name}"`)
     used.add(name)
   }
 }
 
 const orphans = [...names].filter((name) => !used.has(name))
-if (orphans.length) fail(`рисунки не вошли ни в один набор: ${orphans.join(', ')}`)
+if (orphans.length) fail(`icons that made it into no set: ${orphans.join(', ')}`)
 
 const list = (values) => `[${values.join(', ')}]`
 
@@ -70,7 +70,7 @@ const shapes = icons.map((icon) => {
   return `  '${icon.name}': {\n    ${fields.join(',\n    ')},\n  },`
 })
 
-const geometry = `/* Собирается tools/icons/build.mjs (npm run icons) из tools/icons/source.json. */
+const geometry = `/* Built by tools/icons/build.mjs (npm run icons) from tools/icons/source.json. */
 
 export const ICON_VIEWBOX = ${VIEWBOX}
 
@@ -96,7 +96,7 @@ const rows = sets.map(({ id, label, slots: map }) => {
   return `  ['${id}', { ${caption} }, { ${pairs} }],`
 })
 
-const registry = `/* Собирается tools/icons/build.mjs (npm run icons) из tools/icons/source.json. */
+const registry = `/* Built by tools/icons/build.mjs (npm run icons) from tools/icons/source.json. */
 
 import type { IconName } from '../components/doodles/icons.generated'
 
@@ -115,6 +115,6 @@ writeFileSync(resolve(root, 'src/components/doodles/icons.generated.ts'), geomet
 writeFileSync(resolve(root, 'src/model/icons.data.ts'), registry)
 
 console.log(
-  `${icons.length} рисунков, ${sets.length} наборов: ` +
+  `${icons.length} icons, ${sets.length} sets: ` +
     'src/components/doodles/icons.generated.ts, src/model/icons.data.ts',
 )

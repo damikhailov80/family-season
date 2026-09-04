@@ -1,6 +1,6 @@
-/* Собирается tools/palettes/build.mjs (npm run palettes) из tools/palettes/source.json. */
+/* Built by tools/palettes/build.mjs (npm run palettes) from tools/palettes/source.json. */
 
-/* Пустыня */
+/* Desert */
 [data-palette='desert'] {
   --c1: #46211A;
   --c2: #693D3D;
@@ -16,7 +16,7 @@
   --d4: #92300E;
 }
 
-/* Осень */
+/* Autumn */
 [data-palette='autumn'] {
   --c1: #1E434C;
   --c2: #8D230F;
@@ -32,7 +32,7 @@
   --d4: #6A5200;
 }
 
-/* Тёплая листва */
+/* Warm Foliage */
 [data-palette='foliage'] {
   --c1: #2E2300;
   --c2: #6E6702;
@@ -48,7 +48,7 @@
   --d4: #734C00;
 }
 
-/* Пряность */
+/* Spice */
 [data-palette='spice'] {
   --c1: #662E1C;
   --c2: #AF4425;
@@ -64,7 +64,7 @@
   --d4: #695200;
 }
 
-/* Тёплый рустик */
+/* Warm Rustic */
 [data-palette='rustic'] {
   --c1: #805A3B;
   --c2: #C60000;
@@ -80,7 +80,7 @@
   --d4: #62523F;
 }
 
-/* Ювелирные тона */
+/* Jewel Tones */
 [data-palette='jewel'] {
   --c1: #7F152E;
   --c2: #D61800;
@@ -96,7 +96,7 @@
   --d4: #6E4F00;
 }
 
-/* Шоколадный брауни */
+/* Chocolate Brownie */
 [data-palette='brownie'] {
   --c1: #301B28;
   --c2: #523634;
@@ -112,7 +112,7 @@
   --d4: #704E10;
 }
 
-/* Уют и тепло */
+/* Cosy and Warm */
 [data-palette='cozy'] {
   --c1: #662225;
   --c2: #B51D0A;
@@ -128,7 +128,7 @@
   --d4: #6B5100;
 }
 
-/* Винный покой */
+/* Wine and Quiet */
 [data-palette='vineyard'] {
   --c1: #1E0000;
   --c2: #500805;
@@ -144,7 +144,7 @@
   --d4: #863C1F;
 }
 
-/* Солнечный городок */
+/* Sunny Town */
 [data-palette='sunny-town'] {
   --c1: #785A46;
   --c2: #D24136;
@@ -160,7 +160,7 @@
   --d4: #7B4700;
 }
 
-/* Средиземноморский полдень */
+/* Mediterranean Noon */
 [data-palette='mediterranean'] {
   --c1: #8C0004;
   --c2: #C8000A;
@@ -176,7 +176,7 @@
   --d4: #724D00;
 }
 
-/* Осенний оранж */
+/* Autumn Orange */
 [data-palette='autumn-orange'] {
   --c1: #896E69;
   --c2: #D55448;
@@ -192,7 +192,7 @@
   --d4: #54545C;
 }
 
-/* Золотой полдень */
+/* Golden Noon */
 [data-palette='golden-noon'] {
   --c1: #323030;
   --c2: #882426;
@@ -208,7 +208,7 @@
   --d4: #67512F;
 }
 
-/* Сила знаний */
+/* Power of Knowledge */
 [data-palette='scholar'] {
   --c1: #42313A;
   --c2: #6C2D2C;
@@ -224,7 +224,7 @@
   --d4: #6B4F34;
 }
 
-/* Тёплая и стильная */
+/* Warm and Stylish */
 [data-palette='warm-cool'] {
   --c1: #444C5C;
   --c2: #CE5A57;
@@ -240,7 +240,7 @@
   --d4: #734D00;
 }
 
-/* Морская волна */
+/* Sea Wave */
 [data-palette='sea-wave'] {
   --c1: #003B46;
   --c2: #06575B;
@@ -256,7 +256,7 @@
   --d4: #345C66;
 }
 
-/* Зелёный туман */
+/* Green Mist */
 [data-palette='green-mist'] {
   --c1: #04202C;
   --c2: #304040;
@@ -272,7 +272,7 @@
   --d4: #4E594D;
 }
 
-/* Водная синева */
+/* Water Blue */
 [data-palette='aqua'] {
   --c1: #004D47;
   --c2: #128277;
@@ -288,7 +288,7 @@
   --d4: #48585F;
 }
 
-/* Туман мегаполиса */
+/* Metropolis Fog */
 [data-palette='city-fog'] {
   --c1: #2C4A52;
   --c2: #537072;
@@ -304,7 +304,7 @@
   --d4: #60543E;
 }
 
-/* Арктический рассвет */
+/* Arctic Dawn */
 [data-palette='arctic-dawn'] {
   --c1: #006C84;
   --c2: #6EB5C0;
@@ -320,7 +320,7 @@
   --d4: #4F5852;
 }
 
-/* Голубые и серые льды */
+/* Blue and Grey Ice */
 [data-palette='ice'] {
   --c1: #1995AD;
   --c2: #BCBABE;
@@ -336,7 +336,7 @@
   --d4: #555556;
 }
 
-/* Яркая Исландия */
+/* Bright Iceland */
 [data-palette='iceland'] {
   --c1: #505160;
   --c2: #598234;
@@ -352,7 +352,7 @@
   --d4: #535B00;
 }
 
-/* Лес после дождя */
+/* Forest After Rain */
 [data-palette='wet-forest'] {
   --c1: #2E4600;
   --c2: #7D4427;
@@ -368,7 +368,7 @@
   --d4: #4B5E00;
 }
 
-/* Современность */
+/* Modernity */
 [data-palette='modern'] {
   --c1: #0F1B07;
   --c2: #5C821A;
@@ -384,7 +384,7 @@
   --d4: #555555;
 }
 
-/* Свежая зелень */
+/* Fresh Greens */
 [data-palette='fresh-green'] {
   --c1: #011C1D;
   --c2: #004445;
@@ -400,7 +400,7 @@
   --d4: #00663E;
 }
 
-/* Горное озеро */
+/* Mountain Lake */
 [data-palette='mountain-lake'] {
   --c1: #324851;
   --c2: #34675C;
@@ -416,7 +416,7 @@
   --d4: #456000;
 }
 
-/* Свежесть и энергия */
+/* Freshness and Energy */
 [data-palette='energy'] {
   --c1: #34675C;
   --c2: #4CB5F5;
@@ -432,7 +432,7 @@
   --d4: #545653;
 }
 
-/* Молодая зелень */
+/* Young Green */
 [data-palette='young-green'] {
   --c1: #265C00;
   --c2: #68A225;
@@ -448,7 +448,7 @@
   --d4: #535656;
 }
 
-/* Зелёные поля */
+/* Green Fields */
 [data-palette='green-fields'] {
   --c1: #524A3A;
   --c2: #5A5F37;
@@ -464,7 +464,7 @@
   --d4: #5D5633;
 }
 
-/* Цитрус и трава */
+/* Citrus and Grass */
 [data-palette='citrus-grass'] {
   --c1: #4B7447;
   --c2: #EB8A44;
@@ -480,7 +480,7 @@
   --d4: #625500;
 }
 
-/* Садовая свежесть */
+/* Garden Freshness */
 [data-palette='garden'] {
   --c1: #739F3D;
   --c2: #EE693F;
@@ -496,7 +496,7 @@
   --d4: #545557;
 }
 
-/* Летняя фиеста */
+/* Summer Fiesta */
 [data-palette='fiesta'] {
   --c1: #7AA802;
   --c2: #F78B2D;
@@ -512,7 +512,7 @@
   --d4: #535C00;
 }
 
-/* Природная элегантность */
+/* Natural Elegance */
 [data-palette='elegant-nature'] {
   --c1: #563E20;
   --c2: #7E7B15;
@@ -528,7 +528,7 @@
   --d4: #5D5800;
 }
 
-/* От заката до сумерек */
+/* Sunset to Dusk */
 [data-palette='dusk'] {
   --c1: #363237;
   --c2: #2D4262;
@@ -544,7 +544,7 @@
   --d4: #8B381B;
 }
 
-/* Лосось и ржаной хлеб */
+/* Salmon and Rye */
 [data-palette='salmon-rye'] {
   --c1: #102A49;
   --c2: #4B4345;
@@ -560,7 +560,7 @@
   --d4: #903300;
 }
 
-/* С высоты полёта */
+/* From Above */
 [data-palette='bird-view'] {
   --c1: #2D3033;
   --c2: #335252;
@@ -576,7 +576,7 @@
   --d4: #4B585D;
 }
 
-/* Янтарь и лазурь */
+/* Amber and Azure */
 [data-palette='amber-azure'] {
   --c1: #2A3132;
   --c2: #763626;
@@ -592,7 +592,7 @@
   --d4: #295B7A;
 }
 
-/* Неоновая вывеска */
+/* Neon Sign */
 [data-palette='neon-sign'] {
   --c1: #262F34;
   --c2: #615049;
@@ -608,7 +608,7 @@
   --d4: #734B29;
 }
 
-/* Экзотика и прочность */
+/* Exotic and Sturdy */
 [data-palette='exotic'] {
   --c1: #0F1F38;
   --c2: #1B4B5A;
@@ -624,7 +624,7 @@
   --d4: #A3000A;
 }
 
-/* Солнце и небо */
+/* Sun and Sky */
 [data-palette='sun-sky'] {
   --c1: #211F30;
   --c2: #32384D;
@@ -640,7 +640,7 @@
   --d4: #764A00;
 }
 
-/* Цветочный луг */
+/* Flower Meadow */
 [data-palette='meadow'] {
   --c1: #3F681C;
   --c2: #375E97;
@@ -656,7 +656,7 @@
   --d4: #6F4F00;
 }
 
-/* Утренняя свежесть */
+/* Morning Freshness */
 [data-palette='morning'] {
   --c1: #FF420E;
   --c2: #F98866;
@@ -672,7 +672,7 @@
   --d4: #306400;
 }
 
-/* Тропический цветок */
+/* Tropical Flower */
 [data-palette='tropic-flower'] {
   --c1: #F52549;
   --c2: #FA6775;
@@ -688,7 +688,7 @@
   --d4: #685300;
 }
 
-/* Летний подсолнечник */
+/* Summer Sunflower */
 [data-palette='sunflower'] {
   --c1: #4E84BD;
   --c2: #CA6218;
@@ -704,7 +704,7 @@
   --d4: #665400;
 }
 
-/* Корзинка овощей */
+/* Basket of Vegetables */
 [data-palette='veggies'] {
   --c1: #258039;
   --c2: #CF3721;
@@ -720,7 +720,7 @@
   --d4: #6D5000;
 }
 
-/* Стойка с лимонадом */
+/* Lemonade Stand */
 [data-palette='lemonade'] {
   --c1: #F70025;
   --c2: #F25C00;
@@ -736,7 +736,7 @@
   --d4: #5E5442;
 }
 
-/* Весёлая и тропическая */
+/* Cheerful and Tropical */
 [data-palette='tropic-fun'] {
   --c1: #4897D8;
   --c2: #FA6E59;
@@ -752,7 +752,7 @@
   --d4: #675300;
 }
 
-/* Сыр, инжир и базилик */
+/* Cheese, Fig and Basil */
 [data-palette='figs-basil'] {
   --c1: #4C3F54;
   --c2: #486824;
@@ -768,7 +768,7 @@
   --d4: #6E5000;
 }
 
-/* Солнечный цитрус */
+/* Sunny Citrus */
 [data-palette='citrus-sun'] {
   --c1: #FA4032;
   --c2: #FA812F;
@@ -784,7 +784,7 @@
   --d4: #62533C;
 }
 
-/* Яблочный контраст */
+/* Apple Contrast */
 [data-palette='apple'] {
   --c1: #A11F0C;
   --c2: #E73F0B;
@@ -800,7 +800,7 @@
   --d4: #5D5800;
 }
 
-/* Неоновая ночь */
+/* Neon Night */
 [data-palette='neon-night'] {
   --c1: #231B12;
   --c2: #F56C57;
@@ -816,7 +816,7 @@
   --d4: #505D00;
 }
 
-/* Дерзость граффити */
+/* Graffiti Nerve */
 [data-palette='graffiti'] {
   --c1: #E1315B;
   --c2: #008DCB;
@@ -832,7 +832,7 @@
   --d4: #605600;
 }
 
-/* Ночная жизнь */
+/* Night Life */
 [data-palette='nightlife'] {
   --c1: #020509;
   --c2: #FF0038;
@@ -848,7 +848,7 @@
   --d4: #6A5200;
 }
 
-/* Вечеринка с бассейном */
+/* Pool Party */
 [data-palette='pool-party'] {
   --c1: #344D90;
   --c2: #E7552C;
@@ -864,7 +864,7 @@
   --d4: #744C00;
 }
 
-/* Живопись */
+/* Painting */
 [data-palette='painting'] {
   --c1: #061283;
   --c2: #138D90;
@@ -880,7 +880,7 @@
   --d4: #744C00;
 }
 
-/* Чашка капучино */
+/* Cup of Cappuccino */
 [data-palette='cappuccino'] {
   --c1: #626D71;
   --c2: #B38867;
@@ -896,7 +896,7 @@
   --d4: #575744;
 }
 
-/* Ягодная синева */
+/* Berry Blue */
 [data-palette='berry-blue'] {
   --c1: #1E1F26;
   --c2: #283655;
@@ -912,7 +912,7 @@
   --d4: #3F5677;
 }
 
-/* Изысканная простота */
+/* Refined Simplicity */
 [data-palette='simple-chic'] {
   --c1: #867666;
   --c2: #E1B80D;
@@ -928,7 +928,7 @@
   --d4: #5E5443;
 }
 
-/* Технология и природа */
+/* Technology and Nature */
 [data-palette='tech-nature'] {
   --c1: #282623;
   --c2: #88A550;
@@ -944,7 +944,7 @@
   --d4: #6A5200;
 }
 
-/* Городская жизнь */
+/* City Life */
 [data-palette='urban-life'] {
   --c1: #232122;
   --c2: #7BA4A8;
@@ -960,7 +960,7 @@
   --d4: #545555;
 }
 
-/* Городской оазис */
+/* Urban Oasis */
 [data-palette='urban-oasis'] {
   --c1: #2A2922;
   --c2: #7D5642;
@@ -976,7 +976,7 @@
   --d4: #5F5441;
 }
 
-/* Современный лоск */
+/* Modern Polish */
 [data-palette='modern-gloss'] {
   --c1: #2F2E33;
   --c2: #3A5199;
@@ -992,7 +992,7 @@
   --d4: #555555;
 }
 
-/* Нейтральный шебби-шик */
+/* Neutral Shabby Chic */
 [data-palette='shabby-chic'] {
   --c1: #4F4A45;
   --c2: #6C5F5B;
@@ -1008,7 +1008,7 @@
   --d4: #6D4E37;
 }
 
-/* Классический металлик */
+/* Classic Metallic */
 [data-palette='metallic'] {
   --c1: #070706;
   --c2: #594D46;
@@ -1024,7 +1024,7 @@
   --d4: #555554;
 }
 
-/* Зимние краски */
+/* Winter Colours */
 [data-palette='winter'] {
   --c1: #A10115;
   --c2: #D72C16;
@@ -1040,7 +1040,7 @@
   --d4: #57554F;
 }
 
-/* Море и пшеница */
+/* Sea and Wheat */
 [data-palette='sea-wheat'] {
   --c1: #00293C;
   --c2: #1E656D;
@@ -1056,7 +1056,7 @@
   --d4: #585921;
 }
 
-/* Самобытная и неожиданная */
+/* Distinct and Unexpected */
 [data-palette='offbeat'] {
   --c1: #432E33;
   --c2: #E7472E;
@@ -1072,7 +1072,7 @@
   --d4: #5B5634;
 }
 
-/* Городские виды */
+/* City Views */
 [data-palette='cityscape'] {
   --c1: #113743;
   --c2: #C5001A;
@@ -1088,7 +1088,7 @@
   --d4: #57564B;
 }
 
-/* Индустриальная строгость */
+/* Industrial Rigour */
 [data-palette='industrial'] {
   --c1: #20232A;
   --c2: #A01D26;
@@ -1104,7 +1104,7 @@
   --d4: #56564F;
 }
 
-/* Профессионализм и власть */
+/* Professional and Powerful */
 [data-palette='authority'] {
   --c1: #1E1E20;
   --c2: #962715;
@@ -1120,7 +1120,7 @@
   --d4: #555555;
 }
 
-/* Нежные тюльпаны */
+/* Tender Tulips */
 [data-palette='tulips'] {
   --c1: #F18D9E;
   --c2: #5BC8AC;
@@ -1136,7 +1136,7 @@
   --d4: #5E5700;
 }
 
-/* Птицы и ягоды */
+/* Birds and Berries */
 [data-palette='birds-berries'] {
   --c1: #5D535E;
   --c2: #9A9EAB;
@@ -1152,7 +1152,7 @@
   --d4: #595900;
 }
 
-/* Стильное ретро */
+/* Stylish Retro */
 [data-palette='retro'] {
   --c1: #4F6457;
   --c2: #75B1A9;
@@ -1168,7 +1168,7 @@
   --d4: #27624D;
 }
 
-/* Летнее барбекю */
+/* Summer Barbecue */
 [data-palette='barbecue'] {
   --c1: #752A07;
   --c2: #5C8F22;
@@ -1184,7 +1184,7 @@
   --d4: #714E00;
 }
 
-/* Безмятежность СПА */
+/* Spa Serenity */
 [data-palette='spa'] {
   --c1: #ED5752;
   --c2: #92AAC7;
@@ -1200,7 +1200,7 @@
   --d4: #5D5800;
 }
 
-/* Пастель */
+/* Pastel */
 [data-palette='pastel'] {
   --c1: #FFCCAC;
   --c2: #C1E1DC;
@@ -1216,7 +1216,7 @@
   --d4: #645500;
 }
 
-/* Клубника со сливками */
+/* Strawberries and Cream */
 [data-palette='strawberry'] {
   --c1: #D8412F;
   --c2: #FE7A47;
@@ -1232,7 +1232,7 @@
   --d4: #535656;
 }
 
-/* Приглушённая античность */
+/* Muted Antiquity */
 [data-palette='antique'] {
   --c1: #B2473E;
   --c2: #ACBD78;
@@ -1248,7 +1248,7 @@
   --d4: #226250;
 }
 
-/* Мегаполис */
+/* Metropolis */
 [data-palette='metropolis'] {
   --c1: #5A4E4D;
   --c2: #7E675E;
@@ -1264,7 +1264,7 @@
   --d4: #8C3804;
 }
 
-/* Солнце в городе */
+/* Sun in the City */
 [data-palette='city-sun'] {
   --c1: #2B616D;
   --c2: #FA8D62;
@@ -1280,7 +1280,7 @@
   --d4: #555555;
 }
 
-/* Побережье */
+/* Coastline */
 [data-palette='coast'] {
   --c1: #A99F3C;
   --c2: #E59D5C;
@@ -1296,7 +1296,7 @@
   --d4: #754A20;
 }
 
-/* Винтаж */
+/* Vintage */
 [data-palette='vintage'] {
   --c1: #E38B75;
   --c2: #BAA896;
@@ -1312,7 +1312,7 @@
   --d4: #724D00;
 }
 
-/* Расслабляющее ретро */
+/* Relaxing Retro */
 [data-palette='easy-retro'] {
   --c1: #D35C37;
   --c2: #BF9A77;
@@ -1328,7 +1328,7 @@
   --d4: #66503E;
 }
 
-/* Утончённость */
+/* Refinement */
 [data-palette='refined'] {
   --c1: #5F968E;
   --c2: #E05858;
@@ -1344,7 +1344,7 @@
   --d4: #345F4E;
 }
 
-/* Романтическая прогулка */
+/* Romantic Walk */
 [data-palette='romance'] {
   --c1: #688B8A;
   --c2: #A57C65;
@@ -1360,7 +1360,7 @@
   --d4: #63532C;
 }
 
-/* Нежный контраст */
+/* Gentle Contrast */
 [data-palette='soft-contrast'] {
   --c1: #1A405F;
   --c2: #337BAE;
@@ -1376,7 +1376,7 @@
   --d4: #565552;
 }
 
-/* Снова в школу */
+/* Back to School */
 [data-palette='school'] {
   --c1: #81715E;
   --c2: #E4535E;
@@ -1392,7 +1392,7 @@
   --d4: #754B00;
 }
 
-/* Дымчатый пурпур */
+/* Smoky Purple */
 [data-palette='smoky-purple'] {
   --c1: #727077;
   --c2: #A49592;
@@ -1408,7 +1408,7 @@
   --d4: #6B4E39;
 }
 
-/* Хюгге */
+/* Hygge */
 [data-palette='hygge'] {
   --c1: #4D585B;
   --c2: #488A99;
@@ -1424,7 +1424,7 @@
   --d4: #6F4F00;
 }
 
-/* День и ночь */
+/* Day and Night */
 [data-palette='day-night'] {
   --c1: #001A27;
   --c2: #053852;
@@ -1440,7 +1440,7 @@
   --d4: #5C5800;
 }
 
-/* Шик без вульгарности */
+/* Chic Without Vulgarity */
 [data-palette='quiet-chic'] {
   --c1: #16253D;
   --c2: #002C54;
@@ -1456,7 +1456,7 @@
   --d4: #6D5000;
 }
 
-/* Ягоды земляники */
+/* Wild Strawberries */
 [data-palette='wild-berry'] {
   --c1: #50312F;
   --c2: #3F6C45;
@@ -1472,7 +1472,7 @@
   --d4: #575A00;
 }
 
-/* Яркая ночь */
+/* Bright Night */
 [data-palette='bright-night'] {
   --c1: #000B29;
   --c2: #D70026;
@@ -1488,7 +1488,7 @@
   --d4: #595450;
 }
 
-/* Кухня 1950-х */
+/* 1950s Kitchen */
 [data-palette='fifties'] {
   --c1: #FE0000;
   --c2: #67BACA;
@@ -1504,7 +1504,7 @@
   --d4: #5C5353;
 }
 
-/* Городские контрасты */
+/* Urban Contrasts */
 [data-palette='city-contrast'] {
   --c1: #2F3131;
   --c2: #426E86;
@@ -1520,7 +1520,7 @@
   --d4: #5D5444;
 }
 
-/* Оранжевый акцент */
+/* Orange Accent */
 [data-palette='orange-accent'] {
   --c1: #353C3F;
   --c2: #756867;
@@ -1536,7 +1536,7 @@
   --d4: #555651;
 }
 
-/* По ту сторону чёрного и белого */
+/* Beyond Black and White */
 [data-palette='beyond-bw'] {
   --c1: #2F2F28;
   --c2: #AF1C1C;
@@ -1552,7 +1552,7 @@
   --d4: #545366;
 }
 
-/* Прибой у песчаного берега */
+/* Surf on Sandy Shore */
 [data-palette='surf'] {
   --c1: #20948B;
   --c2: #DE7A22;
@@ -1568,7 +1568,7 @@
   --d4: #6C5100;
 }
 
-/* Греческие каникулы */
+/* Greek Holidays */
 [data-palette='greece'] {
   --c1: #2F496E;
   --c2: #2988BC;
@@ -1584,7 +1584,7 @@
   --d4: #605342;
 }
 
-/* Морские огни */
+/* Sea Lights */
 [data-palette='sea-lights'] {
   --c1: #257985;
   --c2: #FF4447;

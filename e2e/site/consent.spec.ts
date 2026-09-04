@@ -3,10 +3,10 @@ import type { Page } from '@playwright/test'
 import { DICTS } from '../../src/i18n/dict'
 
 /*
- * CLAUDE.md → «Согласие и аналитика».
+ * CLAUDE.md → "Consent and analytics".
  *
- * Сознательно не покрыто: смена `CONSENT_VERSION`, поведение без `GA_ID`
- * (переменная стоит на весь прогон) и то, что уходит в сам Google.
+ * Deliberately not covered: a change of `CONSENT_VERSION`, the behaviour without
+ * `GA_ID` (the variable is set for the whole run) and what goes to Google itself.
  */
 async function analyticsStorage(page: Page): Promise<string> {
   return page.evaluate(() => {
@@ -26,8 +26,8 @@ test.beforeEach(async ({ context }) => {
   await context.route('**/googletagmanager.com/**', (route) => route.abort())
 })
 
-test.describe('согласие на аналитику', () => {
-  test('до ответа аналитика выключена, а «Принять» включает её без перезагрузки', async ({
+test.describe('consent to analytics', () => {
+  test('analytics is off until the answer, and "Accept" turns it on without a reload', async ({
     page,
   }) => {
     await page.goto('/ru')
@@ -47,7 +47,7 @@ test.describe('согласие на аналитику', () => {
     expect(await analyticsStorage(page)).toBe('granted')
   })
 
-  test('отказ запоминается так же, как согласие', async ({ page }) => {
+  test('a refusal is remembered the same way as consent', async ({ page }) => {
     await page.goto('/ru')
 
     const banner = page.getByRole('region', { name: DICTS.ru.consent.bannerAria })
@@ -60,7 +60,7 @@ test.describe('согласие на аналитику', () => {
     expect(await analyticsStorage(page)).toBe('denied')
   })
 
-  test('ссылка «Куки» в подвале открывает разговор заново', async ({ page }) => {
+  test('the "Cookies" link in the footer opens the conversation again', async ({ page }) => {
     await page.goto('/ru')
 
     const banner = page.getByRole('region', { name: DICTS.ru.consent.bannerAria })
@@ -74,7 +74,7 @@ test.describe('согласие на аналитику', () => {
     expect(await analyticsStorage(page)).toBe('granted')
   })
 
-  test('решение вошедшего лежит в настройках аккаунта и переживает чистую куку', async ({
+  test('a signed-in decision lives in the account settings and survives a cleared cookie', async ({
     signedIn: page,
   }) => {
     await page.goto('/ru')

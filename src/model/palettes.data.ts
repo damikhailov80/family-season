@@ -1,4 +1,4 @@
-/* Собирается tools/palettes/build.mjs (npm run palettes) из tools/palettes/source.json. */
+/* Built by tools/palettes/build.mjs (npm run palettes) from tools/palettes/source.json. */
 
 export const PALETTES = [
   ['desert', { ru: 'Пустыня', en: 'Desert', pl: 'Pustynia' }],

@@ -24,8 +24,8 @@ const round = (n) => Number(n.toFixed(3))
 const tx = round(SHEET.x + SHEET.w / 2 - (BOX.x + BOX.w / 2) * scale)
 const ty = round(SHEET.y + SHEET.h / 2 - (BOX.y + BOX.h / 2) * scale)
 
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ICON_VIEWBOX} ${ICON_VIEWBOX}" width="${ICON_VIEWBOX}" height="${ICON_VIEWBOX}" role="img" aria-label="Семейный сезон">
-  <!-- Собран tools/logo/build.mjs (npm run logo) из ICONS['heart']. Руками не править. -->
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${ICON_VIEWBOX} ${ICON_VIEWBOX}" width="${ICON_VIEWBOX}" height="${ICON_VIEWBOX}" role="img" aria-label="Family Season">
+  <!-- Built by tools/logo/build.mjs (npm run logo) from ICONS['heart']. Do not edit by hand. -->
   <rect width="${ICON_VIEWBOX}" height="${ICON_VIEWBOX}" rx="${RADIUS}" fill="${TILE}"/>
   <rect x="${SHEET.x}" y="${SHEET.y}" width="${SHEET.w}" height="${SHEET.h}" rx="${SHEET.r}" fill="${PAPER}"/>
   <g transform="translate(${tx} ${ty}) scale(${round(scale)})" fill="${INK}">

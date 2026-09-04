@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Семейный сезон">
-  <!-- Собран tools/logo/build.mjs (npm run logo) из ICONS['heart']. Руками не править. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Family Season">
+  <!-- Built by tools/logo/build.mjs (npm run logo) from ICONS['heart']. Do not edit by hand. -->
   <rect width="64" height="64" rx="15" fill="#336B87"/>
   <rect x="15" y="9" width="34" height="46" rx="4" fill="#fff"/>
   <g transform="translate(16.571 16.08) scale(0.482)" fill="#763626">

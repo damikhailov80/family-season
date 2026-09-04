@@ -1,4 +1,4 @@
--- Жалоба перестаёт быть ссылкой и становится снимком.
+-- A report stops being a reference and becomes a snapshot.
 
 alter table public_reports add column if not exists code    text;
 alter table public_reports add column if not exists content jsonb;

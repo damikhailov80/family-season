@@ -3,6 +3,6 @@ export function dbTarget(value) {
     const parsed = new URL(value)
     return `${parsed.hostname}${parsed.port ? `:${parsed.port}` : ''}${parsed.pathname}`
   } catch {
-    return 'адрес не разобрался'
+    return 'address did not parse'
   }
 }

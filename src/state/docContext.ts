@@ -36,7 +36,7 @@ export const DocContext = createContext<DocValue | null>(null)
 
 export function useDoc(): DocValue {
   const value = useContext(DocContext)
-  if (!value) throw new Error('useDoc вызван вне провайдера постера')
+  if (!value) throw new Error('useDoc was called outside the poster provider')
   return value
 }
 

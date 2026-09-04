@@ -1,4 +1,4 @@
--- Согласие на аналитику.
+-- Consent to analytics.
 
 alter table user_settings add column if not exists consent         text;
 alter table user_settings add column if not exists consent_version int;

@@ -1,1826 +1,1882 @@
-# Заметки по проекту (для агента)
+# Project notes (for the agent)
 
-Продуктовое описание — в `README.md`. Здесь то, что легко сломать, не зная замысла.
+The product description is in `README.md`. What follows is what is easy to break without
+knowing the intent.
 
-## Две породы сезонов
+## Two breeds of season
 
-Сезонов две породы, и они лежат в разных таблицах:
+There are two breeds of season, and they live in different tables:
 
-- **личный сезон** (`user_seasons`) — своя коллекция, снаружи не видна, форк всегда даёт
-  новую строку, содержимое правится сколько угодно;
-- **публичный сезон** (`public_seasons`) — выложенная идея с постоянным коротким адресом,
-  лайками, жалобами и избранным. Автор — человек или система (наши примеры).
-  Публикация — **копия**, а не указатель: связи с личным сезоном нет вовсе.
+- a **personal season** (`user_seasons`) — your own collection, invisible from outside, a fork
+  always makes a new row, the content can be edited as much as you like;
+- a **published season** (`public_seasons`) — an idea put out with a permanent short address,
+  likes, reports and favourites. The author is a person or the system (our examples).
+  Publishing is a **copy**, not a pointer: there is no link to the personal season at all.
 
-Три вещи, на которых держится всё остальное:
+Three things hold up everything else:
 
-- **у каждого постера ровно одно хранилище.** У вошедшего — строка в базе, у невошедшего —
-  один черновик в `localStorage`. Раньше эту роль играл адрес, и запрет на `localStorage`
-  защищал не от технологии, а от расхождения двух копий; копия по-прежнему одна.
-- **имена людей лежат отдельно от содержимого** (`names` рядом с `content`): по содержимому
-  считается уникальность публикации — тот же сезон с другими именами выложить нельзя, — и
-  подмена ровно `names` даёт обезличивание при публикации.
-- **мёртвая база означает «сезонов нет»**: работают лендинг, черновик невошедшего и печать.
-  Всё остальное без базы не живёт, и притворяться, что живёт, не надо.
+- **every poster has exactly one storage.** A signed-in person has a row in the database, a
+  signed-out one has a single draft in `localStorage`. The address used to play that role, and
+  the ban on `localStorage` protected not against the technology but against two copies drifting
+  apart; there is still only one copy.
+- **people's names live apart from the content** (`names` next to `content`): the uniqueness of
+  a publication is counted by content — the same season with different names cannot be published
+  — and swapping exactly `names` is what anonymises a publication.
+- **a dead database means "there are no seasons"**: the landing page, a signed-out person's
+  draft and printing keep working. Nothing else lives without the database, and there is no need
+  to pretend otherwise.
 
-История переезда с адреса на базу — в git (шаги Э0–Э9, август 2026); здесь описана только
-сегодняшняя жизнь.
+The history of the move from the address to the database is in git (steps E0–E9, August 2026);
+what is described here is only today's life.
 
-## Каркас: Next.js
+## The frame: Next.js
 
-Постер бывает трёх видов, и различаются они тем, **где лежит содержимое**: черновик
-невошедшего — в `localStorage`, свой сезон и выложенный — строками в базе. Сам лист при
-этом один и тот же компонент (`components/Poster.tsx`), а страницы вокруг него разные.
+A poster comes in three kinds, and they differ by **where the content lies**: a signed-out
+person's draft is in `localStorage`, your own season and a published one are rows in the
+database. The sheet itself is the same component (`components/Poster.tsx`); the pages around it
+differ.
 
-**У каждого адреса первым сегментом стоит язык** — `/ru`, `/en`, `/pl`, — и корневой
-лейаут лежит внутри `[lang]` (см. «Языки»). Без языка адресов на сайте нет: `proxy`
-подставляет его редиректом. Исключение одно — `/api/*`: у роут-хендлеров корневых
-параметров не бывает.
+**Every address has the language as its first segment** — `/ru`, `/en`, `/pl` — and the root
+layout lives inside `[lang]` (see "Languages"). There are no addresses on the site without a
+language: `proxy` supplies it with a redirect. There is one exception — `/api/*`: route
+handlers do not get root params.
 
-| Адрес | Что | Рендер |
+| Address | What | Rendering |
 | --- | --- | --- |
-| `/<lang>` | Лендинг: объяснение сути проекта | Серверный компонент |
-| `/<lang>/sheet` | Черновик из `localStorage` в просмотре | `'use client'` + `dynamic(ssr: false)` |
-| `/<lang>/sheet/edit` | Он же в правке | то же |
-| `/<lang>/season/<code>` | Свой сезон из базы, просмотр | Серверная страница + клиентский постер |
-| `/<lang>/season/<code>/edit` | Он же в правке; правки пишутся сами | то же |
-| `/<lang>/s/<code>` | Выложенный сезон (в том числе наши примеры) | то же |
-| `/<lang>/seasons` | «Мои сезоны», только для вошедших | Серверный компонент |
-| `/<lang>/ideas` | «Идеи сообщества» — витрина выложенных сезонов | Серверный компонент |
-| `/<lang>/account` | Кабинет: язык, состав семьи, выход | Серверный компонент |
-| `/<lang>/privacy` | Политика приватности | Серверный компонент |
-| `/api/auth/*` | Вход: всё, что обслуживает Auth.js | Роут-хендлер |
-| `/api/family` | Состав семьи для живого постера | Роут-хендлер |
-| `/<lang>/<что угодно ещё>` | 404 нашей страницей, а не заглушкой Next | Серверный компонент |
+| `/<lang>` | Landing page: what the project is about | Server component |
+| `/<lang>/sheet` | The draft from `localStorage`, viewing | `'use client'` + `dynamic(ssr: false)` |
+| `/<lang>/sheet/edit` | The same one, editing | same |
+| `/<lang>/season/<code>` | Your own season from the database, viewing | Server page + client poster |
+| `/<lang>/season/<code>/edit` | The same one, editing; edits write themselves | same |
+| `/<lang>/s/<code>` | A published season (our examples included) | same |
+| `/<lang>/seasons` | "My seasons", signed-in only | Server component |
+| `/<lang>/ideas` | "Community Ideas" — the showcase of published seasons | Server component |
+| `/<lang>/account` | Account: language, family, sign-out | Server component |
+| `/<lang>/privacy` | Privacy policy | Server component |
+| `/api/auth/*` | Sign-in: everything Auth.js serves | Route handler |
+| `/api/family` | The family for the live poster | Route handler |
+| `/<lang>/<anything else>` | Our own 404 page, not the Next stub | Server component |
 
-**Режим несёт путь, а не пометка.** Просмотр и правка — разные адреса, и это верно для
-всех трёх видов постера. Переключение — обычная ссылка (`next/link` у сезона из базы,
-чтобы незаписанная правка успела уйти на сервер из размонтирования). Никакого
-`history.pushState` руками больше нет: содержимое лежит либо в строке, либо в
-`localStorage`, и перемонтирование постера ничего не теряет.
+**The path carries the mode, not a flag.** Viewing and editing are different addresses, and that
+holds for all three kinds of poster. Switching is an ordinary link (`next/link` for a season
+from the database, so an unwritten edit has time to reach the server from the unmount). There is
+no more hand-written `history.pushState`: the content lies either in a row or in `localStorage`,
+and remounting the poster loses nothing.
 
-**Содержимого в адресе нет.** Ни бланка, ни темы, ни набора рисунков: в адресе стоит
-короткий код строки (`src/model/shortcode.ts`). Единственное исключение — `?p=` и `?i=`
-у выложенного сезона: это **перебивка оформления**, чтобы примеривший чужой постер в
-своей теме мог прислать ссылку на увиденное. Содержимого в них нет, строку они не меняют.
+**There is no content in the address.** Neither the blank, nor the theme, nor the icon set: the
+address holds the short code of a row (`src/model/shortcode.ts`). The only exception is `?p=`
+and `?i=` on a published season: they are a **styling override**, so that someone who tried
+another person's poster in their own theme can send a link to what they saw. They carry no
+content and do not change the row.
 
-- Бандлер — **Turbopack**, это дефолт Next 16 и для `dev`, и для `build`. Ни флага, ни
-  настройки в `next.config.ts` для этого не нужно; webpack, наоборот, включается
-  `--webpack`. Строка `vite-plus` в `package-lock.json` — необязательный peer-dep oxlint,
-  к сборке отношения не имеет.
-- **`output: 'export'` добавлять нельзя.** Статический экспорт выключает роут-хендлеры,
-  то есть закроет дорогу тому самому бэкенду.
-- `ssr: false` на листе бэкенду не мешает: он касается только рендера страницы. Роут-хендлеры
-  (`src/app/api/*/route.ts`) — независимый серверный слой, их можно заводить как обычно.
-  Дымового роута больше нет: он и заводился до первого настоящего маршрута, а теперь
-  его роль играет `GET /api/auth/providers`.
-- **У каждого постера ровно одно хранилище, и второй копии не бывает.** Свой сезон и
-  выложенный лежат строками в базе (`user_seasons`, `public_seasons`), черновик
-  невошедшего — в `localStorage` (`src/model/draft.ts`). Раньше эту роль играл адрес, и
-  запрет на `localStorage` защищал не от технологии, а от расхождения двух копий; теперь
-  копия по-прежнему одна. Заводить рядом со строкой колонки «месяц», «тема», «люди»
-  нельзя — вот они и были бы той самой второй копией.
-- `src/app/[lang]/sheet/page.tsx` и `src/app/[lang]/sheet/edit/page.tsx` **серверные**, но лист внутри
-  по-прежнему грузится с **`ssr: false`** — через клиентский `SheetLoader.tsx`. Разводить
-  их пришлось потому, что `next/dynamic` с `ssr: false` из серверного компонента звать
-  нельзя, а сессию странице читать надо: от входа зависит, что панель черновика предлагает
-  сделать. Сам черновик как лежал в браузере, так и лежит — серверу его негде взять, а
-  `location` и хранилище доступны уже в первом рендере листа. Страницы `/season` и `/s`
-  серверные целиком: содержимое едет пропсом, и постер рендерится на сервере.
-- **Next патчит `history.pushState`/`replaceState`.** Если в `data` уже лежит его служебное
-  поле `__NA`, патч уходит на короткий путь и роутера не трогает: адрес меняется, дерево
-  React остаётся смонтированным. Отсюда правило: `replaceState` зовите **с
-  `history.state`** — так делает единственное оставшееся место, перебивка оформления на
-  `/s/<code>`. Подставите `null` — вызов пойдёт через `ACTION_RESTORE`, и постер может
-  перемонтироваться.
-- Обёртка `<div id="root">` в `layout.tsx` осталась от версии на Vite: на `#root` завязаны
-  экранные отступы, `min-height` и рецепт проверки печати. Не убирайте её. Внутри неё
-  корневой лейаут рисует общую обвязку сайта: `SiteHeader`, `<main>` со страницей и
-  `SiteFooter` (`src/components/site/`). `#root` для этого стал flex-колонкой, а
-  растянутый `main` прижимает подвал к низу коротких страниц.
-- **Сайтовая обвязка на бумагу не идёт.** Шапка и подвал скрыты в `@media print`, а `#root`
-  и `main` там возвращаются в `display: block` — flex-контейнер Chrome при печати кроит
-  по страницам (см. «Печать»). Любой новый элемент обвязки скрывайте сразу же.
-- В шапке, подвале и на лендинге ссылки на страницы сайта — `next/link`, а **в постер —
-  обычные `<a href>`**: страницы постера клиентские и тянут свой кусок бандла, выигрыш от
-  мягкого перехода невелик, а свежий документ надёжнее. Исключение — переход
-  «Править»/«Готово» внутри своего сезона: там нужен именно мягкий переход, иначе
-  незаписанная правка не успеет уйти на сервер.
-- Вход (`site/LoginButtons.tsx`) настоящий и **целиком серверный** — см. раздел «Вход».
-  Клиентских компонентов в обвязке три, и все заведены сознательно: `Toast`,
-  `NewSeasonButton` (кнопка «Новый сезон» — ей нужно окно с именем) и `DraftClaimer`
-  (черновик после входа — он лежит в `localStorage`, серверу его негде взять).
-- Шрифты — `next/font/google` в `layout.tsx`, файлы отдаёт сам сайт. Имена семейств
-  хэшируются, поэтому в `tokens.css` они подставляются переменными `--font-nunito`,
-  `--font-caveat`, `--font-marck-script`, а не строкой `'Nunito'`. Кириллицу в `subsets`
-  нужно указывать явно — css2 подбирал её сам, `next/font` не догадается.
-- В `.oxlintrc.json` для `src/app/**` выключен `react/only-export-components`: файлы
-  маршрутов Next обязаны экспортировать `metadata` рядом с компонентом.
+- The bundler is **Turbopack**, the Next 16 default for both `dev` and `build`. Neither a flag
+  nor a setting in `next.config.ts` is needed for that; webpack, on the contrary, is switched on
+  with `--webpack`. The `vite-plus` line in `package-lock.json` is an optional peer dep of
+  oxlint and has nothing to do with the build.
+- **`output: 'export'` must not be added.** A static export turns off route handlers, i.e. it
+  closes the road to the very backend we need.
+- `ssr: false` on the sheet does not get in the backend's way: it only concerns page rendering.
+  Route handlers (`src/app/api/*/route.ts`) are an independent server layer and can be added as
+  usual. There is no smoke route any more: it only existed until the first real one, and
+  `GET /api/auth/providers` plays its part now.
+- **Every poster has exactly one storage, and there is never a second copy.** Your own season
+  and a published one are rows in the database (`user_seasons`, `public_seasons`), a signed-out
+  person's draft is in `localStorage` (`src/model/draft.ts`). Adding columns "month", "theme" or
+  "people" next to a row is forbidden — those would be that second copy.
+- `src/app/[lang]/sheet/page.tsx` and `src/app/[lang]/sheet/edit/page.tsx` are **server**
+  components, but the sheet inside is still loaded with **`ssr: false`** — through the client
+  `SheetLoader.tsx`. They had to be split because `next/dynamic` with `ssr: false` cannot be
+  called from a server component, while the page does need to read the session: what the draft
+  bar offers depends on being signed in. The draft itself still lies in the browser — the server
+  has nowhere to take it from — and `location` and storage are available in the sheet's first
+  render. The `/season` and `/s` pages are server pages throughout: the content arrives as a
+  prop and the poster renders on the server.
+- **Next patches `history.pushState`/`replaceState`.** If `data` already holds its internal
+  `__NA` field, the patch takes a short path and leaves the router alone: the address changes,
+  the React tree stays mounted. Hence the rule: call `replaceState` **with `history.state`** —
+  that is what the single remaining place does, the styling override on `/s/<code>`. Pass `null`
+  and the call goes through `ACTION_RESTORE`, and the poster may remount.
+- The `<div id="root">` wrapper in `layout.tsx` is left over from the Vite version: screen
+  padding, `min-height` and the print-check recipe are tied to `#root`. Do not remove it. Inside
+  it the root layout draws the site frame: `SiteHeader`, `<main>` with the page and `SiteFooter`
+  (`src/components/site/`). For that `#root` became a flex column, and the stretched `main`
+  presses the footer to the bottom of short pages.
+- **The site frame does not go to paper.** The header and footer are hidden in `@media print`,
+  and `#root` and `main` go back to `display: block` there — Chrome slices a flex container into
+  pages when printing (see "Printing: two A4 pages"). Hide any new frame element right away.
+- In the header, the footer and the landing page, links to site pages are `next/link`, but
+  **links into the poster are plain `<a href>`**: the poster pages are client pages and pull
+  their own chunk of the bundle, the gain from a soft transition is small and a fresh document
+  is more reliable. The exception is the "Edit"/"Done" transition inside your own season: there a
+  soft transition is exactly what is needed, otherwise an unwritten edit does not reach the
+  server in time.
+- Sign-in (`site/LoginButtons.tsx`) is real and **entirely server-side** — see "Sign-in". There
+  are three client components in the frame, all of them deliberate: `Toast`, `NewSeasonButton`
+  (the "New season" button — it needs a dialog with a name) and `DraftClaimer` (the draft after
+  sign-in — it lies in `localStorage` and the server has nowhere to take it from).
+- Fonts are `next/font/google` in `layout.tsx`, and the site serves the files itself. Family
+  names are hashed, so `tokens.css` substitutes them through the variables `--font-nunito`,
+  `--font-caveat`, `--font-marck-script` rather than the string `'Nunito'`. Cyrillic has to be
+  named explicitly in `subsets` — css2 picked it up by itself, `next/font` will not guess.
+- In `.oxlintrc.json`, `react/only-export-components` is switched off for `src/app/**`: Next
+  route files are obliged to export `metadata` next to the component.
 
-## Языки
+## Languages
 
-Три языка: русский, английский, польский. Русский — тот, с которого сайт начинался, и
-эталон словаря; остальные два обязаны иметь ровно те же ключи.
+Three languages: Russian, English and Polish. Russian is the one the site started with and the
+reference dictionary; the other two must have exactly the same keys.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Список языков, кука, разбор `Accept-Language` | `src/model/lang.ts` |
-| Словари | `src/i18n/dict/{ru,en,pl}.ts`, реестр — `dict/index.ts` |
-| Форма словаря | `src/i18n/types.ts` (`Dict = typeof ru`) |
-| Подстановка `{n}` и `**жирное**` | `src/i18n/fill.ts` |
-| Язык и словарь на сервере | `src/i18n/server.ts` (`getLang`, `getDict`) |
-| Язык и словарь на клиенте | `src/i18n/LangProvider.tsx`, `src/i18n/context.ts` |
-| Язык в адресе | `src/proxy.ts`, `withLang`/`stripLang` в `model/site.ts` |
-| Настройка вошедшего | колонка `user_settings.language`, `readLanguage`/`writeLanguage` |
-| Запись определённого языка в базу | `components/site/LangSync.tsx`, действие `rememberLanguage` |
-| Переключатели | `components/site/LangSwitcher.tsx` (шапка), `app/[lang]/account/LanguageEditor.tsx` |
-| Схема | `tools/db/migrations/005_language.sql` |
+| The language list, the cookie, parsing `Accept-Language` | `src/model/lang.ts` |
+| The dictionaries | `src/i18n/dict/{ru,en,pl}.ts`, registry in `dict/index.ts` |
+| The shape of a dictionary | `src/i18n/types.ts` (`Dict = typeof ru`) |
+| Substituting `{n}` and `**bold**` | `src/i18n/fill.ts` |
+| Language and dictionary on the server | `src/i18n/server.ts` (`getLang`, `getDict`) |
+| Language and dictionary on the client | `src/i18n/LangProvider.tsx`, `src/i18n/context.ts` |
+| The language in the address | `src/proxy.ts`, `withLang`/`stripLang` in `model/site.ts` |
+| A signed-in person's setting | the `user_settings.language` column, `readLanguage`/`writeLanguage` |
+| Writing the detected language to the database | `components/site/LangSync.tsx`, action `rememberLanguage` |
+| The switchers | `components/site/LangSwitcher.tsx` (header), `app/[lang]/account/LanguageEditor.tsx` |
+| Schema | `tools/db/migrations/005_language.sql` |
 
-### Два разных языка, и путать их нельзя
+### Two different languages, and they must not be confused
 
-- **язык интерфейса** — им подписаны шапка, кнопки, окна и тосты. Стоит в адресе, хранится
-  кукой, у вошедшего ещё и в базе. Берётся `getDict()` на сервере и `useDict()` на клиенте;
-- **язык сезона** — им подписан сам лист: месяц, подписи секций, подсказки пустых полей.
-  Лежит колонкой рядом с содержимым (`user_seasons.language`, `public_seasons.language`,
-  поле `lang` у черновика) и **не ходит за настройкой**: переключив сайт на английский,
-  человек не переписывает свой русский сезон. Берётся `usePoster()` из контекста постера.
+- the **interface language** — it captions the header, the buttons, the dialogs and the toasts.
+  It stands in the address, is kept in a cookie and, for a signed-in person, in the database as
+  well. Taken with `getDict()` on the server and `useDict()` on the client;
+- the **season's language** — it captions the sheet itself: the month, the section labels, the
+  placeholders of empty fields. It lies in a column next to the content
+  (`user_seasons.language`, `public_seasons.language`, the `lang` field of a draft) and **does
+  not follow the setting**: switching the site to English does not rewrite someone's Russian
+  season. Taken with `usePoster()` from the poster context.
 
-Разводить их обязательно: свой сезон человек правит на любом языке интерфейса, а лист при
-этом остаётся на своём — переключив сайт, он не переписывает набранное. Экранные
-кнопки на самом постере (стрелки месяца, «Сменить рисунок», «Добавить человека») — это
-интерфейс: на бумагу они не идут, и человек, правящий чужой сезон, обязан читать их на
-своём языке.
+Keeping them apart is mandatory. The on-screen buttons on the poster itself (the month arrows,
+"Change the drawing", "Add a person") are interface: they do not go to paper, and a person
+editing someone else's season must read them in their own language.
 
-**Внутрь `content` язык не идёт.** Он лежит колонкой рядом, как тема и набор рисунков.
-Иначе пришлось бы поднимать версию формата (`codec.ts`) и переписывать все строки в базе
-ради значения, к самому бланку отношения не имеющего. Третьим исключением из «печатается
-только `Template`» язык не становится: он не печатается, он выбирает, чем печатать.
+**The language does not go inside `content`.** It lies in a column next to it, like the theme
+and the icon set: otherwise we would have to raise the format version (`codec.ts`) and rewrite
+every row for a value that has nothing to do with the blank. It is not a third exception to "only
+`Template` is printed" — it is not printed, it chooses what to print with.
 
-### Адрес
+### The address
 
-Язык стоит в адресе **всегда, включая русский**: так адрес одинаково устроен на всех трёх
-языках, присланная ссылка открывается ровно тем, чем её видел отправитель, а `[lang]`
-остаётся **корневым параметром** — иначе `next/root-params` не работает вовсе, и язык
-пришлось бы тащить пропом через каждую страницу.
+The language stands in the address **always, Russian included**: the address is then built the
+same on all three, a link opens exactly as its sender saw it, and `[lang]` stays a **root param** —
+otherwise `next/root-params` does not work at all and the language would have to be dragged as a
+prop through every page.
 
-Отсюда `src/app/[lang]/layout.tsx` вместо `src/app/layout.tsx`. Всё, кроме `api/`, лежит
-под `[lang]`; адреса собираются строителями из `model/site.ts`, которые берут язык первым
-аргументом (`seasonHref(lang, code)`, `publicSeasonHref(lang, code)`, …). `ROUTES` осталась
-таблицей путей **без** языка: путь один и тот же на всех трёх, и трёх копий каждого адреса
-заводить не надо.
+Hence `src/app/[lang]/layout.tsx` instead of `src/app/layout.tsx`. Everything except `api/` lies
+under `[lang]`; addresses are assembled by the builders in `model/site.ts`, which take the
+language as their first argument (`seasonHref(lang, code)`, `publicSeasonHref(lang, code)`, …).
+`ROUTES` remains a table of paths **without** the language: the path is the same on all three,
+and three copies of every address are not needed.
 
-### Кто решает, какой язык показать
+### Who decides which language to show
 
-`proxy` знает только адрес, куку `fs-lang` и `Accept-Language`, и разбирает их так:
+`proxy` knows only the address, the `fs-lang` cookie and `Accept-Language`, and reads them like
+this:
 
-1. язык в пути есть — пропускаем и **запоминаем его кукой**. Это и значит «язык можно
-   поменять руками в адресе»: следующий заход на голый `/` приведёт туда же. Настройку
-   вошедшего это не трогает — она меняется только в кабинете;
-2. языка в пути нет — берём куку, потом `Accept-Language`, потом русский, и уводим
-   редиректом.
+1. the path has a language — let it through and **remember it in the cookie**. That is what "the
+   language can be changed by hand in the address" means: the next visit to a bare `/` will lead
+   to the same place. This does not touch a signed-in person's setting — that changes only in
+   the account;
+2. the path has no language — take the cookie, then `Accept-Language`, then Russian, and redirect
+   there.
 
-Заодно `proxy` дописывает в запрос два заголовка: `x-lang-path` (путь без языка **вместе с
-query** — иначе лейауту некуда уводить, своего адреса серверный компонент не знает, а без
-query редирект терял бы примеренное оформление `?p=`/`?i=` и состояние списков) и
-`x-lang-source`:
-`url` — язык стоял в запрошенном адресе, `auto` — его подставил сам `proxy`.
+At the same time `proxy` adds two headers to the request: `x-lang-path` (the path without the
+language **together with the query** — otherwise the layout has nowhere to redirect to, a server
+component does not know its own address, and without the query a redirect would lose the tried-on
+styling `?p=`/`?i=` and the state of the lists) and `x-lang-source`: `url` — the language was in
+the requested address, `auto` — `proxy` supplied it.
 
-Проверяется: `e2e/site/lang.spec.ts` — переключатель уводит на тот же адрес, не теряя
-ни query, ни сессию.
+Verified by: `e2e/site/lang.spec.ts` — the switcher goes to the same address without losing the
+query or the session.
 
-**Различать `url` и `auto` по одному адресу нельзя, и это уже стоило отладки.** После
-редиректа `proxy` язык стоит в пути ровно так же, как если бы его набрали руками; пока
-`proxy` во втором случае честно отвечал `url`, настройка из базы не побеждала **никогда** —
-заход на голый `/` уводил на язык куки и там же и оставался. Поэтому свой редирект `proxy`
-помечает кукой-однодневкой `fs-lang-auto` и снимает её, прочитав на следующем запросе.
+**`url` and `auto` cannot be told apart by the address alone, and that has already cost
+debugging.** After a `proxy` redirect the language stands in the path exactly as if it had been
+typed by hand; while `proxy` honestly answered `url` there, the setting from the database **never**
+won — a visit to a bare `/` led to the cookie's language and stayed. So `proxy` marks its own
+redirect with a one-day `fs-lang-auto` cookie and removes it once it has read it.
 
-**После входа возвращаемся на путь без языка.** `googleLoginUrl` срезает язык с адреса
-возврата (`stripLang`), и это не мелочь: вернув `/en/ideas` как есть, мы сказали бы
-«человек выбрал английский», и вошедший с русской настройкой остался бы на английском — а
-вход это и есть «заход на сайт», где язык берётся из базы. Отдаём голый путь — `proxy`
-подставит язык сам, пометит `auto`, и настройка победит. Страница и примерка оформления при
-этом не теряются: `?p=` и `?i=` едут в том же адресе.
+**After signing in we come back to the path without a language.** `googleLoginUrl` strips the
+language off the return address (`stripLang`), and that is not a detail: returning `/en/ideas` as
+it was would say "the person chose English", and someone with a Russian setting would be left on
+English — whereas signing in *is* "arriving at the site", where the language comes from the
+database. We give back the bare path, `proxy` marks it `auto`, and the setting wins. The page and
+the tried-on styling are not lost: `?p=` and `?i=` travel in the same address.
 
-**Настройка из базы сильнее `auto` и слабее `url`.** Сверку делает корневой лейаут: вошёл,
-язык базы отличается от языка адреса, источник `auto` — уводим на язык базы. Дальше всё
-кончается само: следующий запрос придёт без пометки, источником будет `url`, а кука
-станет равна базе — то есть заход чинит и её. Руками введённый `/en/...` этим не сбивается:
-у него источник `url`, английский показывается, настройка не меняется, — но следующий заход
-на `/` снова приведёт на язык настройки, как и обещано.
+**The setting from the database is stronger than `auto` and weaker than `url`.** The root layout
+does the check: signed in, the database language differs from the address language, the source is
+`auto` — redirect to the database language. After that it ends by itself: the next request comes
+without the marker, the source is `url`, and the cookie becomes equal to the database — so the
+visit fixes the cookie too. A hand-typed `/en/...` is not knocked off course by this: its source
+is `url`, English is shown, the setting is not changed — but the next visit to `/` will again
+lead to the setting's language, as promised.
 
-В базу `proxy` не ходит — это запрещено документацией Next и не нужно.
+`proxy` never goes to the database — that is forbidden by the Next documentation and is not
+needed.
 
-**Переключатель стоит в шапке, а не в подвале.** Сперва он стоял именно там — «язык
-выбирают один раз, а шапка занята тем, чем пользуются каждый день», — и оказался
-ненаходимым: у невошедшего это **единственный** способ сменить язык, а лендинг длиной в два
-с половиной экрана, и попавший не на свой язык до подвала просто не доходит. Сделан он
-`<details>`-ом: раскрытие умеет сам браузер, JS не нужен, клиентским компонентом в обвязке
-сайта становиться не приходится.
+**The switcher stands in the header, not in the footer.** At first it stood exactly there — "the
+language is chosen once, and the header is busy with what is used every day" — and turned out to
+be unfindable: for a signed-out person it is the **only** way to change the language, the landing
+page is two and a half screens long, and someone who landed on the wrong language simply never
+reaches the footer. It is made as a `<details>`: the browser can do the disclosure itself, no JS
+is needed, and the site frame does not have to gain a client component.
 
-**На кнопке один глобус, без названия языка, и на десктопе тоже.** Свободного места в шапке
-около девяноста пикселей — его собирает `margin-right: auto` у бренда, — а название языка в
-них не влезает: с «Русский» и `Polski` кнопка входа сваливалась на вторую строку, и ряд ещё
-и прыгал при смене языка, потому что у трёх названий три разные ширины. Значок же одинаков
-всегда. Какой язык сейчас, видно по самой странице; для читалки он назван в `aria-label`, а
-полные имена стоят в меню — там они и нужны.
+**The button carries one globe, without the language name, on desktop too.** There are about
+ninety free pixels in the header — collected by `margin-right: auto` on the brand — and a
+language name does not fit into them: with "Русский" and `Polski` the sign-in button fell onto a
+second line, and the row also jumped when the language changed, because three names have three
+different widths. The icon is always the same. Which language is current is visible from the page
+itself; for a screen reader it is named in `aria-label`, and the full names stand in the menu —
+that is where they are needed.
 
-Выпадающее меню стоит в общей лестнице слоёв сайта: липкий тулбар постера 20, плавающие
-кнопки 30, **меню языков 35**, баннер согласия 36, тост 40. Равный тулбару `z-index` не
-годился — тот стоит в разметке позже и побеждал, и список языков выпадал под панель сезона.
+The dropdown menu is part of the site's common ladder of layers: the poster's sticky toolbar 20,
+the floating buttons 30, **the language menu 35**, the consent banner 36, the toast 40. A
+`z-index` equal to the toolbar's would not do — that one stands later in the markup and won, and
+the language list fell out under the season bar.
 
-**Язык нового пользователя.** Таблицы людей у нас нет, «создание» — первая строка
-`user_settings`. Пишет её клиентский `LangSync` в корневом лейауте, повадкой ровно как
-`DraftClaimer`: серверный компонент писать в базу при рендере не имеет права, а серверное
-действие имеет.
+**A new user's language.** We have no table of people; "creation" is the first `user_settings`
+row. It is written by the client `LangSync` in the root layout, in exactly the manner of
+`DraftClaimer`: a server component has no right to write to the database while rendering, but a
+server action does.
 
-### Словарь
+### The dictionary
 
-- **Ни одной пользовательской строки в разметке.** Всё живёт в `src/i18n/dict/*`. Прежнее
-  правило «строки живут в модели, чтобы не расходились копии» не нарушено — единым местом
-  стал словарь, а `library.ts`, `community.ts`, `labels.ts` и `accents.ts` сохранили типы,
-  числа и доступ, потеряв только сами строки.
-- **Форма выводится из русского**: `Dict = typeof ru`, а `en.ts` и `pl.ts` объявлены
-  `const en: Dict`. Забытый ключ ловит `npm run typecheck`, а не глаз на седьмом экране.
-  `as const` на словаре нет намеренно: он сузил бы значения до самих русских строк.
-- **Значения — строки, а не функции.** Словарь едет в клиентские компоненты внутри
-  RSC-нагрузки (провайдер получает его пропом с сервера), а функции не сериализуются.
-  Подстановка — пометками `{n}` и хелпером `fill()`. Побочная выгода: в клиентском бандле
-  не оказывается ни одного языка, в нагрузке едет ровно нужный.
-- **Множественного числа избегаем домашним приёмом «Слово: N»** («Лайков: 3», «Likes: 3»,
-  «Polubienia: 3»). Он уже стоял везде, где есть счётчики, и переживает перевод без правил
-  склонения. Не заводите `Intl.PluralRules` ради одной строки.
-- **Разметка в словаре есть ровно одна — `**жирное**`,** и только у `/privacy`: смысл там
-  держится на выделенных словах, а резать их на отдельные ключи значит отдать перевод
-  кусками, из которых фразу уже не собрать. Разбирает её `marked()`.
-- **Месяцев два списка на язык.** `months` — именительный, им подписан лист;
-  `monthsOf` — родительный, для дат («27 августа», «27 sierpnia»). У английского они
-  совпадают, и это не небрежность. Пишется ли месяц внутри строки со строчной, решает флаг
-  `monthLowercaseInText`: третьего списка из двенадцати слов заводить не надо.
-- **Подписи ста тем и двадцати наборов рисунков переводятся** — они видны на плавающих
-  кнопках. Лежат в `tools/palettes/source.json` и `tools/icons/source.json` объектом
-  `{ru, en, pl}`, собираются в реестры; сборка проверяет, что ни один язык не забыт.
-- **Имена языков в переключателе не переводятся**: их читает тот, кто нужного языка ещё не
-  видит, и «польский» ему не поможет, а `Polski` — поможет (`LANG_LABELS`).
-- **Домашний словарь продукта переведён осознанно и одинаково:** сезон — season / sezon,
-  постер — poster / plakat, недели — weeks / tygodnie, сюжетные линии — storylines /
-  własne projekty, финал — wrap-up / podsumowanie, анонс — next up / na przyszły miesiąc.
-  Новый текст пишите этими словами, иначе второй переводчик разойдётся с первым.
+- **Not a single user-facing string in the markup.** Everything lives in `src/i18n/dict/*`. The
+  former rule "strings live in the model so copies do not drift apart" is not broken — the single
+  place became the dictionary, and `library.ts`, `community.ts`, `labels.ts` and `accents.ts` kept
+  their types, numbers and access, losing only the strings.
+- **The shape is derived from Russian**: `Dict = typeof ru`, while `en.ts` and `pl.ts` are
+  declared `const en: Dict`. A forgotten key is caught by `npm run typecheck`, not by an eye on
+  the seventh screen. There is deliberately no `as const` on the dictionary: it would narrow the
+  values to the Russian strings themselves.
+- **Values are strings, not functions.** The dictionary travels into client components inside the
+  RSC payload (the provider gets it as a prop), and functions do not serialise. Substitution uses
+  `{n}` markers and the `fill()` helper. A side benefit: not one language ends up in the client
+  bundle, and exactly the needed one travels in the payload.
+- **Plurals are avoided with the house trick "Word: N"** ("Лайков: 3", "Likes: 3",
+  "Polubienia: 3"). It already stood everywhere there are counters and survives translation
+  without declension rules. Do not introduce `Intl.PluralRules` for the sake of one string.
+- **There is exactly one piece of markup in the dictionary — `**bold**`,** and only on
+  `/privacy`: the meaning there rests on the emphasised words, and cutting them into separate keys
+  means handing the translator pieces a phrase cannot be assembled from. Parsed by `marked()`.
+- **There are two month lists per language.** `months` is the nominative, captioning the sheet;
+  `monthsOf` is the genitive, for dates ("27 августа", "27 sierpnia"). In English they coincide,
+  and that is not sloppiness. Whether a month is written in lower case inside a sentence is
+  decided by the `monthLowercaseInText` flag: a third list of twelve words is not needed.
+- **The labels of a hundred themes and twenty icon sets are translated** — they are visible on
+  the floating buttons. They lie in `tools/palettes/source.json` and `tools/icons/source.json` as
+  a `{ru, en, pl}` object and are compiled into the registries; the build checks that no language
+  is forgotten.
+- **The language names in the switcher are not translated**: they are read by someone who cannot
+  yet see the language they need, and "польский" will not help them while `Polski` will
+  (`LANG_LABELS`).
+- **The product's house vocabulary is translated deliberately and consistently:** сезон — season
+  / sezon, постер — poster / plakat, недели — weeks / tygodnie, сюжетные линии — storylines /
+  własne projekty, финал — wrap-up / podsumowanie, анонс — next up / na przyszły miesiąc. Write
+  new text in these words, or the second translator will diverge from the first.
 
-### Что ещё стало языкозависимым
+### What else became language-dependent
 
-- **Публикация живёт только в своём языке.** И витрина (`randomIdeas(lang)`), и прямая
-  ссылка: `/en/s/<код русского сезона>` отвечает «сезона нет», а не показывает русский лист
-  в английской обвязке. Идею берут, чтобы прочитать, и показывать её тому, кто её не
-  прочтёт, незачем.
+- **A publication lives only in its own language.** Both the showcase (`randomIdeas(lang)`) and a
+  direct link: `/en/s/<code of a Russian season>` answers "no such season" rather than showing a
+  Russian sheet in an English frame. An idea is taken to be read, and there is no point showing
+  it to someone who will not read it.
 
-  Отсюда правило, которое легко нарушить: **всякая ссылка на `/s/` собирается языком
-  сезона, а не смотрящего.** Мест таких пять — превью витрины, строка кабинета
-  («Избранное» и «Опубликованные» бывают на чужом языке), переход после публикации (там
-  язык выбран в окне и может отличаться от интерфейса) и ссылка на дубль в том же окне.
-  Возьмёте `useLang()` — получите 404 на собственную же публикацию.
+  Hence a rule that is easy to break: **every link to `/s/` is built with the season's language,
+  not the viewer's.** There are five such places — the showcase preview, the account row
+  ("Favourites" and "Published" can be in another language), the transition after publishing (the
+  language is chosen in the dialog and may differ from the interface) and the link to a duplicate
+  in the same dialog. Take `useLang()` and you get a 404 on your own publication.
 
-  Цена принята сознательно: разосланная ссылка не откроется у того, кого `proxy` уводит на
-  другой язык. Своих сезонов (`/season/<code>`) и личных ссылок (`/p/<token>`) это **не**
-  касается: там язык интерфейса к делу не относится — хозяин смотрит своё, а получатель
-  личной ссылки чаще всего вообще с другого языка, и запирать её значило бы сломать ровно
-  тот случай, ради которого она заведена.
-- **Уникальность публикации считается вместе с языком**: `content_key` теперь
-  `md5(language || content::text)`. Тот же бланк, переведённый на другой язык, — другая
-  идея: её видят другие люди, и отбивать её как дубль значило бы запереть витрину за тем,
-  кто успел первым. Отсюда же список языков в окне публикации: смена языка **пересчитывает**
-  ответ витрины, а не красит кнопку.
-- **Обезличивание берёт имена языка сезона** (`anonymousNames(count, lang)`): русские имена
-  в польском сезоне выдавали бы не то, что человек прятал.
-- **Примеры переведены целиком** — девять файлов `src/data/examples/<язык>/demo-N.json`,
-  включая слой заполнения. Это девять строк витрины, а не три с подписями. Номера строк
-  проставлены таблицей `PUBLIC_IDS` в реестре, а не порядком: короткий код — перестановка
-  id, он обещан постоянным, и новый язык не имеет права сдвинуть выданные коды. Фотографии
-  недель общие: в них нет ни слова.
-- **`localeCompare` берёт язык списка**, а не зашитый `'ru'`.
-- **Шрифты просят `latin-ext`**: без него польские `ą ę ł ń ś ź ż` поедут запасным шрифтом,
-  и лист напечатается двумя гарнитурами сразу. Списки подмножеств в `next/font` обязаны
-  быть литералами — общей константы у трёх вызовов быть не может, сборка падает.
-- **Печать проверяется на каждом языке.** Пределы полей (`limits.ts`) мерены под русский, а
-  подписи и месяцы у языков разные; `longestMonth(lang)` — своя распорка заголовка на
-  каждый («Сентябрь», `September`, `Październik`).
+  The price is accepted deliberately: a link that was sent will not open for someone whom `proxy`
+  takes to another language. This does **not** apply to your own seasons (`/season/<code>`) or
+  private links (`/p/<token>`): the owner is looking at their own, and the recipient of a private
+  link is most often on another language entirely, so locking it would break the very case it
+  exists for.
+- **The uniqueness of a publication is counted together with the language**: `content_key` is now
+  `md5(language || content::text)`. The same blank translated into another language is a
+  different idea: other people see it, and rejecting it as a duplicate would lock the showcase
+  behind whoever was first. Hence the language list in the publish dialog: changing the language
+  **recomputes** the showcase's answer rather than repainting a button.
+- **Anonymising takes names from the season's language** (`anonymousNames(count, lang)`): Russian
+  names in a Polish season would give away something other than what the person was hiding.
+- **The examples are translated whole** — nine files `src/data/examples/<lang>/demo-N.json`, the
+  fill layer included. That is nine showcase rows, not three with captions. The row numbers are set
+  by the `PUBLIC_IDS` table rather than by order: a short code is a permutation of an id, it is
+  promised to be permanent, and a new language has no right to shift codes already handed out. The
+  week photographs are shared: there is not a word in them.
+- **`localeCompare` takes the list's language**, not a hard-wired `'ru'`.
+- **The fonts ask for `latin-ext`**: without it the Polish `ą ę ł ń ś ź ż` fall back to another
+  font and the sheet prints in two typefaces at once. Subset lists in `next/font` must be
+  literals — three calls cannot share a constant, the build fails.
+- **Printing is checked in every language.** The field limits (`limits.ts`) were measured for
+  Russian, while labels and months differ per language; `longestMonth(lang)` is a spacer for the
+  heading, one per language ("Сентябрь", `September`, `Październik`).
 
-### Чего у языков нет
+### What languages do not have
 
-- **Автоперевода содержимого.** Сезон написан на том языке, на котором его написали; мы
-  переводим интерфейс и свои примеры, а не чужие постеры.
-- **Языка внутри `Template`** — см. выше.
-- **Отдельного домена или поддомена на язык.** Сайт один, адрес один, язык — сегмент пути.
+- **No auto-translation of content.** A season is written in the language it was written in; we
+  translate the interface and our own examples, not other people's posters.
+- **No language inside `Template`** — see above.
+- **No separate domain or subdomain per language.** One site, one address, the language is a path
+  segment.
 
-## Главный инвариант: два слоя
+## The main invariant: two layers
 
-- `Template` — бланк. **Только он печатается и только он хранится в `content`.**
-- Тема оформления и набор рисунков — **сознательные исключения**: они печатаются, но в
-  бланк не входят и лежат своими колонками рядом. Дублировать их ещё и внутри `content`
-  нельзя: две копии одного значения обязательно разойдутся. Третьего такого исключения
-  быть не должно.
-- `FillState` — заполнение (настроения, проценты, записи в итогах и идеях, пути к фото).
-  Не хранится, не копируется форком, на печать не идёт — существует только для примеров.
-  У системного сезона рядом лежит `fill_id`, сами данные — в репозитории
-  (`src/data/examples/<id>.json`, реестр в `src/model/examples.ts`).
+- `Template` — the blank. **Only it is printed and only it is stored in `content`.**
+- The colour theme and the icon set are **deliberate exceptions**: they print, but they are not
+  part of the blank and live in their own columns next to it. Duplicating them inside `content`
+  as well is forbidden: two copies of one value are bound to drift apart. There must not be a
+  third such exception.
+- `FillState` — the fill (moods, percentages, the notes in the summary and the ideas, photo
+  paths). It is not stored, not copied by a fork, does not print — it exists only for the
+  examples. A system season has a `fill_id` next to it, and the data itself is in the repository
+  (`src/data/examples/<id>.json`, registry in `src/model/examples.ts`).
 
-Из этого следуют правила, которые нельзя нарушать «по дороге»:
+From this follow rules that must not be broken along the way:
 
-- прогресс проектов в бланке — **0**, клетки настроений — **пустые**, «Итоги месяца» и
-  «Идеи на следующий месяц» — **пустые**; всё это заполняют ручкой на бумаге;
-- любое новое поле нужно сознательно отнести к одному из слоёв. Печатается → `Template`.
-  Пишется от руки → `FillState`;
-- фото недель показываются только из `FillState.photos`; в бланке всегда пустая рамка
-  под вклейку. Заново добавлять `photoSrc` в шаблон не нужно — это решение, а не пробел.
-  Место под вклейку (`.placeholder`) рисуется **всегда**, а фото ложится поверх него:
-  в печати фото скрыто, и рамка обязана выглядеть точно как у недели без фотографии.
+- project progress in the blank is **0**, the mood cells are **empty**, "How it went" and "Ideas
+  for next month" are **empty**; all of it is filled in with a pen on paper;
+- any new field must be consciously assigned to one of the layers. It prints → `Template`. It is
+  written by hand → `FillState`;
+- week photos are shown only from `FillState.photos`; the blank always has an empty frame for
+  gluing one in. There is no need to add `photoSrc` back to the template — that is a decision,
+  not a gap. The space for gluing (`.placeholder`) is drawn **always**, and a photo lies on top
+  of it: in printing the photo is hidden, and the frame must look exactly like the one on a week
+  without a photograph.
 
-## Месяц
+## The month
 
-`src/model/calendar.ts`. Месяц хранится числами (`year`, `monthIndex`), имя берётся из
-словаря языка **сезона** (`monthName(month, lang)`), число дней — из `daysInMonth`. Отдельного поля «дней в месяце» нет и быть не
-должно. Новый лист получает месяц из `pickTargetMonth`: до 10-го числа (`MONTH_SWITCH_DAY`)
-текущий, с 10-го — следующий. Вручную переключается стрелками в `MonthTheme`.
+`src/model/calendar.ts`. The month is stored as numbers (`year`, `monthIndex`), the name comes
+from the dictionary of the **season's** language (`monthName(month, lang)`), and the number of
+days comes from `daysInMonth`. There is no separate "days in the month" field and there must not
+be one. A new sheet gets its month from `pickTargetMonth`: before the 10th (`MONTH_SWITCH_DAY`)
+the current one, from the 10th the next one. It is switched by hand with the arrows in
+`MonthTheme`.
 
-Ширину заголовка месяца держит скрытая распорка с самым длинным названием
-(`longestMonth(lang)`, стопка в одной grid-ячейке): без неё строка при переключении меняет
-длину и стрелки прыгают влево-вправо. Название центрируется внутри этой фиксированной
-ширины, поэтому у коротких месяцев («Май») до стрелок остаётся воздух — так и задумано.
+The width of the month heading is held by a hidden spacer with the longest name
+(`longestMonth(lang)`, a stack in one grid cell): without it the line changes length when the
+month is switched and the arrows jump left and right. The name is centred inside that fixed
+width, so short months ("Май") leave air before the arrows — that is intended.
 
-## Адрес и хранилище
+## Address and storage
 
-Адрес больше не возит содержимое. В нём стоит короткий код строки, а сам постер лежит
-там, где ему положено: у вошедшего — в базе, у невошедшего — в браузере.
+The address no longer carries content. It holds the short code of a row, and the poster itself
+lies where it belongs: in the database for a signed-in person, in the browser for a signed-out
+one.
 
-| Вид постера | Где содержимое | Адрес |
+| Kind of poster | Where the content is | Address |
 | --- | --- | --- |
-| Черновик | `localStorage`, один на браузер (`src/model/draft.ts`) | `/<lang>/sheet`, `/<lang>/sheet/edit` |
-| Свой сезон | строка `user_seasons` | `/<lang>/season/<code>`, `…/edit` |
-| Он же по личной ссылке | та же строка, только просмотр | `/<lang>/p/<token>` |
-| Выложенный | строка `public_seasons` | `/<lang>/s/<code>` |
+| Draft | `localStorage`, one per browser (`src/model/draft.ts`) | `/<lang>/sheet`, `/<lang>/sheet/edit` |
+| Your own season | a `user_seasons` row | `/<lang>/season/<code>`, `…/edit` |
+| The same one by private link | the same row, viewing only | `/<lang>/p/<token>` |
+| Published | a `public_seasons` row | `/<lang>/s/<code>` |
 
-- **Код — перестановка битов id** (`src/model/shortcode.ts`): шесть знаков base32 на 2^30 ≈
-  1,07 млрд строк, сеть Фейстеля на двух половинах по 15 бит. Он взаимно однозначен, поэтому
-  коллизий не бывает вовсе, а id не переиспользуются — код постоянен. Ключ у каждой таблицы
-  свой, менять их нельзя: выданные коды живут вечно. Обратного преобразования нет намеренно —
-  строка ищется по своей колонке `code`.
-- **Токен приватной ссылки — случайный, а не выведенный из id.** Это единственный адрес,
-  который можно **отозвать**: выдали новую ссылку — прежняя перестала работать в тот же
-  миг. Перестановка битов так не умеет, она всегда даёт один и тот же ответ. Отсюда и
-  длина: шестнадцать знаков, восемьдесят бит — код угадать не страшно, он и так публичный,
-  а токен угадывать нельзя.
-- **`?p=` и `?i=` у выложенного сезона — перебивка оформления, а не содержимое.** Тема и
-  набор рисунков хранятся в строке, но примеривший чужой постер в своей теме должен уметь
-  прислать ссылку на то, что видит. Пометки лежат в **query**, а не в хэше: хэш до сервера
-  не доходит, и присланная ссылка открылась бы сперва в чужой теме, а потом перекрашивалась.
-  Строку перебивка не трогает.
-- **Содержимое хранится разобранным**: `content` — вывод `pack()` из `codec.ts`, `names` —
-  имена людей отдельным массивом (см. `src/model/season.ts`). Формат по-прежнему знает один
-  `codec.ts`; колонок «месяц», «тема» или «люди» рядом заводить нельзя. Колонка `language`
-  рядом — можно и нужно: это, как тема и рисунки, оформление, а не содержимое (см. «Языки»).
-- **Имена вынуты из контента не ради красоты.** По контенту считается уникальность
-  публикации: сезон, у которого поменяли только имена, — тот же самый сезон. Оттуда же
-  берётся обезличивание при публикации: подменить надо ровно `names`.
-- Всё, что пришло снаружи — из базы, из `localStorage`, из формы, — прогоняется через
-  `normalizeTemplate`: людей 2..5, недель ровно 4, месяц в диапазоне, строки обрезаются.
-- Сжатия и base64 в `codec.ts` больше нет: они были нужны, только пока бланк ехал в
-  адресной строке. В базу едет тот же массив, но как `jsonb`.
+- **A code is a permutation of the bits of an id** (`src/model/shortcode.ts`): six base32
+  characters over 2^30 ≈ 1.07 billion rows, a Feistel network on two 15-bit halves. It is
+  one-to-one, so collisions do not happen at all, and ids are not reused — a code is permanent.
+  Each table has its own key and they must not be changed: codes that have been handed out live
+  forever. There is deliberately no inverse transform — a row is looked up by its own `code`
+  column.
+- **The private link's token is random, not derived from the id.** It is the only address that
+  can be **revoked**: issue a new link and the previous one stops working that same instant. A
+  permutation of bits cannot do that, it always gives the same answer. Hence the length: sixteen
+  characters, eighty bits — guessing a code is not frightening, it is public anyway, but a token
+  must not be guessable.
+- **`?p=` and `?i=` on a published season are a styling override, not content.** The theme and
+  the icon set are kept in the row, but someone who tried another person's poster in their own
+  theme must be able to send a link to what they see. The markers lie in the **query**, not in
+  the hash: a hash never reaches the server, and a link that was sent would open in the other
+  person's theme first and then repaint. The override does not touch the row.
+- **The content is stored taken apart**: `content` is the output of `pack()` from `codec.ts`,
+  `names` is a separate array of people's names (see `src/model/season.ts`). The format is still
+  known to `codec.ts` alone; columns "month", "theme" or "people" must not be added next to it. A
+  `language` column next to it is allowed and needed: like the theme and the icons, it is
+  styling, not content (see "Languages").
+- **The names were taken out of the content not for beauty.** The uniqueness of a publication is
+  counted by content: a season with only the names changed is the same season. Anonymising on
+  publication comes from the same place: exactly `names` has to be swapped.
+- Everything that comes from outside — from the database, from `localStorage`, from a form — goes
+  through `normalizeTemplate`: 2..5 people, exactly 4 weeks, the month within range, strings
+  trimmed.
+- There is no more compression or base64 in `codec.ts`: they were needed only while the blank
+  travelled in the address bar. The same array goes into the database, but as `jsonb`.
 
-**Истории руками больше нет.** Ни `pushState` с пометками, ни `popstate`/`hashchange`,
-ни счётчика переходов: переходы между просмотром и правкой — обычные ссылки, а содержимое
-переживает перемонтирование, потому что лежит не в компоненте. Раздел «История навигации»
-про эту машинерию удалён вместе с ней.
+**There is no more hand-written history.** No `pushState` with markers, no `popstate`/
+`hashchange`, no transition counter: moves between viewing and editing are ordinary links, and
+the content survives remounting because it does not live in the component. The "Navigation
+history" section about that machinery was deleted along with it.
 
-## Темы оформления
+## Colour themes
 
-Сто тем постера — подборка Canva «100 цветовых сочетаний», по четыре краски в наборе.
-Ничего кроме этих четырёх красок, их оттенков, чёрного и белого на постере нет.
+A hundred poster themes, the Canva "100 colour combinations" collection, four paints per set.
+There is nothing on the poster except those four paints, their shades, black and white.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Исходник: id, подпись, четыре hex | `tools/palettes/source.json` |
-| Сборка | `tools/palettes/build.mjs` (`npm run palettes`) |
-| Краски тем (собирается) | `src/styles/palettes.css` |
-| Реестр id и подписей (собирается) | `src/model/palettes.data.ts` |
-| Выбор темы, тема по умолчанию, случайная | `src/model/palettes.ts` |
-| Тема сайта и раздача ролей | `src/styles/tokens.css` |
+| Source: id, label, four hex values | `tools/palettes/source.json` |
+| Build | `tools/palettes/build.mjs` (`npm run palettes`) |
+| Theme paints (generated) | `src/styles/palettes.css` |
+| Registry of ids and labels (generated) | `src/model/palettes.data.ts` |
+| Choosing a theme, the default one, a random one | `src/model/palettes.ts` |
+| The site theme and the handing out of roles | `src/styles/tokens.css` |
 
-Выбранная тема лежит не в бланке, а своей колонкой рядом с ним (у черновика — своим полем
-в записи браузера). Она переживает форк, печатается, а на чужом выложенном сезоне
-примеряется и уезжает в адрес пометкой `?p=` — см. «Адрес и хранилище».
+The chosen theme lies not in the blank but in its own column next to it (for a draft, in its own
+field in the browser record). It survives a fork, it prints, and on someone else's published
+season it is tried on and travels into the address as `?p=` — see "Address and storage".
 
-- **Тема сайта — отдельная, нейтральная и не переключается.** Она объявлена в `:root`
-  теми же именами ролей, что и тема постера (графит и белое), поэтому лендинг,
-  собранный из тех же `SectionBox` и `Badge`, рисуется вне листа сам собой. Рядом
-  может стоять постер любого из ста наборов — сайт не должен ни спорить с ним, ни
-  притворяться его частью. Переключателя у неё нет и заводить его не надо.
-- **Собранные файлы руками не правят.** Меняется `source.json`, дальше `npm run palettes`.
-  В `build.mjs` же лежит и весь подбор: сортировка красок, контраст текста на плашке,
-  тёмные оттенки. Это то, чего CSS не умеет, — остальное выводится уже в `tokens.css`.
-- **Четыре краски набора отсортированы по светлоте**, от тёмной `--c1` к светлой `--c4`.
-  Лестница постоянна у всех тем, поэтому «глубокая» роль (заголовок, лента, рамка листа)
-  везде самая тёмная, а лист не разваливается на случайном наборе.
-- **Плашка красится краской как есть, а рамка и заголовок — её тёмным оттенком**
-  (`--d1..--d4`, светлота не выше 0.45: на белом только такой оттенок держит форму).
-  Поэтому плашки бывают и тёмными, и светлыми — это и делает темы разными.
-- **Цвет текста на плашке считается, а не назначается.** `--on-c1..4` — белый или
-  чернила, по контрасту с краской (порог 4:1, `build.mjs`). Не заменяйте их на белый
-  «для единообразия»: в наборе бывает и `#FFFFFF`, и лимонно-жёлтый.
-  Тонкая рамка у плашки (`Badge.module.css`) нужна ровно для светлых красок — без неё
-  они растворяются в бумаге.
-- **Роли, а не цвета.** `--accent-<слот>` — тёмный оттенок (рамки, заголовки),
-  `--badge-<слот>` — краска (заливка плашки), `--on-<слот>` — текст на ней. Слоты:
-  `deep`/`projects` → 1, `theme` → 2, `weeks` → 3, `goal` → 4; персоны — те же четыре
-  тона по порядку рисунков.
-- **Рецепт обязан лежать на том же элементе, что и краски.** `var()` внутри
-  пользовательского свойства подставляется там, где свойство объявлено, поэтому
-  «рецепт в `:root`, краски в темах» посчитало бы всё от нейтральных красок `:root`.
-  Отсюда блок `[data-palette]` в `tokens.css` — он матчит любой элемент с темой.
-- **Подложки белые — и на бумаге, и на экране.** `--paper`, `--surface`, `--photo-frame`
-  равны `#fff`; цвет несут плашки, рамки и чернила. Единственная цветная заливка —
-  карточка личного проекта (`ProjectsSection.module.css`, 10 % цвета человека): она
-  печатается и на экране выглядит так же. Не «возвращайте насыщенность» подложкам
-  и не заводите новых заливок — это регресс, а не украшение (см. принцип 3).
-- **Отдельной печатной палитры больше нет.** Раньше `print.css` сбрасывал подложки
-  в белый; теперь сбрасывать нечего, и подменять токены в `@media print` не нужно.
-- **Настроения из тем исключены.** `--mood-good|ok|bad` — светофор: «хорошо» обязано
-  быть зелёным в любой теме, иначе легенду придётся читать. Это единственные цвета
-  вне четырёх красок, и добавлять их в тему не нужно.
-- **Тема живёт на самом постере, а не на странице.** Атрибут вешает `PaperSheet`
-  через проп `palette` (его передаёт `Poster`, читая тему из `useDoc`), поэтому сайт
-  вокруг постера — шапка, тулбар, подвал, кнопки, фон страницы, лендинг — своих
-  цветов не меняет **никогда**. Не переносите атрибут на `<html>`: тогда тема
-  потечёт на весь сайт, а фон страницы начнёт прыгать при каждом переключении.
-  Побочная выгода — атрибут рисует React, поэтому размонтировался постер, ушла
-  и тема: чистить ничего не надо и мигнуть при загрузке нечему.
-- **Селекторы — по атрибуту** (`[data-palette='desert']`), без привязки к `:root`:
-  пользовательские свойства наследуются, поэтому ближайший предок выигрывает. За счёт
-  этого образец на кнопке темы и полоса тем на лендинге красятся каждый своей темой,
-  и краски нигде не дублируются. Атрибут висит на самом кружке, а не на кнопке:
-  краски показывает образец, а рамка и подпись остаются цветами сайта.
-- **Карточки примеров на лендинге тему не носят** — они часть сайта. Тема примера
-  видна, когда его открываешь.
-- **Тёмной темы нет намеренно.** Веб и печать — одна вёрстка, а тёмный лист на бумаге
-  съедает картридж; чтобы завести тёмную, пришлось бы городить отдельную печатную
-  палитру и нарушить принцип 3. Тёмные наборы Canva дают тёмные плашки на белой
-  бумаге — это не то же самое, что тёмный лист.
-- Цвет человека выводится из рисунка прямо в `var(--person-${face})` — таблицы
-  `ACCENT_BY_FACE` больше нет, и возвращать её не нужно.
-- **Переключатель кидает в случайную тему, а не листает список.** Сто наборов
-  перебирать по одному бессмысленно, а соседние по списку часто похожи; текущая тема
-  из выбора исключена, иначе клик иногда «ничего не делает» (`randomPalette`).
-  Переключатель (`src/components/edit/PaletteSwitcher.tsx`) виден **во всех трёх
-  состояниях постера**, пример включительно: тема не часть бланка, её несёт `p=`, а `p=`
-  и так сильнее ключа `palette` из `src/data/examples/<id>.json`. Сменить тему примера —
-  не правка, форк для этого не нужен.
-- **Кнопка темы — плавающая, а не часть тулбара.** Раз она не зависит ни от одного
-  из трёх состояний, ей нечего делать среди кнопок, которые от них зависят: `App.tsx`
-  рисует её рядом с `Toolbar`, а `position: fixed` держит её в правом нижнем углу окна,
-  пока постер прокручивают. `z-index` у неё выше липкого тулбара, иначе у верха страницы
-  она ныряет под него; на узком экране название темы прячется и остаётся кружок-образец.
+- **The site theme is separate, neutral and does not switch.** It is declared in `:root` with the
+  same role names as the poster theme (graphite and white), so the landing page, assembled from
+  the same `SectionBox` and `Badge`, draws itself. A poster of any of the hundred sets may stand
+  next to it — the site must neither argue with it nor pretend to be part of it. It has no
+  switcher and does not need one.
+- **Generated files are not edited by hand.** Change `source.json`, then `npm run palettes`. All
+  the picking lives in `build.mjs` too: sorting the paints, the contrast of text on a badge, the
+  dark shades. That is what CSS cannot do — the rest is derived in `tokens.css`.
+- **The four paints of a set are sorted by lightness**, from the dark `--c1` to the light `--c4`.
+  The ladder is constant across all themes, so the "deep" role (heading, ribbon, sheet frame) is
+  everywhere the darkest, and the sheet does not fall apart on a random set.
+- **A badge is painted with the paint as it is, while its frame and heading take its dark shade**
+  (`--d1..--d4`, lightness no higher than 0.45: on white only such a shade holds its shape).
+  That is why badges come out both dark and light — and that is what makes the themes different.
+- **The colour of text on a badge is computed, not assigned.** `--on-c1..4` is white or ink, by
+  contrast with the paint (threshold 4:1, `build.mjs`). Do not replace them with white "for
+  consistency": a set may contain both `#FFFFFF` and lemon yellow. The thin frame on a badge
+  (`Badge.module.css`) is there exactly for light paints — without it they dissolve into the
+  paper.
+- **Roles, not colours.** `--accent-<slot>` is the dark shade (frames, headings), `--badge-<slot>`
+  is the paint (the badge fill), `--on-<slot>` is the text on it. Slots: `deep`/`projects` → 1,
+  `theme` → 2, `weeks` → 3, `goal` → 4; people take the same four tones in the order of their
+  drawings.
+- **The recipe must lie on the same element as the paints.** A `var()` inside a custom property
+  is substituted where the property is declared, so "recipe in `:root`, paints in the themes"
+  would compute everything from the neutral `:root` paints. Hence the `[data-palette]` block in
+  `tokens.css` — it matches any element with a theme.
+- **The backgrounds are white — on paper and on screen.** `--paper`, `--surface` and
+  `--photo-frame` are all `#fff`; colour is carried by badges, frames and ink. The only coloured
+  fill is a personal project card (`ProjectsSection.module.css`, 10 % of the person's colour): it
+  prints and looks the same on screen. Do not "bring the saturation back" to the backgrounds and
+  do not add new fills — that is a regression, not decoration (see principle 3).
+- **There is no separate print palette any more.** `print.css` used to reset the backgrounds to
+  white; now there is nothing to reset, and substituting tokens in `@media print` is not needed.
+- **Moods are excluded from the themes.** `--mood-good|ok|bad` is a traffic light: "good" must be
+  green in any theme, otherwise the legend has to be read. These are the only colours outside the
+  four paints, and there is no need to add them to a theme.
+- **The theme lives on the poster itself, not on the page.** The attribute is set by `PaperSheet`
+  through the `palette` prop (passed by `Poster`, which reads the theme from `useDoc`), so the
+  site around the poster — header, toolbar, footer, buttons, page background, landing page —
+  **never** changes its colours. Do not move the attribute onto `<html>`: the theme would then
+  leak across the whole site and the page background would jump on every switch. A side benefit:
+  the attribute is drawn by React, so when the poster unmounts the theme goes with it — nothing
+  to clean up and nothing to flash on load.
+- **Selectors go by attribute** (`[data-palette='desert']`), with no tie to `:root`: custom
+  properties are inherited, so the nearest ancestor wins. Thanks to that the swatch on the theme
+  button and the strip of themes on the landing page are each painted in their own theme, and the
+  paints are duplicated nowhere. The attribute hangs on the swatch itself, not on the button: the
+  swatch shows the paints, while the frame and the label stay in site colours.
+- **The example cards on the landing page do not carry a theme** — they are part of the site. An
+  example's theme is visible when you open it.
+- **There is deliberately no dark theme.** Web and print are one layout, and a dark sheet eats the
+  cartridge; to have a dark theme we would have to build a separate print palette and break
+  principle 3. Dark Canva sets give dark badges on white paper — that is not the same thing as a
+  dark sheet.
+- A person's colour is derived from their drawing straight into `var(--person-${face})` — the
+  `ACCENT_BY_FACE` table is gone and does not need to come back.
+- **The switcher throws you into a random theme rather than walking the list.** Stepping through a
+  hundred sets one by one is pointless, and neighbours in the list are often alike; the current
+  theme is excluded from the choice, otherwise a click sometimes "does nothing"
+  (`randomPalette`). The switcher (`src/components/edit/PaletteSwitcher.tsx`) is visible in **all
+  three states of the poster**, an example included: the theme is not part of the blank, it is
+  carried by `p=`, and `p=` already beats the `palette` key from `src/data/examples/<id>.json`.
+  Changing an example's theme is not an edit, and a fork is not needed for it.
+- **The theme button is floating, not part of the toolbar.** Since it depends on none of the
+  three states, it has no business among buttons that do: `App.tsx` draws it next to `Toolbar`,
+  and `position: fixed` keeps it in the bottom right corner of the window while the poster is
+  scrolled. Its `z-index` is above the sticky toolbar, otherwise it dives under it at the top of
+  the page; on a narrow screen the theme name is hidden and only the swatch remains.
 
-## Наборы рисунков
+## Icon sets
 
-Двадцать наборов по восемь рисунков; библиотека — сорок рисунков, и один и тот же
-рисунок стоит в разных наборах и даже в разных слотах одного набора.
+Twenty sets of eight drawings; the library holds forty, and the same drawing stands in different
+sets and even in different slots of one set.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Исходник: сорок рисунков, слоты и составы наборов | `tools/icons/source.json` |
-| Сборка | `tools/icons/build.mjs` (`npm run icons`) |
-| Геометрия рисунков (собирается) | `src/components/doodles/icons.generated.ts` |
-| Реестр наборов (собирается) | `src/model/icons.data.ts` |
-| Выбор набора, набор по умолчанию, случайный | `src/model/icons.ts` |
-| Рисовальщик и слот | `src/components/doodles/Icon.tsx`, `PosterIcon.tsx` |
-| Набор на постере | `src/components/doodles/iconSetContext.ts` |
+| Source: forty drawings, slots and set compositions | `tools/icons/source.json` |
+| Build | `tools/icons/build.mjs` (`npm run icons`) |
+| Drawing geometry (generated) | `src/components/doodles/icons.generated.ts` |
+| Set registry (generated) | `src/model/icons.data.ts` |
+| Choosing a set, the default one, a random one | `src/model/icons.ts` |
+| The renderer and the slot | `src/components/doodles/Icon.tsx`, `PosterIcon.tsx` |
+| The set on the poster | `src/components/doodles/iconSetContext.ts` |
 
-Набор лежит не в бланке, а своей колонкой рядом с ним. Он переживает форк, печатается и
-примеряется пометкой `?i=` — всё ровно как у темы.
+A set lies not in the blank but in its own column next to it. It survives a fork, it prints and
+it is tried on with the `?i=` marker — exactly like a theme.
 
-- **Слот — это место в макете, а не рисунок.** Их восемь: `mark` и `love` в шапке,
-  `voice` и `spark` в теме месяца, `path` в сюжетных линиях, `goal` и `care` у цели
-  месяца, `idea` в анонсе. Секции просят слот, набор подставляет в него рисунок —
-  поэтому смена набора не трогает ни вёрстку, ни сами секции. Новое место под рисунок —
-  это новый слот в `source.json` и по строке в каждом из двадцати наборов; забыть хоть
-  один сборка не даст.
-- **Все рисунки на одной сетке `0 0 64 64`.** Иначе подстановка меняла бы пропорции
-  места: слот задаёт размер, и любой рисунок обязан вставать в чужое место. Размеры
-  слотов подобраны так, что рисунок занимает примерно тот же кусок бумаги, что и
-  доодл до появления наборов, — поэтому печать осталась двумя страницами.
-- **Набор едет по контексту, а не атрибутом на бумаге.** Тему CSS раздаёт через
-  `data-palette`, но геометрию SVG атрибутом не подменишь. Провайдер стоит в
-  `Poster` (`src/components/Poster.tsx`) вокруг `PaperSheet`, поэтому сайт вокруг постера
-  своих рисунков не меняет никогда, а значение по умолчанию у контекста настоящее:
-  постер бывает и без провайдера (`/seasons` рисует `PaperSheet` без `palette`).
-- **Собранные файлы руками не правят.** Меняется `source.json`, дальше `npm run icons`.
-  Считать там, в отличие от тем, нечего — зато есть что проверять, и ради этого
-  сборка и существует: у набора ровно восемь слотов, все имена рисунков существуют,
-  ни один рисунок не остался вне наборов, id не повторяются. Проглядеть такое руками
-  в двадцати наборах нельзя, а цена ошибки — дырка на постере вместо рисунка.
-- **Мелкий слот требует другой обводки.** `spark` рисуется в 18 px: общая обводка 2.3
-  на сетке в 64 единицы даёт там 0,65 экранного пикселя — серую паутину. Поэтому у
-  таких рисунков в исходнике своя `stroke` и заливка (`fill`), как у прежней звёздочки.
-  Не «приводите их к единой толщине» — они на постере самые маленькие.
-- **Переключатель кидает в случайный набор, а не листает список** — по тем же причинам,
-  что и у тем, и текущий из выбора исключён (`randomIconSet`). Он виден **во всех трёх
-  состояниях постера**, пример включительно: набор не часть бланка, его несёт `i=`,
-  а `i=` и так сильнее ключа `icons` из `src/data/examples/<id>.json`.
-- **Обе плавающие кнопки живут в общей обёртке** `FloatingControls`: позиция и `z-index`
-  на ней, а не на кнопках. Две независимые `position: fixed` пришлось бы разводить
-  подобранными вручную `bottom` — и повторять их в каждом медиазапросе.
-- **Образец на кнопке — три рисунка, а не один**: набор это подбор, по одной иконке его
-  не узнать, как не узнать тему по одной краске. Красится он цветами сайта: рисунки
-  различаются формой, краску им даёт тема постера, и на кнопке ей делать нечего.
-  Рисует его `Icon` напрямую — кнопка живёт вне постера, брать набор из контекста ей
-  неоткуда, да и незачем: она сама его и показывает.
+- **A slot is a place in the layout, not a drawing.** There are eight: `mark` and `love` in the
+  header, `voice` and `spark` in the theme of the month, `path` in the storylines, `goal` and
+  `care` at the goal of the month, `idea` in the next-up block. A section asks for a slot and the
+  set puts a drawing into it — which is why changing the set touches neither the layout nor the
+  sections. A new place for a drawing means a new slot in `source.json` and a line in each of the
+  twenty sets; the build will not let you forget one.
+- **All drawings sit on one `0 0 64 64` grid.** Otherwise substitution would change the
+  proportions of the place: the slot sets the size, and any drawing must fit into someone else's
+  place. Slot sizes are picked so that a drawing takes roughly the same piece of paper as the
+  doodle did before the sets appeared — which is why printing stayed at two pages.
+- **A set travels through context, not as an attribute on paper.** CSS hands out a theme through
+  `data-palette`, but SVG geometry cannot be substituted with an attribute. The provider stands in
+  `Poster` (`src/components/Poster.tsx`) around `PaperSheet`, so the site around the poster never
+  changes its drawings, and the context's default value is a real one: a poster also exists
+  without a provider (`/seasons` draws `PaperSheet` without a `palette`).
+- **Generated files are not edited by hand.** Change `source.json`, then `npm run icons`. Unlike
+  the themes there is nothing to compute — but there is something to check, and that is what the
+  build exists for: a set has exactly eight slots, every drawing name exists, no drawing is left
+  out of the sets, ids do not repeat. Spotting that by eye across twenty sets is impossible, and
+  the price of a mistake is a hole on the poster instead of a drawing.
+- **A small slot needs a different stroke.** `spark` is drawn at 18 px: the common stroke of 2.3
+  on a grid of 64 gives 0.65 screen pixels there — a grey cobweb. So such drawings have their own
+  `stroke` and `fill` in the source, as the old star did. Do not "bring them to a single
+  thickness" — they are the smallest things on the poster.
+- **The switcher throws you into a random set rather than walking the list** — for the same
+  reasons as the themes, and the current one is excluded from the choice (`randomIconSet`). It is
+  visible in **all three states of the poster**, an example included: a set is not part of the
+  blank, it is carried by `i=`, and `i=` already beats the `icons` key from
+  `src/data/examples/<id>.json`.
+- **Both floating buttons live in a common wrapper** `FloatingControls`: the position and
+  `z-index` are on it, not on the buttons. Two independent `position: fixed` elements would have
+  to be spread apart with hand-picked `bottom` values — and repeated in every media query.
+- **The swatch on the button shows three drawings, not one**: a set is a selection, and it cannot
+  be recognised from one icon any more than a theme can from one paint. It is painted in site
+  colours: drawings differ by shape, their paint comes from the poster's theme, and it has no
+  business on the button. It is drawn by `Icon` directly — the button lives outside the poster,
+  it has nowhere to take the set from and no need to: it is showing the set itself.
 
-## Вход
+## Sign-in
 
-Вход через Google на Auth.js (`next-auth@5`, beta — это его нормальное состояние).
+Sign-in with Google on Auth.js (`next-auth@5`, beta — that is its normal state).
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Конфигурация, `auth`/`signIn`/`signOut`/`handlers` | `src/server/auth.ts` |
-| Серверные действия входа и выхода | `src/server/actions.ts` |
-| Роут-хендлер Auth.js | `src/app/api/auth/[...nextauth]/route.ts` |
-| Кнопка и правый угол шапки | `src/components/site/LoginButtons.tsx` |
-| Ворота кабинета | `src/app/[lang]/seasons/page.tsx` |
-| Образец переменных | `.env.example` (значения — в `.env.local`) |
+| Configuration, `auth`/`signIn`/`signOut`/`handlers` | `src/server/auth.ts` |
+| Server actions for signing in and out | `src/server/actions.ts` |
+| The Auth.js route handler | `src/app/api/auth/[...nextauth]/route.ts` |
+| The button and the right corner of the header | `src/components/site/LoginButtons.tsx` |
+| The account gate | `src/app/[lang]/seasons/page.tsx` |
+| Variable template | `.env.example` (values in `.env.local`) |
 
-- **Адаптера БД нет, и это не пробел.** Он не подключён, поэтому Auth.js держит сессию
-  в зашифрованной куке (стратегия JWT), а на сервере не остаётся ни строчки о самом
-  пользователе — имя и почта живут только в куке читателя, и в базе их нет даже теперь,
-  когда там лежат его сезоны. Что именно хранится, написано на `/seasons` и `/privacy`;
-  тексты пережили уже две такие правки (таблица настроек, затем библиотека) и **правятся
-  тем же изменением**, что и хранилище, иначе сайт начнёт врать о себе. `/privacy` при
-  этом не украшение: без её адреса Google не выпускает вход из режима Testing в продакшен
-  (обязательны app name, support email, homepage URL и privacy policy URL; ToS — нет).
-- **Postgres входу не нужен был и не нужен.** База нужна кнопке «Сохранить», а не логину;
-  вход поэтому был сделан отдельным изменением, до неё. Адаптер и сейчас можно добавить
-  **рядом**: Auth.js держит JWT и вместе с ним, стратегию менять не придётся.
-- **`proxy.ts` рубежом защиты не служит** (в Next 16 так теперь зовётся `middleware.ts`).
-  Проверка входа стоит в серверном компоненте `/seasons` — это и есть проверка у источника
-  данных; прокси по документации Next лишь оптимистичная догадка. Сам файл в проекте есть,
-  но делает он ровно одно — **ставит язык в адрес** (см. «Языки»): это его прямая работа,
-  и документация Next предлагает делать её именно так. Ни сессии, ни базы в нём нет и
-  быть не должно.
-- **Незалогиненного не уводим редиректом.** `/seasons` есть в шапке, и адрес обязан
-  открываться. Список у него тот же самый, просто короткий — черновик в браузере один, —
-  и пустота объясняется одной фразой на обе роли (`EMPTY_LIST` в `library.ts`). Отдельной
-  страницы `/login` нет и заводить её не надо; кнопки входа на `/seasons` тоже нет —
-  про вход говорит окно заведения сезона, когда до него доходит дело, а проповедь на
-  пустой странице ничего не добавляла.
-- **Вход — серверное действие, а не `useSession`.** В браузер не уезжает ни строчки
-  Auth.js, `SessionProvider` не нужен, мигания состояния нет. Не переводите вход на
-  клиентские хуки Auth.js — это разом отменит всё перечисленное.
-- **После входа человек остаётся там, где был.** Адрес возврата собирает
-  `GoogleLoginButton` (`location.pathname + search + hash`) и отдаёт аргументом действия:
-  примеренное оформление живёт в `?p=` и `?i=`, и с постоянным `redirectTo` человек
-  возвращался бы из Google не на тот постер, который смотрел. Весь адрес переживает круг
-  через Google — Auth.js кладёт его в куку `authjs.callback-url` (проверено).
-- **К Google уводит браузер, а не роутер Next.** `googleLoginUrl` — единственное действие
-  входа, которое **не редиректит, а отдаёт адрес**; уводит по нему `location.href` в
-  `GoogleLoginButton`. `redirect()` на чужой origin работал, но роутер Next сперва просил
-  у `accounts.google.com` RSC-ответ, ловил отказ CORS и только потом откатывался к
-  обычному переходу — с «Failed to fetch RSC payload …» в консоли на каждый вход. Куки
-  `state` и PKCE от этого не страдают: их ставит сам `signIn` через `cookies()`.
-- **Кнопка входа одна на весь сайт** (`GoogleLoginButton`), и подпись у неё пропом:
-  в шапке «Войти через Google», в окне `LoginDialog` она же, а в блоках про устаревшую
-  сессию на `/seasons` и `/account` — «Войти заново». Своих форм с серверным действием
-  там больше нет: путь входа должен быть один, иначе половина мест продолжит уводить
-  через роутер.
-- **`returnTo` приходит из браузера, поэтому проверяется** (`safeReturnTo` в
-  `actions.ts`): только относительный путь, и `//host` отвергается — иначе вход
-  превратился бы в открытый редирект на чужой сайт.
-- **Цена: корневой лейаут стал динамическим.** `LoginButtons` читает куку, лейаут общий,
-  поэтому статикой не отдаётся больше ни одна страница (в выводе `next build` все
-  маршруты помечены `ƒ`). Принято сознательно: тяжёлых выборок на сайте нет, а
-  альтернатива — тащить сессию на клиент, то есть отменить предыдущий пункт.
-- **Набор данных — умолчание провайдера** (`openid email profile`), `authorization.params`
-  не переопределяем: имя и почта дальше куки всё равно не уезжают.
-- **В сессии есть `accountKey`** — `провайдер:id`, его ставят колбэки `jwt`/`session`.
-  Это имя строки в таблице настроек (см. «Настройки и база»); типы дополнены в
-  `src/server/next-auth.d.ts`.
-- **Ключи читаются по имени провайдера.** `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET` в конфиге
-  не упомянуты — Auth.js находит их сам; в `auth.ts` поэтому пусто, и это не забывчивость.
-- **Второй провайдер — это строка в `providers` и кнопка в `LoginButtons`.** Значок рисуется
-  inline SVG, как `GoogleMark`: растровых картинок в проекте нет. Аватар пользователя не
-  показываем — чужой домен потребовал бы `images.remotePatterns` в пустом `next.config.ts`.
-- Кнопки входа лежат внутри `.wrap`, который уже скрыт в `@media print`, — новые элементы
-  добавляйте туда же (правило «сайтовая обвязка на бумагу не идёт»).
+- **There is no database adapter, and that is not a gap.** It is not connected, so Auth.js keeps
+  the session in an encrypted cookie (the JWT strategy) and not a line about the user is left on
+  the server — the name and the email live only in the reader's cookie, and they are not in the
+  database even now that their seasons are. What exactly is stored is written on `/seasons` and
+  `/privacy`; those texts have already survived two such changes (the settings table, then the
+  collection) and are **edited by the same change** as the storage, otherwise the site starts
+  lying about itself. `/privacy` is not decoration either: without its address Google will not
+  let sign-in out of Testing mode into production (app name, support email, homepage URL and
+  privacy policy URL are required; ToS is not).
+- **Postgres was not needed for sign-in and still is not.** The database is needed by the "Save"
+  button, not by the login; sign-in was therefore built as a separate change, before it. The
+  adapter can still be added **alongside**: Auth.js keeps the JWT together with it, and the
+  strategy will not have to change.
+- **`proxy.ts` is not a line of defence** (in Next 16 that is what `middleware.ts` is now
+  called). The sign-in check stands in the `/seasons` server component — that is the check at the
+  data source; per the Next documentation a proxy is only an optimistic guess. The file does
+  exist in the project, but it does exactly one thing — **it puts the language in the address**
+  (see "Languages"): that is its proper job, and the Next documentation suggests doing it exactly
+  there. Neither the session nor the database is in it, and neither must be.
+- **A signed-out person is not redirected away.** `/seasons` is in the header, and the address
+  must open. The list is the same one, only short — there is one draft in the browser — and the
+  emptiness is explained by a single phrase covering both roles (`EMPTY_LIST` in `library.ts`).
+  There is no separate `/login` page and there must not be one; there is no sign-in button on
+  `/seasons` either — the season-creation dialog talks about signing in when it comes to that,
+  and a sermon on an empty page added nothing.
+- **Sign-in is a server action, not `useSession`.** Not a line of Auth.js reaches the browser,
+  `SessionProvider` is not needed, there is no flicker of state. Do not move sign-in to the
+  Auth.js client hooks — that would cancel all of the above at once.
+- **After signing in a person stays where they were.** The return address is assembled by
+  `GoogleLoginButton` (`location.pathname + search + hash`) and handed to the action as an
+  argument: the tried-on styling lives in `?p=` and `?i=`, and with a constant `redirectTo` a
+  person would come back from Google to the wrong poster. The whole address survives the trip
+  through Google — Auth.js puts it in the `authjs.callback-url` cookie (verified).
+- **The browser takes you to Google, not the Next router.** `googleLoginUrl` is the only sign-in
+  action that **does not redirect but returns an address**; `location.href` in
+  `GoogleLoginButton` follows it. `redirect()` to a foreign origin worked, but the Next router
+  first asked `accounts.google.com` for an RSC response, caught a CORS refusal and only then fell
+  back to an ordinary navigation — with "Failed to fetch RSC payload …" in the console on every
+  sign-in. The `state` and PKCE cookies do not suffer from this: `signIn` itself sets them
+  through `cookies()`.
+- **There is one sign-in button for the whole site** (`GoogleLoginButton`), and its label is a
+  prop: "Sign in with Google" in the header, the same in the `LoginDialog`, and "Sign in again"
+  in the stale-session blocks on `/seasons` and `/account`. They no longer have their own forms
+  with a server action: there must be one path to signing in, otherwise half the places will keep
+  going through the router.
+- **`returnTo` comes from the browser, so it is checked** (`safeReturnTo` in `actions.ts`): only a
+  relative path, and `//host` is rejected — otherwise sign-in would turn into an open redirect to
+  someone else's site.
+- **The price: the root layout became dynamic.** `LoginButtons` reads a cookie, the layout is
+  shared, so not a single route is served as static any more (in the `next build` output every
+  route is marked `ƒ`). Accepted deliberately: there are no heavy queries on the site, and the
+  alternative is to drag the session to the client, i.e. to cancel the previous point.
+- **The data set is the provider default** (`openid email profile`); we do not override
+  `authorization.params`: the name and the email do not travel beyond the cookie anyway.
+- **The session carries an `accountKey`** — `provider:id`, set by the `jwt`/`session` callbacks.
+  That is the name of a row in the settings table (see "Settings and the database"); the types are
+  extended in `src/server/next-auth.d.ts`.
+- **The keys are read by provider name.** `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET` are not mentioned
+  in the config — Auth.js finds them itself; `auth.ts` is therefore empty on that point, and that
+  is not forgetfulness.
+- **A second provider is a line in `providers` and a button in `LoginButtons`.** The mark is
+  drawn as inline SVG, like `GoogleMark`: there are no raster images in the project. We do not
+  show the user's avatar — a foreign domain would require `images.remotePatterns` in an empty
+  `next.config.ts`.
+- The sign-in buttons live inside `.wrap`, which is already hidden in `@media print` — add new
+  elements there too (the rule "the site frame does not go to paper").
 
-## Настройки и база
+## Settings and the database
 
-Первая таблица в PostgreSQL: `user_settings`. В ней лежат три настройки — язык интерфейса
-(см. «Языки»), состав семьи для новых постеров и ответ про аналитику (см. «Согласие и
-аналитика»). Про две остальные (`favorites` и `seasons`) — следующий раздел;
-общий для всех трёх слой (`db.ts`, логи, тост, накат схемы) описан здесь.
+The first table in PostgreSQL: `user_settings`. It holds three settings — the interface language
+(see "Languages"), the family for new posters and the answer about analytics (see "Consent and
+analytics"). The other two tables are covered in "My seasons"; the layer shared by all three
+(`db.ts`, logging, the toast, applying the schema) is described here.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Пул соединений, «запрос, который не бросает» | `src/server/db.ts` |
-| Логи сервера | `src/server/logger.ts` |
-| Чтение и запись настроек | `src/server/settings.ts` |
-| Модель состава: тип, нормализация, бланк по составу | `src/model/family.ts` |
-| Схема и накат | `tools/db/migrations/*.sql`, `tools/db/migrate.mjs`, `npm run db:migrate` |
-| Страница кабинета | `src/app/[lang]/account/page.tsx` |
-| Тост об ошибке сервера | `src/components/site/Toast.tsx` |
-| Редактор состава (клиентский) | `src/app/[lang]/account/FamilyEditor.tsx` |
-| Состав для живого постера | `src/app/api/family/route.ts`, `src/state/useFamilyPreset.ts` |
-| Кнопка и диалог замены | `src/components/edit/FamilySwap.tsx` |
-| Строка подключения | `DATABASE_URL` в `.env.local`, образец в `.env.example` |
+| The connection pool, "a query that does not throw" | `src/server/db.ts` |
+| Server logging | `src/server/logger.ts` |
+| Reading and writing settings | `src/server/settings.ts` |
+| The family model: type, normalisation, blank by family | `src/model/family.ts` |
+| Schema and applying it | `tools/db/migrations/*.sql`, `tools/db/migrate.mjs`, `npm run db:migrate` |
+| The account page | `src/app/[lang]/account/page.tsx` |
+| The server-error toast | `src/components/site/Toast.tsx` |
+| The family editor (client) | `src/app/[lang]/account/FamilyEditor.tsx` |
+| The family for the live poster | `src/app/api/family/route.ts`, `src/state/useFamilyPreset.ts` |
+| The button and the swap dialog | `src/components/edit/FamilySwap.tsx` |
+| Connection string | `DATABASE_URL` in `.env.local`, template in `.env.example` |
 
-- **В `user_settings` постера нет** — там язык, ответ про аналитику (см. «Согласие и
-  аналитика») и от двух до пяти пар «лицо — имя».
-  Язык и состав пишутся **разными операторами** (`writeFamily`, `writeLanguage`): общий
-  upsert пришлось бы звать с обоими значениями сразу, и меняющий язык затирал бы состав
-  прочитанным до правки. Адреса
-  постеров лежат в других таблицах, см. «Мои сезоны» и «Витрина».
-- **У состава два разных пути к постеру, и путать их нельзя.** В **новый** сезон он
-  уезжает при заведении строки — бланк собирается на сервере, до открытия. В **уже
-  открытый** (форкнутый чужой) его так не подставишь: постер живой, и менять людей в нём
-  может только он сам. Поэтому есть `GET /api/family` и хук `useFamilyPreset`, а сам
-  обмен — мутатор `replacePeople` в `useTemplateState`.
-- **Запрос за составом уходит только в правке.** В просмотре и на примере подставлять
-  некуда. Молчание сервера (не вошёл, база молчит, настройки нет) — это `null` и означает
-  «кнопки не будет»: постер обязан работать без сервера, просто без этой кнопки.
-- **Замена сохраняет содержимое карточек по позиции** — меняются только рисунок и имя.
-  Это решение, а не недоделка: форкают ради идей, а меняют актёрский состав. Лишние
-  карточки отбрасываются, недостающие добавляются пустыми; `templateForFamily` тут не
-  годится — она вернула бы весь пустой бланк и затёрла тему, недели и цель месяца.
-- **Окно у всех окон одно** — `src/components/dialog/Dialog.tsx` и его
-  `Dialog.module.css`, см. «Модальные окна». Замена состава затирает имена, а при
-  меньшей семье отбрасывает карточки вместе с проектами, поэтому подтверждение
-  обязательно, и окно показывает оба состава списками, а потерю карточек —
-  отдельной рамкой предупреждения.
-- **До постера настройка доезжает действием, а не ссылкой.** «Новый сезон» у вошедшего —
-  серверное действие `createSeason`: оно собирает бланк по составу (`templateForFamily`),
-  заводит строку и уводит человека в неё. Раньше бланк кодировался в `href` кнопки —
-  теперь бланку место в базе. Постеру про базу знать по-прежнему нечего.
-- **Невошедший получает черновик.** У него нет ни строки, ни настроек: сезон ложится
-  пустым бланком в браузер, и человек уезжает на `/sheet/edit`.
-- **«Новый сезон» — одна кнопка на весь сайт** (`components/site/NewSeasonAction.tsx` —
-  серверная обёртка, читает сессию; `NewSeasonButton.tsx` — клиентская кнопка с окном).
-  Стоит в шапке, в кабинете, на лендинге, в «Идеях», на `/account` и `/privacy`: разговор
-  один и тот же, подписи разные. **Имя спрашивается до заведения, у обеих ролей** —
-  раньше вошедший получал строку молча, а невошедший молча же открывал прежний черновик.
-  Цена: у вошедшего кнопка перестала работать без JS — была `<form action={createSeason}>`.
-  Принято сознательно: без JS окна с именем не бывает.
-- **Умолчание имени считается на клиенте, и состава семьи не требует.**
-  `defaultSeasonTitle` читает только `theme` бланка, а семья живёт в `people` — значит,
-  `readFamily()` кнопке не нужен. Заодно снимается расхождение «сегодня» между сервером и
-  браузером: месяц нового бланка зависит от даты (`pickTargetMonth`).
-- **Таблицы пользователей нет намеренно.** Строка именуется `accountKey` — `провайдер:id`
-  из сессии (ставит колбэк `jwt` в `src/server/auth.ts`). Ни имени из Google, ни почты в
-  базе нет. Ключ именно не почта: почту меняют, и настройки потерялись бы.
-- **`token.sub` вместо `accountKey` подставлять нельзя.** Соблазн велик — им хочется
-  починить сессии, выпущенные до появления ключа. Но без адаптера БД Auth.js кладёт в
-  `sub` случайный UUID, живущий до конца сессии: настройки нашлись бы сегодня и пропали
-  при следующем входе. Это проверено на живой сессии, а не выведено из документации.
-  Поэтому у старой сессии ключа просто нет, `familyState` возвращает `stale`, и кабинет
-  просит войти заново — один раз.
-- **Имена членов семьи — персональные данные, и они в базе.** До их появления там лежали
-  только четыре слова про рисунки. Теперь `/privacy` описывает это буквально, включая то,
-  что имена вписывает сам человек и может не вписывать вовсе.
-- **Чтение сессии в шапке — вне `try/catch`.** `auth()` трогает куки, а Next сообщает
-  «маршрут обязан быть динамическим» исключением; проглотив его, мы завалили бы сборку
-  логом и помешали роутеру пометить маршрут. В `try` завёрнуто только кодирование.
-- **Сайт обязан работать при мёртвой базе.** Лендинг, примеры, постер, печать и сам вход
-  от неё не зависят: `query` не бросает, `readFamily` отдаёт `null`, шапка молча откатывает
-  ссылку «Новый сезон». Не заводите запросов, которые роняют страницу.
-- **Ошибка сервера показывается одним способом на весь сайт: тост плюс пустота на месте
-  данных.** `Toast` (`src/components/site/Toast.tsx`) говорит, что случилось, а блок,
-  которому нечего показать, просто не рисуется. Ни страниц-заглушек под каждый отказ, ни
-  `error.tsx` на сегмент, ни мягких плашек «попробуйте попозже» вместо данных: первое
-  разрастается на каждый новый экран, последнее врёт — умолчание выдаёт себя за настоящие
-  настройки, а «Сохранить» поверх него это `upsert`, он затрёт непрочитанное.
-- **`Toast` — один из трёх клиентских компонентов в самой обвязке сайта** (шапка, подвал;
-  остальные — `NewSeasonButton` и `DraftClaimer`). Иначе никак: сообщение
-  обязано само уходить и закрываться по кнопке. Рисовать его может и серверный компонент
-  (страница знает об ошибке при рендере), и клиентский (отказ пришёл в ответ на действие).
-  Повторный отказ показывается заново только со сменой `key` — поэтому у неудачи рядом со
-  статусом едет отметка времени: строка `error` при второй неудаче подряд не меняется, и
-  тост бы не перемонтировался.
-- **«Не бросает» не значит «молчит».** `query` возвращает не `null`, а размеченный
-  результат: `ok` с рядами, `unconfigured` (нет `DATABASE_URL`) или `failed` (база не
-  ответила). Разводить эти две беды обязательно: они чинятся по-разному, а сложенные в
-  один `null` не отличимы в логе. Дискриминант — строка, а не `ok: boolean`: в `tsconfig`
-  выключен `strict`, и булев союз TypeScript не сужает. **Наружу эта разница не выходит:**
-  `familyState` и `writeFamily` схлопывают обе беды в один статус `error` — человеку от
-  разницы никакой пользы, а разбираться в ней по строке `db.ts` в логе, где лежит и код
-  Postgres, и стек.
-- **Лог — единственный след аварии, и он обязан отвечать «что чинить».** Поэтому в `catch`
-  печатается `error.code` (`42P01` — схему не накатывали, `28P01` — пароль,
-  `ENOTFOUND`/`ETIMEDOUT` — сеть) и стек, а первым аргументом `query` идёт метка вызова
-  (`settings:read` — чтение шапки, `settings:read:account` — чтение кабинета,
-  `settings:write`). Сам SQL в лог **не пишем**: вместе с ним туда уехали бы
-  значения, а среди них имена людей. Случай «нет `DATABASE_URL`» логируется **один раз на
-  процесс** — иначе строка добавлялась бы на каждый рендер шапки и утопила бы в себе
-  настоящие ошибки.
-- **`AggregateError` разворачивается вручную.** Упавшее соединение приезжает именно им: у
-  него пустой `message`, бесполезный стек, а настоящие причины — в `errors`, по одной на
-  каждый адрес, куда резолвится хост. Без `describe()` в логе оставалась строка
-  «AggregateError:» и больше ничего — то есть ровно та немота, от которой мы уходили.
-- **Чтение обёрнуто в `cache()` из React.** За один запрос состав спрашивают и шапка, и
-  кабинет — запрос должен уйти один. Между запросами кэш не живёт, и это правильно:
-  настройку могли сменить в соседней вкладке. Кабинет поэтому читает `familyState()`,
-  который не кэшируется: ему нужен свежий ответ сразу после записи и причина пустоты
-  («не вошёл» и «база молчит» — разные вещи).
-- **Кабинет — страница, а не выпадашка в шапке.** Выпадающее меню стало бы первым
-  клиентским компонентом в обвязке сайта и всё равно упёрлось бы в страницу, как только
-  настроек станет больше одной. Имя в шапке — просто ссылка на неё, «Выйти» переехало
-  внутрь: выход — действие над аккаунтом, а не раздел сайта.
-- **Редактор состава повторяет повадку постера** — клик по рисунку перебирает героя,
-  имя правится на месте, «×» убирает, «+» добавляет. Это **первый клиентский компонент
-  сайта вне постера**, и заведён он сознательно: без JS каждый клик по рисунку стоил бы
-  перезагрузки страницы. Переиспользовать `ProjectsSection` нельзя — она завязана на
-  `useDoc`, то есть на документ постера, которого в кабинете нет.
-- **Состав уезжает аргументом действия, а не полями формы.** Это не вкусовщина: форму,
-  отправленную из клиентского компонента, React кодирует под своими именами (`_1_name`
-  вместо `name`), и разбор `formData.getAll('name')` на сервере молча возвращает пустоту —
-  запрос уходит, а в базе ничего не появляется. Аргумент React сериализует сам. Пришедшему
-  при этом не доверяем: `normalizeFamily` в `saveFamily` режет границы, лица и длину имён.
-  Успех и неудача расходятся намеренно: **успех уезжает пометкой в адрес** (`?ok=1`) — ему
-  надо пережить перезагрузку, — а **неудача возвращается значением** и показывается тостом.
-  Редирект на неудаче перерисовал бы кабинет с нуля, а набранного состава у сервера нет: он
-  молча пропадал бы, и повторять было бы нечего. Отсюда `useActionState` в редакторе.
-  `?ok=1` он же и вычищает `replaceState`-ом после первого рендера — иначе перезагрузка
-  показывала бы «Сохранено ✓» и через час.
-- **Редактор ключуется по составу с сервера** (`key={JSON.stringify(family)}`): после
-  сохранения приходят новые данные, и он обязан начать с них, а не держать своё прежнее
-  состояние.
-- **Не прочитали состав — не показываем редактор.** На его месте пусто, а про причину
-  говорит тост. Иначе редактор показал бы умолчание вместо настоящих настроек, а
-  «Сохранить» — это `upsert`: он затёр бы то, чего мы не видели.
-- **Схему на прод накатывают руками.** `npm run db:migrate` читает только `.env.local`, и
-  на Vercel её не накатит никто: `vercel env pull --environment=production
-  .env.production.local`, затем `node --env-file=.env.production.local tools/db/migrate.mjs`,
-  а следом посев — `node --env-file=.env.production.local --import tsx
-  tools/db/seed-examples.ts`. `--env-file` — флаг **node**, а не приставка к команде: через
-  `npm run` его не передать, и скрипт возьмёт `.env.local`, то есть дев. Поэтому каждый
-  скрипт, который трогает базу, печатает хост и имя базы **до** подключения (`dbTarget` в
-  `tools/db/target.mjs`) — это единственная защита от «сел не в тот поезд».
-  Шагом сборки миграцию не делаем: билд на Vercel идёт без прод-секретов, а её падение
-  завалило бы деплой сайта, который обязан работать и при мёртвой базе.
-- **Границы состава — те же, что у постера** (`MIN_PEOPLE`..`MAX_PEOPLE`), их держит
-  `normalizeFamily`. Иначе настройка собрала бы бланк, который сам постер собрать не даёт.
-- **Имена в составе обязательны, а на постере — нет.** Проверяет это `familyNamed`
-  (`model/family.ts`), и стоит она **не** в `normalizeFamily`: та читает и старые строки
-  базы, и умолчание `DEFAULT_FAMILY`, где имён нет вовсе, — терять такие настройки нельзя.
-  Правило одно на два места: кнопка «Сохранить состав» погашена, пока хоть одно имя пусто
-  (тот же приём, что в окне жалобы), а `saveFamily` отвечает статусом `unnamed` — кнопка
-  удобство, а не рубеж защиты. Отдельный статус, а не общий `error`: сервер тут в порядке,
-  и человеку надо сказать ровно что чинить.
-- **`/privacy` описывает содержимое базы буквально.** Появилась строка — страница
-  переписана тем же изменением. Это правило, а не разовая любезность.
-- **Шаги нумерованные, и применённые записаны в `schema_migrations`.** Одного
-  идемпотентного файла хватало, пока таблицы только заводились; переезд на две породы
-  сезонов приносит шаги, повторять которые уже не всё равно. Старая схема лежит первым
-  шагом (`000_legacy.sql`) как была и на живой базе проходит вхолостую. `npm run db:status`
-  показывает, что накатано и что осталось.
+- **There is no poster in `user_settings`** — the language, the analytics answer and from two to
+  five "face — name" pairs. The language and the family are written by **different statements**
+  (`writeFamily`, `writeLanguage`): a shared upsert would need both values at once, and whoever
+  changed the language would overwrite the family with what was read before the edit. Poster
+  addresses live in other tables, see "My seasons" and "The showcase: publishing".
+- **The family has two routes to the poster, and they must not be confused.** Into a **new**
+  season it travels when the row is created — the blank is assembled on the server, before it is
+  opened. Into an **already open** (forked) one it cannot be put that way: the poster is live, and
+  only it can change the people in itself. Hence `GET /api/family` and `useFamilyPreset`, with the
+  swap itself being the `replacePeople` mutator in `useTemplateState`.
+- **The request for the family goes out only in edit mode.** Elsewhere there is nowhere to put it.
+  Silence from the server (not signed in, quiet database, no setting) is `null` and means "there
+  will be no button": the poster must work without the server, just without that button.
+- **The swap keeps the card content by position** — only the drawing and the name change. People
+  fork for the ideas but change the cast. Extra cards are dropped, missing ones added empty;
+  `templateForFamily` will not do — it would return the whole empty blank and wipe the theme, the
+  weeks and the goal.
+- **All dialogs share one wrapper** (see "Modal dialogs"). The swap wipes the names and, with a
+  smaller family, drops cards together with their projects, so confirmation is mandatory: the
+  dialog shows both families as lists and the loss of cards in a warning frame.
+- **The setting reaches the poster by an action, not by a link.** "New season" for a signed-in
+  person is the `createSeason` server action: it assembles the blank from the family
+  (`templateForFamily`), creates the row and takes the person into it. The blank used to be encoded
+  in the button's `href`; now it belongs in the database, and the poster still knows nothing about
+  the database.
+- **A signed-out person gets a draft.** No row, no settings: the season lands in the browser as an
+  empty blank and the person goes to `/sheet/edit`.
+- **"New season" is one button for the whole site** (`NewSeasonAction.tsx` — a server wrapper that
+  reads the session; `NewSeasonButton.tsx` — the client button with the dialog). It stands in the
+  header, the account, the landing page, "Ideas", `/account` and `/privacy`: one conversation,
+  different labels. **The name is asked before creation, for both roles** — a signed-in person used
+  to get a row silently, a signed-out one silently opened the previous draft. The price: without JS
+  the button stopped working for a signed-in person (it was `<form action={createSeason}>`).
+  Accepted deliberately: there is no dialog with a name without JS.
+- **The default name is computed on the client and does not need the family.**
+  `defaultSeasonTitle` reads only the blank's `theme`, and the family lives in `people`. That also
+  removes the "today" disagreement between server and browser: a new blank's month depends on the
+  date (`pickTargetMonth`).
+- **There is deliberately no table of users.** A row is named by `accountKey` — `provider:id` from
+  the session (set by the `jwt` callback). Neither the name from Google nor the email is in the
+  database. The key is specifically not the email: emails change and the settings would be lost.
+- **`token.sub` must not be substituted for `accountKey`.** It looks like a fix for sessions issued
+  before the key appeared, but without a database adapter Auth.js puts a random UUID into `sub`
+  that lives until the session ends: the settings would be found today and gone at the next
+  sign-in. Verified on a live session. So an old session has no key, `familyState` returns `stale`,
+  and the account asks the person to sign in again — once.
+- **Family members' names are personal data, and they are in the database.** `/privacy` describes
+  this literally, including that a person types the names themselves and may not type them at all.
+- **Reading the session in the header is outside `try/catch`.** `auth()` touches cookies, and Next
+  reports "this route must be dynamic" with an exception; swallowing it would fill the build with a
+  log line and stop the router from marking the route. Only the encoding is wrapped.
+- **The site must work with a dead database.** The landing page, the examples, the poster, printing
+  and sign-in do not depend on it: `query` does not throw, `readFamily` returns `null`, the header
+  quietly falls back on the "New season" link. Do not add queries that bring a page down.
+- **A server error is shown one way across the site: a toast plus emptiness where the data should
+  be.** `Toast` says what happened, and a block with nothing to show is not drawn. No stub pages
+  per failure, no `error.tsx` per segment, no soft "try again later" plates: the first multiplies
+  with every screen, the last lies — a default passes itself off as real settings, and "Save" on
+  top of it is an `upsert` that overwrites what was never read.
+- **`Toast` is one of the three client components in the site frame** (the others are
+  `NewSeasonButton` and `DraftClaimer`): the message must go away by itself and close on a button.
+  It can be drawn by a server component (the page knows at render time) or by a client one (a
+  refusal came in reply to an action). A repeated refusal is shown again only with a changed `key`
+  — hence the timestamp next to the status: the `error` string does not change on a second failure
+  in a row and the toast would not remount.
+- **"Does not throw" does not mean "says nothing".** `query` returns a tagged result: `ok` with
+  rows, `unconfigured` (no `DATABASE_URL`) or `failed` (no answer). Keeping those apart is
+  mandatory — they are fixed differently, and folded into one `null` they are indistinguishable in
+  the log. The discriminant is a string, not `ok: boolean`: `strict` is off in `tsconfig` and
+  TypeScript does not narrow a boolean union. **That difference does not go outward:**
+  `familyState` and `writeFamily` collapse both into one `error` status.
+- **The log is the only trace of a failure, and it must answer "what to fix".** The `catch` prints
+  `error.code` (`42P01` — the schema was not applied, `28P01` — the password,
+  `ENOTFOUND`/`ETIMEDOUT` — the network) and the stack, and the first argument of `query` is a call
+  label (`settings:read`, `settings:read:account`, `settings:write`). The SQL is **not** logged:
+  values would travel with it, and among them people's names. The "no `DATABASE_URL`" case is
+  logged **once per process** — otherwise a line would be added on every header render and would
+  drown the real errors.
+- **`AggregateError` is unwrapped by hand.** A failed connection arrives as exactly that: empty
+  `message`, useless stack, and the real causes in `errors`, one per address the host resolves to.
+  Without `describe()` the log kept the line "AggregateError:" and nothing else.
+- **Reading is wrapped in `cache()` from React.** Within one request both the header and the
+  account ask for the family; the query must go out once. The cache does not live between requests,
+  and that is right: the setting could have changed in another tab. The account therefore reads the
+  uncached `familyState`: it needs a fresh answer right after a write, and the reason for the
+  emptiness ("not signed in" and "the database is quiet" are different things).
+- **The account is a page, not a dropdown in the header.** A dropdown would become the first client
+  component in the site frame and would run into a page anyway once there was more than one
+  setting. The name in the header is a link to it, and "Sign out" moved inside: signing out is an
+  action on an account, not a section of the site.
+- **The family editor repeats the poster's manner** — a click on a drawing cycles the character,
+  the name is edited in place, "×" removes, "+" adds. This is the **first client component of the
+  site outside the poster**, and it is deliberate: without JS every click would cost a page reload.
+  `ProjectsSection` cannot be reused — it is tied to `useDoc`, i.e. to a poster document the
+  account does not have.
+- **The family travels as an action argument, not as form fields.** Not taste: React encodes a form
+  submitted from a client component under its own names (`_1_name` instead of `name`), and
+  `formData.getAll('name')` on the server silently returns nothing — the request goes out and
+  nothing appears in the database. React serialises an argument itself. We still do not trust what
+  arrives: `normalizeFamily` in `saveFamily` cuts the bounds, the faces and the name lengths.
+  Success and failure diverge deliberately: **success travels as a marker in the address**
+  (`?ok=1`), because it must survive a reload, while **failure comes back as a value** and is shown
+  as a toast — a redirect would redraw the account from scratch, and the server does not have the
+  typed family. Hence `useActionState` in the editor, which also cleans `?ok=1` out with
+  `replaceState` after the first render: otherwise a reload would show "Saved ✓" an hour later.
+- **The editor is keyed by the family from the server** (`key={JSON.stringify(family)}`): after a
+  save new data arrives and it must start from that.
+- **If the family was not read, the editor is not shown.** Its place is empty and the toast
+  explains why. Otherwise it would show a default instead of the real settings, and "Save" is an
+  `upsert`: it would overwrite what we never saw.
+- **The schema is applied to production by hand.** `npm run db:migrate` reads only `.env.local`:
+  `vercel env pull --environment=production .env.production.local`, then `node
+  --env-file=.env.production.local tools/db/migrate.mjs`, then the seed with the same flag and
+  `--import tsx tools/db/seed-examples.ts`. `--env-file` is a **node** flag, not a prefix to the
+  command: it cannot be passed through `npm run`, and the script would take `.env.local`, i.e. dev.
+  That is why every script that touches the database prints the host and the database name
+  **before** connecting (`dbTarget` in `tools/db/target.mjs`) — the only protection against
+  boarding the wrong train. The migration is not a build step: the Vercel build runs without
+  production secrets, and its failure would take down the deploy of a site that must work with a
+  dead database.
+- **The family bounds are the poster's bounds** (`MIN_PEOPLE`..`MAX_PEOPLE`), held by
+  `normalizeFamily`. Otherwise the setting would assemble a blank the poster refuses to assemble.
+- **Names in the family are required, on the poster they are not.** That is checked by
+  `familyNamed` (`model/family.ts`), and it stands **outside** `normalizeFamily`: that one reads old
+  database rows and the `DEFAULT_FAMILY` default, where there are no names at all, and such
+  settings must not be lost. One rule in two places: the "Save the family" button is disabled while
+  any name is empty (the same trick as in the report dialog), and `saveFamily` answers `unnamed` —
+  the button is a convenience, not a line of defence. A separate status rather than a shared
+  `error`: the server is fine, and the person must be told exactly what to fix.
+- **`/privacy` describes the contents of the database literally.** A row appeared — the page is
+  rewritten by the same change. That is a rule, not a one-off courtesy.
+- **The steps are numbered, and the applied ones are recorded in `schema_migrations`.** One
+  idempotent file was enough while the tables were only being created; two breeds of season bring
+  steps that are no longer safe to repeat. The old schema lies as the first step
+  (`000_legacy.sql`) and runs as a no-op on the live database. `npm run db:status` shows what is
+  applied and what is left.
 
-## Согласие и аналитика
+## Consent and analytics
 
-Google Analytics — единственное, что сайт собирает **не ради постера смотрящего**, и
-единственная сторонняя библиотека, доезжающая до браузера. Поэтому у него один на весь
-сайт разговор о согласии: своём, отзывном и данном до первой куки.
+Google Analytics is the only thing the site collects **not for the sake of the viewer's poster**,
+and the only third-party library that reaches the browser. So it gets one conversation about
+consent for the whole site: consent that is its own, revocable and given before the first cookie.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Тип, версия, кука, разбор значения, оповещение | `src/model/consent.ts` |
-| Чтение ответа и `GA_ID` | `src/server/consent.ts` |
-| Колонки настроек, `readConsentSetting`, `writeConsent` | `src/server/settings.ts` |
-| Действия: ответ на баннер и правка в кабинете | `src/server/actions.ts` |
-| Узел в корневом лейауте | `components/site/ConsentGate.tsx` |
-| Сам счётчик | `components/site/Analytics.tsx` |
-| Баннер | `components/site/ConsentBanner.tsx` |
-| «Куки» в подвале | `components/site/ConsentLink.tsx` |
-| Раздел кабинета | `app/[lang]/account/ConsentEditor.tsx` |
-| Схема | `tools/db/migrations/006_consent.sql` |
-| Типы `window.gtag` | `src/model/gtag.d.ts` |
+| The type, the version, the cookie, parsing the value, notifying | `src/model/consent.ts` |
+| Reading the answer and `GA_ID` | `src/server/consent.ts` |
+| The settings columns, `readConsentSetting`, `writeConsent` | `src/server/settings.ts` |
+| Actions: answering the banner and editing in the account | `src/server/actions.ts` |
+| The node in the root layout | `components/site/ConsentGate.tsx` |
+| The tag itself | `components/site/Analytics.tsx` |
+| The banner | `components/site/ConsentBanner.tsx` |
+| "Cookies" in the footer | `components/site/ConsentLink.tsx` |
+| The account section | `app/[lang]/account/ConsentEditor.tsx` |
+| Schema | `tools/db/migrations/006_consent.sql` |
+| `window.gtag` types | `src/model/gtag.d.ts` |
 
-- **Нет `GA_ID` — нет ничего.** Ни баннера, ни строки в подвале, ни раздела в кабинете, ни
-  байта Google; в базу за ответом мы тогда даже не ходим. Это главный рубильник, и он же
-  делает механизм безопасным: пока переменной нет, сайт ведёт себя ровно как прежде.
-  Спрашивать согласие на то, чего не происходит, нельзя — человек ответит на
-  несуществующий вопрос, а мы получим запись, которая ничего не значит.
-- **Переменная серверная (`GA_ID`), а не `NEXT_PUBLIC_GA_ID`.** Публичная подставляется
-  сборкой, то есть становится частью бандла: выключить счётчик на Vercel без пересборки
-  стало бы нельзя, а тестовый сервер получал бы значение от `npm run build`, а не от
-  своего окружения. Читает её только сервер, в браузер идентификатор едет **пропом** — тем
-  же путём, каким туда попадает всё остальное серверное в этом проекте.
-- **Consent Mode v2, а не «грузить после согласия».** `gtag` загружен сразу, но все четыре
-  ключа хранения стоят в `denied`: в этом состоянии он не пишет кук и не собирает
-  идентификаторов. Выигрыш ровно один и он существенный — «Принять» включает счётчик **на
-  месте**, `consent update` меняет режим уже загруженного `gtag`, и перезагружать страницу
-  человеку не надо. Порядок двух скриптов правильный сам собой: `dataLayer` — очередь, а
-  `afterInteractive` выполняется в порядке документа.
-- **Хранилищ два, и кука сильнее настройки.** Кука `fs-consent` — ответ **этого браузера**,
-  и у невошедшего другого места нет вовсе; колонки `consent`, `consent_version`,
-  `consent_at` — ответ аккаунта, чтобы вошедший не отвечал на один и тот же вопрос на
-  каждом своём устройстве. Порядок простой: `cookie ?? saved`. Хитростей языка (`url`
-  против `auto`, пометка на один переход) здесь нет и не надо — у языка спорят два
-  источника догадки, а тут два ответа одного и того же человека, и свежим считается данный
-  в этом браузере.
-- **Настройку в куку не переписываем.** Клиентского близнеца `LangSync` заводить незачем:
-  `readSettings` кэширован `cache()` из React и всё равно вызывается лейаутом ради языка —
-  чтение бесплатно, а записывать нечего, куку поставит первое же решение.
-- **Колонок три, потому что вопросов три.** Что ответили, на что именно (`consent_version`)
-  и когда (`consent_at`). Ответ без версии и даты — не доказательство согласия, а просто
-  слово; предъявить его GDPR требует уметь. Дату берёт `now()` базы, а не браузер: часы
-  того, кто соглашается, доказательством быть не могут.
-- **`null` в `consent` значит «не спрашивали», а не «запрещено».** Та же разница, что у
-  `language`, и на ней держится показ баннера. Умолчания у колонки нет и быть не может —
-  оно означало бы, что за человека уже ответили. В кабинете при этом умолчание честное:
-  не отвечал — значит, не разрешал.
-- **Согласие на прежнюю версию новым целям не указ.** Не совпала `CONSENT_VERSION` (в куке
-  она едет прямо в значении — `granted.1`, в базе лежит колонкой) — читаем как «не
-  спрашивали», и баннер выходит снова. Сегодня версия `1`; появится вторая цель — поднимите
-  её, и разговор повторится сам.
-- **Баннер — полоса, а не модальное окно.** Запирать сайт до ответа нельзя: согласие
-  обязано быть свободным, а окно без выхода — это стена, и такое согласие не считается
-  согласием вовсе. Отсюда же `z-index: 36` — выше меню языков, но **ниже тоста**: тост
-  говорит о том, что случилось только что, и он важнее вопроса, который висит и подождёт.
-- **Обе кнопки одного веса.** Отказ не имеет права быть труднее согласия — ни лишним
-  кликом, ни бледной краской. Роли окон (`.primary` слева, `.ghost` справа) поэтому здесь
-  и не взяты: они разводят действие и отказ, а тут это два равных ответа на один вопрос.
-- **Отказ запоминается так же, как согласие.** «Нет» — это тоже ответ; забыть его значило
-  бы спрашивать снова на каждой странице, то есть давить. Срок у обоих один — полгода
-  (`CONSENT_COOKIE_MAX_AGE`): переспрашивать отказавшегося чаще, чем согласившегося, — тот
-  же нажим.
-- **Передумать можно двумя способами, и оба обязательны.** В кабинете — вошедшему, ссылкой
-  «Куки» в подвале — всем: у невошедшего кабинета нет, а отзывать согласие он вправе так же
-  легко, как давал. Ссылка — кнопка, а не адрес: она открывает тот же разговор заново через
-  `openConsent`/`subscribeConsent`. Приём тот же, что у `announce` в `draft.ts`, и выбран по
-  той же причине — ради одной кнопки заводить контекст и делать подвал клиентским незачем.
-- **Куку ставит серверное действие.** В `document.cookie` проект не лезет нигде, и заводить
-  это ради согласия не стали: действия — единственное место, кроме `proxy`, где куку вообще
-  можно поставить. Отсюда же и то, что баннер не ждёт ответа сервера: он закрывается сам, а
-  `gtag` переводится в новое состояние на месте.
-- **Молчание базы у вошедшего кукой не отменяется.** В браузере ответ сохранён, в
-  настройках его не оказалось — переспросим на следующем устройстве. Это честнее, чем
-  считать несохранённое сохранённым.
-- **`/privacy` переписывается тем же изменением** — правило общее, и здесь оно сработало
-  всерьёз: страница прямо утверждала, что аналитики на сайте нет. Переписаны `cookiesText`
-  и `dbSettings`, добавлена пара `analyticsHead`/`analyticsText`, поднята дата — во всех
-  трёх языках.
-- **Второй такой библиотеки быть не должно.** Правило «в браузер не едет ни одной сторонней
-  библиотеки» держалось, пока сайту нечего было считать. Счётчик его отменяет — и отменяет
-  **ровно один раз**.
+- **No `GA_ID` — nothing at all.** No banner, no line in the footer, no section in the account,
+  not a byte of Google; we do not even go to the database for the answer. That is the master
+  switch and what makes the mechanism safe: while the variable is absent the site behaves exactly
+  as before. Asking consent for something that is not happening is forbidden — a person would
+  answer a question that does not exist and we would get a record that means nothing.
+- **The variable is a server one (`GA_ID`), not `NEXT_PUBLIC_GA_ID`.** A public one is
+  substituted at build time, i.e. becomes part of the bundle: turning the tag off on Vercel
+  without a rebuild would become impossible, and a test server would get its value from
+  `npm run build` rather than from its own environment. Only the server reads it; the identifier
+  travels to the browser **as a prop** — the same way everything else server-side gets there in
+  this project.
+- **Consent Mode v2, not "load after consent".** `gtag` is loaded straight away, but all four
+  storage keys are `denied`: in that state it writes no cookies and collects no identifiers. The
+  gain is one and it is substantial — "Accept" turns the tag on **in place**, a `consent update`
+  changes the mode of an already loaded `gtag`, and the page need not be reloaded. The order of the
+  two scripts is right by itself: `dataLayer` is a queue and `afterInteractive` executes in
+  document order.
+- **There are two storages, and the cookie is stronger than the setting.** The `fs-consent` cookie
+  is **this browser's** answer, and a signed-out person has no other place; the `consent`,
+  `consent_version`, `consent_at` columns are the account's answer, so a signed-in person does not
+  answer the same question on every device. The order is simply `cookie ?? saved`. The language's
+  tricks (`url` against `auto`, a marker for one navigation) are not needed here: there two sources
+  of a guess argue, here two answers from the same person do, and the one given in this browser is
+  the fresher.
+- **We do not rewrite the setting into the cookie.** A client twin of `LangSync` is pointless:
+  `readSettings` is cached with `cache()` from React and is called by the layout for the language
+  anyway — the read is free, and there is nothing to write, the first decision will set the
+  cookie.
+- **There are three columns because there are three questions.** What was answered, to what
+  exactly (`consent_version`) and when (`consent_at`). An answer without a version and a date is
+  not proof of consent but merely a word; GDPR requires being able to produce it. The date comes
+  from the database's `now()`, not from the browser: the clock of whoever consents cannot be
+  proof.
+- **`null` in `consent` means "not asked", not "forbidden".** The same difference as with
+  `language`, and showing the banner rests on it. The column has no default and cannot have one —
+  a default would mean someone has already answered for the person. In the account the default is
+  honest, though: did not answer means did not allow.
+- **Consent to a previous version does not cover new purposes.** `CONSENT_VERSION` does not match
+  (in the cookie it travels right in the value — `granted.1`; in the database it is a column) — we
+  read it as "not asked" and the banner comes out again. Today the version is `1`; when a second
+  purpose appears, raise it and the conversation repeats itself.
+- **The banner is a bar, not a modal dialog.** Locking the site until an answer is forbidden:
+  consent must be free, and a dialog with no way out is a wall, and such consent is not consent at
+  all. Hence `z-index: 36` — above the language menu but **below the toast**: the toast speaks
+  about what has just happened, and it matters more than a question that is hanging there and can
+  wait.
+- **Both buttons carry the same weight.** A refusal has no right to be harder than consent — not
+  by an extra click, not by a paler colour. The dialog roles (`.primary` on the left, `.ghost` on
+  the right) are therefore not taken here: they separate an action from a refusal, and here there
+  are two equal answers to one question.
+- **A refusal is remembered the same way as consent.** "No" is an answer too; forgetting it would
+  mean asking again on every page, i.e. pressing. Both have the same term — six months
+  (`CONSENT_COOKIE_MAX_AGE`): asking someone who refused more often than someone who agreed is
+  the same pressure.
+- **There are two ways to change your mind, and both are mandatory.** In the account for a
+  signed-in person, and through the "Cookies" link in the footer for everyone: a signed-out person
+  has no account and has the right to withdraw consent as easily as it was given. The link is a
+  button, not an address: it reopens the conversation through `openConsent`/`subscribeConsent` —
+  the same trick as `announce` in `draft.ts`, and for the same reason: a context and a client
+  footer for one button are pointless.
+- **A server action sets the cookie.** The project never touches `document.cookie` anywhere, and
+  we did not start doing it for consent: actions are the only place besides `proxy` where a cookie
+  can be set at all. Hence also the fact that the banner does not wait for the server's answer: it
+  closes itself, and `gtag` is switched to the new state in place.
+- **Silence from the database for a signed-in person is not overridden by the cookie.** The answer
+  is saved in the browser but did not turn up in the settings — we will ask again on the next
+  device. That is more honest than treating something unsaved as saved.
+- **`/privacy` is rewritten by the same change** — the rule is general, and here it applied in
+  earnest: the page stated outright that there is no analytics on the site. `cookiesText` and
+  `dbSettings` were rewritten, an `analyticsHead`/`analyticsText` pair was added and the date was
+  raised — in all three languages.
+- **There must not be a second such library.** The rule "not a single third-party library reaches
+  the browser" held while the site had nothing to count. The tag cancels it — and cancels it
+  **exactly once**.
 
-Проверяется: `e2e/site/consent.spec.ts` — до ответа аналитика выключена, «Принять» включает
-её без перезагрузки, отказ запоминается, ссылка в подвале открывает разговор заново, а
-решение вошедшего переживает чистую куку.
+Verified by: `e2e/site/consent.spec.ts` — analytics is off before the answer, "Accept" turns it
+on without a reload, a refusal is remembered, the footer link opens the conversation again, and a
+signed-in person's decision survives a cleared cookie.
 
-## Модальные окна
+## Modal dialogs
 
-Обвязка одна на весь сайт: `src/components/dialog/Dialog.tsx` рисует `<dialog>`,
-`src/components/dialog/Dialog.module.css` — всё его оформление. Копий этих правил
-было три (окна постера, окна списка, замена семьи), и они уже разошлись в кегле
-заголовка, отступах и высоте кнопок — чем такие копии и кончаются.
+There is one wrapper for the whole site: `src/components/dialog/Dialog.tsx` draws the `<dialog>`,
+`src/components/dialog/Dialog.module.css` holds all of its styling. There used to be three copies
+of these rules (the poster's dialogs, the list's dialogs, the family swap) and they had already
+diverged in heading size, padding and button height — which is how such copies end.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Обвязка: `<dialog>`, `showModal()`, заголовок, ряд кнопок | `src/components/dialog/Dialog.tsx` |
-| Оформление: рамка, поля, кнопки, предупреждение | `src/components/dialog/Dialog.module.css` |
-| Запирание прокрутки | `html:has(dialog:modal)` в `src/styles/global.css` |
+| The wrapper: `<dialog>`, `showModal()`, the heading, the button row | `src/components/dialog/Dialog.tsx` |
+| The styling: frame, padding, buttons, the warning | `src/components/dialog/Dialog.module.css` |
+| Locking the scroll | `html:has(dialog:modal)` in `src/styles/global.css` |
 
-- **`confirm()` не годится нигде:** он вешает вкладку, ломает автоматическую
-  проверку печати и не умеет показать главное — **что именно** изменится.
-- **Окно рисуется, только пока открыто.** Вызывающий держит `useState` и
-  монтирует его, а `onDismiss` ловит Esc, клик по подложке и кнопку отмены сразу:
-  иначе состояние разойдётся с настоящим состоянием окна и второй раз оно не
-  откроется. Способ «висеть в дереве всегда и открываться через `ref.showModal()`»
-  был вторым и отменён — одна обвязка не может иметь двух повадок. Побочная
-  выгода: поля внутри каждый раз новые, и `defaultValue` работает честно даже
-  после переименования (раньше значение приходилось класть в узел руками).
-- **Ролей у кнопок две: `.ghost` слева, `.primary` справа.** Третьей, красной
-  «опасной», нет намеренно — цвет светофора на сайте означает предупреждение о
-  потере (`.warning`), а не кнопку; красная кнопка была только в списке, и одно и
-  то же «Убрать с витрины» выглядело в двух местах по-разному. Ряд приходит в
-  `Dialog` узлом, а не описанием: в нём бывает `<form>` с серверным действием
-  (удаление строки), кнопка входа и одинокая «Закрыть» (отказ витрины).
-- **Заголовок связывается с окном сам** (`useId`): захардкоженные `id` пришлось бы
-  разводить руками там, где на странице несколько одинаковых окон списка.
-- **Прокрутка под открытым окном заперта одним правилом на весь сайт**
-  (`html:has(dialog:modal)`), а `scrollbar-gutter: stable` там же держит ширину
-  страницы, чтобы вёрстка не дёргалась на открытии. Своего запирания окну заводить
-  не надо.
-- **`@media print { display: none }` стоит в общем модуле** — закрытый `<dialog>`
-  и так не рисуется, но правило нужно на случай печати с открытым окном.
-- **Ширина 560px — под три кнопки в ряду**, и это потолок, а не цель: окна с
-  четырьмя кнопками (была «Поделиться ссылкой») переносят ряд на узком экране и
-  читаются как поломка. Не влезает — значит, кнопке место не в ряду.
-- **Ряд кнопок прижат к низу окна.** У окна есть `min-height`, чтобы фраза в одну
-  строку не сжимала его в полоску, — и свободное место обязано уходить **над**
-  рядом, а не под ним: под ним получалась дыра, а кнопки повисали в середине.
-  Держит это `.dialog[open] { display: flex; flex-direction: column }` плюс
-  `margin-top: auto` у ряда. Селектор именно с `[open]`: авторский `display`
-  сильнее умолчания браузера, и голый `.dialog` показал бы окно в тот кадр, когда
-  оно уже в дереве, а `showModal()` ещё не вызван.
+- **`confirm()` will not do anywhere:** it hangs the tab, breaks the automated print check and
+  cannot show the main thing — **what exactly** will change.
+- **A dialog is drawn only while it is open.** The caller holds a `useState` and mounts it, while
+  `onDismiss` catches Esc, a click on the backdrop and the cancel button at once: otherwise the
+  state diverges from the dialog's real state and it will not open a second time. The approach of
+  "always hang in the tree and open through `ref.showModal()`" was the second one and was
+  cancelled — one wrapper cannot have two manners. A side benefit: the fields inside are new every
+  time, and `defaultValue` works honestly even after a rename (the value used to have to be put
+  into the node by hand).
+- **Buttons have two roles: `.ghost` on the left, `.primary` on the right.** There is deliberately
+  no third, red "dangerous" one — on this site the traffic-light colour means a warning about loss
+  (`.warning`), not a button; a red button existed only in the list, and one and the same "Take
+  off the showcase" looked different in two places. The row arrives in `Dialog` as a node rather
+  than a description: it may contain a `<form>` with a server action (deleting a row), the sign-in
+  button and a lone "Close" (the showcase's refusal).
+- **The heading links itself to the dialog** (`useId`): hard-coded `id`s would have to be spread
+  by hand wherever a page has several identical list dialogs.
+- **The scroll under an open dialog is locked by one rule for the whole site**
+  (`html:has(dialog:modal)`), and `scrollbar-gutter: stable` there keeps the page width so the
+  layout does not twitch on opening. A dialog does not need its own locking.
+- **`@media print { display: none }` stands in the shared module** — a closed `<dialog>` does not
+  render anyway, but the rule is needed in case of printing with a dialog open.
+- **The width of 560px is for three buttons in a row**, and that is a ceiling, not a goal: dialogs
+  with four buttons (there used to be a "Share a link") wrap the row on a narrow screen and read
+  as a breakage. If it does not fit, the button does not belong in the row.
+- **The button row is pressed to the bottom of the dialog.** The dialog has a `min-height` so that
+  a one-line phrase does not squeeze it into a strip — and the free space must go **above** the
+  row, not below it: below it there was a hole and the buttons hung in the middle. That is held by
+  `.dialog[open] { display: flex; flex-direction: column }` plus `margin-top: auto` on the row.
+  The selector has `[open]` for a reason: an authored `display` beats the browser default, and a
+  bare `.dialog` would show the dialog in the frame when it is already in the tree but
+  `showModal()` has not been called yet.
 
+## My seasons
 
-## Мои сезоны
+Your own collection: the `user_seasons` table and the `/seasons` page. It is invisible from
+outside, a fork always makes a new row, the content can be edited as much as you like.
 
-Своя коллекция: таблица `user_seasons` и страница `/seasons`. Снаружи не видна, форк
-всегда даёт новую строку, содержимое правится сколько угодно.
-
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Пределы, название сезона, статусы | `src/model/library.ts` |
-| Чтение, список, запись, удаление | `src/server/userSeasons.ts` |
-| Действия страниц и постера | `src/server/actions.ts` |
-| Постер своего сезона | `src/app/season/[code]/` |
-| Черновик невошедшего | `src/model/draft.ts`, `src/app/[lang]/sheet/` |
-| Черновик строкой списка (клиентский) | `src/app/[lang]/seasons/DraftEntry.tsx` |
-| Перенос черновика после входа | `src/components/site/ClaimDraft.tsx` |
-| Список, поиск, сортировка | `src/app/[lang]/seasons/page.tsx` |
-| Переименование и удаление строки (клиентские) | `src/app/[lang]/seasons/RenameEntry.tsx`, `DeleteEntry.tsx` |
-| Переименование с самого постера | `src/components/edit/RenameDialog.tsx` |
-| Схема | `tools/db/migrations/001_seasons_v2.sql` |
+| Limits, the season's name, the statuses | `src/model/library.ts` |
+| Reading, listing, writing, deleting | `src/server/userSeasons.ts` |
+| Page and poster actions | `src/server/actions.ts` |
+| The poster of your own season | `src/app/season/[code]/` |
+| A signed-out person's draft | `src/model/draft.ts`, `src/app/[lang]/sheet/` |
+| The draft as a list row (client) | `src/app/[lang]/seasons/DraftEntry.tsx` |
+| Moving the draft after sign-in | `src/components/site/ClaimDraft.tsx` |
+| The list, search and sorting | `src/app/[lang]/seasons/page.tsx` |
+| Renaming and deleting a row (client) | `src/app/[lang]/seasons/RenameEntry.tsx`, `DeleteEntry.tsx` |
+| Renaming from the poster itself | `src/components/edit/RenameDialog.tsx` |
+| Schema | `tools/db/migrations/001_seasons_v2.sql` |
 
-- **Уникальности содержимого здесь нет и быть не должно.** Форк своего же сезона — законная
-  вторая строка, и два сезона с одинаковым названием тоже. Уникальность — правило витрины,
-  а не коллекции.
-- **«Форкнуть» есть и у своего сезона**: следующий месяц собирают из прошлого, а прошлый
-  должен остаться. В правке кнопки нет — там правят эту самую строку, и заводить рядом
-  вторую посреди работы незачем.
-- **Строка всегда ищется вместе с владельцем** (`where code = $1 and account_key = $2`).
-  Поэтому чужой код неотличим от выдуманного: и то и другое — 404. Невошедшего уводим в
-  кабинет, там объяснено, зачем вход.
-- **У черновика есть имя и дата, и он виден в списке.** `/seasons` невошедшему показывает
-  его единственный черновик такой же строкой, как сезоны из базы: открыть, переименовать,
-  удалить. Пока черновик нигде не показывался, правило «черновик один» человеку неоткуда
-  было проверить, и «Новый сезон» затирал набранное молча. Вкладок анониму не показываем:
-  избранного и публикаций без входа не бывает.
-- **Строку рисует клиент, и только он.** Черновик лежит в `localStorage`, серверу его
-  негде взять. `DraftEntry` читает хранилище через `useSyncExternalStore`, а не эффектом:
-  серверный снимок — `undefined`, и это **не то же самое**, что «черновика нет», иначе
-  фраза «черновика нет» мигала бы неправдой на кадр. Оттуда же берётся честность после
-  переименования и при правке в соседней вкладке — писатели черновика будят подписку сами
-  (`announce` в `draft.ts`), потому что своя запись события `storage` не рождает.
-- **Дата у черновика лежит полем, а месяц и тема — нет.** `savedAt` вывести неоткуда, а
-  месяц с темой выводятся из самого бланка — колонка рядом была бы той самой второй копией.
-  Отметку времени ставит `writeDraft`, а не тот, кто её зовёт: писателей четверо, и забыть
-  её значит показать в списке чужую дату.
-- **Вход доводит дело до конца сам, любой кнопкой и с любой страницы.** Черновик
-  забирает `components/site/ClaimDraft.tsx` — серверная обёртка читает сессию, клиентский
-  `DraftClaimer` читает хранилище, — и стоит он в корневом лейауте, а не на `/seasons`.
-  Ни пометки `?claim=1`, ни своей кнопки входа у панели черновика больше нет: **у
-  вошедшего черновика не бывает** (коллекция у него в базе), поэтому запись в браузере
-  означает ровно одно — её собрали до входа, и согласия спрашивать не о чем. С самого
-  `/sheet` человека уводим в новую строку с сохранением режима: постер иначе остался бы
-  без хранилища. Неудача черновик не трогает — строки не появилось, и стирать нечего.
-- **Забранный черновик запирается, а не просто стирается** (`sealDraft` в `draft.ts`).
-  Рядом на `/sheet` работает `DraftStore`, он пишет дебаунсом — его отложенная запись
-  легла бы в хранилище уже после чистки и воскресила бы вторую копию. Удаление руками
-  (`DraftEntry`) запирать нельзя: следом человек тут же заводит новый черновик.
-- **Вошедшему черновик на `/seasons` не показываем.** У него коллекция в базе, а
-  залежаться черновику теперь негде: вход уносит его в тот же миг.
-- **Название даётся при заведении и выводится из бланка** (`defaultSeasonTitle`: месяц плюс
-  подзаголовок темы) **на языке сезона**: оно пишется в колонку `title` один раз и дальше
-  живёт своей жизнью — смена языка в кабинете его не трогает. Оно нужно списку, а на постере не печатается нигде. Переименование
-  **не трогает `updated_at`**: это дата правки сезона, по ней список сортируется, и смена
-  имени не должна поднимать строку наверх.
-- **Предел — 100 строк на аккаунт**, и держит его приложение, а не схема: переполнение
-  обязано объясняться словами. Проверка стоит **в том же запросе**, что и вставка (CTE
-  `room`) — между отдельными `count` и `insert` есть окно.
-- **Код строки берётся до вставки.** `insert ... returning` отдал бы id, когда строка уже
-  записана, и код пришлось бы дописывать вторым запросом; поэтому id берётся `nextval`-ом,
-  код считается из него, и оба уезжают в одну вставку.
-- **Месяц в списке выводится из содержимого**, а не хранится колонкой рядом: вот она и была
-  бы второй копией. Разбор теперь дешёвый — в базе распакованный массив.
-- **Поиск — `position(lower($2) in lower(title))`, а не `ilike`:** не приходится
-  экранировать `%` и `_`, которые в строке поиска напечатают запросто. Порядок
-  подставляется в текст запроса, но из закрытого союза `LibrarySort`, а не от человека.
-- **Поиск и сортировка живут в адресе** (`?q=&sort=`), а не в состоянии React: их можно
-  переслать и перезагрузить, страница остаётся серверной, всё работает без JS. Умолчания
-  в адрес не пишутся — короткий `/seasons` должен оставаться коротким.
-- **Удаление подтверждается окном**, и `DeleteEntry` — клиентский компонент по той же
-  причине, что `FamilyEditor`: без JS подтверждение стоило бы отдельного экрана. Спрашиваем
-  не для порядка: другой копии сезона нет ни у нас, ни у человека.
-- **Два места в `RenameEntry`, где легко ошибиться, и оба уже стоили отладки.** Действие
-  заканчивается редиректом, но **компонент от этого не монтируется заново** — Next
-  перерисовывает маршрут на месте. Отсюда: свой флажок «сохраняем» так и остался бы
-  поднятым и кнопка залипла бы навсегда (ожидание держит `useTransition`, он гаснет сам),
-  а `defaultValue` в поле не обновился бы после переименования (значение кладём в узел при
-  открытии окна).
-- **Не прочитали список — показываем пустоту и тост**, никогда не умолчание.
-- **Избранное сюда вернётся на Э6** — уже на публичных сезонах: откладывают чужую
-  выложенную идею, а не произвольный адрес. Вкладок в кабинете пока нет.
+- **There is no uniqueness of content here and there must not be.** A fork of your own season is a
+  lawful second row, and two seasons with the same name are lawful too. Uniqueness is a rule of
+  the showcase, not of the collection.
+- **"Fork" exists on your own season too**: next month is assembled from the last one, and the
+  last one must stay. In edit mode there is no such button — there you are editing that very row,
+  and starting a second one mid-work is pointless.
+- **A row is always looked up together with its owner** (`where code = $1 and account_key = $2`).
+  So someone else's code is indistinguishable from an invented one: both are a 404. A signed-out
+  person is sent to the account, where it is explained what signing in is for.
+- **A draft has a name and a date, and it is visible in the list.** For a signed-out person
+  `/seasons` shows their single draft as the same kind of row as seasons from the database: open,
+  rename, delete. While the draft was shown nowhere, the person had no way to check the "there is
+  one draft" rule, and "New season" silently overwrote what they had typed. We do not show tabs to
+  an anonymous person: there are no favourites and no publications without signing in.
+- **The row is drawn by the client, and only by it.** The draft lies in `localStorage`, the server
+  has nowhere to take it from. `DraftEntry` reads the storage through `useSyncExternalStore`
+  rather than in an effect: the server snapshot is `undefined`, and that is **not the same** as
+  "there is no draft", otherwise the phrase "there is no draft" would flash untruthfully for a
+  frame. Honesty after a rename and during an edit in a neighbouring tab comes from the same
+  place — the draft's writers wake the subscription themselves (`announce` in `draft.ts`), because
+  your own write does not raise a `storage` event.
+- **A draft's date lies in a field, while the month and the theme do not.** `savedAt` cannot be
+  derived from anywhere, while the month and the theme are derived from the blank itself — a
+  column next to it would be that second copy. The timestamp is set by `writeDraft`, not by
+  whoever calls it: there are four writers, and forgetting it means showing someone else's date in
+  the list.
+- **Signing in finishes the job itself, from any button and any page.** The draft is taken by
+  `components/site/ClaimDraft.tsx` — the server wrapper reads the session, the client
+  `DraftClaimer` reads the storage — and it stands in the root layout, not on `/seasons`. There is
+  no `?claim=1` marker and no sign-in button on the draft bar any more: **a signed-in person has no
+  draft**, so a record in the browser means one thing — it was assembled before signing in, and
+  there is no consent to ask about. From `/sheet` the person is taken to the new row keeping the
+  mode, or the poster would be left without storage. A failure does not touch the draft — no row
+  appeared and there is nothing to erase.
+- **A claimed draft is sealed, not merely erased** (`sealDraft` in `draft.ts`). `DraftStore` works
+  next to it on `/sheet` and writes with a debounce — its delayed write would land in the storage
+  after the clean-up and resurrect a second copy. A manual deletion (`DraftEntry`) must not be
+  sealed: right after it the person starts a new draft.
+- **We do not show a signed-in person a draft on `/seasons`.** Their collection is in the
+  database, and a draft has nowhere to linger now: signing in carries it away that same instant.
+- **The name is given at creation and derived from the blank** (`defaultSeasonTitle`: the month
+  plus the theme's subtitle) **in the season's language**: it is written into the `title` column
+  once and then lives its own life — changing the language in the account does not touch it. It is
+  needed by the list, and it is printed nowhere on the poster. Renaming **does not touch
+  `updated_at`**: that is the date of the season's edit, the list is sorted by it, and changing a
+  name must not raise a row to the top.
+- **The limit is 100 rows per account**, and it is held by the application, not by the schema:
+  overflow must be explained in words. The check stands **in the same query** as the insert (the
+  `room` CTE) — between a separate `count` and `insert` there is a window.
+- **The row's code is taken before the insert.** `insert ... returning` would give the id when the
+  row is already written, and the code would have to be added with a second query; so the id is
+  taken with `nextval`, the code is computed from it, and both travel in one insert.
+- **The month in the list is derived from the content** rather than kept in a column next to it:
+  that column would be the second copy. Parsing is cheap now — the database holds an unpacked
+  array.
+- **Search is `position(lower($2) in lower(title))`, not `ilike`:** there is no need to escape `%`
+  and `_`, which people type in a search box easily enough. The sort order is substituted into the
+  query text, but from the closed `LibrarySort` union, not from a person.
+- **Search and sorting live in the address** (`?q=&sort=`), not in React state: they can be sent
+  and reloaded, the page stays a server page and everything works without JS. Defaults are not
+  written into the address — a short `/seasons` must stay short.
+- **Deletion is confirmed with a dialog**, and `DeleteEntry` is a client component for the same
+  reason as `FamilyEditor`: without JS the confirmation would cost a separate screen. We ask not
+  for form's sake: there is no other copy of the season, neither with us nor with the person.
+- **Two places in `RenameEntry` are easy to get wrong, and both have already cost debugging.** The
+  action ends with a redirect, but **the component is not remounted because of it** — Next redraws
+  the route in place. Hence: a home-made "saving" flag would stay raised and the button would
+  stick forever (the pending state is held by `useTransition`, which clears itself), and
+  `defaultValue` in the field would not update after a rename (the value is put into the node when
+  the dialog opens).
+- **If the list was not read — show emptiness and a toast**, never a default.
+- **Favourites come back here at E6** — already on published seasons: what people set aside is
+  someone else's published idea, not an arbitrary address. There are no account tabs yet.
 
-## Витрина: публикация
+## The showcase: publishing
 
-Свой сезон можно **выложить** — тогда его копия ложится в `public_seasons` и живёт на
-витрине «Идеи сообщества» по своему постоянному адресу.
+Your own season can be **published** — then its copy lands in `public_seasons` and lives on the
+"Community Ideas" showcase at its own permanent address.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Пределы, порог разбора, `PublishStatus`, слова отказов | `src/model/community.ts` |
-| Разбор жалоб и блокировка руками | `tools/db/reports.ts` (`npm run db:reports`) |
-| Публикация, снятие, выборка для витрины | `src/server/publicSeasons.ts` |
-| Случайные имена для обезличивания | `src/model/season.ts` |
-| Действия постера | `src/server/actions.ts` |
-| Кнопка мегафона и окно | `src/app/season/[code]/OwnBar.tsx`, `components/edit/PublishDialog.tsx` |
-| Снятие и возврат на витрину | `src/app/s/[code]/PublicBar.tsx`, `components/edit/WithdrawDialog.tsx` |
-| То же строкой кабинета | `src/app/[lang]/seasons/ShowcaseEntry.tsx` |
-| Витрина и мини-постер | `src/app/[lang]/ideas/page.tsx`, `src/components/community/SeasonPreview.tsx` |
-| Схема | `tools/db/migrations/001_seasons_v2.sql` (`public_*`), `004_reports_snapshot.sql` |
+| Limits, the review threshold, `PublishStatus`, the refusal wording | `src/model/community.ts` |
+| Reviewing reports and closing by hand | `tools/db/reports.ts` (`npm run db:reports`) |
+| Publishing, withdrawing, the showcase query | `src/server/publicSeasons.ts` |
+| Random names for anonymising | `src/model/season.ts` |
+| Poster actions | `src/server/actions.ts` |
+| The megaphone button and the dialog | `src/app/season/[code]/OwnBar.tsx`, `components/edit/PublishDialog.tsx` |
+| Withdrawing and returning to the showcase | `src/app/s/[code]/PublicBar.tsx`, `components/edit/WithdrawDialog.tsx` |
+| The same as an account row | `src/app/[lang]/seasons/ShowcaseEntry.tsx` |
+| The showcase and the mini-poster | `src/app/[lang]/ideas/page.tsx`, `src/components/community/SeasonPreview.tsx` |
+| Schema | `tools/db/migrations/001_seasons_v2.sql` (`public_*`), `004_reports_snapshot.sql` |
 
-- **Публикация — копия, а не указатель.** Связь с личным сезоном обрывается в тот же
-  момент: правки в кабинете витрину не трогают, переименование её не касается, удаление
-  сезона её не уносит. Поэтому у выложенного и своя строка, и свой код, и своё оформление.
-  Выкладывать при этом можно только **сохранённый** сезон: копировать нечего, пока нечего
-  указывать.
-- **Одинакового контента на витрине не бывает, и держит это база.** `content_key` —
-  уникальный `md5(language || content::text)`, генерируемая колонка. В сравнение не входят
-  ни тема, ни рисунки, ни имена, ни название: сезон, у которого поменяли краски или
-  подписали другими именами, — тот же самый сезон. **Язык в сравнение входит**: тот же
-  бланк, переведённый на другой язык, — другая идея, её видят другие люди (см. «Языки»). Считать ключ в приложении было бы хуже: он зависел бы от
-  того, кто и чем его посчитал.
-- **Свою снятую строку публикация возвращает, чужую не трогает.** Если тот же контент уже
-  лежит снятым и выложен **тем же человеком**, вторая строка не заводится: прежняя выходит
-  обратно на витрину со своим кодом, лайками и всем, что успела собрать. Чужую строку не
-  перехватывает никто — ни видимую, ни снятую: выложенное содержимое остаётся за тем, кто
-  его выложил, а форк даёт копию бланка, а не право распоряжаться чужой публикацией.
-  Прежнее правило «форкнул снятое, выложил заново — сезон вернулся с новым авторством»
-  отменено: оно позволяло присвоить чужое и заводилось, когда вернуть снятое автору было
-  нечем. Теперь есть чем — `republishPublic`.
-- **Дубль на витрине уводит к себе, снятый — нет.** Видимый отвечает `duplicate` **с
-  кодом**, и человека уводит на ту самую публикацию: ему нужен не отказ, а тот сезон.
-  Снятый отвечает `duplicate` **без кода**, одним тостом: вести на страницу, которой на
-  витрине нет, незачем. Порядок веток в разборе поэтому не произволен — видимый дубль
-  сильнее нехватки мест (освободи хоть все пять, выложить это нельзя), а снятый слабее:
-  снятая строка бывает и своя, и тогда настоящая причина отказа — именно места.
-- **На витрине у одного человека не больше пяти сезонов** (`PUBLISH_LIMIT` в
-  `model/community.ts`). Число своё, а не `LIBRARY_LIMIT`: коллекция — склад, и сто строк
-  в ней никому не мешают, а витрина — общая полка, и десяток случайных идей на ней не
-  должен оказываться идеями одного автора. Считаются только **видимые** строки: снятое и
-  закрытое места не занимают — иначе слова «уберите лишние с витрины» были бы неправдой.
-  Проверка стоит в том же операторе, что и вставка (CTE `room`), и перехват скрытой строки
-  ей подчиняется тоже: перехваченная строка становится видимой, то есть занимает место.
-- **Разговор о публикации начинается с ответа витрины, а не кончается им.** Окно
-  (`PublishDialog`) спрашивает её само, в тот миг, когда открывается: `previewPublish` —
-  сухой прогон проверок `publishSeason`, без записи. Нашёлся такой же сезон — окно говорит
-  об этом сразу и предлагает посмотреть; предел на пять исчерпан — говорит и это. Прежде
-  человек заполнял окно, жал «Выложить» и только тогда получал отказ тостом. Отличие
-  прогона от самой публикации одно: **своя снятая строка — это `ok`**, публикация её
-  вернёт, а не отобьёт. Рубежом защиты прогон не является: решает `publishSeason`, а на
-  молчание базы окно ведёт себя как раньше — отказ, если он будет, объяснит публикация.
-- **Ссылка в окне есть не всегда.** Видимая копия — «Посмотреть на витрине»; снятая чужая
-  ответа с кодом не даёт вовсе (см. правило про `duplicate` выше), и вести туда незачем.
-- **Состояния у мегафона в личном сезоне нет: он всегда обычная кнопка.** Сценария в окне
-  ровно два — выложить или «такой уже есть» со ссылкой, — и оба приходят из одной свежей
-  проверки. Нажатость была третьим ответом на тот же вопрос и стоила запроса к базе на
-  каждый показ страницы: витрину спрашивали до того, как человек ею заинтересовался. Хуже
-  того, ответ был неполным — чужих публикаций того же содержимого он не искал вовсе.
-  Поэтому `publishedCode` удалён целиком, а не оставлен «на всякий случай».
-- **Обезличивание подменяет ровно `names`** (`anonymousNames`), и только в копии: свой
-  сезон остаётся с настоящими именами. На уникальность замена не влияет — имена в
-  сравнении не участвуют. Имена берутся без повторов: две «Ани» в одной семье читались бы
-  как ошибка, а не как анонимность.
-- **Снятие с витрины зависит не только от автора.** Строка остаётся (и лишь помечается
-  `hidden_at`), если её **отложили в избранное**: забирать отложенное у людей нельзя, а
-  прямая ссылка уже разошлась. Не держит ничего — удаляем совсем. Лайки и форки удалению не
-  мешают: лайк — знак внимания, форк — копия, которая и так живёт своей жизнью. **Жалоба
-  строку тоже больше не держит** — у неё свой снимок, см. «Лайки, жалобы и избранное».
-- **Закрытая публикация (`blocked_at`) не показывается нигде** — ни в «Идеях», ни по
-  прямой ссылке, ни автору: `/s/<code>` отвечает 404 всем. В базе она при этом остаётся,
-  потому что на неё пожаловались и разбор не должен упираться в удалённую строку. Автор
-  узнаёт о закрытии в своём списке опубликованных — там пометка «закрыт после жалоб».
-- **Закрывает человек, руками, и это решение.** Порог `REPORTS_TO_REVIEW` — повод
-  посмотреть, а не действие: витрина ничего не прячет сама. Автоматика тут стояла раньше и
-  была плоха двумя вещами сразу — сезон пропадал молча, ничего не объяснив автору, а
-  шестеро сговорившихся убирали чужое без всякого разбора. Очередь и блокировка — в
-  `npm run db:reports` (`-- --block <code> «почему»`, `-- --unblock <code>`); рядом с
-  `blocked_at` лежит `block_note`: через месяц «почему» не вспомнит никто.
-- **Закрытый контент не воскрешается перехватом.** Скрытую строку перехватывает тот, кто
-  выложил тот же контент заново, — закрытую не перехватывает никто, иначе блокировка не
-  стоила бы ничего: форкнул, выложил, и тот же постер снова на витрине. Закрывают не
-  строку, а содержимое; попытка выложить такое же кончается статусом `blocked`.
-- **Скрытый сезон — не удалённый.** Он открывается по своему адресу, принимает лайки и
-  форки, но в «Идеях» его нет. Панель об этом молчит: подсказка называет место, и у
-  снятого сезона места нет — она пустая (см. «Подсказка называет место»).
-- **Мегафон работает в обе стороны, и в обоих местах одинаково** — на самом `/s/<code>` и
-  строкой в кабинете. Нажат (`aria-pressed`) — сезон на витрине, и нажатие его снимает;
-  отжат — снят, и нажатие возвращает (`republishPublic`, действия `republishSeason` и
-  `republishEntry`). Погашенной кнопка была, пока вернуть снятое было нечем: сезон
-  оказывался в тупике, из которого его выводила только повторная публикация из личного
-  сезона. Возврат окна не просит — терять нечего и строка та же самая; подтверждают только
-  снятие, где сезон может исчезнуть совсем. Возврат считается тем же `PUBLISH_LIMIT`:
-  он занимает место на витрине. Уже видимая строка отвечает `ok`, а не отказом, — тот же
-  приём, что у лайка: повторное нажатие в соседней вкладке ничего ломать не должно.
-- **Закрытую строку не возвращает никто**, включая автора: `blocked` — это ответ разбора,
-  а не состояние, которым распоряжаются кнопкой.
-- **Название публикации не даётся руками** — оно выводится из содержимого
-  (`ideaTitle`). Колонки рядом нет: это была бы вторая копия того, что уже лежит
-  в `content`. **Месяца с годом в нём нет, в отличие от своей коллекции**
-  (`defaultSeasonTitle`): в коллекции месяц помогает найти строку, а на витрине идею берут
-  ради того, чем занять месяц, — чей это был месяц и когда, к делу не относится.
-- **Убрать с витрины можно там, где сезон видно** — на самом `/s/<code>`, и только автору.
-  Кнопка нажата (`aria-pressed`), пока сезон на витрине: это состояние строки, а не
-  действие «выложить ещё раз» — выкладывают из своего сезона.
-- **`/privacy` описывает содержимое базы буквально.** Появилась витрина копий — страница
-  переписана тем же изменением, включая главное: **выложенный сезон виден всем**.
+- **Publishing is a copy, not a pointer.** The link to the personal season is cut that same
+  moment: edits in the account do not touch the showcase, a rename does not concern it, deleting
+  the season does not take it away. Hence a publication has its own row, its own code and its own
+  styling. Only a **saved** season can be published: there is nothing to copy while there is
+  nothing to point at.
+- **There are no identical contents on the showcase, and the database holds that.** `content_key`
+  is a unique `md5(language || content::text)`, a generated column. Neither the theme, nor the
+  icons, nor the names, nor the title enter the comparison: a season with changed paints or
+  different names is the same season. **The language does enter it**: the same blank translated
+  into another language is a different idea seen by different people (see "Languages"). Computing
+  the key in the application would be worse: it would depend on who computed it and with what.
+- **Publishing brings your own withdrawn row back, and never touches someone else's.** If the same
+  content already lies withdrawn and was published **by the same person**, no second row is
+  created: the previous one comes back with its code, its likes and everything else it collected.
+  Nobody hijacks someone else's row, visible or withdrawn: published content stays with whoever
+  published it, and a fork gives a copy of the blank, not the right to dispose of someone else's
+  publication. The former rule "fork a withdrawn one, publish it again and it comes back under new
+  authorship" is cancelled: it allowed appropriating someone else's, and it existed only because
+  there was no way to return a withdrawn one to its author. Now there is — `republishPublic`.
+- **A duplicate on the showcase leads you to it, a withdrawn one does not.** A visible one answers
+  `duplicate` **with a code**, and the person is taken to that very publication: what they need is
+  not a refusal but that season. A withdrawn one answers `duplicate` **without a code**, with a
+  single toast: leading to a page that is not on the showcase is pointless. The order of the
+  branches in the check is therefore not arbitrary — a visible duplicate beats a lack of room
+  (free up all five and this still cannot be published), while a withdrawn one is weaker: a
+  withdrawn row can be your own, and then the real reason for the refusal is exactly the room.
+- **One person gets no more than five seasons on the showcase** (`PUBLISH_LIMIT` in
+  `model/community.ts`). The number is its own, not `LIBRARY_LIMIT`: a collection is a warehouse,
+  and a hundred rows in it bother nobody, while the showcase is a shared shelf and a dozen random
+  ideas on it must not turn out to be one author's. Only **visible** rows count: withdrawn and
+  closed ones take no room — otherwise the words "take the extra ones off the showcase" would be
+  untrue. The check stands in the same statement as the insert (the `room` CTE), and reclaiming a
+  hidden row obeys it too: a reclaimed row becomes visible, i.e. takes a place.
+- **The conversation about publishing starts with the showcase's answer, it does not end with
+  it.** `PublishDialog` asks the showcase the moment it opens: `previewPublish` is a dry run of the
+  `publishSeason` checks with no write. Found the same season — it says so at once and offers to
+  look; the limit of five is used up — it says that too. Before, a person filled in the dialog,
+  pressed "Publish" and only then got a refusal as a toast. The dry run differs in one thing:
+  **your own withdrawn row is `ok`**, publication brings it back. It is not a line of defence:
+  `publishSeason` decides, and on a silent database the publication will explain the refusal.
+- **There is not always a link in the dialog.** A visible copy gets "Look at it on the showcase";
+  someone else's withdrawn one does not give an answer with a code at all (see the `duplicate`
+  rule above), and there is nowhere to lead.
+- **The megaphone in a personal season has no state: it is always an ordinary button.** The dialog
+  has exactly two scenarios — publish, or "one like this already exists" with a link — and both
+  come from one fresh check. A pressed state was a third answer to the same question and cost a
+  database query on every page view, before the person took any interest; worse, it did not look
+  for other people's publications of the same content at all. So `publishedCode` was deleted
+  entirely rather than left "just in case".
+- **Anonymising swaps exactly `names`** (`anonymousNames`), and only in the copy: your own season
+  keeps the real names. The swap does not affect uniqueness — names do not take part in the
+  comparison. The names are taken without repeats: two "Anyas" in one family would read as a bug,
+  not as anonymity.
+- **Withdrawing from the showcase depends on more than the author.** The row stays (and is merely
+  marked `hidden_at`) if somebody **saved it to their favourites**: taking away what people set
+  aside is not allowed, and the direct link has already gone around. Nothing holds it — we delete
+  it outright. Likes and forks do not prevent deletion: a like is a sign of attention, a fork is a
+  copy that lives its own life anyway. **A report does not hold the row any more either** — it has
+  its own snapshot, see "Likes, reports and favourites".
+- **A closed publication (`blocked_at`) is shown nowhere** — not in "Ideas", not by a direct link,
+  not to its author: `/s/<code>` answers 404 to everyone. It stays in the database because it was
+  reported and the review must not run into a deleted row. The author learns about the closure in
+  their list of publications — there is a "closed after reports" mark there.
+- **A person closes it, by hand, and it is a decision.** The `REPORTS_TO_REVIEW` threshold is a
+  reason to look, not an action: the showcase hides nothing by itself. Automation stood here
+  before and was bad in two ways at once — a season disappeared silently, explaining nothing to
+  its author, and six people in agreement removed someone else's without any review. The queue and
+  the closing are in `npm run db:reports` (`-- --block <code> "why"`, `-- --unblock <code>`); next
+  to `blocked_at` lies `block_note`: in a month nobody will remember the "why".
+- **Closed content is not resurrected by reclaiming.** A hidden row is reclaimed by whoever
+  publishes the same content again — a closed one is reclaimed by nobody, otherwise closing would
+  be worth nothing: fork it, publish it, and the same poster is back on the showcase. What is
+  closed is not a row but content; an attempt to publish the same ends with the `blocked` status.
+- **A hidden season is not a deleted one.** It opens at its address, accepts likes and forks, but
+  it is not in "Ideas". The bar says nothing about it: the hint names a place, and a withdrawn
+  season has no place — it is empty (see the hint rule in "State").
+- **The megaphone works both ways, and identically in both places** — on `/s/<code>` itself and as
+  a row in the account. Pressed (`aria-pressed`) means the season is on the showcase and a press
+  takes it off; unpressed means a press brings it back (`republishPublic`, the `republishSeason`
+  and `republishEntry` actions). The button was disabled while there was no way to bring a
+  withdrawn one back: the season ended up in a dead end. A return asks for no dialog — nothing to
+  lose, same row; only withdrawal is confirmed, where a season may disappear altogether. A return
+  counts against the same `PUBLISH_LIMIT`. An already visible row answers `ok` rather than a
+  refusal — the same trick as with a like: a repeated press in a neighbouring tab must break
+  nothing.
+- **A closed row is brought back by nobody**, the author included: `blocked` is the review's
+  answer, not a state to be disposed of with a button.
+- **A publication's name is not given by hand** — it is derived from the content (`ideaTitle`).
+  There is no column next to it: that would be a second copy of what is already in `content`.
+  **There is no month and year in it, unlike in your own collection** (`defaultSeasonTitle`): in
+  the collection the month helps find a row, while on the showcase an idea is taken for what to
+  fill a month with — whose month it was and when is beside the point.
+- **A season can be taken off the showcase where it is visible** — on `/s/<code>` itself, and only
+  by its author. The button is pressed (`aria-pressed`) while the season is on the showcase: that
+  is the state of a row, not the action "publish once more" — publishing is done from your own
+  season.
+- **`/privacy` describes the contents of the database literally.** A showcase of copies appeared —
+  the page was rewritten by the same change, including the main thing: **a published season is
+  visible to everyone**.
 
-Про саму витрину `/ideas`:
+About the showcase `/ideas` itself:
 
-- **Десяток случайных, а не первая десятка по лайкам.** Сортировка по рейтингу заперла бы
-  витрину навсегда: попавшие наверх собирали бы лайки просто потому, что их видно. Выборка
-  взвешенная — ключ строки `power(random(), 1.0 / (1 + лайки))`, берём наибольшие
-  (Эфраимидис — Спиракис): залайканный попадается чаще, но места себе не гарантирует.
-- **«Показать другие» — обычная ссылка с растущей пометкой `?r=`,** а не кнопка на JS:
-  выборка случайна на каждый рендер, меняющийся адрес честно заводит запись в истории и
-  работает без JS. Считать пометку от `Date.now()` нельзя — это вызов нечистой функции
-  в рендере, и oxlint на него ругается; она поэтому счётчик, взятый из самого адреса.
-- **Превью — мини-постер, а не карточка сайта,** и потому носит тему: `data-palette`
-  висит на самом превью. Это единственное исключение из правила «карточки на сайте тему
-  не носят» — оно про карточки, а тут изображение листа.
-- **На превью нет личных проектов, настроений и итогов.** Это и есть то, ради чего сезон
-  открывают: витрина заманивает, а не заменяет постер. Всё рисуется из содержимого строки,
-  второго источника у превью нет. Месяца нет по другой причине — он идее ничего не
-  добавляет (см. `ideaTitle` выше); подписи под превью тоже нет: название и есть тема
-  месяца, крупно написанная на самом превью.
-- **Системные сезоны (наши примеры) — такие же строки витрины**, только без автора и с
-  катящимся месяцем. Пожаловаться на них будет нельзя: шестеро недовольных иначе спрятали
-  бы примеры.
-- **Не прочитали витрину — пустота и тост**, никогда не умолчание.
-- **С витрины можно пожаловаться, но не лайкнуть.** Лайкают, посмотрев сезон; брань,
-  наоборот, видно сразу — за тем флажок здесь и стоит. `ReportEntry` — клиентский
-  компонент по той же причине, что `DeleteEntry`: без JS окно с комментарием стоило бы
-  отдельного экрана. Окна и слова у него общие с постером, вторых копий не заводим —
-  включая правило «вход спрашивается до окна жалобы»: витрина поэтому читает сессию и
-  отдаёт `signedIn` строке.
-- **Флажка у системных сезонов на витрине нет.** Правило «на наши примеры не жалуются»
-  одно на все экраны: сервер такую жалобу и так не примет (`author_key is null` — это
-  `own`), но кнопка, которая заведомо кончается отказом, — не кнопка. Поэтому у `Idea`
-  есть `system`, и берётся он там же, где у постера: `author_key is null`.
+- **A dozen random ones, not the top ten by likes.** Sorting by rating would lock the showcase
+  forever: whatever got to the top would collect likes simply because it is visible. The query is
+  weighted — a row's key is `power(random(), 1.0 / (1 + likes))`, and we take the largest
+  (Efraimidis–Spirakis): a liked one turns up more often but does not guarantee itself a place.
+- **"Show others" is an ordinary link with a growing `?r=` marker,** not a JS button: the query is
+  random on every render, a changing address honestly makes a history entry and works without JS.
+  Computing the marker from `Date.now()` is not allowed — that is calling an impure function
+  during render, and oxlint complains about it; it is therefore a counter taken from the address
+  itself.
+- **The preview is a mini-poster, not a site card,** and therefore carries a theme: `data-palette`
+  hangs on the preview itself. That is the only exception to "cards on the site do not carry a
+  theme" — the rule is about cards, and this is an image of a sheet.
+- **The preview has no personal storylines, moods or wrap-up.** That is exactly what a season is
+  opened for: the showcase entices, it does not replace the poster. Everything is drawn from the
+  row's content, the preview has no second source. The month is absent for another reason — it
+  adds nothing to an idea (see `ideaTitle` above); there is no caption under the preview either:
+  the name *is* the theme of the month, written large on the preview itself.
+- **System seasons (our examples) are the same kind of showcase rows**, only without an author and
+  with a rolling month. They cannot be reported: otherwise six unhappy people would hide the
+  examples.
+- **If the showcase was not read — emptiness and a toast**, never a default.
+- **From the showcase you can report but not like.** People like after looking at a season; abuse
+  is visible at once — that is what the flag is doing here. `ReportEntry` is a client component for
+  the same reason as `DeleteEntry`. Its dialogs and wording are shared with the poster, including
+  the rule "sign-in is asked before the report dialog": the showcase reads the session and hands
+  `signedIn` to the row.
+- **System seasons have no flag on the showcase.** The rule "our examples are not reported" is one
+  for all screens: the server would not accept such a report anyway (`author_key is null` is
+  `own`), but a button that is bound to end in a refusal is not a button. That is why `Idea` has a
+  `system` field, and it is taken from the same place as on the poster: `author_key is null`.
 
-## Поделиться ссылкой
+## Sharing a link
 
-Свой сезон снаружи не виден — а показать его иногда надо: второму родителю, бабушке, кому
-угодно без аккаунта. Для этого у строки есть `share_token` и адрес `/p/<token>`.
+Your own season is invisible from outside — and sometimes it has to be shown: to the other
+parent, to a grandmother, to anyone without an account. For that a row has a `share_token` and the
+address `/p/<token>`.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Токен и его проверка | `src/model/shortcode.ts` (`shareToken`, `tokenOrNull`) |
-| Чтение по токену, выдача и отзыв | `src/server/userSeasons.ts` |
-| Окно ссылки | `src/components/edit/ShareLinkDialog.tsx` |
-| Страница получателя | `src/app/p/[token]/` |
-| Код ссылки для листа | `src/server/qr.ts` (`shareQr`, `sharedLink`) |
+| The token and its check | `src/model/shortcode.ts` (`shareToken`, `tokenOrNull`) |
+| Reading by token, issuing and revoking | `src/server/userSeasons.ts` |
+| The link dialog | `src/components/edit/ShareLinkDialog.tsx` |
+| The recipient's page | `src/app/p/[token]/` |
+| The link's code for the sheet | `src/server/qr.ts` (`shareQr`, `sharedLink`) |
 
-- **Ссылка открывает сезон кому угодно и без входа** — в том и смысл: её отправляют тому,
-  у кого аккаунта нет. Правку она не открывает никогда: получателю остаются просмотр,
-  печать и форк.
-- **Отзыв и выдача новой — одно и то же действие**: токен просто перезаписывается, и
-  прежний перестаёт работать. Отозванная ссылка неотличима от выдуманной — и то и другое
-  404: по ответу не должно быть видно, существовал ли когда-нибудь такой токен.
-- **Ни имени владельца, ни его кабинета наружу не уходит.** Получатель видит постер, а не
-  чужую коллекцию; кода строки в адресе тоже нет — только токен.
-- **Оформление здесь не перебивается адресом**, в отличие от витрины: адрес выдал хозяин,
-  и дописывать в него чужую примерку значило бы портить присланную ссылку.
-- **Ссылка печатается на самом листе.** Есть токен — QR у цели месяца ведёт по нему, а не
-  на сайт (см. «QR-код»): распечатку вешают на холодильник и показывают тем же людям, кому
-  ссылку и отправляют, а набрать шестнадцать знаков токена с бумаги нельзя. Отзыв возвращает
-  на лист адрес сайта: печатать код, который уже никуда не ведёт, незачем.
-- **Ссылка и её код ходят вместе** (`SharedLink` в `model/qr.ts`), и состояние у них одно:
-  держит его страница (`OwnSeason`), а не панель. Окно из панели ссылку выдаёт и отзывает,
-  печатает её лист, и оба обязаны узнать об этом в один и тот же миг. Матрицу возвращает
-  само действие `shareLink` — переспрашивать сервер после его же ответа незачем.
-- **«Скопировать» стоит у самого поля, а не в ряду окна:** копируют то, что видят
-  рядом, а ряд у всех окон один и тот же — отказ слева, действие справа.
-  Отдельной кнопки «Выдать новую» **нет намеренно**: с ней кнопок набиралось
-  четыре, из них три одинаковых. Отзыв и выдача при этом остались обоими — окно от
-  «Отозвать» не закрывается, и правая кнопка тут же становится «Создать ссылку».
-- **Окно говорит, зачем ссылка, а не что она делает.** «Ссылка открывает сезон для
-  просмотра» и «Ссылки пока нет» пересказывали устройство и состояние, а человек
-  пришёл сюда поделиться; вторая фраза вдобавок не говорила ничего о том, что даст
-  нажатие. Теперь обе — указания: «Отправьте ссылку тому, кому хотите показать
-  сезон» и «Создайте ссылку, чтобы поделиться сезоном». **Словом «публичная» эту
-  ссылку звать нельзя:** публичный сезон на сайте один — выложенный на витрину, и
-  спутать их значит пообещать не то.
+- **The link opens the season for anyone and without signing in** — that is the point: it is sent
+  to someone who has no account. It never opens editing: the recipient gets viewing, printing and
+  forking.
+- **Revoking and issuing a new one are the same action**: the token is simply overwritten and the
+  previous one stops working. A revoked link is indistinguishable from an invented one — both are
+  a 404: the answer must not reveal whether such a token ever existed.
+- **Neither the owner's name nor their account leaks outward.** The recipient sees a poster, not
+  someone else's collection; the row's code is not in the address either — only the token.
+- **The styling is not overridden by the address here**, unlike on the showcase: the address was
+  handed out by the owner, and writing someone else's try-on into it would mean spoiling the link
+  that was sent.
+- **The link is printed on the sheet itself.** If there is a token, the QR next to the goal of the
+  month leads to it rather than to the site (see "The QR code"): the printout is put on the fridge
+  and shown to the same people the link is sent to, and sixteen characters of a token cannot be
+  typed off paper. Revoking puts the site address back on the sheet: printing a code that leads
+  nowhere is pointless.
+- **The link and its code travel together** (`SharedLink` in `model/qr.ts`), and they have one
+  state: it is held by the page (`OwnSeason`), not by the bar. The dialog in the bar issues and
+  revokes the link, the sheet prints it, and both must learn about it at the same instant. The
+  matrix is returned by the `shareLink` action itself — asking the server again after its own
+  answer is pointless.
+- **"Copy" stands next to the field, not in the dialog's row:** people copy what they see next to
+  it, and the row is the same in all dialogs — refusal on the left, action on the right. There is
+  deliberately **no separate "Issue a new one" button**: with it the buttons came to four, three
+  of them alike. Revoking and issuing both remain, though — the dialog does not close on "Revoke",
+  and the right button immediately becomes "Create a link".
+- **The dialog says what the link is for, not what it does.** "The link opens the season for
+  viewing" and "There is no link yet" retold the mechanism and the state, while the person came
+  here to share; the second phrase also said nothing about what a press would give. Now both are
+  instructions: "Send the link to whoever you want to show the season to" and "Create a link to
+  share the season". **This link must not be called "public":** there is one public season on the
+  site — the one put on the showcase — and confusing them means promising the wrong thing.
 
-## Лайки, жалобы и избранное
+## Likes, reports and favourites
 
-Три таблицы вокруг публикации: `public_likes`, `public_reports`, `public_favorites`.
-Живут они в `src/server/publicSeasons.ts` рядом с самой публикацией — это одна тема, и
-разводить её по файлам незачем.
+Three tables around a publication: `public_likes`, `public_reports`, `public_favorites`. They
+live in `src/server/publicSeasons.ts` next to the publication itself — it is one subject, and
+there is no point in splitting it across files.
 
-- **Желаемое состояние приходит от клиента** (`setLike(code, on)`), а не вычисляется на
-  сервере. Не лень: «переключить» одним оператором не выходит — удаление и вставка в общем
-  CTE не видят работы друг друга и дерутся за первичный ключ. Так запрос один и
-  **идемпотентен**, а повторное нажатие в соседней вкладке ничего не ломает.
-- **Счётчика лайков нет, есть ряды.** Число выводится через `count(*)`, как месяц и тема
-  выводятся из содержимого, и по той же причине. Первичный ключ `(public_id, account_key)`
-  и есть правило «один человек — один лайк».
-- **Своё не лайкают, на своё не жалуются и своё не откладывают.** У избранного причина
-  вдобавок практическая: оно удерживает публикацию от удаления, и автор запер бы себе
-  снятие с витрины. Кнопок у своего сезона нет вовсе, но проверки стоят и на сервере —
-  кнопки удобство, а не рубеж защиты; ответ на них — отдельный статус `own`.
-- **На системные сезоны не жалуются**: шестеро недовольных иначе убрали бы с витрины наши
-  примеры. Лайкать и откладывать их можно — они ничьи.
-- **Повторная жалоба уточняет прежнюю** (`on conflict … do update`), а не заводит вторую.
-  Поэтому порог `REPORTS_TO_REVIEW` считает **авторов**, а не нажатия: иначе отправить
-  чужой сезон на разбор мог бы один человек. Предел в сто жалоб на аккаунт считается по
-  чужим публикациям (`code is distinct from`): правка своей же жалобы не имеет права
-  в него упереться.
-- **Жалоба живёт дольше публикации, поэтому носит снимок, а не ссылку.** В строке лежат
-  `code` из адреса, `author_key` и **копия контента** — ссылки на `public_seasons` нет
-  вовсе (`004_reports_snapshot.sql`). Иначе не сходилось: скрытый сезон исчезает, как
-  только его убирает из избранного последний, кто отложил, — а разбирают жалобу по тексту,
-  и взять его после этого негде. Прежнее решение «строку с жалобами не удаляем никогда»
-  отменено вместе с `public_id`: держать вечно то, чего никто не видит, хуже, чем дать
-  жалобе собственную память. Язык в снимке тоже есть, и он нужен: у пустого поля бланка
-  текст берётся из подсказки, а подсказка своя у каждого языка — без колонки очередь
-  разбора показывала бы польский сезон с русской подписью. Имена в снимок не идут:
-  жалуются на содержимое, а имена — персональные данные и в сравнении публикаций не
-  участвуют. Копию повторная жалоба не
-  переписывает — контент публикации не правится никогда, меняется только комментарий.
-- **Удалённую публикацию закрыть нечем, и это принято сознательно.** `blocked_at` живёт на
-  строке и вместе с ней исчезает: выложат тот же контент заново — он снова на витрине.
-  Отдельный список закрытого содержимого, переживающий удаление, заводить не стали — цена
-  выше пользы; вернувшееся разберут заново, а снимок в жалобах покажет, что это уже видели.
-  `npm run db:reports` показывает такие жалобы состоянием **«удалена»** и печатает тему из
-  снимка — иначе о чём шла речь, не увидеть; `--block` на них честно говорит, что закрывать
-  нечего.
-- **На закрытую публикацию не жалуются, её не лайкают и не откладывают**: разбор уже был.
-  Отдельный статус `blocked` — по той же причине, что `own`: человеку понятно, что
-  случилось.
-- **Состояние кнопок приходит со страницы, а дальше живёт на клиенте**: ответ известен из
-  самого действия, переспрашивать сервер незачем.
-- **У кабинета три вкладки: «Мои», «Избранное», «Опубликованные».** Третья — про свои
-  публикации: у каждой отдельной строкой стоят три счётчика — «лайков: N», «в избранном: N»,
-  «форков: N». Пары одинакового склада и своя строка — не вкусовщина: сердце `LikeCount`
-  посреди слов сбивало числу базовую линию, а вместе с датой и месяцем всё это собиралось
-  в один неопрятный хвост. Числа показываем всегда, включая нули: это собственные данные
-  автора, а не оценка. «В избранном» стоит
-  рядом не для красоты — именно оно решает, исчезнет публикация при снятии или спрячется.
-  Об этом же говорит приписка в окне снятия (`WITHDRAW_NOTE` в `model/community.ts`): «убрать»
-  здесь не то же самое, что «удалить», и человек вправе знать это до нажатия. Условная («у
-  тех, кто добавил») не для мягкости: не отложил никто — строка уходит совсем, и обещать
-  работающую ссылку было бы неправдой. Остального устройства витрины окно не пересказывает.
-- **Витриной распоряжаются и из списка** (`ShowcaseEntry`), тем же мегафоном и в обе
-  стороны: нажат — снять, отжат — вернуть. Крестик стоял здесь, пока кнопка умела одно
-  движение; «убрать» и «вернуть» одним крестиком не показать, а про одно и то же в двух
-  местах незачем говорить разными значками. Кнопки нет только у закрытого после жалоб: там
-  решает не автор. Действия отдельные от кнопок на самом постере ровно потому, что кончаются
-  редиректом: списку надо перерисоваться и пережить перезагрузку.
-- **Свой форк своей же публикации не считается** — по той же причине, по которой своё не
-  лайкают: это не чужой интерес, а работа над своим сезоном.
-- **«Избранное» и «Опубликованные» ищутся и сортируются в приложении, а не в запросе.** Названия у публикации
-  нет — оно выводится из содержимого, и искать по нему в SQL нечего; строк не больше ста.
-- **Снятое с витрины остаётся в избранном** и помечено в списке: ссылка работает, а в
-  «Идеях» сезона больше нет.
-- **Убрать закладку — не удаление.** `UnfavoriteEntry` поэтому серверный компонент без
-  окна: сам сезон чужой и никуда не денется, подтверждать нечего.
-- **Но у скрытого сезона последняя закладка — это всё, чем он держится**, и убравший её
-  уносит строку совсем. Снятый с витрины сезон живёт ровно потому, что его кто-то отложил;
-  не осталось никого — держать его больше некому и незачем. Видимого это не касается: он на
-  витрине, и закладки к тому отношения не имеют, закрытого — тоже (на нём держится запрет
-  выкладывать тот же контент). Всё одним оператором: между отдельными «убрать закладку» и
-  «а не осталось ли держателей» есть окно, в которое влезет чужая закладка. Ветки видят один
-  снимок, поэтому «моей закладки больше нет» в условии удаления не видно — и не должно быть:
-  пишем то, что в снимке правда, — моя закладка есть, а чужих нет вовсе.
+- **The desired state comes from the client** (`setLike(code, on)`), it is not computed on the
+  server. Not laziness: "toggle" does not work as one statement — a delete and an insert in a
+  shared CTE do not see each other's work and fight over the primary key. This way there is one
+  query and it is **idempotent**, and a repeated press in a neighbouring tab breaks nothing.
+- **There is no like counter, there are rows.** The number is derived with `count(*)`, just as the
+  month and the theme are derived from the content, and for the same reason. The primary key
+  `(public_id, account_key)` *is* the rule "one person, one like".
+- **You do not like your own, report your own or set aside your own.** For favourites there is a
+  practical reason too: they hold a publication back from deletion, and the author would lock
+  themselves out of withdrawing it. Your own season has no such buttons at all, but the checks
+  stand on the server too — buttons are a convenience, not a line of defence; their answer is a
+  separate `own` status.
+- **System seasons are not reported**: otherwise six unhappy people would take our examples off
+  the showcase. They can be liked and set aside — they belong to nobody.
+- **A repeated report refines the previous one** (`on conflict … do update`) rather than making a
+  second. So the `REPORTS_TO_REVIEW` threshold counts **authors**, not presses: otherwise one
+  person could send someone else's season to review. The limit of a hundred reports per account is
+  counted over other people's publications (`code is distinct from`): editing your own report has
+  no right to run into it.
+- **A report outlives the publication, so it carries a snapshot rather than a reference.** The row
+  holds the `code` from the address, the `author_key` and **a copy of the content** — there is no
+  reference to `public_seasons` at all (`004_reports_snapshot.sql`). Otherwise it did not add up:
+  a hidden season disappears as soon as the last person who saved it removes it from favourites —
+  and a report is reviewed by its text, which after that is nowhere to be taken from. The language
+  is in the snapshot too, and it is needed: an empty field of a blank takes its text from the
+  placeholder, and the placeholder differs per language — without the column the review queue
+  would show a Polish season with a Russian caption. Names do not go into the snapshot: reports
+  are about the content, and names are personal data that take no part in comparing publications.
+  A repeated report does not rewrite the copy — a publication's content is never edited, only the
+  comment changes.
+- **A deleted publication cannot be closed, and that is accepted deliberately.** `blocked_at`
+  lives on the row and disappears with it: publish the same content again and it is back on the
+  showcase. A separate list of closed content surviving deletion was not introduced — the price is
+  higher than the benefit; what comes back will be reviewed again, and the snapshot in the reports
+  will show that this has been seen before. `npm run db:reports` shows such reports in the
+  **"deleted"** state and prints the theme from the snapshot — otherwise there is no seeing what
+  it was about; `--block` on them says honestly that there is nothing to close.
+- **A closed publication is not reported, not liked and not set aside**: the review has already
+  happened. A separate `blocked` status for the same reason as `own`: the person understands what
+  happened.
+- **The state of the buttons arrives from the page and then lives on the client**: the answer is
+  known from the action itself, and asking the server again is pointless.
+- **The account has three tabs: "My", "Favourites", "Published".** The third is about your own
+  publications: each has three counters on a separate line — "likes: N", "in favourites: N",
+  "forks: N". Pairs of the same kind and a line of their own are not taste: a `LikeCount` heart
+  amid the words knocked the number off its baseline, and with the date and the month it all
+  gathered into one untidy tail. The numbers are always shown, zeros included: this is the author's
+  own data, not a rating. "In favourites" is exactly what decides whether a publication disappears
+  or hides when withdrawn. The note in the withdrawal dialog says the same (`WITHDRAW_NOTE`):
+  "take off" is not "delete", and a person has the right to know that before pressing. The
+  conditional wording ("for those who added it") is not softness: if nobody set it aside, the row
+  goes away completely, and promising a working link would be untrue. The dialog does not retell
+  the rest of the showcase's workings.
+- **The showcase is also managed from the list** (`ShowcaseEntry`), with the same megaphone and in
+  both directions: pressed means take off, unpressed means bring back. A cross stood here while
+  the button could do one move; "take off" and "bring back" cannot be shown with one cross, and
+  there is no point in saying the same thing with different icons in two places. There is no
+  button only for something closed after reports: the author does not decide there. The actions
+  are separate from the buttons on the poster itself precisely because they end with a redirect:
+  the list has to redraw and survive a reload.
+- **Your own fork of your own publication does not count** — for the same reason you do not like
+  your own: it is not someone else's interest but work on your own season.
+- **"Favourites" and "Published" are searched and sorted in the application, not in the query.** A
+  publication has no name — it is derived from the content, and there is nothing to search by in
+  SQL; there are no more than a hundred rows.
+- **What is taken off the showcase stays in favourites** and is marked in the list: the link
+  works, but the season is no longer in "Ideas".
+- **Removing a bookmark is not a deletion.** `UnfavoriteEntry` is therefore a server component with
+  no dialog: the season itself is someone else's and is not going anywhere, there is nothing to
+  confirm.
+- **But for a hidden season the last bookmark is all that holds it**, and whoever removes it takes
+  the row away entirely. A season withdrawn from the showcase lives exactly because somebody set
+  it aside; nobody is left — there is nobody and nothing left to hold it. This does not concern a
+  visible one: it is on the showcase, and bookmarks have nothing to do with that; nor a closed one
+  (the ban on publishing the same content rests on it). All of it in one statement: between
+  separate "remove the bookmark" and "are there any holders left" there is a window a stranger's
+  bookmark fits into. The branches see one snapshot, so "my bookmark is gone" is not visible in the
+  delete condition — and must not be: we write what is true in the snapshot — my bookmark exists,
+  and there are no others at all.
 
-## QR-код
+## The QR code
 
-Справа от рамки «Наша цель на месяц» печатается QR. Ведёт он на сайт, а у сезона с
-выданной личной ссылкой — по ней.
+A QR is printed to the right of the "Our goal for the month" frame. It leads to the site, and for
+a season with a private link issued, to that link.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Исходник: адрес сайта | `tools/qr/source.json` |
-| Кодировщик: коррекция, тихая зона, склейка модулей | `src/server/qr.ts` |
-| Сборка постоянного кода | `tools/qr/build.ts` (`npm run qr`) |
-| Матрица кода сайта (собирается) | `src/model/qr.data.ts` |
-| Выбор кода и адрес личной ссылки | `src/model/qr.ts` (`SITE_QR`, `shareQrUrl`) |
-| Рисовальщик | `src/components/QrCode.tsx` |
-| Место на листе | `MonthGoal.tsx` + `.qr` в его модуле |
+| Source: the site address | `tools/qr/source.json` |
+| The encoder: correction level, quiet zone, module merging | `src/server/qr.ts` |
+| Building the permanent code | `tools/qr/build.ts` (`npm run qr`) |
+| The site code's matrix (generated) | `src/model/qr.data.ts` |
+| Choosing a code and the private link's address | `src/model/qr.ts` (`SITE_QR`, `shareQrUrl`) |
+| The renderer | `src/components/QrCode.tsx` |
+| Its place on the sheet | `MonthGoal.tsx` + `.qr` in its module |
 
-- **По умолчанию код ведёт на сайт, а не на этот лист.** Так было не сразу: сначала он нёс
-  адрес самого постера, но ссылка на лист — 780–1100 символов, это версия 20–24 и больше
-  сотни модулей в стороне. Такой код рябит полотном, требует 50 мм бумаги и на A4 не
-  читается вовсе. К тому же по коду с холодильника приходят **собирать свой сезон**, а не
-  разглядывать чужой: адрес сайта здесь и полезнее, и мельче.
-- **Личная ссылка — исключение, и ровно она одна.** Есть у сезона `share_token` — на листе
-  стоит `/p/<token>`, а не адрес сайта: ссылка и заведена затем, чтобы показать сезон, а с
-  бумаги шестнадцать знаков токена руками не набирают. Отменённый вариант этим не
-  воскрешается: там в код лез **сам бланк**, здесь — короткий адрес строки (53 знака,
-  версия 4, 33 модуля). Печатается он и у хозяина на `/season/<code>`, и у получателя на
-  `/p/<token>`: лист один и тот же, и переслать его дальше — обычное дело.
-  Выложенного сезона это не касается: у витрины свой постоянный адрес, а `/s/<code>` и так
-  открывается всем.
-- **Кодов два, а кодировщик один** (`src/server/qr.ts`). Постоянный код сайта собирается
-  заранее (`npm run qr`), как темы и наборы рисунков, — считать одну и ту же матрицу на
-  каждый лист незачем; код личной ссылки у каждого сезона свой, и его считает сервер. Оба
-  идут через один `qrMatrix`: два кода на одном листе обязаны быть собраны одинаково,
-  поэтому ни коррекции, ни тихой зоны, ни склейки модулей в сборке больше нет — только
-  адрес. Собранный файл руками не правят: правят `source.json` и пересобирают.
-- **Кодировщик в браузер не едет.** `qrcode-generator` стал обычной зависимостью (раньше
-  был сборочной), но зовут его только серверные модули: страница знает адрес при рендере,
-  а «Создать ссылку» — серверное действие, которое возвращает готовую матрицу вместе с
-  токеном. Одиннадцать килобайт в бандле постера ничего бы не купили, а лист от них не
-  стал бы честнее.
-- **Матрица едет пропом, а не контекстом.** `Poster` получает её от страницы и передаёт в
-  `MonthGoal`; провайдер про QR не знает вовсе — контекст знает только про бланк, а ссылку
-  выдаёт и отзывает страница. Без пропа рисуется `SITE_QR`: так печатаются черновик,
-  выложенный сезон и пример.
-- **Адрес сайта живёт в `source.json`,** а `SITE_URL` (`src/model/site.ts`) — это
-  реэкспорт `QR_URL` из собранного файла. Второй копии адреса быть не должно: код собран
-  ровно из этой строки, и разойдясь с ней он молча поведёт не туда. Из него же собирается
-  и адрес личной ссылки: он **абсолютный и от имени сайта**, а не от хоста, с которого лист
-  открыли, — у бумаги «текущего адреса» нет. Язык в нём — язык сезона: им подписан лист.
-- **Это по-прежнему константа бланка, а не данные листа.** В `Template` QR не входит, в
-  базу не едет и в `content` не попадает; личная ссылка лежит своей колонкой, как тема и
-  набор рисунков, и на печать идёт ровно так же.
-- **Размер — 84 px, то есть 22 мм макета и 31 мм на A3.** У кода сайта данных мало (версия
-  3 при коррекции M, 29 модулей) — модуль выходит 0,85 мм на A3 и 0,6 мм на A4. У личной
-  ссылки модулей 33, и модуль мельче: 0,76 мм на A3 и 0,54 мм на A4 — всё ещё читается,
-  тем более что печатают минимум на A3. Место на листе от этого не меняется: ширина
-  задана в пикселях, растёт только сторона `viewBox`.
-- **Высоты он не добавляет.** Строка цели и так 72–92 px, код в неё вписывается: после его
-  появления нерастянутая высота первой страницы осталась прежней (840 px у demo-3). Если
-  будете менять размер — перемеряйте, бюджет страницы расписан до пикселя (см. «Печать»).
-- **Уровень коррекции M, а не L.** Запас прочности здесь бесплатный: на такой короткой
-  строке он не поднимает версию настолько, чтобы модуль стал мелким. L имеет смысл только
-  под длинную ссылку — то есть в отменённом варианте.
-- **Цвета — чистые чёрный и белый** (`--qr-ink` рядом с настроениями, вне тем): камера
-  читает код по контрасту, тонировать его чернилами темы нельзя. Заливки задаются CSS-ом,
-  а не презентационными атрибутами SVG — `var()` в атрибуте поддерживают не все браузеры.
-- **Тихая зона — 4 модуля внутри `viewBox`.** Без неё код не читается, а рассчитывать на
-  поля соседних блоков нельзя: они меняются вместе с вёрсткой. Сборка проверяет, что адрес
-  сайта абсолютный и без не-ASCII символов; у личной ссылки проверять нечего — её собирает
-  сам сайт из своего же адреса и токена.
+- **By default the code leads to the site, not to this sheet.** It was not like that at first: it
+  carried the address of the poster itself, but a link to a sheet is 780–1100 characters, which is
+  version 20–24 and more than a hundred modules on a side. Such a code ripples like cloth, needs
+  50 mm of paper and cannot be read on A4 at all. Besides, people who come from a code on the
+  fridge come **to build their own season**, not to look at someone else's: the site address is
+  both more useful and smaller here.
+- **The private link is the exception, and exactly one.** If a season has a `share_token`, the
+  sheet carries `/p/<token>` rather than the site address: the link exists precisely to show the
+  season, and sixteen characters of a token are not typed off paper by hand. This does not
+  resurrect the cancelled variant: there the **blank itself** went into the code, here it is a
+  short row address (53 characters, version 4, 33 modules). It is printed both for the owner on
+  `/season/<code>` and for the recipient on `/p/<token>`: it is the same sheet, and forwarding it
+  further is an ordinary thing. This does not concern a published season: the showcase has its own
+  permanent address, and `/s/<code>` opens for everyone anyway.
+- **There are two codes but one encoder** (`src/server/qr.ts`). The permanent site code is built
+  in advance (`npm run qr`), like the themes and the icon sets — there is no point computing the
+  same matrix for every sheet; the private link's code is different for every season and is
+  computed by the server. Both go through one `qrMatrix`: two codes on one sheet must be built
+  identically, so the build no longer holds the correction level, the quiet zone or the module
+  merging — only the address. The generated file is not edited by hand: edit `source.json` and
+  rebuild.
+- **The encoder does not reach the browser.** `qrcode-generator` became an ordinary dependency (it
+  used to be a build one), but only server modules call it: the page knows the address at render
+  time, and "Create a link" is a server action that returns a ready matrix together with the
+  token. Eleven kilobytes in the poster bundle would buy nothing, and the sheet would be no more
+  honest for them.
+- **The matrix travels as a prop, not through context.** `Poster` gets it from the page and passes
+  it to `MonthGoal`; the provider knows nothing about the QR — the context knows only about the
+  blank, while the link is issued and revoked by the page. Without a prop `SITE_QR` is drawn: that
+  is how a draft, a published season and an example print.
+- **The site address lives in `source.json`,** and `SITE_URL` (`src/model/site.ts`) is a re-export
+  of `QR_URL` from the generated file. There must not be a second copy of the address: the code is
+  built from exactly that string, and diverging from it it would silently lead the wrong way. The
+  private link's address is built from it too: it is **absolute and in the site's name**, not from
+  the host the sheet was opened from — paper has no "current address". The language in it is the
+  season's language: that is what captions the sheet.
+- **It is still a constant of the blank, not data of the sheet.** The QR is not part of `Template`,
+  does not go to the database and does not end up in `content`; the private link lies in its own
+  column, like the theme and the icon set, and prints in exactly the same way.
+- **The size is 84 px, i.e. 22 mm of layout and 31 mm on A3.** The site code has little data
+  (version 3 at correction M, 29 modules) — a module comes out at 0.85 mm on A3 and 0.6 mm on A4.
+  The private link has 33 modules and a smaller module: 0.76 mm on A3 and 0.54 mm on A4 — still
+  readable, all the more so since printing is on A3 at the least. Its place on the sheet does not
+  change: the width is set in pixels, only the `viewBox` side grows.
+- **It adds no height.** The goal row is 72–92 px anyway and the code fits into it: after it
+  appeared the unstretched height of the first page stayed the same (840 px for demo-3). If you
+  change the size, measure again — the page budget is worked out to the pixel (see "Printing: two
+  A4 pages").
+- **The correction level is M, not L.** The safety margin is free here: on such a short string it
+  does not raise the version enough to make a module small. L only makes sense for a long link,
+  i.e. in the cancelled variant.
+- **The colours are pure black and white** (`--qr-ink`, next to the moods, outside the themes): a
+  camera reads a code by contrast, and tinting it with the theme's ink is not allowed. The fills
+  are set in CSS rather than with presentational SVG attributes — `var()` in an attribute is not
+  supported by every browser.
+- **The quiet zone is 4 modules inside the `viewBox`.** Without it the code cannot be read, and
+  relying on the margins of neighbouring blocks is not an option: they change with the layout. The
+  build checks that the site address is absolute and free of non-ASCII characters; there is
+  nothing to check about the private link — the site assembles it from its own address and a
+  token.
 
-## Инлайн-редактирование
+## Inline editing
 
-`src/components/edit/EditableText.tsx` — `contentEditable="plaintext-only"`,
-**неконтролируемый** узел: React не рендерит текст внутрь, пока элемент в фокусе, а
-`useEffect` пишет `innerText` только если узел не сфокусирован. Если сделать поле
-контролируемым (`{value}` в children), каретка на каждом символе прыгает в начало —
-это ровно та ошибка, ради которой компонент устроен именно так.
+`src/components/edit/EditableText.tsx` — `contentEditable="plaintext-only"`, an **uncontrolled**
+node: React does not render text inside while the element has focus, and the `useEffect` writes
+`innerText` only if the node is not focused. Make the field controlled (`{value}` in children) and
+the caret jumps to the start on every character — that is exactly the mistake the component is
+shaped this way to avoid.
 
-**Пустых полей на бланке не бывает.** Незаполненное поле вне правки показывает и
-печатает свою подсказку из `PLACEHOLDERS` (`src/model/labels.ts`) — обязательных полей
-поэтому нет, а дырок в макете тоже. Отсюда два следствия: подсказки пишутся как готовое
-содержимое листа («Наша жизнь. Наши приключения. Наши месяцы.»), а не как инструкция
-к полю («Введите девиз»); и вторых копий этих текстов заводить нельзя — ни в
-`createEmptyTemplate`, ни запасным значением в `normalizeTemplate`: копия разошлась бы
-с подсказкой. Пустой лист пуст буквально весь, включая название и подписи.
+**There are no empty fields on the blank.** Outside edit mode an unfilled field shows and prints
+its placeholder from `PLACEHOLDERS` (`src/model/labels.ts`) — so there are no required fields and
+no holes in the layout either. Two consequences follow: placeholders are written as finished sheet
+content ("Our life. Our adventures. Our months.") rather than as an instruction to a field
+("Enter a motto"); and second copies of those texts must not be created — neither in
+`createEmptyTemplate` nor as a fallback value in `normalizeTemplate`: a copy would diverge from
+the placeholder. An empty sheet is literally empty all through, the title and the captions
+included.
 
-**Все поля бланка однострочные.** Enter расфокусирует поле, вставка схлопывает переводы
-строк в пробел (`singleLine`), и то же делает `text()` в `normalizeTemplate` — ссылку могли
-поправить руками. Перенос — работа браузера, высоту блока задаёт макет (`min-height`
-в CSS-модулях). Ручной перевод строки — это вёрстка руками: им подгоняют текст под рамку,
-блок растёт без предела (в проектах карточка тянулась вниз, пока жмут Enter) и лист
-разъезжается на лишние печатные страницы.
+**All the blank's fields are single-line.** Enter blurs the field, pasting collapses line breaks
+into a space (`singleLine`), and `text()` in `normalizeTemplate` does the same — the link could
+have been edited by hand. Wrapping is the browser's job, the block's height is set by the layout
+(`min-height` in the CSS modules). A manual line break is hand-made layout: it is used to fit text
+into a frame, the block grows without limit (in the storylines a card stretched down as long as
+Enter was pressed) and the sheet spills onto extra printed pages.
 
-**У каждого поля свой предел длины** — `src/model/limits.ts`, таблица «путь поля → число
-символов» и `limitFor('people.0.name')`, приводящий индекс к `*`. Это не вкусовщина, а
-бюджет бумаги: одна лишняя строка в карточке человека умножается на пять и выносит лист
-на третью страницу.
+**Every field has its own length limit** — `src/model/limits.ts`, a table of "field path → number
+of characters" and `limitFor('people.0.name')`, which reduces an index to `*`. That is not taste
+but a paper budget: one extra line in a person's card is multiplied by five and carries the sheet
+onto a third page.
 
-- **Числа измерены, а не выведены из кегля.** Постер открывался при печатной ширине 718 px
-  с `media=print`, и для каждого поля считалось, сколько символов реально ложится в строку.
-  Прикидка «ширина ÷ кегль» ошибается вдвое: рукописные шрифты шире, а перенос идёт по
-  словам. Меняете предел или вёрстку поля — перемеряйте, а не пересчитывайте.
-- **Проверок две, и обе обязаны давать ровно две страницы:** все поля забиты до предела
-  правдоподобным русским текстом и они же — словами по семь букв подряд (худший перенос,
-  какой можно набрать). Второй случай и определил самые тесные пределы.
-- **Пределы человека держит `min-height: 104px` карточки** (см. «Печать»): проект в одну
-  строку, описание в две, цель рядом с подписью, а не под ней. Длиннее — и карточка растёт
-  сразу у пятерых. Поэтому они самые тесные, и растить их, не перемерив вторую страницу,
-  нельзя.
-- **Пределы обязаны быть шире самого длинного текста в `src/data/examples/*.json`** и шире
-  всех `PLACEHOLDERS`: и то и другое печатается как содержимое листа. Сегодня подпёрт
-  вплотную `goal` — 87 символов при пределе 88.
-- **Предел един для ввода и для хранения.** `field(path)` в `useTemplateState` отдаёт его
-  вместе с `value`/`onChange`, поэтому секции про него не знают; `normalizeTemplate` режет
-  по той же таблице — в базе лежат сезоны, собранные раньше, а в `localStorage` мог залезть
-  кто угодно. Версия формата от этого не меняется: состав `Template` прежний, длинный
-  текст просто обрезается.
-- **Ввод сверх предела не проходит** (`onBeforeInput`), а не обрезается молча: поле на
-  мгновение вспыхивает подчёркиванием, иначе отказ выглядит поломкой клавиатуры. Вставка
-  и перетаскивание кладут то, что влезает, — тем же обработчиком, а не своей проверкой.
-- **Неразрывное слово переносится, а не вылезает:** `overflow-wrap: anywhere` объявлен один
-  раз на `.sheet` и наследуется на весь постер. Именно `anywhere`, а не `break-word`: сетка
-  недель задана как `repeat(4, 1fr)`, и при `break-word` длинное слово растянуло бы колонку.
+- **The numbers are measured, not derived from the font size.** The poster was opened at the print
+  width of 718 px with `media=print`, and for each field it was counted how many characters really
+  fit in a line. The estimate "width ÷ font size" is off by a factor of two: handwriting fonts are
+  wider and wrapping goes by words. Change a limit or a field's layout — measure again, do not
+  recompute.
+- **There are two checks, and both must give exactly two pages:** every field filled to the limit
+  with plausible Russian text, and the same fields filled with seven-letter words in a row (the
+  worst wrapping that can be typed). The second case is what determined the tightest limits.
+- **A person's limits are held by the card's `min-height: 104px`** (see "Printing: two A4
+  pages"): the project on one line, the description on two, the goal next to its label rather than
+  under it. Any longer and
+  the card grows for five people at once. That is why they are the tightest, and growing them
+  without re-measuring the second page is not allowed.
+- **The limits must be wider than the longest text in `src/data/examples/*.json`** and wider than
+  all the `PLACEHOLDERS`: both print as sheet content. Today `goal` is right up against it — 87
+  characters against a limit of 88.
+- **The limit is one and the same for input and for storage.** `field(path)` in `useTemplateState`
+  hands it out together with `value`/`onChange`, so the sections know nothing about it;
+  `normalizeTemplate` trims by the same table — the database holds seasons assembled earlier, and
+  anyone could have got into `localStorage`. The format version does not change because of it: the
+  composition of `Template` is the same, long text is simply trimmed.
+- **Input beyond the limit does not go through** (`onBeforeInput`) rather than being trimmed
+  silently: the field flashes an underline for a moment, otherwise the refusal looks like a broken
+  keyboard. Pasting and dragging put in what fits — through the same handler, not a check of their
+  own.
+- **An unbreakable word wraps rather than sticking out:** `overflow-wrap: anywhere` is declared
+  once on `.sheet` and inherited across the poster. Specifically `anywhere` and not `break-word`:
+  the weeks grid is `repeat(4, 1fr)`, and with `break-word` a long word would stretch a column.
 
-Переводы строк остались только в слое заполнения — `summaryAnswer` и `nextIdeas` — где это
-список отдельных записей, а не оформление. Их рисуют `MonthTheme`/`NextMonthIdeas` со своим
-`white-space: pre-line`, через `EditableText` они не проходят. В самом `EditableText`
-и в контейнерах бланка (`.cardText`, `.description`, `.text`, `.goal`) `pre-line` больше нет.
+Line breaks are left only in the fill layer — `summaryAnswer` and `nextIdeas` — where it is a list
+of separate entries rather than formatting. They are drawn by `MonthTheme`/`NextMonthIdeas` with
+their own `white-space: pre-line` and do not go through `EditableText`. In `EditableText` itself
+and in the blank's containers (`.cardText`, `.description`, `.text`, `.goal`) there is no more
+`pre-line`.
 
-## Состояние
+## State
 
-`src/state/SeasonProvider.tsx` + `docContext.ts` (контекст и хук вынесены в отдельный файл
-из-за правила `react/only-export-components` в oxlint — не сливайте их обратно). Правки
-самого бланка живут в общем хуке `useTemplateState`: провайдер у постера один, но
-страниц, которые его ставят, три, и различаются они не правками, а хранилищем.
+`src/state/SeasonProvider.tsx` + `docContext.ts` (the context and the hook are moved to a separate
+file because of the `react/only-export-components` rule in oxlint — do not merge them back). Edits
+to the blank itself live in the shared `useTemplateState` hook: the poster has one provider, but
+three pages set it up, and they differ not in the edits but in the storage.
 
-**Контекст знает только про бланк.** Ни адреса, ни базы, ни того, что можно сделать с
-этим постером, в нём нет: набор действий — дело страницы. Поэтому у каждого вида постера
-своя панель, а не один тулбар с ветвлениями:
+**The context knows only about the blank.** Neither the address, nor the database, nor what can be
+done with this poster is in it: the set of actions is the page's business. So every kind of poster
+has its own bar rather than one toolbar full of branches:
 
-| Страница | Панель | Что умеет |
+| Page | Bar | What it can do |
 | --- | --- | --- |
-| Черновик `/sheet*` | `app/[lang]/sheet/DraftBar.tsx` | Править/Готово, печать и «Сохранить в мои сезоны» — только вошедшему |
-| Свой сезон `/season/<code>*` | `app/season/[code]/OwnBar.tsx` | Править/Готово, переименование (в правке), «Форкнуть» и мегафон (в просмотре), печать; правки пишутся сами |
-| По личной ссылке `/p/<token>` | `app/p/[token]/SharedBar.tsx` | «Форкнуть», ссылка, печать |
-| Выложенный `/s/<code>` | `app/s/[code]/PublicBar.tsx` | Звёздочка, лайк, жалоба, «Форкнуть», ссылка, печать; автору — снятие и возврат на витрину, счёт лайков |
+| Draft `/sheet*` | `app/[lang]/sheet/DraftBar.tsx` | Edit/Done, printing and "Save to my seasons" — signed-in only |
+| Own season `/season/<code>*` | `app/season/[code]/OwnBar.tsx` | Edit/Done, renaming (in edit), "Fork" and the megaphone (in viewing), printing; edits write themselves |
+| By private link `/p/<token>` | `app/p/[token]/SharedBar.tsx` | "Fork", the link, printing |
+| Published `/s/<code>` | `app/s/[code]/PublicBar.tsx` | Star, like, report, "Fork", the link, printing; for the author, withdrawal and return to the showcase, the like count |
 
-Тема и набор рисунков не зависят ни от одного из этих видов и живут отдельно — плавающими
-кнопками в углу окна (`FloatingControls`). Куда деть переключённое, решает страница:
-черновик пишет в `localStorage`, свой сезон — в базу, выложенный — перебивкой в адрес.
+The theme and the icon set depend on none of these kinds and live apart — as floating buttons in
+the corner of the window (`FloatingControls`). Where to put what was switched is decided by the
+page: a draft writes to `localStorage`, your own season to the database, a published one as an
+override in the address.
 
-**Язык сезона лежит в том же контексте**, рядом с бланком, и переключателя у него нет:
-подписи листа печатаются, и менять их у готового сезона незачем. Секции берут их
-`usePoster()`, а экранные кнопки на постере — `useDict()`, то есть языком интерфейса.
+**The season's language lies in the same context**, next to the blank, and has no switcher: the
+sheet's captions print, and there is no point changing them on a finished season. The sections
+take them from `usePoster()`, while the on-screen buttons on the poster take `useDict()`, i.e. the
+interface language.
 
-Правила, из которых собираются панели:
+The rules the bars are assembled from:
 
-- **сохранение — это не кнопка.** У своего сезона правки уезжают в строку дебаунсом
-  (`Autosave`), у черновика — в `localStorage` (`DraftStore`). Оба сделаны **компонентом
-  внутри провайдера**, а не пропом у него: так они читают тот же контекст и видят любое
-  изменение, включая смену темы. «Сохранить» осталось ровно там, где сезон **заводится**:
-  черновик уезжает в кабинет строкой;
-- **панель черновика знает про вход заранее** (проп со страницы) и потому не обещает того,
-  чего не будет. Невошедшему «Сохранить в мои сезоны» показывать нельзя: коллекции у него
-  нет. Своей кнопки входа у панели при этом тоже нет: вход любой кнопкой, хоть из шапки,
-  сам увозит черновик в коллекцию (см. «Мои сезоны»), и вторая кнопка про то же самое
-  только повторяла бы разговор. Это **единственное** место, где вход спрашивается заранее
-  ради того, показывать кнопку или нет, а не ради того, куда ляжет сезон;
-- **имени панель не спрашивает.** Черновик назвали, когда заводили, — второй раз то же
-  самое спрашивать незачем, переименование живёт в списке. Заодно из панели ушло второе
-  «Готово»: слово стояло и на кнопке окна, и в шаге от неё на кнопке выхода из правки, и
-  означало разное;
-- **имя спрашивается один раз, окном** (`NewSeasonDialog`): список без имён нечитаем, а
-  заводить сезон молча слишком похоже на промах по кнопке. Окно одно на все случаи
-  заведения сезона, и спрашивает оно **всегда** — у черновика теперь тоже есть имя, он
-  строка в списке на `/seasons`;
-- **разговор о потере один, и он про «сейчас».** Красное предупреждение (`warning`,
-  `draftWillBeLost` в `draft.ts`) добавляется, только когда черновик уже есть, и потому
-  называет имя: «черновик будет затёрт» человек проверить не может, а «„Сентябрь у
-  бабушки“ будет затёрт» — может. Слова лежат в `draft.ts`, а не в окне: окна заведения
-  два (`NewSeasonButton` и `ForkButton`), и вторая копия текста разошлась бы с первой.
-  Постоянного «сезон живёт только в этом браузере» и кнопки входа в окне больше нет:
-  вход сам увозит черновик в коллекцию, а где черновик лежит, одной фразой говорит
-  подсказка его панели — окну заведения незачем вести тот же разговор второй раз;
-- **«Форкнуть» — один компонент на все чужие постеры** (`components/edit/ForkButton.tsx`):
-  выложенный и присланный по личной ссылке форкаются одинаково, и держать два одинаковых
-  разговора незачем. Окно он рисует прямо в баре, и это можно: модальный `<dialog>` живёт
-  в верхнем слое, `backdrop-filter` ему не помеха — в отличие от тоста, поэтому об отказе
-  кнопка не рассказывает сама, а отдаёт его наружу;
-- **форк копирует то, что на экране**, вместе с примеренной темой и набором рисунков:
-  человек берёт себе увиденное, а не строку из базы. Слой заполнения не копируется никогда —
-  он не часть бланка. От исходного сезона в копии не остаётся ничего, поэтому повторный
-  форк — просто ещё одна своя строка, а не отказ «уже есть»;
-- **вход у страниц постера спрошен заранее** (`signedIn` пропом с сервера) — от него
-  зависит, куда ляжет форк. Там, где спросить негде (черновик грузится `ssr: false`),
-  работает прежний приём: действие уходит на сервер и на `anonymous` открывает окно входа;
-- **про вход у лайка и звёздочки панель не спрашивает.** Действие уходит на сервер, и если
-  тот отвечает `anonymous`, открывается окно входа. Иначе постер ждал бы ответа сервера,
-  чтобы нарисовать кнопку. **Жалоба — исключение:** её окно просит написать текст, и
-  заставлять человека сочинять жалобу, чтобы в ответ услышать «сначала войдите», нельзя —
-  флажок смотрит на `signedIn` (он у страниц постера и так спрошен) и невошедшему открывает
-  сразу окно входа. Ответ `anonymous` при этом всё равно обрабатывается: сессия могла
-  кончиться, пока человек набирал текст;
-- **подсказка называет место и сезон, а не объясняет устройство.** В левом углу ряда
-  стоит имя места и, через двоеточие, название сезона — «Наш пример: Месяц первых раз»,
-  «Сезон сообщества: …», «Ваш сезон: …», — и ничего больше. Ни того, как сезон сюда попал,
-  ни того, что с ним станет дальше: это устройство сайта, а не забота смотрящего, и место
-  ему в этом файле. Черновик и сезон по ссылке называют только место («Черновик в этом
-  браузере», «Сезон по ссылке»). У снятого с витрины места нет, и остаётся одно название;
-  сам `<span>` при этом не исчезает никогда — он разводит кнопки по краям ряда;
-- **у своего сезона название — то самое, что в списке**, то есть колонка `title`, и едет
-  оно пропом со страницы. Выводить его из содержимого (`ideaTitle`) нельзя: человек назвал
-  строку сам, и панель обязана звать сезон так же, как зовёт его список, — иначе одно и то
-  же приходится узнавать по двум разным именам. У выложенного и примера всё наоборот:
-  колонки `title` у публикации нет вовсе, и название там по-прежнему выводится из темы
-  месяца;
-- **в правке по названию нажимают, и открывается окно** (`RenameDialog`, действие
-  `renameSeason`): переименовывают сезон там же, где его меняют, а не окном в кабинете.
-  Слова о записи («Сохраняется само») на этом месте больше нет: автосохранение и так
-  незаметно, а имя человек ищет глазами. **Поля прямо в ряду здесь стояло и не прижилось:**
-  ширина у него шла по набранному, и соседние кнопки дёргались на каждом знаке — окно к
-  тому же повторяет повадку всех остальных. Кнопка при этом не выглядит кнопкой: в ряду
-  они все справа, а слева стоит надпись, и что по ней нажимают, говорит пунктир.
-  То же правило и в окнах: они говорят, что случится, одной фразой, а устройства сайта не
-  пересказывают. Приписка бывает одна и только там, где без неё человек ответит не на тот
-  вопрос: у снятия с витрины (`WITHDRAW_NOTE`) «убрать» слишком похоже на «удалить»;
-- **всё, что панель сообщает, идёт одним тостом** — и «ссылка скопирована», и отказ
-  сервера. Исключение одно: `anonymous` — это не отказ, а предложение войти, и его
-  показывает окно. **Окно входа одно, заголовок у него общий, а фраза под ним своя у каждой кнопки** —
-  строчки лежат в `LOGIN_TEXT` (`model/community.ts`), причина едет в `LoginDialog`
-  пропом `reason`. Фраза называет ровно то, что человек нажал («Чтобы поставить лайк,
-  нужно войти»), и ничего больше: объяснять устройство избранного в окне входа незачем;
-- **тост и окна рисуются вне `.bar`, и это обязательно.** У бара есть `backdrop-filter`,
-  а он делает элемент содержащим блоком для `position: fixed` — тост внутри прилипал бы
-  к панели вместо низа экрана. Поэтому панели возвращают фрагмент;
-- **состояние переключателя показывает заливка кнопки, а не рисунок**
-  (`.icon[aria-pressed='true']` в `Bar.module.css`). Через `filled` договориться нельзя:
-  у звезды и сердца залитая форма есть, у мегафона её нет. Правило обязано стоять
-  **после** `.icon:hover` — специфичность у них одинаковая;
-- **кнопки без подписи стоят по двум краям, и это два разных края.** Слева, до подсказки, —
-  то, что делают с постером **у себя**: звёздочка, лайк, жалоба. Справа — то, что уносит
-  его наружу: ссылка и печать. Подписи им заменяют `title` и `aria-label` — рядом с
-  текстовыми кнопками короткие надписи только утяжеляли бы ряд;
-- **ряд не разводится брейкпоинтами.** Подсказка отжимает всё вправо (`.hint`), действия
-  собраны в один флекс-элемент (`.actions`) и при нехватке места уезжают вниз разом.
-  Медиазапрос тут не годится в принципе: ширина, на которой ряд переносится, зависит от
-  набора кнопок — а он у трёх видов разный — и от длины подписей, а они переводятся.
+- **saving is not a button.** In your own season the edits go to the row with a debounce
+  (`Autosave`), in a draft they go to `localStorage` (`DraftStore`). Both are made as a
+  **component inside the provider** rather than a prop on it: that way they read the same context
+  and see any change, a theme switch included. "Save" is left exactly where a season is
+  **created**: a draft travels into the account as a row;
+- **the draft bar knows about sign-in in advance** (a prop from the page) and therefore does not
+  promise what will not happen: a signed-out person has no collection and must not be shown "Save
+  to my seasons". It has no sign-in button of its own either — signing in with any button carries
+  the draft into the collection by itself (see "My seasons"). This is the **only** place where
+  sign-in is asked in advance to decide whether to show a button, rather than where the season
+  will land;
+- **the bar does not ask for a name.** The draft was named when it was created — asking the same
+  thing a second time is pointless, and renaming lives in the list. That also removed a second
+  "Done" from the bar: the word stood both on the dialog's button and, one step away, on the
+  button that leaves edit mode, and it meant different things;
+- **the name is asked once, with a dialog** (`NewSeasonDialog`): a list without names is
+  unreadable, and creating a season silently looks too much like a misclick. The dialog is one for
+  all cases of creating a season, and it **always** asks — a draft now has a name too, it is a row
+  in the list on `/seasons`;
+- **there is one conversation about loss, and it is about "now".** The red warning (`warning`,
+  `draftWillBeLost` in `draft.ts`) is added only when a draft already exists, and names it: "the
+  draft will be overwritten" is something a person cannot check, while ""September at Grandma's"
+  will be overwritten" is. The wording lies in `draft.ts`, not in the dialog: there are two
+  creation dialogs (`NewSeasonButton` and `ForkButton`) and a second copy would diverge. The
+  permanent "the season lives only in this browser" and the sign-in button are gone from the
+  creation dialog: signing in carries the draft into the collection by itself, and where the draft
+  lies is said by the hint on its bar;
+- **"Fork" is one component for all foreign posters**
+  (`components/edit/ForkButton.tsx`): a published season and one sent by private link are forked
+  identically, and there is no point keeping two identical conversations. It draws its dialog right
+  in the bar, and that is allowed: a modal `<dialog>` lives in the top layer and `backdrop-filter`
+  is no obstacle to it — unlike for a toast, which is why the button does not report a refusal
+  itself but hands it outward;
+- **a fork copies what is on screen**, together with the tried-on theme and icon set: a person
+  takes what they saw, not a row from the database. The fill layer is never copied — it is not
+  part of the blank. Nothing of the original season is left in the copy, so a second fork is simply
+  one more row of your own rather than an "already exists" refusal;
+- **sign-in is asked in advance on the poster pages** (`signedIn` as a prop from the server) —
+  where the fork lands depends on it. Where there is nowhere to ask (a draft is loaded with
+  `ssr: false`), the old trick works: the action goes to the server and opens the sign-in dialog on
+  `anonymous`;
+- **the bar does not ask about sign-in for the like and the star.** The action goes to the server,
+  and if it answers `anonymous`, the sign-in dialog opens. Otherwise the poster would wait for the
+  server's answer just to draw a button. **The report is the exception:** its dialog asks the
+  person to write a text, and making someone compose a report only to hear "sign in first" is not
+  allowed — the flag looks at `signedIn` (which the poster pages have asked for anyway) and opens
+  the sign-in dialog straight away for a signed-out person. The `anonymous` answer is still
+  handled, though: the session could have ended while the person was typing;
+- **the hint names the place and the season, it does not explain the mechanism.** The left corner
+  of the row holds the place and, after a colon, the season's name — "Our example: Month of
+  Firsts", "A community season: …", "Your season: …" — and nothing more. Neither how the season got
+  here nor what will happen to it: that is the site's workings, and its place is in this file. A
+  draft and a season by link name only the place ("A draft in this browser", "A season by link"). A
+  withdrawn season has no place and only the name is left; the `<span>` itself never disappears —
+  it holds the buttons apart at the edges of the row;
+- **for your own season the name is the very one in the list**, i.e. the `title` column, and it
+  travels as a prop from the page. Deriving it from the content (`ideaTitle`) is not allowed: the
+  person named the row themselves, and the bar must call the season what the list calls it —
+  otherwise one and the same thing has to be recognised under two different names. For a published
+  season and an example it is the other way round: a publication has no `title` column at all, and
+  the name there is still derived from the theme of the month;
+- **in edit mode you press on the name and a dialog opens** (`RenameDialog`, the `renameSeason`
+  action): a season is renamed where it is changed, not in the account. The words about writing
+  ("Saves itself") are gone from that place: autosaving is unnoticeable anyway, and the name is
+  what a person looks for. **A field right in the row was tried and did not take:** its width
+  followed what was typed and the neighbouring buttons twitched on every character — and a dialog
+  repeats the manner of all the others. The button does not look like a button: in the row they are
+  all on the right, on the left stands a caption, and a dotted underline says it is pressed. The
+  same rule holds in the dialogs: one phrase about what will happen, no retelling of the site's
+  workings. At most one note, and only where a person would otherwise answer the wrong question —
+  as with withdrawal from the showcase (`WITHDRAW_NOTE`), where "take off" is too much like
+  "delete";
+- **everything the bar reports goes as one toast** — both "the link is copied" and a server
+  refusal. There is one exception: `anonymous` is not a refusal but an offer to sign in, and it is
+  shown by a dialog. **There is one sign-in dialog with a shared heading, and its own phrase under
+  it for every button** — the lines lie in `LOGIN_TEXT` (`model/community.ts`), and the reason
+  travels into `LoginDialog` as the `reason` prop. The phrase names exactly what the person
+  pressed ("To leave a like you need to sign in") and nothing else: explaining how favourites work
+  in the sign-in dialog is pointless;
+- **the toast and the dialogs are drawn outside `.bar`, and that is mandatory.** The bar has a
+  `backdrop-filter`, which makes an element a containing block for `position: fixed` — a toast
+  inside it would stick to the bar instead of the bottom of the screen. So the bars return a
+  fragment;
+- **a toggle's state is shown by the button's fill, not by the drawing**
+  (`.icon[aria-pressed='true']` in `Bar.module.css`). Agreeing through `filled` is impossible: the
+  star and the heart have a filled shape, the megaphone does not. The rule must stand **after**
+  `.icon:hover` — they have the same specificity;
+- **the buttons without labels stand at the two edges, and those are two different edges.** On the
+  left, before the hint, is what people do with the poster **for themselves**: the star, the like,
+  the report. On the right is what carries it outward: the link and printing. Their labels are
+  replaced by `title` and `aria-label` — next to text buttons, short captions would only make the
+  row heavier;
+- **the row is not broken up with breakpoints.** The hint pushes everything to the right
+  (`.hint`), the actions are gathered into one flex item (`.actions`) and move down all at once
+  when there is not enough room. A media query will not do here in principle: the width at which
+  the row wraps depends on the set of buttons — which differs between the three kinds — and on the
+  length of the labels, which are translated.
 
-Текстовые поля привязываются по пути: `field('people.0.name')`, запись — `setByPath`
-через `structuredClone`. Цвет человека не хранится, а выводится из `face` — не добавляйте
-поле `accent` обратно.
+Text fields are bound by path: `field('people.0.name')`, and writing goes through `setByPath` with
+`structuredClone`. A person's colour is not stored but derived from `face` — do not add an
+`accent` field back.
 
-## Печать: две страницы A4
+## Printing: two A4 pages
 
-Лист должен печататься ровно в две страницы: `PrintPage` (`src/components/PrintPage.tsx`)
-делит секции на две группы, у первой `break-after: page`. Каждая группа занимает страницу
-целиком (`min-height: 275mm`).
+The sheet must print as exactly two pages: `PrintPage` (`src/components/PrintPage.tsx`) splits the
+sections into two groups, and the first gets `break-after: page`. Each group occupies a whole page
+(`min-height: 275mm`).
 
-**Свободное место уходит внутрь блоков, а не в промежутки между ними.** Пустые полосы
-между рамками выглядят как брак, поэтому `justify-content: space-between` здесь не
-применяем. На каждой странице растёт ровно один блок — поле для записи от руки:
+**Free space goes inside the blocks, not into the gaps between them.** Empty strips between frames
+look like a defect, so `justify-content: space-between` is not used here. Exactly one block grows
+on each page — the field for writing by hand:
 
-- страница 1 — рамка под вопросом темы месяца (`.section { flex: 1 }` в
-  `MonthTheme.module.css`). Недели и цель месяца зафиксированы (`flex: 0 0 auto`):
-  растянутые полароиды теряют квадратные пропорции, а место под фото должно выглядеть
-  так же, как в вебе;
-- страница 2 — «Идеи на следующий месяц» (`flex: 1`). Карточки людей намеренно фиксированной
-  высоты (`min-height: 104px`): если дать им расти, при семье из двух человек контент
-  повисает в середине пустой рамки. Так у маленькой семьи автоматически получается
-  большое поле под итоги, а у большой — компактное.
+- page 1 — the frame under the question in the theme of the month (`.section { flex: 1 }` in
+  `MonthTheme.module.css`). The weeks and the goal of the month are fixed (`flex: 0 0 auto`):
+  stretched polaroids lose their square proportions, and the space for a photo must look the same
+  as on the web;
+- page 2 — "Ideas for next month" (`flex: 1`). The people's cards are deliberately of fixed height
+  (`min-height: 104px`): let them grow and, with a family of two, the content hangs in the middle
+  of an empty frame. That way a small family automatically gets a large field for the wrap-up and a
+  large one gets a compact one.
 
-Веб и печать должны выглядеть одинаково: пустое место под заметки задано и на экране
-(`.answerBox { min-height: 260px }`), а в печати блок просто дотягивается до низа листа.
-Не заводите в `@media print` значения, отличные от экранных, без причины: там уместны
-только уплотнение под ширину A4, возврат десктопной раскладки, скрытие экранных
-контролов и слоя заполнения, да замена непечатаемых теней рамками.
+Web and print must look the same: the empty space for notes is set on screen as well
+(`.answerBox { min-height: 260px }`), and in printing the block simply stretches to the bottom of
+the sheet. Do not introduce values in `@media print` that differ from the screen ones without a
+reason: only tightening to the A4 width, restoring the desktop layout, hiding the on-screen
+controls and the fill layer, and replacing unprintable shadows with frames belong there.
 
-Растяжка работает только сплошной цепочкой flex: секция → `.box` → `.body` → контент.
-**Никаких `height: 100%`** — у flex-элемента высота не definite, процент схлопывается в
-высоту по контенту и молча глушит растяжку (рамка остаётся маленькой внутри растянутой
-секции). Каждому звену — `display: flex; flex-direction: column` и `flex: 1; min-height: 0`.
+Stretching works only through an unbroken flex chain: section → `.box` → `.body` → content. **No
+`height: 100%`** — a flex item's height is not definite, a percentage collapses to the content
+height and silently kills the stretch (the frame stays small inside a stretched section). Every
+link gets `display: flex; flex-direction: column` and `flex: 1; min-height: 0`.
 
-Бюджет высоты одной группы — **1046 px** (277 мм при полях 10 мм); растянутая группа
-занимает 1039 px. Замеры нерастянутого содержимого:
+The height budget of one group is **1046 px** (277 mm with 10 mm margins); a stretched group
+occupies 1039 px. Measurements of unstretched content:
 
-| Лист | Стр. 1 | Запас | Стр. 2 | Запас |
+| Sheet | Page 1 | Slack | Page 2 | Slack |
 | --- | --- | --- | --- | --- |
-| 4 человека, 30 дней (demo-1) | 820 px | 220 px | 779 px | 261 px |
-| 5 человек, 30 дней (demo-3) | 840 px | 200 px | 917 px | 123 px |
-| 5 человек, 31 день, длинные тексты | 864 px | 175 px | 966 px | 74 px |
+| 4 people, 30 days (demo-1) | 820 px | 220 px | 779 px | 261 px |
+| 5 people, 30 days (demo-3) | 840 px | 200 px | 917 px | 123 px |
+| 5 people, 31 days, long texts | 864 px | 175 px | 966 px | 74 px |
 
-Запас первой страницы почти не зависит от семьи и не падает ниже ~175 px — её содержимое
-фиксировано макетом. Запас второй съедают карточки людей и таблица настроений, поэтому
-**всё, что добавляется на вторую страницу, надо мерить на худшем случае**: пять человек,
-месяц из 31 дня и описания в две строки. Остальное добирает растянутый блок; при
-переполнении растяжка превращается в лишние страницы, и лечится это ужиманием секций,
-а не увеличением `min-height`.
+The slack on the first page barely depends on the family and never falls below ~175 px — its
+content is fixed by the layout. The slack on the second is eaten by the people's cards and the mood
+table, so **anything added to the second page must be measured on the worst case**: five people, a
+month of 31 days and two-line descriptions. The rest is taken up by the stretched block; on
+overflow the stretch turns into extra pages, and that is cured by tightening the sections, not by
+raising `min-height`.
 
-Снимаются эти числа рецептом ниже: печатные правила применяются как обычные, `#root`
-сужается до 718 px, у группы снимается `min-height` — разница между растянутой и
-натуральной высотой и есть запас.
+These numbers are taken with the recipe below: the print rules are applied as ordinary ones,
+`#root` is narrowed to 718 px, the group's `min-height` is removed — and the difference between the
+stretched and the natural height is the slack.
 
-**Печатают минимум на A3.** Макет при этом остаётся A4: принтер масштабирует страницу
-целиком, всё выходит в 1,41 раза крупнее, а проверка «ровно две страницы» не меняется.
-Отсюда же правило для мелких деталей вроде QR: считать их размер в макете, а читаемость
-на бумаге — с коэффициентом 1,41.
+**Printing is on A3 at the least.** The layout stays A4: the printer scales the whole page,
+everything comes out 1.41 times larger, and the "exactly two pages" check does not change. Hence
+the rule for small details such as the QR: compute their size in the layout, and their readability
+on paper with a factor of 1.41.
 
-Три ловушки, каждая уже стоила лишних страниц:
+Three traps, each of which has already cost extra pages:
 
-1. **Flex ломает разбиение.** Chrome при печати кроит flex-контейнер, не помещающийся на
-   страницу, и раскидывает детей по отдельным листам. `.sheet` в печати поэтому
-   `display: block`. У `.page` flex оставлен сознательно — только ради растяжки и только
-   потому, что группа гарантированно влезает в страницу и разбивать её не приходится.
-2. **Мобильные брейкпоинты срабатывают на бумаге.** Печатная ширина ≈ 718 px, то есть
-   активны `@media (max-width: 720|760|820px)`: недели встают в две колонки, проекты в
-   одну, доодлы прячутся — лист раздувается вдвое. Поэтому **блок `@media print` должен
-   быть последним в каждом CSS-модуле** (одинаковая специфичность — выигрывает последний)
-   и явно возвращать «десктопную» раскладку. Двигая эти блоки, держите их в конце файла.
-3. **`break-inside: avoid` на большой группе** заставляет Chrome вытолкнуть её целиком и
-   оставить пустые листы. Запрет разрывов — только на отдельных секциях, не на группе.
+1. **Flex breaks pagination.** When printing, Chrome slices a flex container that does not fit on a
+   page and scatters its children across separate sheets. `.sheet` in printing is therefore
+   `display: block`. Flex is deliberately left on `.page` — only for the stretching, and only
+   because the group is guaranteed to fit on a page and never has to be split.
+2. **Mobile breakpoints fire on paper.** The print width is ≈ 718 px, i.e.
+   `@media (max-width: 720|760|820px)` is active: the weeks go into two columns, the storylines into
+   one, the doodles hide — and the sheet doubles in size. So the `@media print` block **must be
+   last in every CSS module** (equal specificity — the last one wins) and must restore the
+   "desktop" layout explicitly. When moving these blocks, keep them at the end of the file.
+3. **`break-inside: avoid` on a large group** makes Chrome push it out whole and leave blank
+   sheets. Forbidding breaks belongs on individual sections, not on a group.
 
-Слой заполнения на бумагу не идёт даже на демо: заливка шкалы, `.cellFace`, записи в
-итогах и идеях, фото — всё скрыто в печати через `display: none` (не `visibility: hidden`:
-скрытый текст сохраняет высоту и может выдавить лишнюю страницу). Любой новый экранный контрол сразу скрывайте в
-`@media print`, иначе он вылезет на распечатке.
+The fill layer does not go to paper even on a demo: the scale fill, `.cellFace`, the notes in the
+wrap-up and the ideas, the photos — all hidden in printing with `display: none` (not
+`visibility: hidden`: hidden text keeps its height and can push out an extra page). Hide any new
+on-screen control in `@media print` right away, or it will show up on the printout.
 
-Как проверять (без модального диалога печати, который блокирует автоматизацию):
+How to check it (without the modal print dialog, which blocks automation):
 
 ```bash
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
   --disable-gpu --no-pdf-header-footer --virtual-time-budget=6000 \
   --print-to-pdf=out.pdf http://localhost:3000/sheet
-grep -ao "/Count [0-9]*" out.pdf | head -1   # число страниц, должно быть 2
-qlmanage -t -s 1200 -o . out.pdf             # превью первой страницы
+grep -ao "/Count [0-9]*" out.pdf | head -1   # the page count, must be 2
+qlmanage -t -s 1200 -o . out.pdf             # a preview of the first page
 ```
 
-Для замера высот и визуальной проверки второй страницы в браузере: применить правила из
-`@media print` как обычный `<style>`, отключить экранные `max-width`-медиа
-(`rule.media.mediaText = 'not all'`) и сузить `#root` до 718 px — так видно ровно то, что
-уйдёт на бумагу. Эмуляция без отключения `max-width`-медиа врёт: окно широкое, и мобильные
-правила не срабатывают.
+To measure heights and check the second page visually in a browser: apply the rules from
+`@media print` as an ordinary `<style>`, disable the on-screen `max-width` media queries
+(`rule.media.mediaText = 'not all'`) and narrow `#root` to 718 px — that shows exactly what will go
+to paper. Emulation without disabling the `max-width` media queries lies: the window is wide and
+the mobile rules do not fire.
 
-## Рисунки
+## Drawings
 
-`src/components/AvatarFace.tsx` — четыре аватара в одном `viewBox="0 0 64 64"`.
-Взрослые и дети должны различаться **силуэтом**, а не деталями: в таблице настроений
-аватар рисуется в 20 px, там видно только пятно. Папа — борода на щеках и подбородке,
-мама — каре и серьги, дети — головы заметно мельче (r 13 против 15+), вихор и хвостики.
-Мелкие детали на волосах рисуйте белым с обводкой, иначе они тонут в тёмной массе
-(`currentColor` у волос и деталей — один цвет).
+`src/components/AvatarFace.tsx` — four avatars in one `viewBox="0 0 64 64"`. Adults and children
+must differ by **silhouette**, not by details: in the mood table an avatar is drawn at 20 px, where
+only a blob is visible. Dad has a beard on the cheeks and chin, mum has a bob and earrings, the
+children have noticeably smaller heads (r 13 against 15+), a cowlick and pigtails. Draw small
+details on the hair in white with a stroke, or they drown in the dark mass (`currentColor` on the
+hair and the details is one colour).
 
-Рисунки (`src/components/doodles/`) — тоже inline SVG на `currentColor`; никаких
-растровых картинок в макете нет и заводить их не нужно. Живут они в двух видах,
-и путать их не надо:
+The drawings (`src/components/doodles/`) are inline SVG on `currentColor` too; there are no raster
+images in the layout and none need to be added. They exist in two kinds, and they must not be
+confused:
 
-- **библиотека** — `icons.generated.ts` (собирается) плюс рисовальщик `Icon.tsx`.
-  Сорок рисунков на общей сетке, из них собраны наборы постера (см. «Наборы рисунков»).
-  Постер зовёт их только через `PosterIcon`, по слоту;
-- **доодлы сайта** — `HeartDoodle`, `FamilyIcon` и прочие имена в `index.ts`. Семь из
-  них — однострочные обёртки над `Icon` с фиксированным именем: у сайта рисунки свои и
-  от набора постера не зависят, но геометрию держать в двух копиях нельзя. У `Icon` ради
-  них есть две перебивки, `filled` и `strokeWidth`: на кнопке тулбара рисунок в 18 px, а
-  общая обводка 2.3 на сетке в 64 даёт там 0,65 экранного пикселя — ту же серую паутину,
-  что у слота `spark`. Заводить ради кнопки второй рисунок нельзя. Остальные
-  (`SparkleRays`, `FridgeDoodle`, `PenDoodle`, `PrinterDoodle`) в наборы не входят и
-  нарисованы прямо в своих файлах.
+- **the library** — `icons.generated.ts` (generated) plus the `Icon.tsx` renderer. Forty drawings
+  on a shared grid, from which the poster's sets are assembled (see "Icon sets"). The poster calls
+  them only through `PosterIcon`, by slot;
+- **the site doodles** — `HeartDoodle`, `FamilyIcon` and the other names in `index.ts`. Seven of
+  them are one-line wrappers over `Icon` with a fixed name: the site has its own drawings and does
+  not depend on the poster's set, but the geometry must not be kept in two copies. For their sake
+  `Icon` has two overrides, `filled` and `strokeWidth`: on a toolbar button a drawing is 18 px, and
+  the common stroke of 2.3 on a grid of 64 gives the same grey cobweb there as in the `spark` slot.
+  Adding a second drawing for the sake of a button is not allowed. The rest (`SparkleRays`,
+  `FridgeDoodle`, `PenDoodle`, `PrinterDoodle`) are not in the sets and are drawn right in their
+  own files.
 
-`PosterIcon` в `index.ts` не экспортируется намеренно: он читает контекст, а барель
-импортируют серверные компоненты сайта.
+`PosterIcon` is deliberately not exported from `index.ts`: it reads context, and the barrel is
+imported by the site's server components.
 
-Фотографии примеров — единственные картинки файлами: `public/examples/<id>/week-N.svg`,
-пути на них лежат в `photos` соответствующего набора заполнения. Они тоже векторные,
-но красятся собственными цветами и темы не знают: это `<img>`, до которого переменные
-CSS всё равно не дотянутся. Правило «только четыре краски набора» на них не
-распространяется — они **слой заполнения**, а не макет: на бумагу не идут, и настоящих
-фотографий в проекте нет, это заведомые заглушки «как выглядит прожитая неделя».
+The example photographs are the only pictures kept as files: `public/examples/<id>/week-N.svg`, and
+the paths to them lie in the `photos` of the corresponding fill set. They are vector too, but they
+are painted in their own colours and know nothing of the themes: they are `<img>`, which CSS
+variables cannot reach anyway. The rule "only the four paints of the set" does not apply to them —
+they are the **fill layer**, not the layout: they do not go to paper, and there are no real
+photographs in the project, these are deliberate stubs for "what a lived week looks like".
 
-## Тесты
+## Tests
 
-E2E на Playwright плюс форматирование и линт на коммите. Слой молодой: каркас стоит,
-сценарии добираются по одному.
+E2E on Playwright plus formatting and linting on commit. The layer is young: the frame is up, the
+scenarios are arriving one at a time.
 
-| Что | Где |
+| What | Where |
 | --- | --- |
-| Конфиг, порт, тестовый сервер | `playwright.config.ts` |
-| Фикстуры (`signedIn`) | `e2e/fixtures.ts` |
-| Подделка куки сессии | `e2e/support/session.ts` |
-| Сами сценарии | `e2e/<порода>/<правило>.spec.ts` |
-| Слепок тестовой базы | `tools/db/reset-e2e.mjs` (`npm run e2e:db`) |
-| Хуки | `.husky/pre-commit`, `.husky/pre-push` |
-| Формат | `.prettierrc`, `.prettierignore` |
+| Config, port, test server | `playwright.config.ts` |
+| Fixtures (`signedIn`) | `e2e/fixtures.ts` |
+| Faking the session cookie | `e2e/support/session.ts` |
+| The scenarios themselves | `e2e/<breed>/<rule>.spec.ts` |
+| The test database snapshot | `tools/db/reset-e2e.mjs` (`npm run e2e:db`) |
+| Hooks | `.husky/pre-commit`, `.husky/pre-push` |
+| Formatting | `.prettierrc`, `.prettierignore` |
 
-- **Тесты — это база знаний о том, как всё должно работать.** Заголовок теста — утверждение
-  о продукте («снятое с витрины остаётся в избранном»), а не пересказ кликов («клик по
-  мегафону открывает окно»). Словарь продуктовый, как велит раздел «Соглашения».
-- **Связь с этим файлом двусторонняя.** В шапке спека — раздел CLAUDE.md, который он
-  проверяет; здесь рядом с инвариантом — строка «Проверяется: `<файл>`». Расхождение видно
-  с обеих сторон, а красный тест означает устаревшую документацию.
-- **Подписи берутся из словаря, ожидаемые значения пишутся буквально.** Локаторы — через
-  `DICTS.ru.bars.fork`, второй копии русского текста в тестах не заводим. А вот ожидаемый
-  результат — литералом (`/en/seasons?tab=published`), а не вычислением через `withLang`:
-  тест, считающий ответ той же функцией, которую проверяет, ничего не утверждает.
-- **`data-testid` не добавляем.** Их в разметке нет ни одного; локаторы — `getByRole` и
-  `getByLabel`, то есть по тому же, по чему страницу читает человек и читалка. Тестовой
-  разметке в постере делать нечего — он и так печатается.
-- **Вёрстку и цвета не проверяем**, кроме печати в две страницы: это принцип 3.
-  Скриншот-тестов здесь нет и заводить их не надо — они ломаются от смены темы (а тем сто)
-  и держат в репозитории картинки.
-- **Состояние готовится фикстурой, кликами — только проверяемый флоу.** Тест про снятие с
-  витрины не проходит публикацию по кнопкам.
-- **Что сознательно не покрыто — списком в конце спека**, как «Сознательно не сделано» здесь.
-  Пустое место должно быть выбранным, а не забытым.
+- **The tests are a knowledge base about how everything must work.** A test title is a statement
+  about the product ("what is taken off the showcase stays in favourites"), not a retelling of
+  clicks ("a click on the megaphone opens a dialog"). The vocabulary is the product one, as the
+  "Conventions" section requires.
+- **The link with this file goes both ways.** The spec header names the CLAUDE.md section it
+  checks; here, next to an invariant, stands a "Verified by: `<file>`" line. A divergence is
+  visible from both sides, and a red test means the documentation is out of date.
+- **Labels come from the dictionary, expected values are written out literally.** Locators go
+  through `DICTS.ru.bars.fork`; we do not create a second copy of the Russian text in the tests.
+  The expected result, though, is a literal (`/en/seasons?tab=published`) rather than a computation
+  through `withLang`: a test that computes the answer with the same function it is checking asserts
+  nothing.
+- **We do not add `data-testid`.** There is not one in the markup; locators are `getByRole` and
+  `getByLabel`, i.e. by the same things a person and a screen reader read the page by. Test markup
+  has no business in the poster — it prints, after all.
+- **We do not check layout and colours**, except for printing in two pages: that is principle 3.
+  There are no screenshot tests here and none should be added — they break on a theme change (and
+  there are a hundred themes) and keep images in the repository.
+- **State is prepared by a fixture, and only the flow under test is clicked through.** A test about
+  withdrawal from the showcase does not go through publishing with buttons.
+- **What is deliberately not covered goes as a list at the end of the spec**, like "Deliberately
+  not done" here. Empty space must be chosen, not forgotten.
 
-Про инфраструктуру — то, что уже стоило отладки:
+About the infrastructure — the things that have already cost debugging:
 
-- **Тесты идут против `next start` на порту 3100, а не против дев-сервера.** Причин две, и
-  обе жёсткие. Дев-сервер разработчика смотрит в **рабочую** базу, а подмена `DATABASE_URL`
-  касается только сервера, который Playwright запускает сам, — `reuseExistingServer`
-  подхватил бы чужой и писал бы тестами в дев. Второй дев-сервер при этом и не поднять:
-  `next dev` держит замок в `distDir`, и флага, чтобы его сменить, нет. Сборка дешёвая
-  (около десяти секунд на тёплом кэше) и вдобавок проверяет то, что уезжает в прод.
-- **Тестовому серверу нужен `AUTH_TRUST_HOST`.** В прод-режиме Auth.js отвечает
-  `UntrustedHost` и **молча не читает сессию** — страница выглядит как у невошедшего, и
-  ищешь ошибку где угодно, только не здесь. На Vercel хост подставляется сам, локально
-  некому. Переменная стоит в `webServer.env`, кода не касается.
-- **Вход подделывается кукой, а не тестовым провайдером.** Это возможно ровно потому, что
-  у входа нет адаптера БД: сессия целиком лежит в зашифрованной куке, и достаточно того же
-  `AUTH_SECRET`. `src/server/auth.ts` тестового кода не содержит и содержать не должен.
-- **База для тестов отдельная и всегда накатывается из слепка.** Слепок — это миграции плюс
-  `db:seed`, своей копии схемы нет: новая миграция подхватывается сама. `reset-e2e.mjs`
-  сносит схему целиком, поэтому читает `E2E_DATABASE_URL` и **отказывается работать, если
-  она совпала с `DATABASE_URL`**.
-- **Изоляция — своим `accountKey` у каждого теста**, а не уборкой после. Слепок один на
-  прогон, тесты параллельны, а все строки ключуются аккаунтом. Глобальна только витрина:
-  тест, который что-то выкладывает, обязан собирать уникальное содержимое и проверять свой
-  код, а не число сезонов на странице.
-- **E2E не шаг сборки на Vercel, и это решение.** Билд обязан оставаться тем, что просто
-  собирает сайт: по тому же правилу, по которому шагом сборки не делается миграция —
-  её падение завалило бы деплой сайта, который работает и при мёртвой базе. Отвалившаяся
-  тестовая база не имеет права мешать выкатке. Вдобавок билд-образ Vercel — Amazon Linux
-  2023, а Playwright поддерживает только Debian и Ubuntu: список системных библиотек
-  Chromium пришлось бы вести руками.
-- **`npm run e2e` пересобирает проект, и это не расточительство.** `e2e:only` гоняет тесты
-  по прошлой сборке — поправив код приложения и запустив его, вы молча проверили бы старое.
-  Быстрый вариант оставлен ровно для правки самих спеков.
-- **E2E на `pre-push` пока не стоят, и это решение.** Хук делает только `lint` и
-  `typecheck`. Набор из одного теста не стоит ожидания, а хук, который тормозит без
-  пользы, начинают обходить `--no-verify` — и дальше обходят уже по привычке. Строка
-  `npm run e2e` возвращается в `.husky/pre-push`, когда сценариев наберётся достаточно.
-- **Хук, который нельзя обойти, заставит обходить себя правкой хука.** Аварийный выход —
-  `git push --no-verify`, и он назван в README намеренно.
-- **Собираемые файлы — в `.prettierignore`.** Отформатируй их — и следующий
-  `npm run palettes` молча даст расхождение. `*.md` там же: CLAUDE.md и README свёрстаны
-  по ширине руками.
+- **The tests run against `next start` on port 3100, not against the dev server.** There are two
+  reasons and both are hard. A developer's dev server looks at the **working** database, and
+  substituting `DATABASE_URL` only affects the server Playwright starts itself —
+  `reuseExistingServer` would pick up someone else's and write into dev with the tests. A second
+  dev server cannot be raised either: `next dev` holds a lock in `distDir`, and there is no flag to
+  change it. The build is cheap (about ten seconds on a warm cache) and additionally checks what
+  goes to production.
+- **The test server needs `AUTH_TRUST_HOST`.** In production mode Auth.js answers `UntrustedHost`
+  and **silently does not read the session** — the page looks like a signed-out person's, and you
+  look for the bug anywhere but here. On Vercel the host is supplied automatically, locally there
+  is nobody to do it. The variable stands in `webServer.env` and does not touch the code.
+- **Sign-in is faked with a cookie, not with a test provider.** That is possible precisely because
+  sign-in has no database adapter: the session lies entirely in an encrypted cookie, and the same
+  `AUTH_SECRET` is enough. `src/server/auth.ts` contains no test code and must not.
+- **The test database is separate and is always built from a snapshot.** The snapshot is the
+  migrations plus `db:seed`; there is no separate copy of the schema, so a new migration is picked
+  up by itself. `reset-e2e.mjs` drops the schema whole, so it reads `E2E_DATABASE_URL` and
+  **refuses to work if it matches `DATABASE_URL`**.
+- **Isolation is by a per-test `accountKey`**, not by cleaning up afterwards. There is one snapshot
+  per run, the tests are parallel, and all rows are keyed by account. Only the showcase is global:
+  a test that publishes something must assemble unique content and check its own code rather than
+  the number of seasons on the page.
+- **E2E is not a build step on Vercel, and that is a decision.** The build must remain something
+  that just builds the site: by the same rule the migration is not a build step — its failure would
+  take down the deploy of a site that works with a dead database. A test database that fell over has
+  no right to get in the way of a release. On top of that the Vercel build image is Amazon Linux
+  2023, while Playwright supports only Debian and Ubuntu: the list of Chromium system libraries
+  would have to be maintained by hand.
+- **`npm run e2e` rebuilds the project, and that is not wasteful.** `e2e:only` runs the tests
+  against the previous build, so after fixing application code and running it you would silently be
+  checking the old one. The fast variant is left exactly for editing the specs themselves.
+- **E2E is not on `pre-push` yet, and that is a decision.** The hook does only `lint` and
+  `typecheck`. A suite of one test is not worth the wait, and a hook that slows you down for
+  nothing starts getting skipped with `--no-verify` — and after that it is skipped out of habit.
+  The line `npm run e2e` goes back into `.husky/pre-push` when there are enough scenarios.
+- **A hook that cannot be skipped will make someone skip it by editing the hook.** The emergency
+  exit is `git push --no-verify`, and it is named in the README deliberately.
+- **Generated files are in `.prettierignore`.** Format them and the next `npm run palettes` silently
+  produces a difference. `*.md` is there too: CLAUDE.md and the README are wrapped by hand.
 
-## Принципы разработки
+## Development principles
 
-1. **Сначала решить, к какому слою относится изменение.** Печатается → `Template`
-   (и, значит, попадает в ссылку и требует версии формата). Пишется от руки →
-   `FillState` (и, значит, скрывается в печати). Третьего не дано.
-2. **Печать проверяется реальным PDF, а не на глаз.** Любая правка вёрстки — прогон
-   рецепта выше на двух конфигурациях: демо (4 человека) и худший случай (5 человек,
-   месяц из 31 дня и описания в две строки — именно он съедает запас второй страницы).
-   Обе должны давать ровно 2 страницы. **Правка подписей, подсказок или названий месяцев —
-   прогон на всех трёх языках**: пределы полей мерены под русский, а переносы у языков
-   разные. Тема печатается
-   (`print-color-adjust: exact`), но на раскладку не влияет — гонять другие темы
-   нужно только когда правка трогает сами цвета; тогда берите крайние случаи:
-   набор со сплошь светлыми красками (`pastel`) и набор с белой (`authority`).
-3. **Постер рисуется под печать, экран показывает распечатку.** Все подложки листа
-   белые и в вебе тоже — единственная цветная заливка — карточка личного проекта,
-   она печатается. Цвет несут плашки, рамки, чернила и доодлы. Экранное «покрасивее»,
-   которого не будет на бумаге (цветная бумага, градиенты, тени вместо рамок,
-   подсветка секций), — регресс: на печати оно исчезнет, и постер окажется не тем,
-   что был на экране. Отсюда же: веб и печать — **одна вёрстка**, и в `@media print`
-   уместны только уплотнение под ширину A4, возврат десктопной раскладки, скрытие
-   экранных контролов и слоя заполнения да замена непечатаемых теней рамками.
-   Новое оформление сначала делается в общих стилях, а не дублируется для печати.
-4. **Ломать формат ссылки нельзя молча.** Меняете состав `Template` — новый префикс
-   версии и чтение старого формата в `decodeTemplate`.
-5. **Мёртвого кода не держим.** Неиспользуемый экспорт, проп или поле модели удаляются
-   в том же изменении, где перестали быть нужны. Проверка: `grep` по имени экспорта и
-   сверка классов CSS-модулей с `styles.*` в компоненте.
-6. **Комментарий пишется только там, где код неоднозначен.** По умолчанию комментария
-   нет: имя функции, тип и сама строка кода говорят, что происходит. Комментарий
-   появляется, когда очевидное решение неверно и его уже пробовали, — неконтролируемый
-   `contentEditable`, `display: block` в печати, деления шкалы ячейками вместо
-   градиента. Он объясняет «почему», и такие места не переоткрывают.
+1. **First decide which layer a change belongs to.** It prints → `Template` (and therefore it gets
+   into the link and requires a format version). It is written by hand → `FillState` (and therefore
+   it is hidden in printing). There is no third option.
+2. **Printing is checked with a real PDF, not by eye.** Any layout change means running the recipe
+   above on two configurations: the demo (4 people) and the worst case (5 people, a month of 31 days
+   and two-line descriptions — that is what eats the second page's slack). Both must give exactly 2
+   pages. **A change to captions, placeholders or month names means a run in all three languages**:
+   the field limits were measured for Russian and the wrapping differs per language. The theme
+   prints (`print-color-adjust: exact`) but does not affect the layout, so other themes need to be
+   run only when the change touches the colours themselves; then take the extreme cases: a set with
+   all-light paints (`pastel`) and a set with a white one (`authority`).
+3. **The poster is drawn for print, and the screen shows the printout.** All the sheet's backgrounds
+   are white on the web too — the only coloured fill is a personal project card, and it prints.
+   Colour is carried by badges, frames, ink and doodles. On-screen "prettiness" that will not be on
+   paper (coloured paper, gradients, shadows instead of frames, highlighted sections) is a
+   regression: it disappears in printing, and the poster turns out not to be what was on screen.
+   Hence: web and print are **one layout**, and in `@media print` only tightening to the A4 width,
+   restoring the desktop layout, hiding the on-screen controls and the fill layer, and replacing
+   unprintable shadows with frames belong. New styling is made in the shared styles first, not
+   duplicated for printing.
+4. **The link format must not be broken silently.** Change the composition of `Template` — new
+   version prefix and reading of the old format in `decodeTemplate`.
+5. **We do not keep dead code.** An unused export, prop or model field is deleted in the same change
+   where it stopped being needed. The check: `grep` for the export name and a comparison of the CSS
+   module's classes with `styles.*` in the component.
+6. **A comment is written only where the code is ambiguous.** By default there is no comment: the
+   function name, the type and the line itself say what is happening. A comment appears when the
+   obvious solution is wrong and has already been tried — the uncontrolled `contentEditable`,
+   `display: block` in printing, the scale's ticks as cells rather than a gradient. It explains
+   "why", and such places are not reopened.
 
-   Чего в комментарии быть не должно: пересказа следующей строки («ставим куку»,
-   «читаем сессию»), заголовков-разделителей над блоками кода, названия того, что и так
-   написано в имени, пометок «важно» без причины и пересказа CLAUDE.md — устройство сайта
-   объясняется здесь, а не в тридцати копиях по файлам. Увидели такой комментарий —
-   удалите его, а не поправьте.
-7. **Примеры живут в `src/data/examples/<id>.json`** и подключаются реестром
-   `src/model/examples.ts`. Не зашивайте примерный текст в компоненты. Внутри файла
-   слои лежат раздельно — `template` и `fill`, — и это единственное место, где их видно
-   рядом. Тема лежит рядом с ними, строкой `"palette"`: в бланк она не входит. Новый пример: новый файл, строка в реестре, карточка
-   на лендинге появится сама. В текстах бланка переводов строк быть не должно:
-   пример показывает лист, а не искусство расстановки Enter.
-8. **Перед завершением задачи:** `npm run lint`, `npm run typecheck`, `npm run build`,
-   `npm run e2e` и печать в 2 страницы. Всё чисто — только тогда работа считается
-   сделанной. Первые два стоят на хуках (`.husky/`), e2e — нет, их зовут руками;
-   но и на хук полагаться вместо проверки не надо: его обходят одним флагом.
+   What must not be in a comment: a retelling of the next line ("set the cookie", "read the
+   session"), divider headings above blocks of code, the name of what is already in the identifier,
+   "important" markers without a reason, and a retelling of CLAUDE.md — the site's workings are
+   explained here, not in thirty copies across the files. See such a comment — delete it, do not fix
+   it.
+7. **The examples live in `src/data/examples/<id>.json`** and are wired up by the
+   `src/model/examples.ts` registry. Do not hard-wire example text into components. Inside a file
+   the layers lie apart — `template` and `fill` — and that is the only place where they are seen
+   side by side. The theme lies next to them as a `"palette"` line: it is not part of the blank. A
+   new example is a new file and a line in the registry; the card on the landing page appears by
+   itself. There must be no line breaks in the blank's texts: an example shows a sheet, not the art
+   of placing Enter.
+8. **Before finishing a task:** `npm run lint`, `npm run typecheck`, `npm run build`, `npm run e2e`
+   and printing in 2 pages. Everything clean — only then is the work done. The first two are on the
+   hooks (`.husky/`), e2e is not and is run by hand; but do not rely on a hook instead of checking
+   either — it is skipped with one flag.
 
-## Соглашения
+## Conventions
 
-- **Комментарии — на русском, UI — в словаре.** Пользовательских строк в разметке не
-  бывает вовсе: новая строка заводится в `src/i18n/dict/ru.ts` и переводится в `en.ts` и
-  `pl.ts` тем же изменением (`npm run typecheck` не даст забыть). Комментарий объясняет
-  «почему», а не пересказывает код.
-- **Словарь продукта и словарь кода — разные, и это намеренно.** Наружу (лендинг, тулбар,
-  метаданные, README-вступление) месяц — это **сезон**, распечатка — **постер**, недели —
-  серии, личные проекты — сюжетные линии, итоги — финал, идеи на следующий месяц — анонс.
-  Внутри (`Template`, «бланк», «шаблон», «слой заполнения», разделы про инварианты) термины
-  прежние: на них завязан главный инвариант, переименовывать их ради метафоры не нужно.
-  Новый текст для пользователя пишите в первом словаре, новый комментарий — во втором.
-- **Текст в интерфейсе — простой и однозначный, устройство сайта объясняется здесь, а не
-  на экране.** Развёрнутый стиль этого файла на пользовательские строки не
-  распространяется: в окне стоят заголовок из двух слов и одна фраза — вопрос («Вы
-  уверены, что хотите удалить сезон «X»?») или указание («Введите новое имя для сезона.»).
-  Ни «другой копии нет ни у вас, ни у нас», ни разбора всех веток: это содержание
-  CLAUDE.md. Метафор («постер живёт этой строкой») в UI тоже нет. Вторая фраза допустима
-  ровно тогда, когда без неё человек ответит не на тот вопрос, — как приписка у снятия с
-  витрины (`WITHDRAW_NOTE`), где «убрать» слишком похоже на «удалить».
-- Стили — только CSS Modules рядом с компонентом; цвета и шрифты — из `src/styles/tokens.css`.
-  Новый цвет заводится не литералом в модуле, а ролью в `tokens.css` — и значит
-  выводится из четырёх красок темы, как и все остальные.
-- `npm run lint` (oxlint) и `npm run build` (next build, он же тайпчекает) должны
-  проходить чисто.
-- В `tsconfig` включены `noUnusedLocals`/`noUnusedParameters`, но не `strict`.
-- Версии полей в моделях не храним: версия формата живёт в префиксе ссылки. Поле `v`
-  в документе не нужно.
+- **Comments are in English, the UI is in the dictionary.** There are no user-facing strings in the
+  markup at all: a new string is created in `src/i18n/dict/ru.ts` and translated into `en.ts` and
+  `pl.ts` by the same change (`npm run typecheck` will not let you forget). A comment explains
+  "why", it does not retell the code.
+- **The product's vocabulary and the code's vocabulary are different, and that is deliberate.**
+  Outward (the landing page, the toolbar, the metadata, the README introduction) a month is a
+  **season**, a printout is a **poster**, the weeks are episodes, personal projects are storylines,
+  the summary is the wrap-up and the ideas for next month are what is next up. Inside (`Template`,
+  "the blank", "the fill layer", the sections about the invariants) the terms are the old ones: the
+  main invariant is tied to them, and renaming them for the sake of a metaphor is not needed. Write
+  new text for the user in the first vocabulary and a new comment in the second.
+- **Text in the interface is simple and unambiguous; the site's workings are explained here, not on
+  screen.** The expansive style of this file does not extend to user-facing strings: a dialog has a
+  two-word heading and one phrase — a question ("Are you sure you want to delete the season "X"?")
+  or an instruction ("Enter a new name for the season."). Neither "there is no other copy, with you
+  or with us" nor a run-through of every branch: that is the content of CLAUDE.md. There are no
+  metaphors ("the poster lives in this row") in the UI either. A second phrase is allowed exactly
+  where without it a person would answer the wrong question — like the note on withdrawal from the
+  showcase (`WITHDRAW_NOTE`), where "take off" is too much like "delete".
+- Styles are CSS Modules next to the component only; colours and fonts come from
+  `src/styles/tokens.css`. A new colour is created not as a literal in a module but as a role in
+  `tokens.css` — and therefore derived from the theme's four paints, like all the others.
+- `npm run lint` (oxlint) and `npm run build` (next build, which also typechecks) must pass clean.
+- `noUnusedLocals`/`noUnusedParameters` are on in `tsconfig`, `strict` is not.
+- We do not store field versions in the models: the format version lives in the link prefix. A `v`
+  field in the document is not needed.
 
-## Сознательно не сделано
+## Deliberately not done
 
-- Нет редактирования слоя заполнения из интерфейса (клик по клетке настроения и т. п.) —
-  бланк заполняют на бумаге.
-- Нет загрузки фото: только пустое место под вклейку.
-- Нет добавления/удаления недель и секций — их состав фиксирован макетом.
+- There is no editing of the fill layer from the interface (clicking a mood cell and so on) — the
+  blank is filled in on paper.
+- There is no photo upload: only an empty space for gluing one in.
+- There is no adding or removing of weeks and sections — their composition is fixed by the layout.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

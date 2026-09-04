@@ -21,8 +21,8 @@
 
 @media print {
   .sheet {
-    /* Chrome кроит flex-контейнер, не влезающий на страницу, и раскидывает
-       детей по отдельным листам. */
+    /* Chrome slices a flex container that does not fit on a page and scatters
+       its children across separate sheets. */
     display: block;
     background: transparent;
     max-width: none;

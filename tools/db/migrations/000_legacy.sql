@@ -1,4 +1,4 @@
--- Схема базы. Идемпотентна: гоняется столько раз, сколько нужно.
+-- The database schema. Idempotent: runs as many times as needed.
 
 create table if not exists user_settings (
   account_key text primary key,

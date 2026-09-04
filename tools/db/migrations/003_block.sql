@@ -1,4 +1,4 @@
--- Блокировка публикации и уборка в жалобах.
+-- Closing a publication, and a clean-up in the reports.
 
 alter table public_seasons add column if not exists blocked_at timestamptz;
 alter table public_seasons add column if not exists block_note text;

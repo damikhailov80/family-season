@@ -1,4 +1,4 @@
-/* Собирается tools/icons/build.mjs (npm run icons) из tools/icons/source.json. */
+/* Built by tools/icons/build.mjs (npm run icons) from tools/icons/source.json. */
 
 export const ICON_VIEWBOX = 64
 

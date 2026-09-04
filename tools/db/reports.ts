@@ -7,7 +7,7 @@ import { dbTarget } from './target.mjs'
 
 const url = process.env.DATABASE_URL
 if (!url) {
-  console.error('Нет DATABASE_URL — положите строку подключения в .env.local (см. .env.example).')
+  console.error('No DATABASE_URL — put the connection string in .env.local (see .env.example).')
   process.exit(1)
 }
 
@@ -17,11 +17,11 @@ const code = flag ? args[args.indexOf(flag) + 1] : null
 const note = flag === '--block' ? args.slice(args.indexOf(flag) + 2).join(' ') || null : null
 
 if (flag && !code) {
-  console.error(`Не назван код: ${flag} <code>`)
+  console.error(`No code given: ${flag} <code>`)
   process.exit(1)
 }
 
-console.log(`База ${dbTarget(url)}.`)
+console.log(`Database ${dbTarget(url)}.`)
 
 const client = new pg.Client({ connectionString: url })
 try {
@@ -35,10 +35,10 @@ try {
       flag === '--block' ? [code, note] : [code],
     )
     if (!result.rowCount) {
-      console.error(`Нет публикации с кодом ${code} — закрывать нечего.`)
+      console.error(`No publication with code ${code} — nothing to close.`)
       process.exitCode = 1
     } else {
-      console.log(flag === '--block' ? `Закрыта /s/${code}.` : `Открыта заново /s/${code}.`)
+      console.log(flag === '--block' ? `Closed /s/${code}.` : `Reopened /s/${code}.`)
     }
   } else {
     const { rows } = await client.query(`
@@ -56,37 +56,37 @@ try {
        order by count(distinct r.reporter_key) desc, max(r.created_at) desc`)
 
     if (!rows.length) {
-      console.log('Жалоб нет.')
+      console.log('No reports.')
     } else {
       console.log(
-        `Публикаций с жалобами: ${rows.length}. Порог для разбора — ${REPORTS_TO_REVIEW}.\n`,
+        `Publications with reports: ${rows.length}. Review threshold — ${REPORTS_TO_REVIEW}.\n`,
       )
       for (const row of rows) {
         const state = !row.alive
-          ? 'удалена'
+          ? 'deleted'
           : row.blocked_at
-            ? 'закрыта'
+            ? 'closed'
             : row.hidden_at
-              ? 'снята автором'
-              : 'на витрине'
+              ? 'withdrawn by the author'
+              : 'on the showcase'
         const mark =
           row.alive && !row.blocked_at && row.reporters >= REPORTS_TO_REVIEW
-            ? ' ← порог пройден'
+            ? ' ← threshold passed'
             : ''
         console.log(
-          `/s/${row.code}  жалоб: ${row.reporters}  избранное: ${row.favorites}  ${state}${mark}`,
+          `/s/${row.code}  reports: ${row.reporters}  favourites: ${row.favorites}  ${state}${mark}`,
         )
-        console.log(`  тема: ${ideaTitle(joinSeason(row.content, []), knownLang(row.language))}`)
-        console.log(`  автор: ${row.author_key}`)
-        console.log(`  последняя: ${row.last_report.toISOString().slice(0, 16).replace('T', ' ')}`)
-        console.log(`  жалобы: ${row.comments}`)
-        if (row.block_note) console.log(`  закрыта потому что: ${row.block_note}`)
+        console.log(`  theme: ${ideaTitle(joinSeason(row.content, []), knownLang(row.language))}`)
+        console.log(`  author: ${row.author_key}`)
+        console.log(`  latest: ${row.last_report.toISOString().slice(0, 16).replace('T', ' ')}`)
+        console.log(`  reports: ${row.comments}`)
+        if (row.block_note) console.log(`  closed because: ${row.block_note}`)
         console.log()
       }
     }
   }
 } catch (error) {
-  console.error(`Не вышло${error?.code ? ` (${error.code})` : ''}: ${error?.message ?? error}`)
+  console.error(`Failed${error?.code ? ` (${error.code})` : ''}: ${error?.message ?? error}`)
   process.exitCode = 1
 } finally {
   await client.end().catch(() => {})

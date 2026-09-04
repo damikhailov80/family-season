@@ -6,11 +6,11 @@ import { dbTarget } from './target.mjs'
 
 const url = process.env.DATABASE_URL
 if (!url) {
-  console.error('Нет DATABASE_URL — положите строку подключения в .env.local (см. .env.example).')
+  console.error('No DATABASE_URL — put the connection string in .env.local (see .env.example).')
   process.exit(1)
 }
 
-console.log(`База ${dbTarget(url)}, сезонов в реестре: ${EXAMPLE_LIST.length}.`)
+console.log(`Database ${dbTarget(url)}, seasons in the registry: ${EXAMPLE_LIST.length}.`)
 
 const client = new pg.Client({ connectionString: url })
 try {
@@ -53,9 +53,9 @@ try {
        greatest((select max(id) from public_seasons), 1)
      )`,
   )
-  console.log(`Системных сезонов в базе: ${EXAMPLE_LIST.length}.`)
+  console.log(`System seasons in the database: ${EXAMPLE_LIST.length}.`)
 } catch (error) {
-  console.error(`Не вышло${error?.code ? ` (${error.code})` : ''}: ${error?.message ?? error}`)
+  console.error(`Failed${error?.code ? ` (${error.code})` : ''}: ${error?.message ?? error}`)
   process.exitCode = 1
 } finally {
   await client.end().catch(() => {})

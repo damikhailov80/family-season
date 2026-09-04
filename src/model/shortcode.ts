@@ -23,7 +23,7 @@ function mix(value: number, round: number, key: number): number {
 
 export function shortCode(kind: CodeKind, id: number): string {
   if (!Number.isInteger(id) || id < 0 || id >= CODE_SPACE) {
-    throw new RangeError(`id ${id} не укладывается в шестизначный код`)
+    throw new RangeError(`id ${id} does not fit into a six-character code`)
   }
 
   let left = Math.floor(id / HALF)

@@ -111,10 +111,10 @@ const LANGS = ['ru', 'en', 'pl']
 
 for (const { id, label } of source) {
   if (!label || typeof label !== 'object') {
-    throw new Error(`тема «${id}»: подпись должна быть объектом {ru, en, pl}`)
+    throw new Error(`palette "${id}": the label must be an object {ru, en, pl}`)
   }
   const missing = LANGS.filter((lang) => !label[lang])
-  if (missing.length) throw new Error(`тема «${id}»: нет подписи на ${missing.join(', ')}`)
+  if (missing.length) throw new Error(`palette "${id}": no label in ${missing.join(', ')}`)
 }
 
 const quote = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
@@ -126,15 +126,15 @@ const cssBlocks = source.map(({ id, label, colors }) => {
     ...onPaints.map((value, i) => `  --on-c${i + 1}: ${value};`),
     ...darks.map((hex, i) => `  --d${i + 1}: ${hex};`),
   ]
-  return `/* ${label.ru} */\n[data-palette='${id}'] {\n${lines.join('\n')}\n}`
+  return `/* ${label.en} */\n[data-palette='${id}'] {\n${lines.join('\n')}\n}`
 })
 
-const css = `/* Собирается tools/palettes/build.mjs (npm run palettes) из tools/palettes/source.json. */
+const css = `/* Built by tools/palettes/build.mjs (npm run palettes) from tools/palettes/source.json. */
 
 ${cssBlocks.join('\n\n')}
 `
 
-const ts = `/* Собирается tools/palettes/build.mjs (npm run palettes) из tools/palettes/source.json. */
+const ts = `/* Built by tools/palettes/build.mjs (npm run palettes) from tools/palettes/source.json. */
 
 export const PALETTES = [
 ${source.map(({ id, label }) => `  ['${id}', { ${LANGS.map((lang) => `${lang}: ${quote(label[lang])}`).join(', ')} }],`).join('\n')}
@@ -147,4 +147,4 @@ ${source.map(({ id, label }) => `  ['${id}', { ${LANGS.map((lang) => `${lang}: $
 writeFileSync(resolve(root, 'src/styles/palettes.css'), css)
 writeFileSync(resolve(root, 'src/model/palettes.data.ts'), ts)
 
-console.log(`${source.length} тем: src/styles/palettes.css, src/model/palettes.data.ts`)
+console.log(`${source.length} palettes: src/styles/palettes.css, src/model/palettes.data.ts`)

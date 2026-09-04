@@ -1,4 +1,4 @@
-/* Собирается tools/qr/build.ts (npm run qr) из tools/qr/source.json. */
+/* Built by tools/qr/build.ts (npm run qr) from tools/qr/source.json. */
 
 export const QR_URL = 'https://www.familyseason.online/'
 

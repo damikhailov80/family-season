@@ -7,8 +7,8 @@ import { dbTarget } from './target.mjs'
 const url = process.env.DATABASE_URL
 if (!url) {
   console.error(
-    'Нет DATABASE_URL. Для локальной базы положите строку подключения в .env.local' +
-      ' (см. .env.example), для прода — запустите с `node --env-file=<файл>`.',
+    'No DATABASE_URL. For a local database put the connection string in .env.local' +
+      ' (see .env.example); for production run with `node --env-file=<file>`.',
   )
   process.exit(1)
 }
@@ -21,7 +21,7 @@ const steps = readdirSync(dir)
   .filter((name) => name.endsWith('.sql'))
   .sort()
 
-console.log(`База ${dbTarget(url)}, шагов в папке: ${steps.length}`)
+console.log(`Database ${dbTarget(url)}, steps in the folder: ${steps.length}`)
 
 const client = new pg.Client({ connectionString: url })
 try {
@@ -40,9 +40,9 @@ try {
 
   if (statusOnly) {
     for (const name of steps) console.log(`${applied.has(name) ? '✓' : '·'} ${name}`)
-    console.log(pending.length ? `Осталось: ${pending.length}` : 'Всё накатано.')
+    console.log(pending.length ? `Pending: ${pending.length}` : 'Everything is applied.')
   } else if (!pending.length) {
-    console.log('Нечего катить — база в актуальном состоянии.')
+    console.log('Nothing to apply — the database is up to date.')
   } else {
     for (const name of pending) {
       console.log(`→ ${name}`)
@@ -56,10 +56,10 @@ try {
         throw error
       }
     }
-    console.log(`Накатано шагов: ${pending.length}.`)
+    console.log(`Steps applied: ${pending.length}.`)
   }
 } catch (error) {
-  console.error(`Не вышло${error?.code ? ` (${error.code})` : ''}: ${error?.message ?? error}`)
+  console.error(`Failed${error?.code ? ` (${error.code})` : ''}: ${error?.message ?? error}`)
   process.exitCode = 1
 } finally {
   await client.end().catch(() => {})

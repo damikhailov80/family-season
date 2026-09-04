@@ -10,11 +10,13 @@ export function testAccountKey(name: string): string {
 export async function signIn(context: BrowserContext, accountKey: string): Promise<void> {
   const secret = process.env.AUTH_SECRET
   if (!secret) {
-    throw new Error('Нет AUTH_SECRET — без него куку сессии не выписать (см. .env.example).')
+    throw new Error(
+      'No AUTH_SECRET — the session cookie cannot be issued without it (see .env.example).',
+    )
   }
 
   const value = await encode({
-    token: { accountKey, name: 'Тест', email: 'e2e@example.test' },
+    token: { accountKey, name: 'Test', email: 'e2e@example.test' },
     secret,
     salt: COOKIE,
   })

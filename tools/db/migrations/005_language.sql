@@ -1,4 +1,4 @@
--- Языки: русский, английский, польский.
+-- Languages: Russian, English, Polish.
 
 alter table user_settings  add column if not exists language text not null default 'ru';
 alter table user_seasons   add column if not exists language text not null default 'ru';

@@ -95,7 +95,8 @@ function Row({
             href={
               kind === 'seasons'
                 ? seasonHref(lang, entry.code)
-                : // Публикация живёт только в своём языке: у отложенного и
+                : // A publication lives only in its own language, and a favourited or
+                  // published one may well be in someone else's.
                   publicSeasonHref(entry.lang, entry.code)
             }
           >

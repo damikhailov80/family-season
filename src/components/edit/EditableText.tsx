@@ -48,8 +48,8 @@ export function EditableText({
   const [full, setFull] = useState(false)
   const Tag = as as React.ElementType
 
-  // Узел неконтролируемый: пиши React текст в children — каретка прыгала бы
-  // в начало на каждом символе.
+  // The node is uncontrolled: render the text into children and the caret jumps
+  // back to the start on every keystroke.
   useEffect(() => {
     const node = ref.current
     if (!node || !editing) return

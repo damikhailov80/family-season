@@ -2,14 +2,14 @@ import { test, expect } from '../fixtures'
 import { DICTS } from '../../src/i18n/dict'
 
 /*
- * CLAUDE.md → «Языки».
+ * CLAUDE.md → "Languages".
  *
- * Сознательно не покрыто: выбор языка по `Accept-Language` на голом `/`,
- * запоминание языка кукой между заходами, язык сезона против языка интерфейса
- * на чужом выложенном постере.
+ * Deliberately not covered: picking the language from `Accept-Language` on a bare
+ * `/`, remembering the language in a cookie between visits, and the season's
+ * language against the interface language on someone else's published poster.
  */
-test.describe('смена языка', () => {
-  test('переключатель уводит на тот же адрес и не теряет ни query, ни сессию', async ({
+test.describe('switching the language', () => {
+  test('the switcher goes to the same address and loses neither the query nor the session', async ({
     signedIn: page,
   }) => {
     await page.goto('/ru/seasons?tab=published')
