@@ -217,7 +217,7 @@ export const pl: Dict = {
       'Drukuje się zawsze czysty plakat: skale na zerze, kratki nastrojów puste, pola na notatki wolne. Resztę wpisze sam miesiąc, odręcznie.',
 
     examplesLabel: 'Przykłady planów rodzinnych',
-    examplesNote: 'cztery sezony, każdy inny',
+    examplesNote: 'każdy inny',
     exampleOpen: 'Otwórz przykład →',
     examplesAsideTitle: 'Weźcie za podstawę',
     examplesAsideText:

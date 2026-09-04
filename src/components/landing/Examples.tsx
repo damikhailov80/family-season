@@ -1,4 +1,4 @@
-import { examplesFor } from '../../model/examples'
+import { landingExamples } from '../../model/examples'
 import { getDict, getLang } from '../../i18n/server'
 import { AvatarFace } from '../AvatarFace'
 import { SectionBox } from '../SectionBox'
@@ -19,7 +19,7 @@ export async function Examples() {
       className={styles.section}
     >
       <div className={styles.grid}>
-        {examplesFor(lang).map((example) => (
+        {landingExamples(lang).map((example) => (
           <a className={styles.card} key={example.key} href={example.href}>
             <div className={styles.faces}>
               {example.faces.map((face, index) => (
