@@ -10,10 +10,7 @@ const MOOD_CODES: Record<string, MoodValue> = {
   '.': null,
 }
 
-/**
- * Разворачивает код настроений ('ggy...') в массив ровно на число дней месяца.
- * Лишнее обрезается, недостающее остаётся пустыми клетками — их заполняют руками.
- */
+/** Лишнее обрезается, недостающее остаётся пустыми клетками — их заполняют руками. */
 export function moodValues(code: string | undefined, days: number): MoodValue[] {
   const values = [...(code ?? '')].map((char) => MOOD_CODES[char] ?? null)
   return Array.from({ length: days }, (_, index) => values[index] ?? null)

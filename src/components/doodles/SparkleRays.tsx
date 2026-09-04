@@ -3,7 +3,6 @@ interface DoodleProps {
   className?: string
 }
 
-/** Три коротких «луча» — жёлтые штрихи по бокам заголовка. */
 export function SparkleRays({ size = 34, className }: DoodleProps) {
   return (
     <svg

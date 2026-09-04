@@ -7,15 +7,9 @@ import { DEFAULT_FAMILY, normalizeFamily, type FamilyPreset } from '../model/fam
 import { langOrNull, type Lang } from '../model/lang'
 
 /**
- * Настройки аккаунта: состав семьи для новых постеров и язык интерфейса.
- *
  * Ни одна страница не имеет права сломаться из-за настроек: `readFamily`
- * возвращает `null` и когда человек не вошёл, и когда база не ответила.
- *
- * Кабинету одного `null` мало — ему нужна причина, и `familyState` её даёт.
- * Отказ базы приезжает статусом `error`: страница показывает тост и **пустоту
- * на месте данных**. Умолчание вместо настоящих настроек показывать нельзя —
- * это враньё, а «Сохранить» поверх него затёр бы то, чего мы не прочитали.
+ * возвращает `null` и когда человек не вошёл, и когда база не ответила. Кабинету
+ * одного `null` мало — ему нужна причина, и `familyState` её даёт.
  */
 
 interface Row {
@@ -29,9 +23,8 @@ const SELECT =
   'select family, language, consent, consent_version from user_settings where account_key = $1'
 
 /**
- * Строка настроек читается **одна на запрос** и разными потребителями: шапке
- * нужен язык, кабинету — и то и другое, `createSeason` — состав. Отсюда общий
- * кэшируемый читатель, а `readFamily`/`readLanguage` — только выборка поля.
+ * Строка читается одна на запрос и разными потребителями: шапке нужен язык,
+ * кабинету — и то и другое, `createSeason` — состав.
  */
 const readSettings = cache(async (): Promise<Row | null> => {
   const session = await auth()
@@ -44,10 +37,8 @@ const readSettings = cache(async (): Promise<Row | null> => {
 })
 
 /**
- * `cache` из React, а не наша память: за один запрос состав спрашивают и шапка
- * (ей строить ссылку «Новый сезон»), и страница кабинета — а запрос в базу
- * должен уйти один. Между запросами кэш не живёт, и это правильно: настройку
- * могли сменить в соседней вкладке.
+ * `cache` из React, а не наша память: между запросами он не живёт, и это
+ * правильно — настройку могли сменить в соседней вкладке.
  */
 export const readFamily = cache(async (): Promise<FamilyPreset | null> => {
   const row = await readSettings()
@@ -55,12 +46,9 @@ export const readFamily = cache(async (): Promise<FamilyPreset | null> => {
 })
 
 /**
- * Язык из настроек — или `null`, если строки настроек нет вовсе.
- *
- * `null` здесь значит **«человек язык ещё не выбирал»**, а не «язык русский», и
- * разница важна: по `null` корневой лейаут понимает, что настройку пора завести
- * (`rememberLanguage`), и записывает тот язык, который определился по браузеру.
- * Подмени мы его умолчанием — определение никогда бы не сохранилось.
+ * `null` значит «человек язык ещё не выбирал», а не «язык русский»: по нему
+ * лейаут понимает, что настройку пора завести (`rememberLanguage`). Подмени мы
+ * его умолчанием — определение по браузеру никогда бы не сохранилось.
  */
 export const readLanguage = cache(async (): Promise<Lang | null> => {
   const row = await readSettings()
@@ -68,12 +56,9 @@ export const readLanguage = cache(async (): Promise<Lang | null> => {
 })
 
 /**
- * Согласие на аналитику — или `null`, если его ещё не спрашивали.
- *
- * `null` здесь, как и у языка, значит **«не спрашивали»**, а не «запрещено»: по
- * нему баннер понимает, что вопрос ещё не задан. Записанная версия старше
- * текущей читается тем же `null` — согласие на прежний набор целей новым целям
- * не указ (см. `CONSENT_VERSION`).
+ * `null`, как и у языка, значит «не спрашивали», а не «запрещено». Записанная
+ * версия старше текущей читается тем же `null`: согласие на прежний набор целей
+ * новым целям не указ (см. `CONSENT_VERSION`).
  */
 export const readConsentSetting = cache(async (): Promise<Consent | null> => {
   const row = await readSettings()
@@ -81,18 +66,14 @@ export const readConsentSetting = cache(async (): Promise<Consent | null> => {
 })
 
 /**
- * Почему настроек может не быть.
- *
- * `stale` — человек вошёл, но в его токене нет `accountKey`: сессия выпущена
- * до того, как ключ появился. Привязать настройки не к чему, лечится входом
- * заново (см. комментарий в `auth.ts`).
- *
- * `error` — сервер не смог. Причин у этого две (`DATABASE_URL` не задан и база
- * не ответила), но **наружу они не разводятся**: человеку от разницы никакой
- * пользы, а разбираться в ней по строке `db.ts` в логе, где лежит и код
- * Postgres, и стек. Наружу — один статус и один тост.
+ * `stale` — человек вошёл, но в токене нет `accountKey`: сессия выпущена до того,
+ * как ключ появился, лечится входом заново (см. `auth.ts`). `error` — сервер не
+ * смог; две его причины наружу не разводятся, разбираются они по логу `db.ts`.
  */
 export type FamilyStatus = 'anonymous' | 'stale' | 'error' | 'ok'
+
+/** `unnamed` отдельно от `error`: сервер в порядке, чинит это человек. */
+export type SaveFamilyStatus = Exclude<FamilyStatus, 'ok'> | 'unnamed'
 
 export type FamilyState =
   | { status: 'anonymous' | 'stale' | 'error' }
@@ -104,8 +85,7 @@ export async function familyState(): Promise<FamilyState> {
   if (!session?.user) return { status: 'anonymous' }
   if (!session.accountKey) return { status: 'stale' }
 
-  // Метка своя: тем же запросом ходит `readFamily`, и в логе их надо различать —
-  // одну строку никто не заметит, вторая оборачивается тостом у человека.
+  // Метка своя: тем же запросом ходит `readFamily`, и в логе их надо различать.
   const result = await query<Row>('settings:read:account', SELECT, [session.accountKey])
   if (result.status !== 'ok') return { status: 'error' }
   const row = result.rows[0]
@@ -117,7 +97,6 @@ export async function familyState(): Promise<FamilyState> {
   }
 }
 
-/** Записывает состав и возвращает, что из этого вышло. */
 export async function writeFamily(family: FamilyPreset): Promise<FamilyStatus> {
   const session = await auth()
   if (!session?.user) return 'anonymous'
@@ -132,8 +111,7 @@ export async function writeFamily(family: FamilyPreset): Promise<FamilyStatus> {
   )
   if (result.status === 'ok') return 'ok'
 
-  // Чей именно состав пропал, из лога `db.ts` не видно: там операция, но не
-  // владелец. Ключ непрозрачный, тот же, что лежит в базе, — ни имени, ни почты.
+  // Ключ непрозрачный, тот же, что в базе: ни имени, ни почты в логе не будет.
   logger.error('family settings not saved', {
     accountKey: session.accountKey,
     reason: result.status,
@@ -142,13 +120,10 @@ export async function writeFamily(family: FamilyPreset): Promise<FamilyStatus> {
 }
 
 /**
- * Записывает язык. Отдельным оператором, а не рядом с составом: общий upsert
- * пришлось бы звать с обоими значениями сразу, и тот, кто менял язык, затирал
- * бы состав семьи прочитанным до правки — а прочитать его мог и не успеть.
- *
- * Состав в этой вставке всё же есть: строки настроек могло не быть вовсе, а
- * колонка `family` объявлена `not null`. Кладём в неё умолчание — ровно то, что
- * и так подставляется новому сезону, пока человек не собрал свой состав.
+ * Отдельным оператором, а не рядом с составом: общий upsert пришлось бы звать с
+ * обоими значениями сразу, и меняющий язык затирал бы состав прочитанным до
+ * правки. Состав в этой вставке всё же есть — строки настроек могло не быть
+ * вовсе, а колонка `family` объявлена `not null`.
  */
 export async function writeLanguage(language: Lang): Promise<FamilyStatus> {
   const session = await auth()
@@ -172,12 +147,9 @@ export async function writeLanguage(language: Lang): Promise<FamilyStatus> {
 }
 
 /**
- * Записывает согласие — тем же складом, что и язык, и по той же причине:
- * общий upsert затирал бы соседнюю настройку значением, прочитанным до правки.
- *
- * Пишутся все три колонки разом: ответ без версии и даты — не доказательство
- * согласия, а просто слово. `consent_at` берётся из `now()` базы, а не из
- * браузера: дату согласия нельзя брать с часов того, кто соглашается.
+ * Свой оператор — по той же причине, что у языка. Пишутся все три колонки разом:
+ * ответ без версии и даты — не доказательство согласия, а просто слово, и
+ * `consent_at` берётся из `now()` базы, а не с часов того, кто соглашается.
  */
 export async function writeConsent(consent: Consent): Promise<FamilyStatus> {
   const session = await auth()

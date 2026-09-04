@@ -9,14 +9,8 @@ import { readUserSeason } from '../../../../server/userSeasons'
 import { OwnSeason } from './OwnSeason'
 
 /**
- * Общая часть двух страниц своего сезона — просмотра и правки. Режим несёт путь,
- * поэтому страниц две, а различаются они одним флагом.
- *
- * Невошедшего уводим в кабинет: там объяснено, зачем вход, и стоит кнопка. Голый
- * 404 на своей же закладке был бы честным, но бесполезным.
- *
- * Чужой и выдуманный код неразличимы намеренно: по ответу не должно быть видно,
- * существует ли чужой сезон.
+ * Невошедшего уводим в кабинет: там объяснено, зачем вход. Чужой и выдуманный код
+ * неразличимы намеренно — по ответу не должно быть видно, существует ли сезон.
  */
 export async function OwnSeasonPage({ code, editing }: { code: string; editing: boolean }) {
   const state = await readUserSeason(code)
@@ -27,15 +21,13 @@ export async function OwnSeasonPage({ code, editing }: { code: string; editing: 
     const { pages } = await getDict()
     return <Toast message={pages.ownError} />
   }
-  /* Личная ссылка приезжает уже кодом: собирает его сервер, а печатает лист. */
   return <OwnSeason season={state.season} editing={editing} share={sharedLink(state.season)} />
 }
 
-/** Название сезона в заголовке вкладки: у человека их сто, и они разные. */
 export async function seasonMetadata(code: string) {
   const state = await readUserSeason(code)
   const { pages } = await getDict()
-  // Запасное имя — на языке интерфейса: сезона мы не нашли, и его языка не знаем.
+  // Запасное имя — языком интерфейса: сезона не нашли, и его языка не знаем.
   const title = state.status === 'ok' ? state.season.title : posterText(await getLang()).untitled
   return { title: fill(pages.ownTitle, { title }) }
 }

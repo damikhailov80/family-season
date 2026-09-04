@@ -5,10 +5,7 @@ import { SectionBox } from '../SectionBox'
 import { NewSeasonAction } from '../site/NewSeasonAction'
 import styles from './Examples.module.css'
 
-/**
- * Карточки примеров — свои у каждого языка: содержимое примеров переведено
- * целиком, и это три разные строки витрины, а не один сезон с подписями.
- */
+/** Карточки свои у каждого языка: это три разные строки витрины. */
 export async function Examples() {
   const lang = await getLang()
   const { landing } = await getDict()
@@ -22,11 +19,8 @@ export async function Examples() {
       className={styles.section}
     >
       <div className={styles.grid}>
-        {/*
-          Ссылки в постер — обычные <a>, а не next/link: страницы постера клиентские и
-          тянут за собой свой кусок бандла, так что мягкий переход выигрывает немного, а
-          свежий документ надёжнее — на нём точно не останется состояния лендинга.
-        */}
+        {/* Ссылки в постер — обычные <a>, а не next/link: страницы постера
+            клиентские, мягкий переход выигрывает мало, а свежий документ надёжнее. */}
         {examplesFor(lang).map((example) => (
           <a className={styles.card} key={example.key} href={example.href}>
             <div className={styles.faces}>

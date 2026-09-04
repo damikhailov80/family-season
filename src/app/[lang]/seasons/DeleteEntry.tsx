@@ -9,14 +9,9 @@ import { dropEntry } from '../../../server/actions'
 import styles from './page.module.css'
 
 /**
- * Удаление строки из библиотеки — с подтверждением.
- *
- * Клиентский компонент по той же причине, что и `FamilyEditor`: без JS
- * подтверждение стоило бы отдельного экрана и лишнего перехода. Сам список при
- * этом остаётся серверным — клиентская здесь одна кнопка.
- *
- * Спрашиваем не для порядка: другой копии сезона у сайта нет, и если ссылка на
- * него больше нигде не осталась, постер пропадает совсем.
+ * Клиентский по той же причине, что и `FamilyEditor`: без JS подтверждение стоило
+ * бы отдельного экрана. Спрашиваем не для порядка — другой копии сезона нет ни у
+ * нас, ни у человека.
  */
 export function DeleteEntry({ code, title, back }: { code: string; title: string; back: string }) {
   const [open, setOpen] = useState(false)
@@ -43,8 +38,7 @@ export function DeleteEntry({ code, title, back }: { code: string; title: string
               <button type="button" className={dialogStyles.ghost} onClick={() => setOpen(false)}>
                 {dialogs.cancel}
               </button>
-              {/* Действие серверное: аргументы привязаны, но проверяются заново —
-                  привязка уезжает в браузер и возвращается оттуда. */}
+              {/* Привязанные аргументы уезжают в браузер и проверяются заново. */}
               <form action={dropEntry.bind(null, code, back, lang)}>
                 <button type="submit" className={dialogStyles.primary}>
                   {seasons.removeAction}

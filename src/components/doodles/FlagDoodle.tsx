@@ -9,12 +9,7 @@ interface DoodleProps {
   strokeWidth?: number
 }
 
-/**
- * «Флажок» из библиотеки рисунков — кнопка жалобы. Геометрия уехала в
- * `icons.generated.ts`, там же её берут наборы постера, и держать вторую копию
- * было бы верным способом их развести. В наборы сам этот доодл не входит: у
- * сайта рисунки свои и от набора постера не зависят.
- */
+/** Обёртка над `Icon`: геометрия живёт в одном месте — `icons.generated.ts`. */
 export function FlagDoodle({ size = 24, className, filled, strokeWidth }: DoodleProps) {
   return (
     <Icon name="flag" size={size} className={className} filled={filled} strokeWidth={strokeWidth} />

@@ -3,10 +3,7 @@ import { SectionBox } from '../SectionBox'
 import { FamilyIcon, FridgeDoodle, PenDoodle, PrinterDoodle } from '../doodles'
 import styles from './Steps.module.css'
 
-/**
- * Рисунки живут здесь, а слова — в словаре: перевод не имеет права переставить
- * доодлы, а порядок шагов один и тот же на всех языках.
- */
+/** Рисунки здесь, а слова в словаре: перевод не имеет права переставить доодлы. */
 const DOODLES = [
   { Doodle: FamilyIcon, size: 54 },
   { Doodle: PrinterDoodle, size: 50 },

@@ -2,15 +2,8 @@ import { SITE_QR, type QrMatrix } from '../model/qr'
 import styles from './QrCode.module.css'
 
 /**
- * QR-код постера — inline SVG, как и все остальные рисунки проекта: растровых
- * картинок в макете нет, а вектор печатается без ступенек на любом масштабе
- * (лист печатают минимум на A3).
- *
- * Что в коде зашито, решает не он: матрица приходит готовой. По умолчанию это
- * постоянный код сайта (`npm run qr`, см. tools/qr/build.ts), а у своего сезона
- * с выданной личной ссылкой — код этой ссылки, собранный сервером.
- *
- * Размера здесь нет: его задаёт место, куда код поставили.
+ * Что в коде зашито, решает не он: матрица приходит готовой. Размера здесь тоже
+ * нет — его задаёт место, куда код поставили.
  */
 export function QrCode({ code = SITE_QR, className }: { code?: QrMatrix; className?: string }) {
   return (
@@ -22,7 +15,7 @@ export function QrCode({ code = SITE_QR, className }: { code?: QrMatrix; classNa
       role="img"
       aria-label={code.url.replace(/^https:\/\/(www\.)?|\/$/g, '')}
     >
-      {/* Белая подложка нужна и на экране, и на бумаге: код читается по контрасту. */}
+      {/* Белая подложка нужна и на экране, и на бумаге: код читают по контрасту. */}
       <rect className={styles.paper} width={code.size} height={code.size} />
       <path className={styles.modules} d={code.path} />
     </svg>

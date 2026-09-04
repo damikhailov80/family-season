@@ -5,16 +5,9 @@ import type { Person, Template } from './types'
 import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
 
 /**
- * Формат бланка: `pack` — позиционный массив, `unpack` — обратно, а
- * `normalizeTemplate` приводит к нему что угодно пришедшее снаружи (строку из
- * базы, запись из `localStorage`, аргумент серверного действия).
- *
- * Имена полей в формат не входят: **порядок элементов и есть формат**, и первым
- * элементом стоит его версия. Меняете состав `Template` — поднимайте версию и
- * учите `unpack` читать прежний вид: в базе лежат сезоны, собранные раньше.
- *
- * Сжатия и base64 здесь больше нет: они были нужны, только пока бланк ехал в
- * адресной строке. В базу едет тот же массив, но как `jsonb`.
+ * Порядок элементов и есть формат, первым стоит его версия. Меняете состав
+ * `Template` — поднимайте версию и учите `unpack` читать прежний вид: в базе
+ * лежат сезоны, собранные раньше.
  */
 
 /** id человека не печатается: его длину диктует не макет, а компактность ссылки. */
@@ -61,7 +54,7 @@ export function pack(template: Template): Packed {
   ]
 }
 
-/** Позиции полей совпадают у всех форматов — лишние хвосты просто игнорируются. */
+/** Позиции полей совпадают у всех версий — лишние хвосты игнорируются. */
 export function unpack(packed: Packed): Template {
   const [, header, theme, weeksNote, weeks, projectsNote, goal, people] = packed
   return normalizeTemplate({
@@ -88,14 +81,12 @@ export function unpack(packed: Packed): Template {
 }
 
 /**
- * Предел у каждого поля свой (`src/model/limits.ts`) и здесь обязателен: ссылку мог
- * поправить кто угодно, а руками вписанные три сотни символов в поле на 16 разносят
- * вёрстку ровно так же, как набранные в правке.
+ * Предел здесь обязателен: вписанные снаружи три сотни символов в поле на 16
+ * разносят вёрстку ровно так же, как набранные в правке.
  */
 function text(value: unknown, limit: number, fallback = ''): string {
   if (typeof value !== 'string') return fallback
-  // Поля бланка однострочные: правленая руками ссылка не должна приносить
-  // переводы строк, которыми лист растягивается на лишние печатные страницы.
+  // Поля бланка однострочные: переводы строк растягивают лист на лишние страницы.
   return value.replace(/\s*\n+\s*/g, ' ').slice(0, limit)
 }
 
@@ -104,7 +95,6 @@ function int(value: unknown, fallback: number, min: number, max: number): number
   return Math.min(max, Math.max(min, parsed))
 }
 
-/** Приводит что угодно к корректному шаблону: ссылку мог поправить кто угодно. */
 export function normalizeTemplate(input: unknown): Template {
   const raw = (input ?? {}) as Record<string, unknown>
   const header = (raw.header ?? {}) as Record<string, unknown>

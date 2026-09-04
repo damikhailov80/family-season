@@ -5,7 +5,6 @@ import styles from './SectionBox.module.css'
 interface SectionBoxProps {
   accent: AccentSlot
   label?: string
-  /** Подпись справа от плашки (курсивом, как на макете). */
   note?: React.ReactNode
   children: React.ReactNode
   className?: string
@@ -15,10 +14,7 @@ interface SectionBoxProps {
   id?: string
 }
 
-/**
- * Каркас почти всех блоков макета: скруглённый бокс с цветной рамкой и
- * плашкой-заголовком, наезжающей на верхнюю границу.
- */
+/** Каркас почти всех блоков макета — и листа, и лендинга. */
 export function SectionBox({
   accent,
   label,

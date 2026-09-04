@@ -28,7 +28,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: seasons.title, description: seasons.description }
 }
 
-/** Что показать: свои сезоны, отложенное чужое или своё выложенное. */
 type Tab = 'seasons' | 'favorites' | 'published'
 
 const TABS: Tab[] = ['seasons', 'favorites', 'published']
@@ -42,9 +41,8 @@ function tabLabel(kind: Tab, dict: Dict): string {
 }
 
 /**
- * Поиск и сортировка живут в адресе, а не в состоянии React. Так их можно
- * переслать и перезагрузить, страница остаётся серверной, и всё работает без JS.
- * Умолчания в адрес не пишем — короткий `/seasons` должен оставаться коротким.
+ * Поиск и сортировка живут в адресе, а не в состоянии React: их можно переслать и
+ * перезагрузить, а страница остаётся серверной. Умолчания в адрес не пишем.
  */
 function listHref(lang: Lang, kind: Tab, search: string, sort: LibrarySort): string {
   const params = new URLSearchParams()
@@ -56,10 +54,7 @@ function listHref(lang: Lang, kind: Tab, search: string, sort: LibrarySort): str
   return query ? `${base}?${query}` : base
 }
 
-/**
- * Строка списка. Оба списка сводятся к ней заранее: свои сезоны лежат теперь в
- * своей таблице и адресуются кодом, отложенное чужое — пока по-старому адресом.
- */
+/** Все три вкладки сводятся к одной строке заранее. */
 interface RowData {
   code: string
   title: string
@@ -72,7 +67,6 @@ interface RowData {
   hidden?: boolean
   /** Только у своих публикаций: закрыта после разбора жалоб. */
   blocked?: boolean
-  /** Только у своих публикаций: что они собрали у людей. */
   likes?: number
   favorites?: number
   forks?: number
@@ -94,8 +88,7 @@ function Row({
   const { seasons } = dict
   return (
     <li className={styles.entry}>
-      {/* Четыре сектора темы — тот же образец, что на кнопке переключателя:
-          по одной краске набор не узнать. */}
+      {/* Четыре сектора: по одной краске набор не узнать. */}
       <span
         className={styles.ink}
         data-palette={entry.palette}
@@ -128,8 +121,6 @@ function Row({
               : seasons.publishedAt}{' '}
           {savedOn(entry.savedAt, lang)}
           {entry.month ? ` · ${entry.month}` : ''}
-          {/* Снятое с витрины остаётся в избранном и открывается по ссылке —
-              но сказать об этом надо: в «Идеях» его больше нет. */}
           {/* Разделитель — снаружи пометки: у `.offStage` `display: inline-flex`,
               а флекс-контейнер срезает ведущий пробел внутри себя. */}
           {(entry.blocked || entry.hidden) && ' · '}
@@ -140,12 +131,8 @@ function Row({
           )}
         </span>
         {/* Числа автору показываем всегда, включая нули: это его собственные
-            данные, а не оценка. «В избранном» стоит рядом не для красоты —
-            именно оно решает, исчезнет публикация при снятии или спрячется.
-
-            Своей строкой и одинаковыми парами «слово: число»: в общей подписи
-            они собирались в хвост из даты, месяца, сердца и двух разных по
-            складу фраз, а сердце вдобавок сбивало числу базовую линию. */}
+            данные, а не оценка. Своей строкой и одинаковыми парами «слово: число» —
+            в общей подписи они собирались в неопрятный хвост. */}
         {kind === 'published' && (
           <span className={styles.entryStats}>
             {fill(seasons.statLikes, { n: entry.likes ?? 0 })} ·{' '}
@@ -161,14 +148,11 @@ function Row({
             <DeleteEntry code={entry.code} title={entry.title} back={back} />
           </>
         )}
-        {/* Убрать закладку — не удаление: сам сезон никуда не денется, и
-            спрашивать подтверждение не о чем. */}
+        {/* Убрать закладку — не удаление: подтверждать нечего. */}
         {kind === 'favorites' && (
           <UnfavoriteEntry code={entry.code} title={entry.title} back={back} />
         )}
-        {/* Мегафон, как на самом сезоне: нажат — сезон на витрине и его можно
-            снять, отжат — снят, и его можно вернуть. Нет кнопки только у
-            закрытого после жалоб: там решает не автор. */}
+        {/* Кнопки нет только у закрытого после жалоб: там решает не автор. */}
         {kind === 'published' && !entry.blocked && (
           <ShowcaseEntry
             code={entry.code}
@@ -184,15 +168,11 @@ function Row({
 }
 
 /**
- * Кабинет открыт только вошедшим. Проверка стоит прямо здесь, в серверном
- * компоненте, а не в `proxy.ts`: это и есть проверка у источника данных, а
- * прокси по документации Next — лишь оптимистичная догадка и рубежом защиты
- * быть не может.
+ * Проверка входа стоит здесь, в серверном компоненте, а не в `proxy.ts`: это и
+ * есть проверка у источника данных, а прокси — лишь оптимистичная догадка.
  *
- * Незалогиненного не уводим редиректом: адрес «Мои сезоны» есть в шапке, и он
- * обязан открываться. Список у него тот же самый, только короткий — черновик в
- * браузере один; отдельной страницы входа поэтому не нужно, а вход предлагает
- * окно заведения сезона, когда до него дойдёт дело.
+ * Незалогиненного не уводим редиректом: адрес есть в шапке и обязан открываться.
+ * Список у него тот же самый, только короткий — черновик в браузере один.
  */
 export default async function SeasonsPage({
   searchParams,
@@ -203,22 +183,16 @@ export default async function SeasonsPage({
   const dict = await getDict()
   const { seasons } = dict
   const session = await auth()
-  // Имя из сессии больше нигде не нужно: страница здоровается не с человеком,
-  // а показывает его список. Остаётся сам факт входа — от него зависит, где
-  // лежат сезоны: строками в базе или единственным черновиком в браузере.
+  // Нужен сам факт входа: от него зависит, где лежат сезоны.
   const signedIn = Boolean(session?.user?.name || session?.user?.email)
 
   if (!signedIn) {
     return (
       <PaperSheet>
         <SectionBox accent="deep" label={seasons.heading} className={styles.section}>
-          {/* Список у невошедшего тот же самый, просто короткий: черновик здесь
-              один. Про вход разговор ведёт окно заведения сезона — оно и так
-              всегда говорит, что без входа сезон живёт только в этом браузере,
-              а вторая проповедь на пустой странице ничего не добавляет.
-
-              Черновик лежит в браузере, поэтому строку рисует клиент. Вкладок
-              анониму не показываем: избранного и публикаций без входа не бывает. */}
+          {/* Про вход разговор ведёт окно заведения сезона: вторая проповедь на
+              пустой странице ничего не добавляет. Вкладок анониму не показываем —
+              избранного и публикаций без входа не бывает. */}
           <DraftEntry />
 
           <NewSeasonAction className={styles.primary}>{seasons.newSeason}</NewSeasonAction>
@@ -228,10 +202,8 @@ export default async function SeasonsPage({
   }
 
   const flags = await searchParams
-  // Вкладка приходит из адреса: неизвестная — как будто её не называли.
   const kind: Tab = flags.tab === 'favorites' || flags.tab === 'published' ? flags.tab : 'seasons'
   const sort: LibrarySort = flags.sort === 'name' ? 'name' : 'date'
-  // Строку поиска режем по тому же пределу, что и название: искать длиннее нечего.
   const search = typeof flags.q === 'string' ? flags.q.slice(0, TITLE_LIMIT) : ''
   const here = listHref(lang, kind, search, sort)
   const state =
@@ -258,8 +230,7 @@ export default async function SeasonsPage({
           ))}
         </nav>
 
-        {/* Обычная GET-форма: поиск обязан пережить перезагрузку и пересылку,
-            а страница — остаться серверной. */}
+        {/* Обычная GET-форма: поиск обязан пережить перезагрузку и пересылку. */}
         <form className={styles.filters} action={withLang(lang, ROUTES.seasons)} method="get">
           {kind !== 'seasons' && <input type="hidden" name="tab" value={kind} />}
           {sort !== 'date' && <input type="hidden" name="sort" value={sort} />}
@@ -291,8 +262,6 @@ export default async function SeasonsPage({
           </span>
         </form>
 
-        {/* Не прочитали — показываем пустоту и тост, а не умолчание: выдумывать
-            содержимое списка нельзя. */}
         {state.status === 'ok' &&
           (entries.length ? (
             <ul className={styles.entries}>
@@ -326,14 +295,12 @@ export default async function SeasonsPage({
           </div>
         )}
 
-        {/* Имя спрашивается окном, и только потом заводится строка: молча
-            заведённый сезон слишком похож на промах по кнопке. */}
         <NewSeasonAction className={styles.primary}>{seasons.newSeason}</NewSeasonAction>
 
         {state.status === 'error' && <Toast message={seasons.listError} />}
 
-        {/* Сюда возвращается неудача «Нового сезона»: строку завести не вышло, и
-            человек оказался здесь вместо своего сезона — молчать об этом нельзя. */}
+        {/* Сюда возвращается неудача «Нового сезона»: человек оказался здесь
+            вместо своего сезона, и молчать об этом нельзя. */}
         {flags.add === 'limit' && <Toast message={fill(seasons.addLimit, { n: LIBRARY_LIMIT })} />}
         {flags.add && flags.add !== 'limit' && <Toast message={seasons.addError} />}
       </SectionBox>

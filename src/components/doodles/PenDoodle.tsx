@@ -20,11 +20,9 @@ export function PenDoodle({ size = 56, className, strokeWidth = 2.3 }: DoodlePro
       aria-hidden="true"
       focusable="false"
     >
-      {/* Ручка под наклоном: колпачок, корпус, перо */}
       <path d="M42 6l8 8-26 26-11 3 3-11Z" />
       <path d="M36 12l8 8" />
       <path d="M13 43l4-4" />
-      {/* Росчерк на строке */}
       <path d="M8 50c5-4 9 2 14-1s6-5 10-3" />
     </svg>
   )

@@ -8,14 +8,8 @@ import { useDict } from '../../../../i18n/context'
 import styles from '../../../../components/edit/Bar.module.css'
 
 /**
- * Панель сезона, присланного по личной ссылке.
- *
- * Ни лайка, ни жалобы, ни звёздочки: сезон не на витрине, его показали лично —
- * оценивать и раскладывать по своим полкам тут нечего. Остаётся то, ради чего
- * ссылку и присылают: посмотреть, распечатать, форкнуть себе.
- *
- * Подсказка называет место — «Сезон по ссылке», — и ничего не объясняет: как
- * этот адрес устроен и кто может его отозвать, человеку тут знать незачем.
+ * Ни лайка, ни жалобы, ни звёздочки: сезон не на витрине, его показали лично.
+ * Остаётся то, ради чего ссылку и присылают: посмотреть, распечатать, форкнуть.
  */
 export function SharedBar({ signedIn }: { signedIn: boolean }) {
   const { bars } = useDict()
@@ -26,7 +20,6 @@ export function SharedBar({ signedIn }: { signedIn: boolean }) {
       await navigator.clipboard.writeText(location.href)
       setNotice({ text: bars.linkCopied, at: Date.now() })
     } catch {
-      // Без разрешения на буфер — показываем ссылку, скопирует руками.
       prompt(bars.linkPrompt, location.href)
     }
   }

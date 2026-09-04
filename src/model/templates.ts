@@ -3,11 +3,8 @@ import type { Person, Template } from './types'
 import { WEEKS_COUNT } from './types'
 
 /**
- * Пустой лист «с нуля»: каркас формы есть, содержимое вписывает пользователь.
- *
- * Поля пустые буквально все, включая название и подписи: пустое поле показывает
- * и печатает свою подсказку (`PLACEHOLDERS`, см. `EditableText`), поэтому второй
- * копии этих текстов здесь заводить не надо — она бы с подсказками разошлась.
+ * Поля пустые буквально все, включая название: пустое поле показывает и печатает
+ * свою подсказку из словаря, и второй копии этих текстов здесь быть не должно.
  */
 export function createEmptyTemplate(): Template {
   return {
@@ -25,7 +22,7 @@ export function createPerson(id: string, face: Person['face']): Person {
   return { id, name: '', face, project: '', description: '', goal: '' }
 }
 
-/** Следующий свободный id вида p7 — ids людей должны быть уникальны в листе. */
+/** Id людей должны быть уникальны в листе. */
 export function nextPersonId(people: Person[]): string {
   const used = new Set(people.map((person) => person.id))
   for (let index = 1; ; index += 1) {

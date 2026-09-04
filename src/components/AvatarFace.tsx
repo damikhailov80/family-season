@@ -12,7 +12,6 @@ interface AvatarFaceProps {
  * Папа — борода, мама — каре и серьги, дети — головы мельче, вихор и хвостики.
  */
 interface FaceGeometry {
-  /** Центр и радиус головы. */
   cy: number
   r: number
 }
@@ -24,7 +23,6 @@ const FACE: Record<FaceVariant, FaceGeometry> = {
   daughter: { cy: 42, r: 13 },
 }
 
-/** Волосы за головой — рисуются до лица. */
 const HAIR_BACK: Record<FaceVariant, React.ReactNode> = {
   dad: null,
   mom: (
@@ -40,7 +38,6 @@ const HAIR_BACK: Record<FaceVariant, React.ReactNode> = {
   ),
 }
 
-/** Причёска поверх лба. */
 const HAIR_FRONT: Record<FaceVariant, React.ReactNode> = {
   dad: <path d="M18 33c0-11.5 6-18 14-18s14 6.5 14 18c-2.5-7.5-7-11-14-11s-11.5 3.5-14 11Z" />,
   mom: <path d="M20 29.5c3-5.5 7-8.5 12-8.5s9 3 12 8.5c-3.5-3.5-7.5-5-12-5s-8.5 1.5-12 5Z" />,
@@ -50,16 +47,13 @@ const HAIR_FRONT: Record<FaceVariant, React.ReactNode> = {
   daughter: null,
 }
 
-/** Что делает взрослого взрослым: борода с усами, серьги. */
 const DETAILS: Record<FaceVariant, React.ReactNode> = {
   dad: (
     <>
-      {/* борода охватывает подбородок */}
       <path
         d="M19 36.5c0 12.5 5.5 21.5 13 21.5s13-9 13-21.5c-.8 8.5-2.5 13.5-4.8 16.2-1.9-2.4-4.8-3.7-8.2-3.7s-6.3 1.3-8.2 3.7C21.5 50 19.8 45 19 36.5Z"
         fill="currentColor"
       />
-      {/* усы */}
       <path
         d="M26 39.8c1.8 1.6 4 1.6 6 0 2 1.6 4.2 1.6 6 0"
         fill="none"
@@ -67,7 +61,6 @@ const DETAILS: Record<FaceVariant, React.ReactNode> = {
         strokeWidth="2.6"
         strokeLinecap="round"
       />
-      {/* брови */}
       <g fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
         <path d="M23.5 32.5c1.8-1.4 4.2-1.4 6 0" />
         <path d="M34.5 32.5c1.8-1.4 4.2-1.4 6 0" />
@@ -83,7 +76,6 @@ const DETAILS: Record<FaceVariant, React.ReactNode> = {
   son: null,
   daughter: (
     <g fill="#fff" stroke="currentColor" strokeWidth="1.6">
-      {/* резинки на хвостиках */}
       <circle cx="12" cy="36" r="2.4" />
       <circle cx="52" cy="36" r="2.4" />
     </g>

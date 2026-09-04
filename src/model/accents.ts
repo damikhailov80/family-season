@@ -6,11 +6,8 @@ import type { FaceVariant } from '../types'
 export const FACE_ORDER: FaceVariant[] = ['dad', 'mom', 'son', 'daughter']
 
 /**
- * Подписи к четырём рисункам живут в словаре (`poster.faces`): они называют
- * рисунок, а не родство, и переводятся вместе с листом.
- *
- * Ключи (`dad`, `mom`, …) остались прежними и трогать их нельзя: лицо едет
- * в ссылку номером — индексом в `FACE_ORDER`.
+ * Ключи (`dad`, `mom`, …) трогать нельзя: лицо едет в формат номером — индексом
+ * в `FACE_ORDER`.
  */
 export function faceLabels(lang: Lang): Record<FaceVariant, string> {
   return posterText(lang).faces

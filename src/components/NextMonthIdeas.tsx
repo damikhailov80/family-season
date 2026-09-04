@@ -3,10 +3,7 @@ import { PosterIcon } from './doodles/PosterIcon'
 import { SectionBox } from './SectionBox'
 import styles from './NextMonthIdeas.module.css'
 
-/**
- * Последняя секция листа — место под записи от руки.
- * На печати пустая и забирает всю свободную высоту второй страницы.
- */
+/** На печати пустая: забирает всю свободную высоту второй страницы. */
 export function NextMonthIdeas() {
   const { fill } = useDoc()
   const { labels } = usePoster()
@@ -22,7 +19,6 @@ export function NextMonthIdeas() {
         className={styles.box}
         bodyClassName={styles.body}
       >
-        {/* Записи — слой заполнения, на бумаге здесь пустое место. */}
         <p className={styles.ideas}>{fill.nextIdeas}</p>
         <div className={styles.space} aria-hidden="true" />
       </SectionBox>

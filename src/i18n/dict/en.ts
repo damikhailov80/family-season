@@ -1,12 +1,9 @@
 import type { Dict } from '../types'
 
 /**
- * Английский словарь. Форма выводится из русского (`Dict`), поэтому забытый
- * ключ — ошибка `npm run typecheck`, а не дырка в интерфейсе.
- *
- * Домашний словарь продукта переведён осознанно и одинаково во всех трёх
- * языках: сезон — season, постер — poster, недели — weeks, сюжетные линии —
- * storylines, финал — wrap-up, анонс — next up (см. «Языки» в CLAUDE.md).
+ * Домашний словарь продукта переведён одинаково во всех трёх языках: сезон —
+ * season, постер — poster, недели — weeks, сюжетные линии — storylines, финал —
+ * wrap-up, анонс — next up (см. «Языки» в CLAUDE.md).
  */
 export const en: Dict = {
   poster: {
@@ -301,7 +298,7 @@ export const en: Dict = {
       'This is where the language and the family for new posters live. To have something to attach the settings to, you need to sign in.',
     newSeason: 'Build my own season',
     familyHint:
-      'Click a drawing to change the character. From {min} to {max} people; names are optional.',
+      'Click a drawing to change the character. From {min} to {max} people; everyone needs a name.',
     error: 'Could not load the settings — a server error.',
     logoutHead: 'Sign out',
     logout: 'Sign out',
@@ -322,6 +319,7 @@ export const en: Dict = {
     saving: 'Saving…',
     saveLanguage: 'Save the language',
     saveFailedError: 'Could not save the settings — a server error. Please try again.',
+    saveFailedUnnamed: 'Could not save. Enter a name for everyone.',
     saveFailedStale: 'Could not save. Refresh the page and sign in again.',
     saveFailedAnonymous: 'Could not save. Refresh the page and sign in again.',
     changeFace: 'Change the drawing',

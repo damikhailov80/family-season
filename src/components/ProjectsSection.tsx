@@ -16,8 +16,8 @@ export function ProjectsSection() {
   const { template, fill, field, editing, addPerson, removePerson, cycleFace, lang } = useDoc()
   const { labels, placeholders } = usePoster()
   const dict = useDict()
-  // Подпись рисунка — часть листа, поэтому языком сезона; сама кнопка вокруг
-  // неё экранная, и её слова приходят из словаря интерфейса.
+  // Подпись рисунка — часть листа, поэтому языком сезона; кнопка вокруг неё
+  // экранная, и её слова приходят из словаря интерфейса.
   const faces = faceLabels(lang)
   const people = template.people
 
@@ -129,7 +129,6 @@ export function ProjectsSection() {
                 {dict.editor.addPerson}
               </button>
             )}
-            {/* Кнопки нет, пока состав семьи не задан в кабинете, — см. FamilySwap. */}
             <FamilySwap />
           </div>
         )}

@@ -14,7 +14,6 @@ interface EditableTextProps {
   id?: string
 }
 
-/** Сколько держится вспышка отказа, мс. */
 const FLASH_MS = 220
 
 /** Переносы строк в поля бланка не попадают: схлопываем их в пробел. */
@@ -22,7 +21,7 @@ function singleLine(value: string): string {
   return value.replace(/\n+$/, '').replace(/\s*\n+\s*/g, ' ')
 }
 
-/** Длина выделения внутри узла: набранное поверх него места не занимает. */
+/** Набранное поверх выделения места не занимает. */
 function selectionLength(node: HTMLElement): number {
   const selection = getSelection()
   if (!selection || selection.rangeCount === 0) return 0
@@ -30,7 +29,6 @@ function selectionLength(node: HTMLElement): number {
   return selection.toString().length
 }
 
-/** Каретка в конец узла — после того, как мы переписали его текст руками. */
 function caretToEnd(node: HTMLElement) {
   const range = document.createRange()
   range.selectNodeContents(node)
@@ -41,24 +39,12 @@ function caretToEnd(node: HTMLElement) {
 }
 
 /**
- * Инлайн-редактирование прямо в вёрстке бланка.
- *
  * Поле неконтролируемое: React не переписывает текст, пока узел в фокусе, —
  * иначе на каждом вводе символа каретка прыгала бы в начало строки.
  *
- * Все поля бланка однострочные. Перевод строки — это ручная вёрстка: ею
- * подгоняют текст под рамку, лист от неё растёт без предела и разъезжается на
- * лишние страницы при печати. Высоту блоков задаёт макет, перенос — браузер.
- *
- * По той же причине у каждого поля есть предел длины: место на бумаге посчитано
- * (`src/model/limits.ts`), и текст сверх него — это лишние строки, а в карточке
- * человека они ещё и умножаются на пять. Предел жёсткий: ввод просто не проходит,
- * зато на бумагу заведомо попадает то же, что на экране. Чтобы отказ не выглядел
- * поломкой, поле на мгновение вспыхивает подчёркиванием.
- *
- * Обязательных полей на бланке нет, но и пустых тоже: незаполненное поле вне
- * правки показывает свою подсказку как обычный текст — и она же уходит на
- * бумагу. Поэтому вписывать всё подряд не нужно, а дырок в макете не бывает.
+ * Все поля бланка однострочные, у каждого свой предел длины (`limits.ts`), и
+ * предел жёсткий: ввод сверх него не проходит, а поле на мгновение вспыхивает
+ * подчёркиванием — иначе отказ выглядит поломкой клавиатуры.
  */
 export function EditableText({
   value,
@@ -82,7 +68,7 @@ export function EditableText({
     }
   }, [value, editing])
 
-  // Вспышка гаснет сама. Таймер снимается, иначе он дёрнет размонтированный узел.
+  // Таймер снимается, иначе он дёрнет размонтированный узел.
   useEffect(() => {
     if (!full) return
     const timer = setTimeout(() => setFull(false), FLASH_MS)
@@ -104,9 +90,8 @@ export function EditableText({
   const commit = (node: HTMLElement) => {
     // innerText нормализует переводы строк contentEditable в обычные '\n'.
     const next = singleLine(node.innerText).slice(0, maxLength)
-    // Сеть под редкие пути мимо beforeinput — перетаскивание текста, автозамена, IME.
-    // Только здесь мы трогаем узел в фокусе: иначе экран разошёлся бы с моделью и
-    // показывал бы текст, которого на бумаге не будет.
+    // Сеть под редкие пути мимо beforeinput — перетаскивание, автозамена, IME.
+    // Только здесь мы трогаем узел в фокусе: иначе экран разошёлся бы с моделью.
     if (node.innerText !== next) {
       node.innerText = next
       if (document.activeElement === node) caretToEnd(node)
@@ -127,10 +112,7 @@ export function EditableText({
       aria-label={placeholder}
       data-placeholder={placeholder}
       tabIndex={0}
-      /*
-       * Единственная проверка длины при вводе — здесь: сюда приходит и набор с
-       * клавиатуры, и вставка, и перетаскивание текста, и подтверждение IME.
-       */
+      // Единственная проверка длины: сюда приходит и набор, и вставка, и IME.
       onBeforeInput={(event: React.InputEvent<HTMLElement>) => {
         const node = event.currentTarget
         // Удаления данных не несут и проходят всегда; считаем только вставляемое.
@@ -140,19 +122,16 @@ export function EditableText({
         if (inserted <= room) return
         event.preventDefault()
         setFull(true)
-        // Кладём то, что влезает, а не отбрасываем всё: набранное начало и остаток
-        // под правку привычнее пустого поля. Вложенный insertText сюда же и придёт,
-        // но он уже по размеру — рекурсии не будет.
+        // Кладём то, что влезает, а не отбрасываем всё. Вложенный insertText
+        // придёт сюда же, но он уже по размеру — рекурсии не будет.
         if (room > 0) document.execCommand('insertText', false, event.data.slice(0, room))
       }}
       onInput={(event: React.InputEvent<HTMLElement>) => commit(event.currentTarget)}
       onBlur={(event: React.FocusEvent<HTMLElement>) => commit(event.currentTarget)}
       onPaste={(event: React.ClipboardEvent<HTMLElement>) => {
-        // Вставка — единственный оставшийся способ занести перевод строки
-        // (Enter перехвачен ниже). Кладём текст одной строкой сразу, иначе узел
-        // вырастет на экране, хотя модель переносы всё равно схлопнет.
+        // Кладём текст одной строкой сразу, иначе узел вырастет на экране,
+        // хотя модель переносы всё равно схлопнет.
         event.preventDefault()
-        // Длину отмерит beforeinput — он ловит и этот insertText тоже.
         // execCommand устарел, но это единственный способ вставить текст,
         // не потеряв историю отмены contentEditable.
         document.execCommand(

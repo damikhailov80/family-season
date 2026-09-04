@@ -28,7 +28,6 @@ export function MonthTheme() {
           <PosterIcon slot="spark" className={styles.starSmall} size={18} />
         </div>
 
-        {/* Месяц подставляется от даты; в правке его переключают стрелками. */}
         <div className={styles.monthRow}>
           {editing && (
             <button
@@ -40,10 +39,8 @@ export function MonthTheme() {
               ‹
             </button>
           )}
-          {/*
-            Ширину держит самое длинное название: без распорки строка при
-            переключении месяцев меняет длину и стрелки скачут влево-вправо.
-          */}
+          {/* Ширину держит самое длинное название: без распорки строка при
+              переключении месяцев меняет длину и стрелки скачут. */}
           <p className={styles.month}>
             <span className={styles.monthSizer} aria-hidden="true">
               {longestMonth(lang)}
@@ -70,7 +67,6 @@ export function MonthTheme() {
           {...field('theme.subtitle')}
         />
 
-        {/* Итоги месяца: вопрос из шаблона, ответ вписывают руками (слой заполнения). */}
         <div className={styles.answerBox}>
           <Badge accent="theme" size="sm" className={styles.answerBadge}>
             {labels.themeSummary}

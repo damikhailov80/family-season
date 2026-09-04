@@ -1,13 +1,9 @@
 import type { Dict } from '../types'
 
 /**
- * Польский словарь. Форма выводится из русского (`Dict`), поэтому забытый
- * ключ — ошибка `npm run typecheck`, а не дырка в интерфейсе.
- *
- * Домашний словарь продукта переведён осознанно и одинаково во всех трёх
- * языках: сезон — sezon, постер — plakat, недели — tygodnie, сюжетные линии —
- * własne projekty, финал — podsumowanie, анонс — na przyszły miesiąc
- * (см. «Языки» в CLAUDE.md).
+ * Домашний словарь продукта переведён одинаково во всех трёх языках: сезон —
+ * sezon, постер — plakat, недели — tygodnie, сюжетные линии — własne projekty,
+ * финал — podsumowanie, анонс — na przyszły miesiąc (см. «Языки» в CLAUDE.md).
  */
 export const pl: Dict = {
   poster: {
@@ -303,7 +299,7 @@ export const pl: Dict = {
       'Tu mieszkają język i rodzina, z którą otwierają się nowe plakaty. Żeby było do czego przypiąć ustawienia, trzeba się zalogować.',
     newSeason: 'Złóż swój sezon',
     familyHint:
-      'Kliknięcie w rysunek zmienia bohatera. Od {min} do {max} osób, imion można nie wpisywać.',
+      'Kliknięcie w rysunek zmienia bohatera. Od {min} do {max} osób, każda musi mieć imię.',
     error: 'Nie udało się wczytać ustawień — błąd serwera.',
     logoutHead: 'Wylogowanie',
     logout: 'Wyloguj się',
@@ -323,6 +319,7 @@ export const pl: Dict = {
     saving: 'Zapisujemy…',
     saveLanguage: 'Zapisz język',
     saveFailedError: 'Nie udało się zapisać ustawień — błąd serwera. Spróbuj jeszcze raz.',
+    saveFailedUnnamed: 'Nie udało się zapisać. Wpisz imię każdej osobie.',
     saveFailedStale: 'Nie udało się zapisać. Odśwież stronę i zaloguj się ponownie.',
     saveFailedAnonymous: 'Nie udało się zapisać. Odśwież stronę i zaloguj się ponownie.',
     changeFace: 'Zmień rysunek',

@@ -5,7 +5,6 @@ import { useDict } from '../../i18n/context'
 import { googleLoginUrl } from '../../server/actions'
 import styles from './LoginButtons.module.css'
 
-/** Значок провайдера — inline SVG: растровых картинок в проекте нет. */
 function GoogleMark() {
   return (
     <svg width="16" height="16" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
@@ -30,23 +29,11 @@ function GoogleMark() {
 }
 
 /**
- * Кнопка входа — одна на весь сайт: и в шапке, и в окне «Нужен вход», и там,
- * где старую сессию просят перевыпустить. Подпись у неё разная, разговор один.
- *
- * Клиентская она по двум причинам, и обе про браузер.
- *
- * Первая — **адрес возврата**: примеренное оформление живёт в `?p=` и `?i=`, и
- * вернуться человек должен на тот же постер, а не на голый адрес. Собрать
- * `pathname + search + hash` может только браузер, серверу это неоткуда взять.
- *
- * Вторая — **сам переход**. Действие отдаёт ссылку, а уводит по ней
- * `location.href`: если отдать её роутеру Next (то есть сделать `redirect()` на
- * сервере), тот у чужого origin сперва попросит RSC-ответ и уронит в консоль
- * «Failed to fetch RSC payload for accounts.google.com», прежде чем откатиться
- * к обычному переходу. Дальше всё равно чужой сайт — роутеру тут делать нечего.
- *
- * Auth.js в браузер при этом по-прежнему не уезжает: на клиенте остаётся одна
- * строчка `location.href`.
+ * Кнопка входа одна на весь сайт, подпись у неё пропом. Клиентская по двум
+ * причинам: адрес возврата собирает браузер (`pathname + search + hash` — в нём
+ * живёт примеренное оформление), и уводит по нему тоже он — `redirect()` на
+ * чужой origin роняет в консоль «Failed to fetch RSC payload» (см.
+ * `googleLoginUrl`). Auth.js в браузер при этом не уезжает.
  */
 export function GoogleLoginButton({ label }: { label?: string }) {
   const { site } = useDict()
@@ -62,9 +49,8 @@ export function GoogleLoginButton({ label }: { label?: string }) {
         })
       }}
     >
-      {/* На телефоне от подписи остаётся «Войти» (`.provider` скрыт): рядом с
-          брендом и навигацией полное название провайдера не помещается. Значок
-          его и так называет, а `aria-label` держит полное имя для читалки. */}
+      {/* На телефоне от подписи остаётся «Войти» (`.provider` скрыт): полное имя
+          провайдера рядом с брендом не помещается, его держит `aria-label`. */}
       <button type="submit" className={styles.button} aria-label={label ?? site.loginFull}>
         <GoogleMark />
         {label ?? (

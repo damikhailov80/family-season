@@ -5,41 +5,31 @@ import { AvatarFace } from '../../../components/AvatarFace'
 import { useDict, useLang } from '../../../i18n/context'
 import { fill } from '../../../i18n/fill'
 import { faceLabels, nextFace } from '../../../model/accents'
-import { NAME_LIMIT, type FamilyPreset } from '../../../model/family'
+import { familyNamed, NAME_LIMIT, type FamilyPreset } from '../../../model/family'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../../model/types'
 import { saveFamily } from '../../../server/actions'
-import type { FamilyStatus } from '../../../server/settings'
+import type { SaveFamilyStatus } from '../../../server/settings'
 import type { Dict } from '../../../i18n/types'
 import { Toast } from '../../../components/site/Toast'
 import styles from './page.module.css'
 
-/**
- * Что сказать, когда сохранить не вышло. Успеха здесь нет: он уводит редиректом
- * и показывается уже страницей.
- */
-function failureText(status: Exclude<FamilyStatus, 'ok'>, account: Dict['account']): string {
+/** Успеха здесь нет: он уводит редиректом и показывается уже страницей. */
+function failureText(status: SaveFamilyStatus, account: Dict['account']): string {
+  if (status === 'unnamed') return account.saveFailedUnnamed
   if (status === 'error') return account.saveFailedError
   return status === 'stale' ? account.saveFailedStale : account.saveFailedAnonymous
 }
 
 /**
- * Редактор состава семьи. Повадка намеренно та же, что у секции «Личные проекты»
- * на постере (`ProjectsSection`): клик по аватару перебирает рисунок, имя правится
- * на месте, «×» убирает, «+» добавляет. Человек уже знает этот жест по постеру —
- * второй способ делать то же самое только сбивал бы.
+ * Повадка та же, что у «Личных проектов» на постере: клик по аватару перебирает
+ * рисунок, имя правится на месте. Переиспользовать `ProjectsSection` нельзя —
+ * она завязана на `useDoc`, то есть на документ постера, которого здесь нет.
  *
- * Это первый клиентский компонент сайта вне постера, и заведён он сознательно:
- * без JS каждый клик по аватару стоил бы перезагрузки страницы.
- *
- * Состав уезжает на сервер **аргументом действия**, а не полями формы: React
- * переименовывает поля формы, отправленной из клиентского компонента (`_1_name`
- * вместо `name`), и разбор `FormData` на сервере молча получал бы пустоту.
- *
- * Логику `ProjectsSection` переиспользовать нельзя: она завязана на `useDoc`,
- * то есть на документ постера, которого здесь нет.
+ * Клиентский компонент сознательно: без JS каждый клик по аватару стоил бы
+ * перезагрузки страницы.
  */
 interface Failure {
-  status: Exclude<FamilyStatus, 'ok'>
+  status: SaveFamilyStatus
   at: number
 }
 
@@ -47,18 +37,16 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
   const [people, setPeople] = useState<FamilyPreset>(initial)
   const lang = useLang()
   const { account } = useDict()
-  // Подписи рисунков — часть словаря постера, но здесь листа нет вовсе, и берём
-  // их языком интерфейса: кабинет говорит с человеком, а не печатается.
+  // Листа здесь нет: подписи берём языком интерфейса, кабинет не печатается.
   const faces = faceLabels(lang)
 
+  // Правило берётся из модели: второй копией оно разошлось бы с `saveFamily`.
+  const named = familyNamed(people)
+
   /*
-   * `useActionState`, а не `useTransition`: действие возвращает статус неудачи
-   * вместо редиректа, и его надо куда-то положить. Успех сюда не приходит —
-   * `saveFamily` уводит на `?ok=1`, и компонент размонтируется.
-   *
-   * Рядом со статусом едет отметка времени: сама по себе строка `error` при
-   * второй неудаче подряд не меняется, тост не перемонтировался бы и повторный
-   * отказ прошёл бы незамеченным. По ней и ставится `key`.
+   * `useActionState`, а не `useTransition`: неудача возвращается значением, и её
+   * надо куда-то положить. Рядом со статусом едет отметка времени — строка
+   * `error` при второй неудаче подряд не меняется, и тост бы не перемонтировался.
    */
   const [failure, save, saving] = useActionState<Failure | null, FormData>(
     async () => ({ status: await saveFamily(people, lang), at: Date.now() }),
@@ -66,10 +54,9 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
   )
 
   /*
-   * `?ok=1` нужен ровно на один рендер: он донёс «Сохранено ✓» через редирект.
-   * Дальше он врёт — перезагрузка показывала бы «Сохранено» и через час. Плашку
-   * это не гасит: она уже нарисована сервером, а React перерисовки не делает.
-   * `history.state` передаём целиком: `null` затёр бы служебные поля Next.
+   * `?ok=1` нужен ровно на один рендер: дальше он врёт — перезагрузка показывала
+   * бы «Сохранено» и через час. `history.state` передаём целиком: `null` затёр бы
+   * служебные поля Next.
    */
   useEffect(() => {
     const url = new URL(location.href)
@@ -114,8 +101,7 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
               <AvatarFace variant={person.face} size={44} />
             </button>
 
-            {/* Кто это, видно по рисунку — подписи под именем не нужно.
-                В `aria-label` она остаётся: скринридер картинку не видит. */}
+            {/* Подпись остаётся в `aria-label`: читалка картинку не видит. */}
             <input
               className={styles.nameInput}
               value={person.name}
@@ -146,13 +132,12 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
             {account.addPerson}
           </button>
         )}
-        <button type="submit" className={styles.primary} disabled={saving}>
+        <button type="submit" className={styles.primary} disabled={saving || !named}>
           {saving ? account.saving : account.saveFamily}
         </button>
       </div>
 
-      {/* Ошибка сервера — тост, набранный состав остаётся в форме нетронутым:
-          повторяют отсюда же, не сходя со страницы. */}
+      {/* Набранный состав остаётся в форме: повторяют отсюда же. */}
       {failure && <Toast key={failure.at} message={failureText(failure.status, account)} />}
     </form>
   )

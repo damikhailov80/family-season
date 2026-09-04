@@ -1,10 +1,8 @@
 import type { FaceVariant } from '../types'
 
 /**
- * Модель листа состоит из двух независимых слоёв.
- *
- * Template — бланк: всё, что печатается на бумаге. Едет в URL целиком.
- * FillState — заполнение: то, что вписывает семья. В URL НЕ едет и на печать не идёт.
+ * Два независимых слоя: `Template` — бланк, всё, что печатается; `FillState` —
+ * заполнение, которое вписывает семья, и на печать оно не идёт.
  */
 
 export interface Person {
@@ -14,14 +12,12 @@ export interface Person {
   /** Один из четырёх рисунков; цвет человека выводится из него: var(--person-<face>). */
   face: FaceVariant
   project: string
-  /** Однострочное поле, как и всё в бланке: перенос делает браузер, не автор. */
   description: string
   goal: string
 }
 
 export interface WeekCard {
   title: string
-  /** Однострочное поле: переносы расставляет браузер по ширине карточки. */
   text: string
 }
 

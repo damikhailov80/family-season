@@ -5,7 +5,6 @@ interface DoodleProps {
   strokeWidth?: number
 }
 
-/** Звено цепи — «скопировать ссылку». Та же сетка и та же манера, что у принтера. */
 export function LinkDoodle({ size = 56, className, strokeWidth = 2.3 }: DoodleProps) {
   return (
     <svg

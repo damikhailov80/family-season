@@ -5,10 +5,6 @@ import { SectionBox } from '../SectionBox'
 import { SparkStar } from '../doodles'
 import styles from './Community.module.css'
 
-/*
- * Ссылка на витрину — next/link: `/ideas` серверная страница сайта, а не постер,
- * и мягкий переход тут ничего не теряет (правило из CLAUDE.md, раздел «Каркас»).
- */
 export async function Community() {
   const lang = await getLang()
   const { landing } = await getDict()

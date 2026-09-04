@@ -1,20 +1,10 @@
 import type { ICON_SETS } from './model/icons.data'
 import type { PALETTES } from './model/palettes.data'
 
-/**
- * Примитивы оформления. Структура листа описана в `src/model/types.ts`.
- */
-
-/**
- * Тема оформления постера — id из реестра `src/model/palettes.ts`. Тем сто,
- * поэтому союз собирается из самого реестра, а не переписывается руками.
- */
+/** Тем сто: союз собирается из реестра, а не переписывается руками. */
 export type PaletteId = (typeof PALETTES)[number][0]
 
-/**
- * Набор рисунков постера — id из реестра `src/model/icons.ts`. Как и тема,
- * в бланк не входит: его несёт пометка `i=` в адресе.
- */
+/** Как и тема, в бланк не входит: лежит колонкой рядом. */
 export type IconSetId = (typeof ICON_SETS)[number][0]
 
 /**
