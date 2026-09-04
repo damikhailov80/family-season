@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Собранные листья на столе</title>
+
+  <!-- Стол -->
+  <rect width="200" height="200" fill="#e6d7bd"/>
+  <rect y="0" width="200" height="200" fill="#dcc9a8" opacity=".35"/>
+
+  <!-- Лист бумаги под гербарий -->
+  <rect x="26" y="22" width="148" height="156" rx="3" fill="#fbf6ea"/>
+  <rect x="26" y="22" width="148" height="156" rx="3" fill="none" stroke="#c9b58c" stroke-width="1.5"/>
+
+  <!-- Клён -->
+  <g transform="translate(72 66)">
+    <path d="M0 -26 L7 -10 L20 -17 L14 -3 L27 -1 L16 7 L24 18 L9 14 L8 27 L0 18 L-8 27 L-9 14 L-24 18 L-16 7 L-27 -1 L-14 -3 L-20 -17 L-7 -10 Z"
+          fill="#c1440e"/>
+    <path d="M0 18 L0 34" stroke="#8a5a2b" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Дуб -->
+  <g transform="translate(130 78)">
+    <path d="M0 -24 C10 -22 15 -14 11 -8 C18 -6 18 2 11 4 C16 10 10 18 3 15 L0 26 L-3 15 C-10 18 -16 10 -11 4 C-18 2 -18 -6 -11 -8 C-15 -14 -10 -22 0 -24 Z"
+          fill="#7d8c1f"/>
+    <path d="M0 15 L0 30" stroke="#8a5a2b" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Берёза -->
+  <g transform="translate(78 138)">
+    <path d="M0 -20 C12 -14 16 0 0 18 C-16 0 -12 -14 0 -20 Z" fill="#d8a51a"/>
+    <path d="M0 -18 L0 16" stroke="#a8781a" stroke-width="1.4"/>
+    <path d="M0 18 L0 30" stroke="#8a5a2b" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Рябина: гроздь -->
+  <g transform="translate(134 140)">
+    <path d="M0 4 L0 26" stroke="#8a5a2b" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="-8" cy="-6" r="5" fill="#a81c07"/>
+    <circle cx="3" cy="-11" r="5" fill="#c1440e"/>
+    <circle cx="9" cy="-1" r="5" fill="#a81c07"/>
+    <circle cx="-2" cy="2" r="5" fill="#c1440e"/>
+  </g>
+
+  <!-- Жёлудь -->
+  <g transform="translate(46 168)">
+    <ellipse cx="0" cy="3" rx="6" ry="8" fill="#a9752f"/>
+    <path d="M-7 -3 A7 6 0 0 1 7 -3 Z" fill="#6f4a1d"/>
+  </g>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Корзина с грибами на траве</title>
+
+  <!-- Лесная подстилка -->
+  <rect width="200" height="200" fill="#4a5f28"/>
+  <path d="M0 128 C40 116 70 138 104 128 C140 118 172 136 200 126 L200 200 L0 200 Z" fill="#3c4e20"/>
+  <path d="M0 150 C46 142 78 162 118 152 C154 143 178 158 200 152 L200 200 L0 200 Z" fill="#33421b"/>
+
+  <!-- Опавшие листья -->
+  <ellipse cx="28" cy="174" rx="11" ry="6" fill="#a9752f" transform="rotate(-18 28 174)"/>
+  <ellipse cx="168" cy="182" rx="10" ry="5" fill="#c1440e" transform="rotate(14 168 182)"/>
+  <ellipse cx="96" cy="188" rx="9" ry="5" fill="#8a5a2b" transform="rotate(-6 96 188)"/>
+
+  <!-- Корзина -->
+  <g transform="translate(100 118)">
+    <!-- Грибы над краем -->
+    <g transform="translate(-22 -14)">
+      <rect x="-4" y="-4" width="8" height="16" rx="3" fill="#efe3cc"/>
+      <path d="M-15 -4 A15 12 0 0 1 15 -4 Z" fill="#8c4a1e"/>
+    </g>
+    <g transform="translate(4 -20)">
+      <rect x="-4" y="-4" width="8" height="18" rx="3" fill="#f3e9d6"/>
+      <path d="M-17 -4 A17 13 0 0 1 17 -4 Z" fill="#a2571f"/>
+    </g>
+    <g transform="translate(26 -12)">
+      <rect x="-3" y="-3" width="7" height="14" rx="3" fill="#efe3cc"/>
+      <path d="M-12 -3 A12 10 0 0 1 12 -3 Z" fill="#c1440e"/>
+      <circle cx="-4" cy="-8" r="1.8" fill="#fbf6ea"/>
+      <circle cx="4" cy="-6" r="1.5" fill="#fbf6ea"/>
+    </g>
+
+    <!-- Плетёный корпус -->
+    <path d="M-46 0 L46 0 L36 56 L-36 56 Z" fill="#b9832f"/>
+    <path d="M-46 0 L46 0 L44 12 L-44 12 Z" fill="#a9752f"/>
+    <g stroke="#8a5a2b" stroke-width="1.6" opacity=".7">
+      <path d="M-43 18 L43 18"/>
+      <path d="M-41 30 L41 30"/>
+      <path d="M-39 42 L39 42"/>
+      <path d="M-30 12 L-26 56"/>
+      <path d="M-12 12 L-10 56"/>
+      <path d="M8 12 L8 56"/>
+      <path d="M28 12 L24 56"/>
+    </g>
+    <!-- Ручка -->
+    <path d="M-30 0 A30 34 0 0 1 30 0" fill="none" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -304,11 +304,20 @@ server action does.
   **recomputes** the showcase's answer rather than repainting a button.
 - **Anonymising takes names from the season's language** (`anonymousNames(count, lang)`): Russian
   names in a Polish season would give away something other than what the person was hiding.
-- **The examples are translated whole** — nine files `src/data/examples/<lang>/demo-N.json`, the
-  fill layer included. That is nine showcase rows, not three with captions. The row numbers are set
-  by the `PUBLIC_IDS` table rather than by order: a short code is a permutation of an id, it is
-  promised to be permanent, and a new language has no right to shift codes already handed out. The
-  week photographs are shared: there is not a word in them.
+- **The examples are translated whole** — one file per language per example
+  (`src/data/examples/<lang>/demo-N.json`), the fill layer included. Every one of them is a
+  showcase row of its own, not one row with three captions. The row numbers are set by the
+  `PUBLIC_IDS` table rather than by order: a short code is a permutation of an id, it is promised
+  to be permanent, and neither a new language nor a new example has any right to shift codes
+  already handed out — **new ids are appended, never inserted**. That is why the fourth example is
+  10/11/12 and not 4/5/6. The week photographs are shared between the languages: there is not a
+  word in them, so one drawing serves all three.
+- **An adaptation is not a translation, and the shared photograph decides how far it can go.**
+  The forest example goes mushrooming in all three languages, though picking mushrooms is a Russian
+  and Polish habit far more than an English one: the week carries a drawing of a basket of
+  mushrooms, and the drawing is one for all three. Where a week has no photograph the wording is
+  free to move with the country; where it has one, the three languages must be telling the same
+  story.
 - **`localeCompare` takes the list's language**, not a hard-wired `'ru'`.
 - **The fonts ask for `latin-ext`**: without it the Polish `ą ę ł ń ś ź ż` fall back to another
   font and the sheet prints in two typefaces at once. Subset lists in `next/font` must be

@@ -1,12 +1,15 @@
 import ruDemo1 from '../data/examples/ru/demo-1.json'
 import ruDemo2 from '../data/examples/ru/demo-2.json'
 import ruDemo3 from '../data/examples/ru/demo-3.json'
+import ruDemo4 from '../data/examples/ru/demo-4.json'
 import enDemo1 from '../data/examples/en/demo-1.json'
 import enDemo2 from '../data/examples/en/demo-2.json'
 import enDemo3 from '../data/examples/en/demo-3.json'
+import enDemo4 from '../data/examples/en/demo-4.json'
 import plDemo1 from '../data/examples/pl/demo-1.json'
 import plDemo2 from '../data/examples/pl/demo-2.json'
 import plDemo3 from '../data/examples/pl/demo-3.json'
+import plDemo4 from '../data/examples/pl/demo-4.json'
 import type { FaceVariant, IconSetId, PaletteId } from '../types'
 import { FACE_ORDER } from './accents'
 import { knownIconSet } from './icons'
@@ -46,15 +49,15 @@ export interface Example {
 }
 
 const RAW: Record<Lang, Record<string, RawExample>> = {
-  ru: { 'demo-1': ruDemo1, 'demo-2': ruDemo2, 'demo-3': ruDemo3 },
-  en: { 'demo-1': enDemo1, 'demo-2': enDemo2, 'demo-3': enDemo3 },
-  pl: { 'demo-1': plDemo1, 'demo-2': plDemo2, 'demo-3': plDemo3 },
+  ru: { 'demo-1': ruDemo1, 'demo-2': ruDemo2, 'demo-3': ruDemo3, 'demo-4': ruDemo4 },
+  en: { 'demo-1': enDemo1, 'demo-2': enDemo2, 'demo-3': enDemo3, 'demo-4': enDemo4 },
+  pl: { 'demo-1': plDemo1, 'demo-2': plDemo2, 'demo-3': plDemo3, 'demo-4': plDemo4 },
 }
 
 const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
-  ru: { 'demo-1': 1, 'demo-2': 2, 'demo-3': 3 },
-  en: { 'demo-1': 4, 'demo-2': 5, 'demo-3': 6 },
-  pl: { 'demo-1': 7, 'demo-2': 8, 'demo-3': 9 },
+  ru: { 'demo-1': 1, 'demo-2': 2, 'demo-3': 3, 'demo-4': 10 },
+  en: { 'demo-1': 4, 'demo-2': 5, 'demo-3': 6, 'demo-4': 11 },
+  pl: { 'demo-1': 7, 'demo-2': 8, 'demo-3': 9, 'demo-4': 12 },
 }
 
 export const DEFAULT_EXAMPLE_ID = 'demo-1'

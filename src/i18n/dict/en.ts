@@ -217,7 +217,7 @@ export const en: Dict = {
       'What prints is always a clean poster: scales at zero, mood cells empty, note fields free. The month itself fills in the rest, by hand.',
 
     examplesLabel: 'Family plan examples',
-    examplesNote: 'three seasons, all different',
+    examplesNote: 'four seasons, all different',
     exampleOpen: 'Open the example →',
     examplesAsideTitle: 'Take one as a starting point',
     examplesAsideText:

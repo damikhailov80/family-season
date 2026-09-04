@@ -1,0 +1,92 @@
+{
+  "name": "Forest Month",
+  "summary": "A herbarium, mushrooms, a campfire — and back to where we started.",
+  "note": "four of us · season in full swing",
+  "palette": "autumn",
+  "icons": "picnic",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our woods. Our paths. Our September."
+    },
+    "theme": {
+      "subtitle": "Forest Month",
+      "question": "What in the woods turned out not to be what we thought?"
+    },
+    "weeksNote": "4 weeks – 4 trips to one wood",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "A herbarium: a leaf from every tree"
+      },
+      {
+        "title": "Week 2",
+        "text": "Mushrooms, a basket and a field guide"
+      },
+      {
+        "title": "Week 3",
+        "text": "Campfire, baked potatoes and sausages"
+      },
+      {
+        "title": "Week 4",
+        "text": "Back to where we started — what changed"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Get to the woods every week and come back to where we started.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Colours of autumn",
+        "description": "One frame every trip, always from the same spot",
+        "goal": "Line up all four frames"
+      },
+      {
+        "id": "p2",
+        "name": "Mom",
+        "face": "mom",
+        "project": "Walks before bed",
+        "description": "Three times a week, half an hour, phone left at home",
+        "goal": "Not to miss a single week"
+      },
+      {
+        "id": "p3",
+        "name": "Timur",
+        "face": "son",
+        "project": "Learning the trees",
+        "description": "By the leaf and by the bark, starting with five",
+        "goal": "Name five trees without the book"
+      },
+      {
+        "id": "p4",
+        "name": "Nastya",
+        "face": "daughter",
+        "project": "Still drawing",
+        "description": "Sketchbook at weekends, now trying from life",
+        "goal": "Draw the woods from life at least once"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 50,
+      "p2": 65,
+      "p3": 40,
+      "p4": 55
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggg",
+      "p2": "gggyggggyggggyg",
+      "p3": "ggyggggyrggyggg",
+      "p4": "gygggyggyggggyg"
+    },
+    "summaryAnswer": "— The herbarium ran out at the seventh leaf: maple and oak we knew at once, about the rest we argued.\n— We went for mushrooms in the rain, filled half a basket and got soaked through — everyone happy.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-4/week-1.svg",
+      "1": "/examples/demo-4/week-2.svg"
+    }
+  }
+}

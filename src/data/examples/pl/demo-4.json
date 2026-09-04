@@ -1,0 +1,92 @@
+{
+  "name": "Miesiąc lasu",
+  "summary": "Zielnik, grzyby, ognisko z kiełbaskami — i znów tam, gdzie zaczęliśmy.",
+  "note": "we czworo · sezon w pełni",
+  "palette": "autumn",
+  "icons": "picnic",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasz las. Nasze ścieżki. Nasz wrzesień."
+    },
+    "theme": {
+      "subtitle": "Miesiąc lasu",
+      "question": "Co w lesie okazało się inne, niż myśleliśmy?"
+    },
+    "weeksNote": "4 tygodnie – 4 wyprawy do jednego lasu",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Zielnik: po liściu z każdego drzewa"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Na grzyby, z koszykiem i atlasem"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Ognisko, pieczone ziemniaki i kiełbaski"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Tam, gdzie zaczęliśmy — co się zmieniło"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Być w lesie co tydzień i wrócić tam, gdzie zaczęliśmy.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Barwy jesieni",
+        "description": "Jedno zdjęcie na wyprawę, zawsze z tego samego miejsca",
+        "goal": "Zebrać cztery zdjęcia w jeden rząd"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Spacery przed snem",
+        "description": "Trzy razy w tygodniu, pół godziny, telefon w domu",
+        "goal": "Nie opuścić ani jednego tygodnia"
+      },
+      {
+        "id": "p3",
+        "name": "Tymur",
+        "face": "son",
+        "project": "Poznaję drzewa",
+        "description": "Po liściu i po korze, zacząłem od pięciu najczęstszych",
+        "goal": "Nazwać pięć drzew bez zaglądania do książki"
+      },
+      {
+        "id": "p4",
+        "name": "Nastia",
+        "face": "daughter",
+        "project": "Dalej rysuję",
+        "description": "Szkicownik w weekendy, teraz próbuję z natury",
+        "goal": "Narysować las z natury choć raz"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 50,
+      "p2": 65,
+      "p3": 40,
+      "p4": 55
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggg",
+      "p2": "gggyggggyggggyg",
+      "p3": "ggyggggyrggyggg",
+      "p4": "gygggyggyggggyg"
+    },
+    "summaryAnswer": "— Zielnik skończył się na siódmym liściu: klon i dąb poznaliśmy od razu, o resztę się spieraliśmy.\n— Na grzyby wyszliśmy w deszczu, nazbieraliśmy pół koszyka i przemokliśmy do suchej nitki — wszyscy zadowoleni.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-4/week-1.svg",
+      "1": "/examples/demo-4/week-2.svg"
+    }
+  }
+}
