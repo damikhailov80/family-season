@@ -1,0 +1,80 @@
+{
+  "name": "Know Your City",
+  "summary": "A museum, an unfamiliar district, the blank spots near home and an ice-cream factory tour.",
+  "note": "three of us · season just started",
+  "palette": "amber-azure",
+  "icons": "discovery",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our city. Our routes. Our discoveries."
+    },
+    "theme": {
+      "subtitle": "Know Your City",
+      "question": "What did we see in our own city for the first time?"
+    },
+    "weeksNote": "4 weeks – 4 places we have never been",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "A museum we have never once walked into"
+      },
+      {
+        "title": "Week 2",
+        "text": "An unfamiliar district: pick one, walk it"
+      },
+      {
+        "title": "Week 3",
+        "text": "The blank spots near home — walk to them"
+      },
+      {
+        "title": "Week 4",
+        "text": "A tour of the local ice-cream factory"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Go where we have never been and see our own city the way visitors do.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Five ways to work",
+        "description": "A new way each time: on foot, by bike, by bus",
+        "goal": "Five routes and not one repeat"
+      },
+      {
+        "id": "p2",
+        "name": "Mum",
+        "face": "mom",
+        "project": "Flea and farm markets",
+        "description": "At the weekend: old things first, then vegetables",
+        "goal": "Both markets before the month is out"
+      },
+      {
+        "id": "p3",
+        "name": "Polya",
+        "face": "daughter",
+        "project": "Five new playgrounds",
+        "description": "In every new district I look for one I have not swung on",
+        "goal": "Five playgrounds, all different"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 20,
+      "p3": 10
+    },
+    "moods": {
+      "p1": "ggy",
+      "p2": "gg",
+      "p3": "ggg"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-8/week-1.svg"
+    }
+  }
+}

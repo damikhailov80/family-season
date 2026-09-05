@@ -1,0 +1,80 @@
+{
+  "name": "Poznaj swoje miasto",
+  "summary": "Muzeum, nieznana dzielnica, białe plamy obok domu i wycieczka do fabryki lodów.",
+  "note": "we troje · sezon dopiero się zaczął",
+  "palette": "amber-azure",
+  "icons": "discovery",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasze miasto. Nasze trasy. Nasze odkrycia."
+    },
+    "theme": {
+      "subtitle": "Poznaj swoje miasto",
+      "question": "Co w swoim mieście zobaczyliśmy po raz pierwszy?"
+    },
+    "weeksNote": "4 tygodnie – 4 miejsca, gdzie nie byliśmy",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Muzeum, do którego nigdy nie weszliśmy"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Nieznana dzielnica: wybieramy i idziemy pieszo"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Białe plamy naszej dzielnicy — docieramy tam"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Wycieczka do fabryki lodów"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Być tam, gdzie nigdy nie byliśmy, i zobaczyć swoje miasto jak przyjezdni.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Pięć dróg do pracy",
+        "description": "Za każdym razem inaczej: pieszo, rowerem, autobusem",
+        "goal": "Pięć tras i żadnego powtórzenia"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Pchli targ i bazarek",
+        "description": "W weekend: najpierw po stare rzeczy, potem po warzywa",
+        "goal": "Odwiedzić oba do końca miesiąca"
+      },
+      {
+        "id": "p3",
+        "name": "Pola",
+        "face": "daughter",
+        "project": "Nowe place zabaw",
+        "description": "W każdej nowej dzielnicy szukam placu, na którym nie byłam",
+        "goal": "Pięć placów zabaw, każdy inny"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 20,
+      "p3": 10
+    },
+    "moods": {
+      "p1": "ggy",
+      "p2": "gg",
+      "p3": "ggg"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-8/week-1.svg"
+    }
+  }
+}
