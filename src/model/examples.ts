@@ -8,6 +8,8 @@ import ruDemo7 from '../data/examples/ru/demo-7.json'
 import ruDemo8 from '../data/examples/ru/demo-8.json'
 import ruDemo9 from '../data/examples/ru/demo-9.json'
 import ruDemo10 from '../data/examples/ru/demo-10.json'
+import ruDemo11 from '../data/examples/ru/demo-11.json'
+import ruDemo12 from '../data/examples/ru/demo-12.json'
 import enDemo1 from '../data/examples/en/demo-1.json'
 import enDemo2 from '../data/examples/en/demo-2.json'
 import enDemo3 from '../data/examples/en/demo-3.json'
@@ -78,6 +80,8 @@ const RAW: Record<Lang, Record<string, RawExample>> = {
     'demo-8': ruDemo8,
     'demo-9': ruDemo9,
     'demo-10': ruDemo10,
+    'demo-11': ruDemo11,
+    'demo-12': ruDemo12,
   },
   en: {
     'demo-1': enDemo1,
@@ -128,6 +132,8 @@ const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
     'demo-8': SYSTEM_ID_BASE + 13,
     'demo-9': SYSTEM_ID_BASE + 16,
     'demo-10': SYSTEM_ID_BASE + 19,
+    'demo-11': SYSTEM_ID_BASE + 22,
+    'demo-12': SYSTEM_ID_BASE + 25,
   },
   en: {
     'demo-1': 4,
