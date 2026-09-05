@@ -7,6 +7,7 @@ import ruDemo6 from '../data/examples/ru/demo-6.json'
 import ruDemo7 from '../data/examples/ru/demo-7.json'
 import ruDemo8 from '../data/examples/ru/demo-8.json'
 import ruDemo9 from '../data/examples/ru/demo-9.json'
+import ruDemo10 from '../data/examples/ru/demo-10.json'
 import enDemo1 from '../data/examples/en/demo-1.json'
 import enDemo2 from '../data/examples/en/demo-2.json'
 import enDemo3 from '../data/examples/en/demo-3.json'
@@ -16,6 +17,7 @@ import enDemo6 from '../data/examples/en/demo-6.json'
 import enDemo7 from '../data/examples/en/demo-7.json'
 import enDemo8 from '../data/examples/en/demo-8.json'
 import enDemo9 from '../data/examples/en/demo-9.json'
+import enDemo10 from '../data/examples/en/demo-10.json'
 import plDemo1 from '../data/examples/pl/demo-1.json'
 import plDemo2 from '../data/examples/pl/demo-2.json'
 import plDemo3 from '../data/examples/pl/demo-3.json'
@@ -25,6 +27,7 @@ import plDemo6 from '../data/examples/pl/demo-6.json'
 import plDemo7 from '../data/examples/pl/demo-7.json'
 import plDemo8 from '../data/examples/pl/demo-8.json'
 import plDemo9 from '../data/examples/pl/demo-9.json'
+import plDemo10 from '../data/examples/pl/demo-10.json'
 import type { FaceVariant, IconSetId, PaletteId } from '../types'
 import { FACE_ORDER } from './accents'
 import { knownIconSet } from './icons'
@@ -74,6 +77,7 @@ const RAW: Record<Lang, Record<string, RawExample>> = {
     'demo-7': ruDemo7,
     'demo-8': ruDemo8,
     'demo-9': ruDemo9,
+    'demo-10': ruDemo10,
   },
   en: {
     'demo-1': enDemo1,
@@ -85,6 +89,7 @@ const RAW: Record<Lang, Record<string, RawExample>> = {
     'demo-7': enDemo7,
     'demo-8': enDemo8,
     'demo-9': enDemo9,
+    'demo-10': enDemo10,
   },
   pl: {
     'demo-1': plDemo1,
@@ -96,6 +101,7 @@ const RAW: Record<Lang, Record<string, RawExample>> = {
     'demo-7': plDemo7,
     'demo-8': plDemo8,
     'demo-9': plDemo9,
+    'demo-10': plDemo10,
   },
 }
 
@@ -121,6 +127,7 @@ const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
     'demo-7': SYSTEM_ID_BASE + 10,
     'demo-8': SYSTEM_ID_BASE + 13,
     'demo-9': SYSTEM_ID_BASE + 16,
+    'demo-10': SYSTEM_ID_BASE + 19,
   },
   en: {
     'demo-1': 4,
@@ -132,6 +139,7 @@ const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
     'demo-7': SYSTEM_ID_BASE + 11,
     'demo-8': SYSTEM_ID_BASE + 14,
     'demo-9': SYSTEM_ID_BASE + 17,
+    'demo-10': SYSTEM_ID_BASE + 20,
   },
   pl: {
     'demo-1': 7,
@@ -143,6 +151,7 @@ const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
     'demo-7': SYSTEM_ID_BASE + 12,
     'demo-8': SYSTEM_ID_BASE + 15,
     'demo-9': SYSTEM_ID_BASE + 18,
+    'demo-10': SYSTEM_ID_BASE + 21,
   },
 }
 
