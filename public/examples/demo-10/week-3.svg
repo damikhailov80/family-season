@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Три тарелки пасты, три соуса</title>
+
+  <!-- Стол -->
+  <rect width="200" height="200" fill="#4c3f54"/>
+  <rect y="150" width="200" height="50" fill="#3f3446"/>
+
+  <!-- Тарелка слева: томатный -->
+  <g transform="translate(56 62)">
+    <circle r="44" fill="#f6f1e6"/>
+    <circle r="34" fill="#efe6d6"/>
+    <path d="M-24 4 q10 -18 24 -6 q14 12 24 -4 q-6 22 -24 22 q-18 0 -24 -12 Z" fill="#d13525"/>
+    <g fill="#486824">
+      <path d="M6 -6 q7 -6 11 1 q-7 6 -11 -1 Z"/>
+    </g>
+  </g>
+
+  <!-- Тарелка справа: базиликовый -->
+  <g transform="translate(146 96)">
+    <circle r="42" fill="#f6f1e6"/>
+    <circle r="32" fill="#efe6d6"/>
+    <path d="M-22 2 q10 -16 22 -5 q13 11 22 -4 q-6 21 -22 21 q-16 0 -22 -12 Z" fill="#486824"/>
+    <g fill="#f2c057">
+      <circle cx="-4" cy="4" r="3"/>
+      <circle cx="10" cy="8" r="2.5"/>
+    </g>
+  </g>
+
+  <!-- Тарелка снизу: сливочный с перцем -->
+  <g transform="translate(92 152)">
+    <circle r="40" fill="#f6f1e6"/>
+    <circle r="30" fill="#efe6d6"/>
+    <path d="M-21 0 q9 -15 21 -5 q12 10 21 -4 q-6 20 -21 20 q-15 0 -21 -11 Z" fill="#f2c057"/>
+    <g fill="#4c3f54">
+      <circle cx="-8" cy="2" r="2"/>
+      <circle cx="4" cy="7" r="2"/>
+      <circle cx="14" cy="0" r="1.6"/>
+    </g>
+  </g>
+
+  <!-- Вилка -->
+  <g transform="translate(20 150) rotate(14)" fill="#c9c4bb">
+    <rect x="-2.5" y="-2" width="5" height="42" rx="2"/>
+    <rect x="-9" y="-22" width="3" height="22" rx="1.5"/>
+    <rect x="-3" y="-22" width="3" height="22" rx="1.5"/>
+    <rect x="3" y="-22" width="3" height="22" rx="1.5"/>
+    <rect x="9" y="-22" width="3" height="22" rx="1.5"/>
+    <path d="M-9 -2 L9 -2 L4 6 L-4 6 Z"/>
+  </g>
+</svg>

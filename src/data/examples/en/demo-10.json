@@ -1,0 +1,74 @@
+{
+  "name": "Italian Kitchen Month",
+  "summary": "Pizza from scratch, the best Italian in town, three sauces in a week and a class.",
+  "note": "two of us · season in full swing",
+  "palette": "figs-basil",
+  "icons": "travel",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our kitchen. Our evenings. Our Italy."
+    },
+    "theme": {
+      "subtitle": "Italian Kitchen Month",
+      "question": "What of all we cooked will we cook again with no occasion?"
+    },
+    "weeksNote": "4 weeks – from our own dough to a class",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Baking pizza ourselves, dough set at night"
+      },
+      {
+        "title": "Week 2",
+        "text": "Out to the best Italian place in town"
+      },
+      {
+        "title": "Week 3",
+        "text": "Pasta week: three sauces, three shapes"
+      },
+      {
+        "title": "Week 4",
+        "text": "A cookery class: cooking under a chef"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Learn to cook Italian at home instead of ordering it.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Igor",
+        "face": "dad",
+        "project": "Italian classics",
+        "description": "A film for every week, and I set the screening up myself",
+        "goal": "Four evenings, not one of them random"
+      },
+      {
+        "id": "p2",
+        "name": "Vera",
+        "face": "mom",
+        "project": "Finding my sauce",
+        "description": "Five different ones this month, each from scratch, no jars",
+        "goal": "Work out which of the five is mine"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 60,
+      "p2": 55
+    },
+    "moods": {
+      "p1": "ggyggygggyggyg",
+      "p2": "gyggggyggyggg"
+    },
+    "summaryAnswer": "— The first pizza stuck to the tray; an hour later the second one was fine.\n— At the restaurant we ordered what we could never make at home — the right call.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-10/week-1.svg",
+      "1": "/examples/demo-10/week-2.svg",
+      "2": "/examples/demo-10/week-3.svg",
+      "3": "/examples/demo-10/week-4.svg"
+    }
+  }
+}

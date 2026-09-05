@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Своя пицца на противне</title>
+
+  <!-- Стол -->
+  <rect width="200" height="200" fill="#e8d9bf"/>
+  <g stroke="#d8c5a4" stroke-width="2">
+    <path d="M0 26 L200 26"/>
+    <path d="M0 92 L200 92"/>
+    <path d="M0 158 L200 158"/>
+  </g>
+
+  <!-- Мука -->
+  <g fill="#f6f1e6">
+    <ellipse cx="34" cy="176" rx="26" ry="9"/>
+    <ellipse cx="172" cy="44" rx="18" ry="7"/>
+    <circle cx="62" cy="160" r="3"/>
+    <circle cx="150" cy="58" r="2.5"/>
+  </g>
+
+  <!-- Противень -->
+  <rect x="18" y="26" width="164" height="140" rx="10" fill="#8e8c86"/>
+  <rect x="24" y="32" width="152" height="128" rx="7" fill="#6f6d68"/>
+
+  <!-- Пицца -->
+  <g transform="translate(100 96)">
+    <circle cx="0" cy="0" r="62" fill="#e8c98b"/>
+    <circle cx="0" cy="0" r="53" fill="#d13525"/>
+    <circle cx="0" cy="0" r="53" fill="#b82c1e" opacity=".25"/>
+    <!-- Моцарелла -->
+    <g fill="#f6f1e6">
+      <circle cx="-26" cy="-18" r="10"/>
+      <circle cx="8" cy="-30" r="9"/>
+      <circle cx="28" cy="-2" r="10"/>
+      <circle cx="-8" cy="16" r="11"/>
+      <circle cx="-34" cy="16" r="7"/>
+      <circle cx="18" cy="30" r="8"/>
+    </g>
+    <!-- Базилик -->
+    <g fill="#486824">
+      <path d="M-18 -34 q8 -8 14 0 q-8 8 -14 0 Z"/>
+      <path d="M34 18 q9 -7 14 2 q-9 7 -14 -2 Z"/>
+      <path d="M-38 -4 q7 -9 14 -1 q-8 8 -14 1 Z"/>
+      <path d="M4 40 q9 -6 14 3 q-10 6 -14 -3 Z"/>
+    </g>
+    <!-- Разрез -->
+    <g stroke="#e8c98b" stroke-width="2.5" opacity=".8">
+      <path d="M0 -53 L0 53"/>
+      <path d="M-53 0 L53 0"/>
+    </g>
+  </g>
+
+  <!-- Скалка -->
+  <g transform="translate(160 176) rotate(-16)">
+    <rect x="-46" y="-6" width="92" height="12" rx="6" fill="#c9a86a"/>
+    <rect x="-62" y="-3" width="18" height="6" rx="3" fill="#a5844b"/>
+    <rect x="44" y="-3" width="18" height="6" rx="3" fill="#a5844b"/>
+  </g>
+</svg>

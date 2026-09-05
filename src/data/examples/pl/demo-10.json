@@ -1,0 +1,74 @@
+{
+  "name": "Miesiąc kuchni włoskiej",
+  "summary": "Pizza od zera, najlepszy Włoch w mieście, trzy sosy w tydzień i warsztaty.",
+  "note": "we dwoje · sezon w pełni",
+  "palette": "figs-basil",
+  "icons": "travel",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasza kuchnia. Nasze wieczory. Nasze Włochy."
+    },
+    "theme": {
+      "subtitle": "Miesiąc kuchni włoskiej",
+      "question": "Co z tego, co ugotowaliśmy, zrobimy znowu bez okazji?"
+    },
+    "weeksNote": "4 tygodnie – od własnego ciasta do warsztatów",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Pieczemy pizzę sami, ciasto z wieczora"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Idziemy do najlepszego Włocha w mieście"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Tydzień makaronu: trzy sosy, trzy kształty"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Warsztaty: gotujemy pod okiem kucharza"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Nauczyć się gotować włoskie w domu, zamiast je zamawiać.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Igor",
+        "face": "dad",
+        "project": "Włoska klasyka",
+        "description": "Po filmie na każdy tydzień, seans przygotowuję sam",
+        "goal": "Cztery wieczory i żadnego przypadkowego"
+      },
+      {
+        "id": "p2",
+        "name": "Wiera",
+        "face": "mom",
+        "project": "Szukam swojego sosu",
+        "description": "Pięć różnych w miesiąc, każdy od zera i bez słoika",
+        "goal": "Zrozumieć, który z pięciu jest mój"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 60,
+      "p2": 55
+    },
+    "moods": {
+      "p1": "ggyggygggyggyg",
+      "p2": "gyggggyggyggg"
+    },
+    "summaryAnswer": "— Pierwsza pizza przywarła do blachy, druga po godzinie była już w porządku.\n— W restauracji wzięliśmy to, czego w domu nie zrobimy — i dobrze.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-10/week-1.svg",
+      "1": "/examples/demo-10/week-2.svg",
+      "2": "/examples/demo-10/week-3.svg",
+      "3": "/examples/demo-10/week-4.svg"
+    }
+  }
+}
