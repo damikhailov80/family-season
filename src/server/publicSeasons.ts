@@ -426,6 +426,62 @@ export async function randomIdeas(lang: Lang): Promise<IdeasState> {
   }
 }
 
+// The month page shows named seasons rather than a random draw, so it asks for them by code.
+// It could have drawn them from the example files - they are in the repository - but then the
+// card would come from one place and the link it carries from another, and the two are bound to
+// part: a season taken off the showcase, or closed after reports, would still be advertised
+// here. One source, and the visibility rules are the showcase's own.
+export async function ideasByCode(codes: string[], lang: Lang): Promise<IdeasState> {
+  if (!codes.length) return { status: 'ok', ideas: [] }
+
+  const result = await query<{
+    code: string
+    content: unknown
+    names: unknown
+    palette: string
+    language: string
+    rolling_month: boolean
+    likes: number
+    system: boolean
+  }>(
+    'public:ideas:codes',
+    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_month,
+            p.author_key is null as system,
+            (select count(*) from public_likes l where l.public_id = p.id)::int as likes
+       from public_seasons p
+      where p.hidden_at is null and p.blocked_at is null
+        and p.language = $2 and p.code = any($1)`,
+    [codes, lang],
+  )
+
+  if (result.status !== 'ok') {
+    logger.error('month ideas not read', { reason: result.status })
+    return { status: 'error' }
+  }
+
+  const found = new Map(
+    result.rows.map((row) => {
+      const template = joinSeason(row.content, row.names)
+      const shown = row.rolling_month ? withTargetMonth(template) : template
+      return [
+        row.code,
+        {
+          code: row.code,
+          title: ideaTitle(shown, knownLang(row.language)),
+          palette: knownPalette(row.palette),
+          lang: knownLang(row.language),
+          template: shown,
+          likes: row.likes,
+          system: row.system,
+        } satisfies Idea,
+      ]
+    }),
+  )
+
+  // The order is the one the month page asked for, not the one the database happened to return.
+  return { status: 'ok', ideas: codes.map((code) => found.get(code)).filter(Boolean) as Idea[] }
+}
+
 export async function setLike(value: string, on: boolean): Promise<ReactionStatus> {
   const code = codeOrNull(value)
   const session = await auth()

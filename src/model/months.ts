@@ -1,7 +1,8 @@
 import ruSeptember from '../data/months/ru/september.json'
 import enSeptember from '../data/months/en/september.json'
 import plSeptember from '../data/months/pl/september.json'
-import { exampleByKey, exampleKey, type Example } from './examples'
+import { exampleByKey, exampleKey } from './examples'
+import { shortCode } from './shortcode'
 import { LANGS, type Lang } from './lang'
 
 export interface MonthText {
@@ -36,10 +37,18 @@ const SEASONS: Record<string, string[]> = {
   september: ['demo-4', 'demo-5', 'demo-6'],
 }
 
+// The card itself is read from the database by code (see ideasByCode): one source for what the
+// season is, and the showcase's own rules about what may be shown. What stays here is the line
+// under the card - editorial text about the idea, which is not part of any season.
+export interface MonthSeason {
+  code: string
+  summary: string
+}
+
 export interface MonthPage {
   slug: string
   text: MonthText
-  seasons: Example[]
+  seasons: MonthSeason[]
 }
 
 export function monthPage(lang: Lang, slug: string): MonthPage | null {
@@ -48,7 +57,11 @@ export function monthPage(lang: Lang, slug: string): MonthPage | null {
 
   const seasons = (SEASONS[slug] ?? [])
     .map((id) => exampleByKey(exampleKey(lang, id)))
-    .filter((example): example is Example => Boolean(example))
+    .filter((example) => Boolean(example))
+    .map((example) => ({
+      code: shortCode('public', example!.publicId),
+      summary: example!.summary,
+    }))
 
   return { slug, text, seasons }
 }

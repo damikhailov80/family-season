@@ -127,6 +127,9 @@ test.describe('a month has a page of its own', () => {
       'Чем заняться с семьёй в сентябре',
     )
     await expect(page.getByRole('heading', { level: 2 })).not.toHaveCount(0)
+
+    // The cards come from the showcase, so they carry its addresses.
+    await expect(page.locator('a[href^="/ru/s/"]')).toHaveCount(3)
   })
 
   test('a month we have not written about is not a page', async ({ request }) => {
@@ -182,6 +185,9 @@ test.describe('the page has a readable outline', () => {
     await expect(h1).toContainText(DICTS.ru.landing.heroTitle)
     await expect(h1).toContainText(DICTS.ru.landing.heroTitleTail)
     await expect(page.getByRole('heading', { level: 2 })).not.toHaveCount(0)
+
+    // The cards come from the showcase, so they carry its addresses.
+    await expect(page.locator('a[href^="/ru/s/"]')).toHaveCount(3)
   })
 
   test('the showcase has a heading of its own', async ({ page }) => {

@@ -1564,10 +1564,18 @@ article rather than as a piece of the product.
   of paths without the language, which is the rule, and makes the `hreflang` set between the
   translations trivial. The price is real and accepted: a transliterated Russian slug would have
   read slightly better to Yandex.
-- **There is no query on this page.** The seasons it shows are our examples, and an example is a
-  file: `EXAMPLE_LIST` already holds the blank, the theme and the id, and `SeasonPreview` never
-  needed more than that. So the page opens with the database down, exactly like the landing - and
-  that is not a nicety, it is the rule about pages that must not depend on the database.
+- **The cards are read from the database, by code** (`ideasByCode`), not drawn from the example
+  files. The files are right there and it was built that way first - but then the card would come
+  from one place and the link it carries from another, and the two are bound to part: a season
+  taken off the showcase, or closed after reports, would still be advertised here and would lead
+  to a 404. One source, and the visibility rules are the showcase's own.
+- **The article is the page; the seasons are a bonus.** A quiet database leaves the block undrawn
+  and the page whole - that is the rule about pages that must not depend on the database, and it
+  is met by not drawing a block, not by avoiding the query. No toast either: on the showcase a
+  person came for the seasons and deserves to be told, here they came to read.
+- **What does stay in the repository is the line under each card.** It is editorial text about the
+  idea, written for this page, and it is not part of any season - so it lives in the registry
+  beside the code it belongs to.
 - **The grouping "which seasons belong to September" lives here, not in the examples.** A
   publication has no month of its own on purpose (see "The showcase: publishing"); the month page
   is what groups them, so the grouping is the month page's business.
