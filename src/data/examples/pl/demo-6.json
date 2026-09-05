@@ -1,0 +1,90 @@
+{
+  "name": "Ekomiesiąc",
+  "summary": "Oddajemy rzeczy, sprzątamy park, półka wymiany — i szukamy swoich.",
+  "note": "we czworo · sezon dopiero się zaczął",
+  "palette": "fresh-green",
+  "icons": "city",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasz dom. Nasze podwórko. Nasze miasto."
+    },
+    "theme": {
+      "subtitle": "Ekomiesiąc",
+      "question": "Co z oddanych rzeczy przydało się komuś bardziej niż nam?"
+    },
+    "weeksNote": "4 tygodnie – od naszych szaf do miasta",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Przeglądamy szafy: oddajemy, nie wyrzucamy"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Sprzątanie Świata w parku obok"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Półka wymiany książek na klatce"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Szukamy ekowolontariuszy w mieście"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Oddać, a nie wyrzucić — i znaleźć, z kim robić to dalej.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Naprawiam, nie kupuję",
+        "description": "Najpierw krzesło, potem rower Jegora",
+        "goal": "Obie rzeczy naprawione do końca miesiąca"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Własna torba",
+        "description": "Materiałowa torba zawsze przy sobie, zamiast reklamówek",
+        "goal": "Ani jednej jednorazowej reklamówki"
+      },
+      {
+        "id": "p3",
+        "name": "Jegor",
+        "face": "son",
+        "project": "Wymieniam komiksy",
+        "description": "Przynoszę swoje, biorę czyjeś — zamiast kupować nowe",
+        "goal": "Wymienić dziesięć i nic nie kupić"
+      },
+      {
+        "id": "p4",
+        "name": "Ania",
+        "face": "daughter",
+        "project": "Prezentacja w szkole",
+        "description": "O tym, co gdzie wyrzucać; robię ją sama",
+        "goal": "Wystąpić przed swoją klasą"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 15,
+      "p2": 20,
+      "p4": 10
+    },
+    "moods": {
+      "p1": "ggy",
+      "p2": "ggg",
+      "p3": "gyg",
+      "p4": "gg"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-6/week-1.svg"
+    }
+  }
+}

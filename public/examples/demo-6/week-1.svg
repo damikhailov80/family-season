@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Коробка с вещами, которые отдаём</title>
+
+  <!-- Комната -->
+  <rect width="200" height="200" fill="#eef2ea"/>
+  <rect y="146" width="200" height="54" fill="#d7dfd1"/>
+  <path d="M0 146 L200 146" stroke="#b9c4b2" stroke-width="2"/>
+
+  <!-- Открытый шкаф слева -->
+  <rect x="6" y="34" width="34" height="112" fill="#b3de81"/>
+  <rect x="10" y="38" width="26" height="104" fill="#eef2ea"/>
+  <g stroke="#68a225" stroke-width="2">
+    <path d="M10 70 L36 70"/>
+    <path d="M10 104 L36 104"/>
+  </g>
+
+  <!-- Коробка -->
+  <g transform="translate(112 146)">
+    <!-- Вещи в коробке -->
+    <g transform="translate(-18 -60)">
+      <rect x="-14" y="0" width="28" height="9" rx="1.5" fill="#265c00"/>
+      <rect x="-11" y="-9" width="26" height="9" rx="1.5" fill="#68a225"/>
+      <rect x="-8" y="-18" width="22" height="9" rx="1.5" fill="#b3de81"/>
+    </g>
+    <g transform="translate(16 -56)">
+      <circle cx="0" cy="-8" r="11" fill="#68a225"/>
+      <path d="M-11 -8 A11 11 0 0 0 11 -8 Z" fill="#265c00" opacity=".35"/>
+    </g>
+    <path d="M28 -50 q10 -14 -2 -20 q-12 -6 -16 8 l6 22 z" fill="#b3de81"/>
+
+    <!-- Створки -->
+    <path d="M-44 -34 L-44 -50 L-16 -42 L-16 -30 Z" fill="#c99a5e"/>
+    <path d="M44 -34 L44 -50 L16 -42 L16 -30 Z" fill="#c99a5e"/>
+
+    <!-- Корпус -->
+    <path d="M-44 -32 L44 -32 L38 0 L-38 0 Z" fill="#d8a86a"/>
+    <path d="M-44 -32 L44 -32 L43 -24 L-43 -24 Z" fill="#c08e4e"/>
+    <path d="M0 -24 L0 0" stroke="#a97b3f" stroke-width="1.6"/>
+  </g>
+
+  <!-- Стопка книг рядом -->
+  <g transform="translate(42 146)">
+    <rect x="-16" y="-10" width="32" height="10" rx="1.5" fill="#265c00"/>
+    <rect x="-14" y="-20" width="30" height="10" rx="1.5" fill="#68a225"/>
+    <rect x="-12" y="-29" width="26" height="9" rx="1.5" fill="#b3de81"/>
+  </g>
+</svg>

@@ -1,0 +1,90 @@
+{
+  "name": "Eco Month",
+  "summary": "Giving things away, clearing a park, a swap shelf — and finding our people.",
+  "note": "four of us · season just started",
+  "palette": "fresh-green",
+  "icons": "city",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our home. Our yard. Our city."
+    },
+    "theme": {
+      "subtitle": "Eco Month",
+      "question": "What we gave away — who needed it more than we did?"
+    },
+    "weeksNote": "4 weeks – from our cupboards to the city",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Clearing cupboards: give away, not throw out"
+      },
+      {
+        "title": "Week 2",
+        "text": "Litter-picking in the park next door"
+      },
+      {
+        "title": "Week 3",
+        "text": "A book swap shelf in our hallway"
+      },
+      {
+        "title": "Week 4",
+        "text": "Finding the city's eco volunteers, joining in"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Give it away rather than bin it — and find who else is doing this.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Mending, not binning",
+        "description": "The chair first, then Egor's bicycle",
+        "goal": "Both of them mended by month's end"
+      },
+      {
+        "id": "p2",
+        "name": "Mom",
+        "face": "mom",
+        "project": "My own bag",
+        "description": "The cloth bag always with me, instead of plastic",
+        "goal": "Not one single-use bag"
+      },
+      {
+        "id": "p3",
+        "name": "Egor",
+        "face": "son",
+        "project": "Swapping comics",
+        "description": "I bring mine, take somebody's — instead of buying new",
+        "goal": "Swap ten and buy nothing"
+      },
+      {
+        "id": "p4",
+        "name": "Anya",
+        "face": "daughter",
+        "project": "A talk at school",
+        "description": "About what goes where; I am making it myself",
+        "goal": "Give it in front of my class"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 15,
+      "p2": 20,
+      "p4": 10
+    },
+    "moods": {
+      "p1": "ggy",
+      "p2": "ggg",
+      "p3": "gyg",
+      "p4": "gg"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-6/week-1.svg"
+    }
+  }
+}
