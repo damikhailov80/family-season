@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Балерина на сцене, первый балет</title>
+
+  <!-- Тёмный зал -->
+  <rect width="200" height="200" fill="#241f22"/>
+
+  <!-- Луч прожектора -->
+  <path d="M84 0 L116 0 L152 158 L48 158 Z" fill="#e3c98f" opacity=".16"/>
+  <ellipse cx="100" cy="158" rx="52" ry="12" fill="#e3c98f" opacity=".22"/>
+
+  <!-- Пол сцены -->
+  <rect y="158" width="200" height="42" fill="#6b4a35"/>
+  <rect y="158" width="200" height="4" fill="#8a6244"/>
+  <g stroke="#5a3d2c" stroke-width="1.4">
+    <path d="M28 162 L28 200"/>
+    <path d="M76 162 L76 200"/>
+    <path d="M124 162 L124 200"/>
+    <path d="M172 162 L172 200"/>
+  </g>
+
+  <!-- Кулисы -->
+  <path d="M0 0 L34 0 L26 200 L0 200 Z" fill="#5e161a"/>
+  <path d="M200 0 L166 0 L174 200 L200 200 Z" fill="#5e161a"/>
+  <path d="M0 0 L18 0 L14 200 L0 200 Z" fill="#4a1115"/>
+  <path d="M200 0 L182 0 L186 200 L200 200 Z" fill="#4a1115"/>
+
+  <!-- Балерина -->
+  <g transform="translate(100 158)">
+    <!-- Опорная нога -->
+    <path d="M-2 -46 L-4 -6 L-10 0 L4 0 L2 -46 Z" fill="#f0dfc4"/>
+    <!-- Поднятая нога -->
+    <path d="M2 -50 L34 -74 L40 -70 L6 -44 Z" fill="#f0dfc4"/>
+    <!-- Пачка -->
+    <path d="M-24 -52 q24 -14 48 0 q-14 12 -24 12 q-10 0 -24 -12 Z" fill="#f6f1e6"/>
+    <!-- Корпус -->
+    <path d="M-7 -84 q7 -6 14 0 l-2 34 q-5 4 -10 0 Z" fill="#c9a86a"/>
+    <!-- Руки -->
+    <path d="M-6 -80 q-22 -6 -30 -22" fill="none" stroke="#f0dfc4" stroke-width="4.5" stroke-linecap="round"/>
+    <path d="M6 -80 q20 -10 24 -26" fill="none" stroke="#f0dfc4" stroke-width="4.5" stroke-linecap="round"/>
+    <!-- Голова -->
+    <circle cx="0" cy="-92" r="8" fill="#f0dfc4"/>
+    <path d="M-8 -94 q8 -12 16 0 q-4 -5 -16 0 Z" fill="#5a3d2c"/>
+    <circle cx="7" cy="-95" r="3.5" fill="#5a3d2c"/>
+  </g>
+</svg>

@@ -1,0 +1,94 @@
+{
+  "name": "Culture Month",
+  "summary": "Theatre, ballet, a concert — and our own tune on guitar and piano at the end.",
+  "note": "four of us · season lived to the end",
+  "palette": "golden-noon",
+  "icons": "music",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our city. Our evenings. Our music."
+    },
+    "theme": {
+      "subtitle": "Culture Month",
+      "question": "What of all we saw did we want to see again?"
+    },
+    "weeksNote": "4 weeks – three halls and a stage of our own",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "The theatre — a play, the whole family"
+      },
+      {
+        "title": "Week 2",
+        "text": "Ballet: the first time in our lives"
+      },
+      {
+        "title": "Week 3",
+        "text": "A concert: the philharmonic or an organ"
+      },
+      {
+        "title": "Week 4",
+        "text": "Playing it ourselves: guitar and piano"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Go where we never go, and play something of our own at the end of the month.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Got the guitar out",
+        "description": "Half an hour in the evenings, starting with the old chords",
+        "goal": "Play the accompaniment without stumbling"
+      },
+      {
+        "id": "p2",
+        "name": "Mum",
+        "face": "mom",
+        "project": "Back at the piano",
+        "description": "Half an hour while the house is empty: scales and one piece",
+        "goal": "Play it with Dad at the end of the month"
+      },
+      {
+        "id": "p3",
+        "name": "Roma",
+        "face": "son",
+        "project": "Reading up the play",
+        "description": "I read about it and tell everyone on the way to the theatre",
+        "goal": "Tell them before it starts, not after"
+      },
+      {
+        "id": "p4",
+        "name": "Yulia",
+        "face": "daughter",
+        "project": "Working out ballet",
+        "description": "What it is about and who is who — so I watch and understand",
+        "goal": "Know the story before act one"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 80,
+      "p2": 85,
+      "p3": 100,
+      "p4": 100
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggygggyggygggyggy",
+      "p2": "gyggggyggygggyggggyggygggyggyg",
+      "p3": "gggyggggyggyggggyggygggyggyggg",
+      "p4": "gygggyrggyggggyggyrggyggggyggy"
+    },
+    "summaryAnswer": "— At the theatre Yulia sat on the edge of her seat through act one and begged for a programme at the interval.\n— Dad fell asleep at the ballet, and now that is the one thing everybody remembers.\n— We listened to the organ in the dark: Roma said the walls were shaking.\n— On the last evening we played it together — third try, but all the way through.",
+    "nextIdeas": "— A month of films: one a week, each of us picks their evening.\n— A day trip to the next town, with no plan.\n— Bake something difficult together, from one recipe.\n— A month with no screens in the evening — let us see what we do instead.",
+    "photos": {
+      "0": "/examples/demo-9/week-1.svg",
+      "1": "/examples/demo-9/week-2.svg",
+      "2": "/examples/demo-9/week-3.svg",
+      "3": "/examples/demo-9/week-4.svg"
+    }
+  }
+}
