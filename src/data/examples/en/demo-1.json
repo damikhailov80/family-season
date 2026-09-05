@@ -71,22 +71,24 @@
   },
   "fill": {
     "percents": {
-      "p1": 40,
-      "p2": 60,
-      "p3": 70,
-      "p4": 50
+      "p1": 90,
+      "p2": 100,
+      "p3": 85,
+      "p4": 95
     },
     "moods": {
-      "p1": "ggyggygggyggyggyg",
-      "p2": "gygggyygggryggygg",
-      "p3": "ggggyggyggggyyggg",
-      "p4": "gyrggygggyryggygg"
+      "p1": "ggyggygggyggyggygggyggyggggyggy",
+      "p2": "gygggyygggryggygggyggyggggyggyg",
+      "p3": "ggggyggyggggyygggyggygggyggyggg",
+      "p4": "gyrggygggyryggyggygggyrggyggygg"
     },
     "summaryAnswer": "— We watched the 2000s trilogy three evenings running and argued about the scariest villain.\n— Lisa fell asleep halfway through the second film and demanded the whole plot at breakfast.\n— Alex climbed the hallway wall and brought down the coat rack: the suit was a bedsheet.\n— On the last evening everyone picked their own: three of us agreed, Dad held his ground.",
     "nextIdeas": "— Board game month: a new game every Friday, the winner picks dessert.\n— A walk in the woods for mushrooms, with a thermos and sandwiches in the backpack.\n— Put together a photo album for the month and caption every picture by hand.\n— Bake grandma's pie — all of us together, no hints.",
     "photos": {
       "0": "/examples/demo-1/week-1.svg",
-      "1": "/examples/demo-1/week-2.svg"
+      "1": "/examples/demo-1/week-2.svg",
+      "2": "/examples/demo-1/week-3.svg",
+      "3": "/examples/demo-1/week-4.svg"
     }
   }
 }

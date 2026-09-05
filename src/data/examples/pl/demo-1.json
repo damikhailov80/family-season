@@ -71,22 +71,24 @@
   },
   "fill": {
     "percents": {
-      "p1": 40,
-      "p2": 60,
-      "p3": 70,
-      "p4": 50
+      "p1": 90,
+      "p2": 100,
+      "p3": 85,
+      "p4": 95
     },
     "moods": {
-      "p1": "ggyggygggyggyggyg",
-      "p2": "gygggyygggryggygg",
-      "p3": "ggggyggyggggyyggg",
-      "p4": "gyrggygggyryggygg"
+      "p1": "ggyggygggyggyggygggyggyggggyggy",
+      "p2": "gygggyygggryggygggyggyggggyggyg",
+      "p3": "ggggyggyggggyygggyggygggyggyggg",
+      "p4": "gyrggygggyryggyggygggyrggyggygg"
     },
     "summaryAnswer": "— Trylogię z lat dwutysięcznych oglądaliśmy trzy wieczory i spieraliśmy się o najstraszniejszego złoczyńcę.\n— Liza zasnęła w połowie drugiego filmu, a rano kazała sobie wszystko opowiedzieć.\n— Alek wszedł na ścianę w korytarzu i zerwał wieszak: kostium był z prześcieradła.\n— Ostatniego wieczoru każdy wybrał swojego: troje było zgodnych, tata został przy swoim.",
     "nextIdeas": "— Miesiąc planszówek: w każdy piątek nowa gra, zwycięzca wybiera deser.\n— Wyprawa do lasu na grzyby, termos i kanapki w plecaku.\n— Zrobić album ze zdjęciami z miesiąca i podpisać każde odręcznie.\n— Upiec ciasto według przepisu babci — wszyscy razem, bez podpowiedzi.",
     "photos": {
       "0": "/examples/demo-1/week-1.svg",
-      "1": "/examples/demo-1/week-2.svg"
+      "1": "/examples/demo-1/week-2.svg",
+      "2": "/examples/demo-1/week-3.svg",
+      "3": "/examples/demo-1/week-4.svg"
     }
   }
 }

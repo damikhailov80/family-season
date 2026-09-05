@@ -71,22 +71,24 @@
   },
   "fill": {
     "percents": {
-      "p1": 40,
-      "p2": 60,
-      "p3": 70,
-      "p4": 50
+      "p1": 90,
+      "p2": 100,
+      "p3": 85,
+      "p4": 95
     },
     "moods": {
-      "p1": "ggyggygggyggyggyg",
-      "p2": "gygggyygggryggygg",
-      "p3": "ggggyggyggggyyggg",
-      "p4": "gyrggygggyryggygg"
+      "p1": "ggyggygggyggyggygggyggyggggyggy",
+      "p2": "gygggyygggryggygggyggyggggyggyg",
+      "p3": "ggggyggyggggyygggyggygggyggyggg",
+      "p4": "gyrggygggyryggyggygggyrggyggygg"
     },
     "summaryAnswer": "— Трилогию нулевых смотрели три вечера подряд и спорили, какой злодей страшнее.\n— Лиза уснула на середине второго фильма, а наутро потребовала пересказать.\n— Леша полез по стене в коридоре и уронил вешалку: костюм был из простыни.\n— В последний вечер каждый выбрал своего: трое сошлись на одном, папа остался при своём.",
     "nextIdeas": "— Месяц настолок: каждую пятницу новая игра, победитель выбирает десерт.\n— Поход в лес за грибами, термос и бутерброды в рюкзаке.\n— Собрать фотоальбом за месяц и подписать каждое фото от руки.\n— Испечь пирог по бабушкиному рецепту — всем вместе, без подсказок.",
     "photos": {
       "0": "/examples/demo-1/week-1.svg",
-      "1": "/examples/demo-1/week-2.svg"
+      "1": "/examples/demo-1/week-2.svg",
+      "2": "/examples/demo-1/week-3.svg",
+      "3": "/examples/demo-1/week-4.svg"
     }
   }
 }

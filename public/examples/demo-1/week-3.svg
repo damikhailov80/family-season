@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Костюм из простыни и упавшая вешалка</title>
+
+  <!-- Коридор -->
+  <rect width="200" height="200" fill="#e7e1d6"/>
+  <rect y="150" width="200" height="50" fill="#c9bfae"/>
+  <path d="M0 150 L200 150" stroke="#ab9f8c" stroke-width="2"/>
+
+  <!-- Обои в полоску -->
+  <g stroke="#dcd4c5" stroke-width="6">
+    <path d="M18 0 L18 150"/>
+    <path d="M62 0 L62 150"/>
+    <path d="M106 0 L106 150"/>
+    <path d="M150 0 L150 150"/>
+    <path d="M194 0 L194 150"/>
+  </g>
+
+  <!-- Крючки на стене, один пустой -->
+  <rect x="112" y="34" width="72" height="8" rx="3" fill="#8f6039"/>
+  <g stroke="#7d5231" stroke-width="4" stroke-linecap="round">
+    <path d="M126 42 L126 52"/>
+    <path d="M148 42 L148 52"/>
+    <path d="M170 42 L170 52"/>
+  </g>
+
+  <!-- Упавшая вешалка на полу -->
+  <g transform="translate(158 168) rotate(-16)">
+    <path d="M-26 0 L26 0" stroke="#8f6039" stroke-width="5" stroke-linecap="round"/>
+    <path d="M-26 0 L0 -16 L26 0" fill="none" stroke="#8f6039" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M0 -16 q0 -10 6 -12" fill="none" stroke="#8f6039" stroke-width="4"/>
+  </g>
+
+  <!-- Ребёнок в самодельном костюме -->
+  <g transform="translate(74 150)">
+    <!-- Плащ из простыни -->
+    <path d="M-30 -68 q30 -14 60 0 L34 4 q-34 10 -68 0 Z" fill="#fdfcf8"/>
+    <path d="M-30 -68 q30 -14 60 0 L26 -30 q-26 8 -52 0 Z" fill="#efe9dd"/>
+    <!-- Тело -->
+    <path d="M-14 -66 q14 -8 28 0 l-4 46 h-20 Z" fill="#2988bc"/>
+    <!-- Ноги -->
+    <path d="M-8 -20 L-10 4" stroke="#2f496e" stroke-width="8" stroke-linecap="round"/>
+    <path d="M8 -20 L10 4" stroke="#2f496e" stroke-width="8" stroke-linecap="round"/>
+    <!-- Руки: одна вверх -->
+    <path d="M-14 -60 q-16 -10 -20 -26" fill="none" stroke="#2988bc" stroke-width="7" stroke-linecap="round"/>
+    <path d="M14 -60 q14 6 16 18" fill="none" stroke="#2988bc" stroke-width="7" stroke-linecap="round"/>
+    <!-- Маска из бумаги -->
+    <circle cx="0" cy="-80" r="15" fill="#ed8c72"/>
+    <path d="M-13 -84 q13 10 26 0" fill="none" stroke="#c96b52" stroke-width="1.6"/>
+    <path d="M-11 -84 q6 -8 10 0 q-5 5 -10 0 Z" fill="#fdfcf8"/>
+    <path d="M11 -84 q-6 -8 -10 0 q5 5 10 0 Z" fill="#fdfcf8"/>
+    <g stroke="#c96b52" stroke-width="1.2">
+      <path d="M-14 -88 L14 -88"/>
+      <path d="M-14 -80 L14 -80"/>
+      <path d="M0 -95 L0 -66"/>
+    </g>
+  </g>
+
+  <!-- Паутина из ниток в углу -->
+  <g stroke="#b9b0a0" stroke-width="1.4" fill="none">
+    <path d="M0 4 L44 4M0 4 L0 48M0 4 L38 42"/>
+    <path d="M0 16 Q11 12 15 4"/>
+    <path d="M0 30 Q22 22 28 4"/>
+  </g>
+</svg>
