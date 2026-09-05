@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Снежная крепость во дворе</title>
+
+  <!-- Двор -->
+  <rect width="200" height="200" fill="#dbe4ec"/>
+  <rect y="132" width="200" height="68" fill="#f2f7fa"/>
+  <path d="M0 132 Q60 124 110 132 Q160 140 200 130 L200 132 Z" fill="#e2ecf3"/>
+
+  <!-- Дом на заднем плане -->
+  <g fill="#9fb3c4">
+    <rect x="140" y="52" width="54" height="80"/>
+  </g>
+  <g fill="#e1b16a" opacity=".85">
+    <rect x="148" y="64" width="8" height="9"/>
+    <rect x="164" y="64" width="8" height="9"/>
+    <rect x="148" y="86" width="8" height="9"/>
+    <rect x="180" y="86" width="8" height="9"/>
+  </g>
+  <rect x="136" y="46" width="62" height="8" fill="#f2f7fa"/>
+
+  <!-- Ёлка -->
+  <g>
+    <path d="M14 132 L30 82 L46 132 Z" fill="#3f5a52"/>
+    <path d="M14 132 L30 82 L46 132 Z" fill="#f2f7fa" opacity=".22"/>
+    <rect x="27" y="132" width="6" height="10" fill="#5a4636"/>
+  </g>
+
+  <!-- Крепость -->
+  <g>
+    <path d="M56 132 L56 100 L150 100 L150 132 Z" fill="#f7fbfd"/>
+    <path d="M56 100 L150 100 L150 106 L56 106 Z" fill="#e2ecf3"/>
+    <!-- Зубцы -->
+    <g fill="#f7fbfd">
+      <rect x="56" y="88" width="16" height="14" rx="3"/>
+      <rect x="80" y="88" width="16" height="14" rx="3"/>
+      <rect x="104" y="88" width="16" height="14" rx="3"/>
+      <rect x="128" y="88" width="16" height="14" rx="3"/>
+    </g>
+    <!-- Кладка -->
+    <g stroke="#cfdde7" stroke-width="1.6">
+      <path d="M56 114 L150 114"/>
+      <path d="M56 124 L150 124"/>
+      <path d="M74 106 L74 114"/>
+      <path d="M100 106 L100 114"/>
+      <path d="M126 106 L126 114"/>
+      <path d="M64 114 L64 124"/>
+      <path d="M88 114 L88 124"/>
+      <path d="M112 114 L112 124"/>
+      <path d="M138 114 L138 124"/>
+    </g>
+    <!-- Флажок -->
+    <path d="M103 88 L103 62" stroke="#444c5c" stroke-width="2.5"/>
+    <path d="M103 62 L124 68 L103 74 Z" fill="#ce5a57"/>
+  </g>
+
+  <!-- Дети у крепости -->
+  <g transform="translate(66 132)">
+    <circle cx="0" cy="-22" r="8" fill="#f0dfc4"/>
+    <path d="M-8 -26 q8 -11 16 0 q-8 -3 -16 0 Z" fill="#e1b16a"/>
+    <path d="M-7 -14 q7 -5 14 0 l-2 14 h-10 Z" fill="#78a5a3"/>
+    <path d="M-7 -11 q-11 3 -12 10" fill="none" stroke="#78a5a3" stroke-width="4" stroke-linecap="round"/>
+    <path d="M7 -11 q11 -3 12 -10" fill="none" stroke="#78a5a3" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(166 132)">
+    <circle cx="0" cy="-24" r="8.5" fill="#f0dfc4"/>
+    <path d="M-8.5 -28 q8.5 -11 17 0 q-8.5 -3 -17 0 Z" fill="#ce5a57"/>
+    <path d="M-8 -15 q8 -5 16 0 l-3 15 h-10 Z" fill="#444c5c"/>
+    <path d="M-8 -12 q-12 4 -13 11" fill="none" stroke="#444c5c" stroke-width="4.2" stroke-linecap="round"/>
+    <path d="M8 -12 q12 -4 12 -12" fill="none" stroke="#444c5c" stroke-width="4.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- Снежки -->
+  <g fill="#ffffff">
+    <circle cx="128" cy="72" r="5"/>
+    <circle cx="150" cy="150" r="6"/>
+    <circle cx="40" cy="160" r="7"/>
+    <circle cx="90" cy="168" r="5"/>
+  </g>
+
+  <!-- Снегопад -->
+  <g fill="#ffffff" opacity=".9">
+    <circle cx="22" cy="40" r="2.5"/>
+    <circle cx="72" cy="26" r="2"/>
+    <circle cx="118" cy="40" r="2.5"/>
+    <circle cx="52" cy="62" r="2"/>
+  </g>
+</svg>

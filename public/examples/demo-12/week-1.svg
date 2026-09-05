@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Каток: вся семья на льду</title>
+
+  <!-- Небо и снег -->
+  <rect width="200" height="200" fill="#cfdae4"/>
+  <rect y="118" width="200" height="82" fill="#a8c3d4"/>
+  <path d="M0 118 L200 118" stroke="#8fb0c6" stroke-width="2"/>
+
+  <!-- Ёлки на дальнем плане -->
+  <g fill="#3f5a52">
+    <path d="M22 118 L34 84 L46 118 Z"/>
+    <path d="M34 100 L34 118" stroke="#3f5a52" stroke-width="3"/>
+    <path d="M52 118 L62 92 L72 118 Z"/>
+    <path d="M158 118 L170 86 L182 118 Z"/>
+  </g>
+  <g fill="#e8eff4">
+    <path d="M22 118 L34 84 L46 118 Z" opacity=".25"/>
+    <path d="M158 118 L170 86 L182 118 Z" opacity=".25"/>
+  </g>
+
+  <!-- Гирлянда над катком -->
+  <path d="M0 26 Q100 56 200 22" fill="none" stroke="#78a5a3" stroke-width="1.6"/>
+  <g fill="#e1b16a">
+    <circle cx="44" cy="40" r="3.5"/>
+    <circle cx="88" cy="48" r="3.5"/>
+    <circle cx="132" cy="47" r="3.5"/>
+    <circle cx="172" cy="37" r="3.5"/>
+  </g>
+
+  <!-- Лёд с бликами -->
+  <g stroke="#e8f1f6" stroke-width="3" stroke-linecap="round" opacity=".8">
+    <path d="M20 150 L64 150"/>
+    <path d="M112 164 L166 164"/>
+    <path d="M46 182 L98 182"/>
+  </g>
+
+  <!-- Бортик -->
+  <rect y="112" width="200" height="8" fill="#e8eff4"/>
+  <rect y="112" width="200" height="3" fill="#ffffff"/>
+
+  <!-- Фигуры на льду -->
+  <g>
+    <!-- Взрослый -->
+    <g transform="translate(58 150)">
+      <circle cx="0" cy="-46" r="9" fill="#f0dfc4"/>
+      <path d="M-9 -50 q9 -12 18 0 q-9 -4 -18 0 Z" fill="#ce5a57"/>
+      <path d="M-9 -36 q9 -6 18 0 l-4 26 h-10 Z" fill="#444c5c"/>
+      <path d="M-9 -32 q-12 6 -14 16" fill="none" stroke="#444c5c" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M9 -32 q12 4 14 14" fill="none" stroke="#444c5c" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M-5 -10 L-8 4" stroke="#2f3540" stroke-width="4" stroke-linecap="round"/>
+      <path d="M5 -10 L8 4" stroke="#2f3540" stroke-width="4" stroke-linecap="round"/>
+      <path d="M-14 5 L-2 5M2 5 L14 5" stroke="#e8f1f6" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <!-- Ребёнок побольше -->
+    <g transform="translate(108 166)">
+      <circle cx="0" cy="-36" r="7.5" fill="#f0dfc4"/>
+      <path d="M-7.5 -40 q7.5 -10 15 0 q-7.5 -3 -15 0 Z" fill="#e1b16a"/>
+      <path d="M-7 -28 q7 -5 14 0 l-3 20 h-8 Z" fill="#78a5a3"/>
+      <path d="M-7 -25 q-11 3 -12 12" fill="none" stroke="#78a5a3" stroke-width="4" stroke-linecap="round"/>
+      <path d="M7 -25 q11 3 12 12" fill="none" stroke="#78a5a3" stroke-width="4" stroke-linecap="round"/>
+      <path d="M-4 -8 L-6 3" stroke="#2f3540" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M4 -8 L6 3" stroke="#2f3540" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M-11 4 L-1 4M1 4 L11 4" stroke="#e8f1f6" stroke-width="2.2" stroke-linecap="round"/>
+    </g>
+    <!-- Малыш у бортика -->
+    <g transform="translate(154 140)">
+      <circle cx="0" cy="-30" r="6.5" fill="#f0dfc4"/>
+      <path d="M-6.5 -34 q6.5 -9 13 0 q-6.5 -3 -13 0 Z" fill="#ce5a57"/>
+      <path d="M-6 -23 q6 -4 12 0 l-2 16 h-8 Z" fill="#444c5c"/>
+      <path d="M-6 -20 q-10 2 -11 9" fill="none" stroke="#444c5c" stroke-width="3.6" stroke-linecap="round"/>
+      <path d="M6 -20 q9 0 11 -6" fill="none" stroke="#444c5c" stroke-width="3.6" stroke-linecap="round"/>
+      <path d="M-3 -7 L-5 2" stroke="#2f3540" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M3 -7 L5 2" stroke="#2f3540" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M-9 3 L-1 3M1 3 L9 3" stroke="#e8f1f6" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Снежинки -->
+  <g fill="#ffffff" opacity=".9">
+    <circle cx="24" cy="60" r="2.5"/>
+    <circle cx="70" cy="30" r="2"/>
+    <circle cx="120" cy="70" r="2.5"/>
+    <circle cx="186" cy="62" r="2"/>
+    <circle cx="150" cy="24" r="2"/>
+  </g>
+</svg>

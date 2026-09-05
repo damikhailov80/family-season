@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Салют в новогоднюю ночь</title>
+
+  <!-- Ночное небо -->
+  <rect width="200" height="200" fill="#1f2836"/>
+  <rect y="150" width="200" height="50" fill="#161d28"/>
+
+  <!-- Звёзды -->
+  <g fill="#e8eff4" opacity=".7">
+    <circle cx="16" cy="24" r="1.6"/>
+    <circle cx="184" cy="18" r="1.6"/>
+    <circle cx="118" cy="14" r="1.4"/>
+    <circle cx="60" cy="10" r="1.4"/>
+  </g>
+
+  <!-- Салют слева -->
+  <g transform="translate(52 56)" stroke-linecap="round">
+    <g stroke="#ce5a57" stroke-width="2.6">
+      <path d="M0 0 L0 -26"/><path d="M0 0 L18 -18"/><path d="M0 0 L26 0"/><path d="M0 0 L18 18"/>
+      <path d="M0 0 L0 26"/><path d="M0 0 L-18 18"/><path d="M0 0 L-26 0"/><path d="M0 0 L-18 -18"/>
+    </g>
+    <g fill="#e1b16a">
+      <circle cx="0" cy="-32" r="2.4"/><circle cx="23" cy="-23" r="2.4"/><circle cx="32" cy="0" r="2.4"/>
+      <circle cx="23" cy="23" r="2.4"/><circle cx="0" cy="32" r="2.4"/><circle cx="-23" cy="23" r="2.4"/>
+      <circle cx="-32" cy="0" r="2.4"/><circle cx="-23" cy="-23" r="2.4"/>
+    </g>
+  </g>
+
+  <!-- Салют справа -->
+  <g transform="translate(146 40)" stroke-linecap="round">
+    <g stroke="#78a5a3" stroke-width="2.2">
+      <path d="M0 0 L0 -20"/><path d="M0 0 L14 -14"/><path d="M0 0 L20 0"/><path d="M0 0 L14 14"/>
+      <path d="M0 0 L0 20"/><path d="M0 0 L-14 14"/><path d="M0 0 L-20 0"/><path d="M0 0 L-14 -14"/>
+    </g>
+    <g fill="#e8eff4">
+      <circle cx="0" cy="-25" r="2"/><circle cx="18" cy="-18" r="2"/><circle cx="25" cy="0" r="2"/>
+      <circle cx="18" cy="18" r="2"/><circle cx="0" cy="25" r="2"/><circle cx="-18" cy="18" r="2"/>
+      <circle cx="-25" cy="0" r="2"/><circle cx="-18" cy="-18" r="2"/>
+    </g>
+  </g>
+
+  <!-- Маленький салют по центру -->
+  <g transform="translate(102 96)" stroke="#e1b16a" stroke-width="1.8" stroke-linecap="round">
+    <path d="M0 0 L0 -12"/><path d="M0 0 L9 -9"/><path d="M0 0 L12 0"/><path d="M0 0 L9 9"/>
+    <path d="M0 0 L0 12"/><path d="M0 0 L-9 9"/><path d="M0 0 L-12 0"/><path d="M0 0 L-9 -9"/>
+  </g>
+
+  <!-- Дома -->
+  <g fill="#2b3644">
+    <rect x="0" y="118" width="42" height="40"/>
+    <rect x="48" y="128" width="34" height="30"/>
+    <rect x="120" y="124" width="38" height="34"/>
+    <rect x="164" y="112" width="36" height="46"/>
+  </g>
+  <g fill="#e1b16a" opacity=".85">
+    <rect x="8" y="128" width="7" height="8"/>
+    <rect x="24" y="128" width="7" height="8"/>
+    <rect x="56" y="138" width="7" height="8"/>
+    <rect x="130" y="134" width="7" height="8"/>
+    <rect x="172" y="122" width="7" height="8"/>
+    <rect x="186" y="140" width="7" height="8"/>
+  </g>
+  <g fill="#f2f7fa">
+    <rect x="0" y="114" width="42" height="5"/>
+    <rect x="48" y="124" width="34" height="5"/>
+    <rect x="120" y="120" width="38" height="5"/>
+    <rect x="164" y="108" width="36" height="5"/>
+  </g>
+
+  <!-- Снег и семья со спины -->
+  <rect y="158" width="200" height="42" fill="#e2ecf3"/>
+  <g fill="#141a24">
+    <g transform="translate(70 186)">
+      <circle cx="0" cy="-30" r="9"/>
+      <path d="M-9 -22 q9 -6 18 0 l-3 22 h-12 Z"/>
+    </g>
+    <g transform="translate(96 188)">
+      <circle cx="0" cy="-24" r="7.5"/>
+      <path d="M-7.5 -17 q7.5 -5 15 0 l-2 17 h-11 Z"/>
+    </g>
+    <g transform="translate(118 189)">
+      <circle cx="0" cy="-20" r="6.5"/>
+      <path d="M-6.5 -14 q6.5 -4 13 0 l-2 14 h-9 Z"/>
+    </g>
+  </g>
+</svg>
