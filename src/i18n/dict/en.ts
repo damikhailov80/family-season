@@ -478,6 +478,14 @@ export const en: Dict = {
     newSeason: 'Build my own season',
   },
 
+  monthsPage: {
+    title: 'Ideas month by month — what to do as a family | Family Season',
+    description:
+      'Every month has things of its own: September is still warm enough for the woods and the harvest is already in. Pick a month and take a ready plan — rewrite it for you and print it.',
+    heading: 'Ideas month by month',
+    lead: 'Every month has things of its own. Pick a month and you get ready plans inside: the weeks, a project for everybody and the goal of the month. Any of them can be rewritten for your family and printed on two A4 sheets.',
+  },
+
   site: {
     brand: 'Family Season',
     alternateName: 'Family Season — printable family planner',
@@ -485,8 +493,9 @@ export const en: Dict = {
     description:
       'A family planner for the month: build it, print it on two A4 sheets and put it on the fridge.',
     navAria: 'Site sections',
-    home: 'Home',
     ideas: 'Community Ideas',
+    byMonth: 'Ideas month by month',
+    months: 'Months',
     seasons: 'My seasons',
     newSeason: 'New season',
     accountTitle: '{who} — account and settings',

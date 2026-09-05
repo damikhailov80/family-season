@@ -15,12 +15,17 @@ export const ROUTES = {
   publicSeason: '/s',
   season: '/season',
   shared: '/p',
+  month: '/month',
   account: '/account',
   privacy: '/privacy',
 } as const
 
 export function withLang(lang: Lang, path: string): string {
   return path === ROUTES.home ? `/${lang}` : `/${lang}${path}`
+}
+
+export function monthHref(lang: Lang, slug: string): string {
+  return withLang(lang, `${ROUTES.month}/${slug}`)
 }
 
 export function stripLang(pathname: string): string {

@@ -477,6 +477,14 @@ export const pl: Dict = {
     newSeason: 'Złóż swój sezon',
   },
 
+  monthsPage: {
+    title: 'Pomysły na miesiące — co robić z rodziną | Sezon rodzinny',
+    description:
+      'Każdy miesiąc ma swoje sprawy: we wrześniu jest jeszcze ciepło na las, a zbiory już dojrzały. Wybierzcie miesiąc i weźcie gotowy plan — można go przepisać pod siebie i wydrukować.',
+    heading: 'Pomysły na miesiące',
+    lead: 'Każdy miesiąc ma swoje sprawy. Wybierzcie miesiąc, a w środku są gotowe plany: tygodnie, projekt dla każdego i cel miesiąca. Dowolny można przepisać pod swoją rodzinę i wydrukować na dwóch kartkach A4.',
+  },
+
   site: {
     brand: 'Sezon rodzinny',
     alternateName: 'Sezon rodzinny — planer na miesiąc dla rodziny',
@@ -484,8 +492,9 @@ export const pl: Dict = {
     description:
       'Planer na miesiąc dla całej rodziny: złóżcie, wydrukujcie na dwóch kartkach A4 i powieście na lodówce.',
     navAria: 'Sekcje strony',
-    home: 'Główna',
     ideas: 'Pomysły społeczności',
+    byMonth: 'Pomysły na miesiące',
+    months: 'Miesiące',
     seasons: 'Moje sezony',
     newSeason: 'Nowy sezon',
     accountTitle: '{who} — konto i ustawienia',

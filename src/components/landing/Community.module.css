@@ -65,3 +65,28 @@
     display: none;
   }
 }
+
+.months {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+  margin-top: 14px;
+  font-size: 16px;
+}
+
+.monthsLabel {
+  color: var(--ink-soft);
+}
+
+.month {
+  color: var(--accent-deep);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.month:hover {
+  color: var(--accent-theme);
+}

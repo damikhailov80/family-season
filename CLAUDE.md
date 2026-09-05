@@ -51,6 +51,8 @@ handlers do not get root params.
 | `/<lang>/s/<code>` | A published season (our examples included) | same |
 | `/<lang>/seasons` | "My seasons", signed-in only | Server component |
 | `/<lang>/ideas` | "Community Ideas" — the showcase of published seasons | Server component |
+| `/<lang>/month` | The list of months we have written about | Server component |
+| `/<lang>/month/<slug>` | What to do as a family in that month | Server component |
 | `/<lang>/account` | Account: language, family, sign-out | Server component |
 | `/<lang>/privacy` | Privacy policy | Server component |
 | `/api/auth/*` | Sign-in: everything Auth.js serves | Route handler |
@@ -1492,7 +1494,7 @@ Google puts next to it in search results. The same generated-assets genre as the
   publication would need the database, and a quiet database must not take a page down — the same
   rule that keeps the migration out of the build; the way to those is `/ideas`. An example is a
   different matter: its code comes from the `PUBLIC_IDS` table, so the list is assembled without a
-  single query. Such a row carries **no** language alternates, for the same reason its page is
+  single query. The month pages are in the map for the same reason - they are files. Such a row carries **no** language alternates, for the same reason its page is
   built with `alternates: 'self'`.
 - **There is no `lastModified` in the map, and that is a decision.** Nothing on this site carries
   the date a page was changed, and a date computed while the map is being rendered would say
@@ -1541,7 +1543,61 @@ address and its translations, a personal page stays out of the index without los
 and is closed to the crawler together with its language, the map lists our examples in their own
 language only, the landing page names itself an application rather than a television season, a
 publication describes itself rather than publications in general, and both the landing page and
-the showcase have a heading of their own.
+the showcase have a heading of their own. The month pages have a describe block of their own -
+see "The month pages".
+
+## The month pages
+
+`/<lang>/month/<slug>` — one page per month, answering the question people actually type in a
+search box: "what to do as a family in September". It is the only page on the site written as an
+article rather than as a piece of the product.
+
+| What | Where |
+| --- | --- |
+| The texts, one file per language | `src/data/months/<lang>/<slug>.json` |
+| The registry, and which seasons belong to a month | `src/model/months.ts` |
+| The page | `src/app/[lang]/month/[slug]/page.tsx` |
+| The list of months | `src/app/[lang]/month/page.tsx` |
+| The address builder | `monthHref` in `src/model/site.ts` |
+
+- **The slug is English in all three languages** (`/month/september`). That keeps `ROUTES` a table
+  of paths without the language, which is the rule, and makes the `hreflang` set between the
+  translations trivial. The price is real and accepted: a transliterated Russian slug would have
+  read slightly better to Yandex.
+- **There is no query on this page.** The seasons it shows are our examples, and an example is a
+  file: `EXAMPLE_LIST` already holds the blank, the theme and the id, and `SeasonPreview` never
+  needed more than that. So the page opens with the database down, exactly like the landing - and
+  that is not a nicety, it is the rule about pages that must not depend on the database.
+- **The grouping "which seasons belong to September" lives here, not in the examples.** A
+  publication has no month of its own on purpose (see "The showcase: publishing"); the month page
+  is what groups them, so the grouping is the month page's business.
+- **A month exists only when it has been written.** `monthPage` returns `null` and the page is a
+  404 - there are no empty month pages, and there must not be: twelve templated pages with the
+  words shuffled are what a search engine calls thin content, and the price is paid by the whole
+  domain, not by the page.
+- **The texts are not in the dictionaries.** They are long, they are one-per-month, and `dict/ru.ts`
+  is already 550 lines. They lie next to the examples and are shaped like them.
+- **A page nobody links to is a page nobody reaches.** The month pages were in the sitemap and in
+  nothing else - unreachable by walking the site, and a crawler reads that as unimportant. They
+  hang off three places now: `/month` in the header, and a "Ideas month by month" line on the
+  showcase and in the landing page's community block. All three are built from the registry, so a
+  new month appears in them by itself.
+- **`Главная` left the header to make room.** There are about ninety free pixels there, and one
+  more item pushed the sign-in button onto a second line at 1280px - the width of an ordinary
+  laptop. The item that went is the one that was duplicated: the brand on the left has always been
+  a link home. Nothing else was shortened, and `site.home` went with it - an unused key is dead
+  code.
+- **The cards are lined up by a fixed `min-height` on the summary, not by `subgrid`.** Subgrid was
+  tried first: it lined the two rows up exactly and lost the gap between the columns, so the
+  posters touched. The card is stretched by the grid anyway, so it is enough to fix the room the
+  summary takes and let the poster have the rest.
+- **The page carries an `<h1>` of its own, and the badge is a plain span** - the month's name in
+  the badge, the searched phrase in the heading. That is the shape `/privacy` already has.
+
+Verified by: `e2e/site/meta.spec.ts` — the page answers the question people type, a month nobody
+has written about is a 404, the page opens in all three languages and knows its translations, it
+is reachable by walking the site from the header rather than by knowing its address, and the map
+of the site lists it.
 
 ## Inline editing
 

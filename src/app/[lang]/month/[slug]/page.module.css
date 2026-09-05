@@ -1,0 +1,116 @@
+.section {
+  position: relative;
+}
+
+.title {
+  font-family: var(--font-hand);
+  font-weight: 700;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 1.05;
+  color: var(--accent-deep);
+}
+
+.lead {
+  max-width: 620px;
+  margin-top: 10px;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.head {
+  margin-top: 26px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent-deep);
+}
+
+.text {
+  max-width: 620px;
+  margin-top: 10px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+  list-style: none;
+  padding-inline-start: 0px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* The posters must end on one line. The card is stretched by the grid, so it is enough to give
+   the summary a fixed room for its three lines and let the poster take the rest - height: 100%
+   inside SeasonPreview cannot do it here, the summary shares the card with it. Subgrid was tried
+   first and dropped: it lined the rows up and lost the gap between the columns. */
+.card > a {
+  flex: 1;
+  height: auto;
+}
+
+.summary {
+  min-height: 4.2em;
+  padding: 0 2px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 20px;
+  border: 1.5px solid var(--accent-deep);
+  border-radius: 8px;
+  background: var(--accent-deep);
+  font-family: var(--font-ui);
+  cursor: pointer;
+  color: var(--on-accent);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+  transition: background-color 0.12s ease;
+}
+
+.primary:hover {
+  background: color-mix(in srgb, var(--accent-deep) 85%, #000);
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 12px 20px;
+  border: 1.5px solid var(--sheet-border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: var(--font-ui);
+  color: var(--ink-soft);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.ghost:hover {
+  border-color: var(--accent-deep);
+  color: var(--accent-deep);
+}

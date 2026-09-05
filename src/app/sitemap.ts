@@ -1,9 +1,16 @@
 import type { MetadataRoute } from 'next'
 import { EXAMPLE_LIST } from '../model/examples'
 import { DEFAULT_LANG, LANGS, type Lang } from '../model/lang'
+import { monthSlugs } from '../model/months'
 import { ROUTES, SITE_URL, withLang } from '../model/site'
 
-const PAGES = [ROUTES.home, ROUTES.ideas, ROUTES.privacy]
+const PAGES = [
+  ROUTES.home,
+  ROUTES.ideas,
+  ROUTES.privacy,
+  ROUTES.month,
+  ...monthSlugs().map((slug) => `${ROUTES.month}/${slug}`),
+]
 
 const address = (path: string) => new URL(path, SITE_URL).href
 

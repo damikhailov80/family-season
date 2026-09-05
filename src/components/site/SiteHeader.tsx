@@ -22,11 +22,11 @@ export async function SiteHeader() {
       </Link>
 
       <nav className={styles.nav} aria-label={site.navAria}>
-        <Link className={styles.link} href={withLang(lang, ROUTES.home)}>
-          {site.home}
-        </Link>
         <Link className={styles.link} href={withLang(lang, ROUTES.ideas)}>
           {site.ideas}
+        </Link>
+        <Link className={styles.link} href={withLang(lang, ROUTES.month)}>
+          {site.months}
         </Link>
         <Link className={styles.link} href={withLang(lang, ROUTES.seasons)}>
           {site.seasons}

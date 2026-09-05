@@ -119,6 +119,60 @@ test.describe('the site says what it is to a crawler', () => {
   })
 })
 
+test.describe('a month has a page of its own', () => {
+  test('the month page answers the question people actually type', async ({ page }) => {
+    await page.goto('/ru/month/september')
+
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Чем заняться с семьёй в сентябре',
+    )
+    await expect(page.getByRole('heading', { level: 2 })).not.toHaveCount(0)
+  })
+
+  test('a month we have not written about is not a page', async ({ request }) => {
+    expect((await request.get('/ru/month/april')).status()).toBe(404)
+    expect((await request.get('/ru/month/nope')).status()).toBe(404)
+  })
+
+  test('the month page opens in all three languages and knows its translations', async ({
+    request,
+  }) => {
+    const html = await (await request.get('/en/month/september')).text()
+
+    expect(content(html, /rel="canonical" href="([^"]+)"/)).toBe(
+      'https://www.familyseason.online/en/month/september',
+    )
+    expect(html).toContain(
+      'hrefLang="pl" href="https://www.familyseason.online/pl/month/september"',
+    )
+    expect((await request.get('/pl/month/september')).status()).toBe(200)
+  })
+
+  test('a month page is reachable by walking the site, not only by knowing its address', async ({
+    page,
+  }) => {
+    await page.goto('/ru')
+    await page
+      .getByRole('navigation', { name: DICTS.ru.site.navAria })
+      .getByRole('link', {
+        name: DICTS.ru.site.months,
+      })
+      .click()
+
+    await expect(page).toHaveURL('/ru/month')
+    await page.getByRole('link', { name: 'Сентябрь', exact: false }).first().click()
+    await expect(page).toHaveURL('/ru/month/september')
+  })
+
+  test('the map of the site lists the month pages', async ({ request }) => {
+    const xml = await (await request.get('/sitemap.xml')).text()
+
+    expect(xml).toContain('<loc>https://www.familyseason.online/ru/month</loc>')
+    expect(xml).toContain('<loc>https://www.familyseason.online/ru/month/september</loc>')
+    expect(xml).toContain('<loc>https://www.familyseason.online/pl/month/september</loc>')
+  })
+})
+
 test.describe('the page has a readable outline', () => {
   test('the landing page is headed by what the site is, not only by its name', async ({ page }) => {
     await page.goto('/ru')

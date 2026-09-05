@@ -9,7 +9,8 @@ import { Toast } from '../../../components/site/Toast'
 import { getDict, getLang } from '../../../i18n/server'
 import { fill } from '../../../i18n/fill'
 import { pageMeta } from '../../../model/meta'
-import { ROUTES, withLang } from '../../../model/site'
+import { monthLinks } from '../../../model/months'
+import { monthHref, ROUTES, withLang } from '../../../model/site'
 import { auth } from '../../../server/auth'
 import { randomIdeas } from '../../../server/publicSeasons'
 import { ReportEntry } from './ReportEntry'
@@ -43,6 +44,15 @@ export default async function IdeasPage({
     <PaperSheet>
       <SectionBox accent="theme" label={dict.ideas.heading} heading="h1" className={styles.section}>
         <p className={styles.text}>{dict.ideas.lead}</p>
+
+        <p className={styles.months}>
+          <span className={styles.monthsLabel}>{dict.site.byMonth}:</span>
+          {monthLinks(lang).map((month) => (
+            <Link className={styles.month} href={monthHref(lang, month.slug)} key={month.slug}>
+              {month.label}
+            </Link>
+          ))}
+        </p>
 
         {state.status === 'ok' &&
           (ideas.length ? (
