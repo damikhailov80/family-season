@@ -1,0 +1,102 @@
+{
+  "name": "Straszny miesiąc",
+  "summary": "Pajęczyny w całym mieszkaniu, „Wednesday” wieczorami, horror na zmianę i makijaż na szkolne Halloween.",
+  "note": "w piątkę · sezon w pełni",
+  "palette": "day-night",
+  "icons": "hygge",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasz dom. Nasze wieczory. Nasze straszne historie."
+    },
+    "theme": {
+      "subtitle": "Straszny miesiąc",
+      "question": "Co wyszło straszniej — serial, gra czy nasz własny makijaż?"
+    },
+    "weeksNote": "4 tygodnie – od girlandy do własnego stroju",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Dekorujemy mieszkanie: pajęczyny, dynie"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Oglądamy „Wednesday” — odcinek na wieczór"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Gramy w Reanimal, na zmianę"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Straszny makijaż: próba szkolnego stroju"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Udekorować dom, wymyślić makijaż i przyjść na szkolne Halloween we własnym stroju.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Naprawiam girlandy",
+        "description": "Pudło ze starymi zjechało ze strychu — przeglądam po jednej",
+        "goal": "Żeby wszystkie zaświeciły na czas"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Szyję stroje",
+        "description": "Wieczorami, z tego, co już leży w szafie",
+        "goal": "Trzy stroje i żadnych zakupów"
+      },
+      {
+        "id": "p3",
+        "name": "Władek",
+        "face": "son",
+        "project": "Wycinam dynie",
+        "description": "Ćwiczę na małych, żeby nie zepsuć tej dużej",
+        "goal": "Wyciąć dużą dynię na okno"
+      },
+      {
+        "id": "p4",
+        "name": "Nika",
+        "face": "daughter",
+        "project": "Uczę się makijażu",
+        "description": "Za każdym razem inna twarz, z filmików; ćwiczę na braciach",
+        "goal": "Pomalować wszystkich do ostatniego tygodnia"
+      },
+      {
+        "id": "p5",
+        "name": "Sewa",
+        "face": "son",
+        "project": "Nietoperze origami",
+        "description": "Składam wieczorami i wieszam na girlandzie w korytarzu",
+        "goal": "Dwadzieścia nietoperzy w mieszkaniu"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 55,
+      "p2": 45,
+      "p3": 60,
+      "p4": 50,
+      "p5": 65
+    },
+    "moods": {
+      "p1": "ggyggygggyggyg",
+      "p2": "gyggggyggyggg",
+      "p3": "gggyggggyggygg",
+      "p4": "gygggyrggyggg",
+      "p5": "gggyggygggyggg"
+    },
+    "summaryAnswer": "— Pajęczyny rozciągnęliśmy po całym korytarzu i pierwszy wpadł w nie tata.\n— „Wednesday” oglądaliśmy po odcinku na wieczór: Sewa zasnął przy drugim.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-7/week-1.svg",
+      "1": "/examples/demo-7/week-2.svg"
+    }
+  }
+}

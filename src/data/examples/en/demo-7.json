@@ -1,0 +1,102 @@
+{
+  "name": "Spooky Month",
+  "summary": "Cobwebs down the hallway, Wednesday every evening, a horror game in turns and face paint for the school Halloween.",
+  "note": "five of us · season in full swing",
+  "palette": "day-night",
+  "icons": "hygge",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our home. Our evenings. Our ghost stories."
+    },
+    "theme": {
+      "subtitle": "Spooky Month",
+      "question": "What came out scarier — the show, the game or our own face paint?"
+    },
+    "weeksNote": "4 weeks – from the garland to a costume",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Decorating the flat: cobwebs, pumpkins, lights"
+      },
+      {
+        "title": "Week 2",
+        "text": "Watching Wednesday — an episode an evening"
+      },
+      {
+        "title": "Week 3",
+        "text": "Playing Reanimal, taking turns"
+      },
+      {
+        "title": "Week 4",
+        "text": "Scary face paint: a costume rehearsal"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Decorate the house, invent our face paint and turn up at the school Halloween.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Fixing the lights",
+        "description": "The box of old ones came down from the attic — one string a night",
+        "goal": "All three lit by the big night"
+      },
+      {
+        "id": "p2",
+        "name": "Mum",
+        "face": "mom",
+        "project": "Sewing costumes",
+        "description": "In the evenings, out of what is already in the wardrobe",
+        "goal": "Three costumes and nothing bought"
+      },
+      {
+        "id": "p3",
+        "name": "Vlad",
+        "face": "son",
+        "project": "Carving pumpkins",
+        "description": "Practising on small ones so I don't ruin the big one",
+        "goal": "Carve the big one for the window"
+      },
+      {
+        "id": "p4",
+        "name": "Nika",
+        "face": "daughter",
+        "project": "Learning face paint",
+        "description": "A new face every time, from videos; my brothers are the canvas",
+        "goal": "Paint everyone by the last week"
+      },
+      {
+        "id": "p5",
+        "name": "Seva",
+        "face": "son",
+        "project": "Origami bats",
+        "description": "Folding them in the evenings, hanging them in the hallway",
+        "goal": "Twenty bats around the flat"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 55,
+      "p2": 45,
+      "p3": 60,
+      "p4": 50,
+      "p5": 65
+    },
+    "moods": {
+      "p1": "ggyggygggyggyg",
+      "p2": "gyggggyggyggg",
+      "p3": "gggyggggyggygg",
+      "p4": "gygggyrggyggg",
+      "p5": "gggyggygggyggg"
+    },
+    "summaryAnswer": "— We strung the cobwebs down the whole hallway, and Dad walked into them first.\n— Wednesday, an episode an evening: Seva fell asleep during the second one.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-7/week-1.svg",
+      "1": "/examples/demo-7/week-2.svg"
+    }
+  }
+}
