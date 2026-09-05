@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Соление огурцов и помидоров</title>
+
+  <!-- Кухонный стол -->
+  <rect width="200" height="200" fill="#fef2e4"/>
+  <rect y="150" width="200" height="50" fill="#e3cdab"/>
+  <path d="M0 150 L200 150" stroke="#c9ab80" stroke-width="2"/>
+
+  <!-- Большая банка с огурцами -->
+  <g transform="translate(66 150)">
+    <path d="M-30 -96 L30 -96 L30 0 L-30 0 Z" fill="#8fae4a"/>
+    <path d="M-30 -96 L30 -96 L30 -80 L-30 -80 Z" fill="#7a9a3c"/>
+    <rect x="-33" y="-108" width="66" height="13" rx="3" fill="#9aa7ad"/>
+    <!-- Огурцы -->
+    <g fill="#4f7a26">
+      <rect x="-22" y="-74" width="12" height="40" rx="6"/>
+      <rect x="-6" y="-70" width="12" height="44" rx="6"/>
+      <rect x="10" y="-76" width="12" height="38" rx="6"/>
+      <rect x="-16" y="-28" width="30" height="12" rx="6"/>
+    </g>
+    <!-- Укроп и чеснок -->
+    <g stroke="#3f6a1f" stroke-width="1.6" fill="none">
+      <path d="M-24 -60 q10 -8 20 -2"/>
+      <path d="M4 -50 q12 -6 20 2"/>
+    </g>
+    <circle cx="-18" cy="-14" r="6" fill="#f3e7d0"/>
+    <circle cx="16" cy="-12" r="5" fill="#f3e7d0"/>
+    <!-- Подпись -->
+    <rect x="-20" y="-52" width="40" height="18" rx="2" fill="#fdf6e8" opacity=".9"/>
+    <g stroke="#805a3b" stroke-width="1.6" stroke-linecap="round">
+      <path d="M-13 -45 L13 -45"/>
+      <path d="M-13 -39 L5 -39"/>
+    </g>
+  </g>
+
+  <!-- Банка с помидорами -->
+  <g transform="translate(136 150)">
+    <path d="M-24 -74 L24 -74 L24 0 L-24 0 Z" fill="#c60000"/>
+    <path d="M-24 -74 L24 -74 L24 -60 L-24 -60 Z" fill="#a30000"/>
+    <rect x="-27" y="-84" width="54" height="11" rx="3" fill="#9aa7ad"/>
+    <g fill="#e23b2a">
+      <circle cx="-11" cy="-42" r="9"/>
+      <circle cx="8" cy="-46" r="8"/>
+      <circle cx="-2" cy="-24" r="9"/>
+      <circle cx="14" cy="-22" r="7"/>
+    </g>
+    <g stroke="#3f6a1f" stroke-width="1.6" fill="none">
+      <path d="M-18 -52 q10 -6 18 0"/>
+    </g>
+  </g>
+
+  <!-- Миска с солью и зеленью -->
+  <g transform="translate(28 150)">
+    <path d="M-20 -22 q20 12 40 0 q-4 22 -20 22 q-16 0 -20 -22 Z" fill="#fd974f"/>
+    <ellipse cx="0" cy="-22" rx="20" ry="7" fill="#ffb37a"/>
+    <g fill="#3f6a1f">
+      <path d="M-10 -24 q6 -6 12 -1 q-6 6 -12 1 Z"/>
+      <path d="M2 -26 q6 -5 11 1 q-6 5 -11 -1 Z"/>
+    </g>
+  </g>
+
+  <!-- Крышки -->
+  <g transform="translate(176 172)">
+    <ellipse cx="0" cy="0" rx="16" ry="5" fill="#9aa7ad"/>
+    <ellipse cx="-3" cy="-7" rx="16" ry="5" fill="#b3bec3"/>
+  </g>
+</svg>
