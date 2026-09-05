@@ -58,8 +58,16 @@
   height: auto;
 }
 
+/* Three lines is a budget, not a hope: with min-height a fourth line stole the room from the
+   poster above it and that one card ended higher than the others. The height is fixed and the
+   text is clamped, so a line written too long is cut here instead of breaking the row. */
 .summary {
-  min-height: 4.2em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  height: 4.2em;
   padding: 0 2px;
   font-size: 15px;
   line-height: 1.4;
