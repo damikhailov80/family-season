@@ -1,0 +1,80 @@
+{
+  "name": "Miesiąc przytulności",
+  "summary": "Naprawiamy, dokupujemy to, czego brakowało, dekorujemy — i zostajemy w domu.",
+  "note": "we troje · sezon dopiero się zaczął",
+  "palette": "brownie",
+  "icons": "home",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasz dom. Nasze ręce. Nasz grudzień."
+    },
+    "theme": {
+      "subtitle": "Miesiąc przytulności",
+      "question": "Który drobiazg zmienił dom najbardziej?"
+    },
+    "weeksNote": "4 tygodnie – naprawiamy, dokupujemy, dekorujemy",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Naprawiamy to, co od dawna denerwuje"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Dokupujemy braki: lampa, koc, półka"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Dekorujemy: okna, choinka, lampki"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Wieczór w domu: świece i film świąteczny"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Doprowadzić mieszkanie do stanu, w którym chce się zostać na święta.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Lista napraw",
+        "description": "Spisałem wszystko, co skrzypi i cieknie; naprawiam w weekendy",
+        "goal": "Pusta lista przed Nowym Rokiem"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Zdjęcia na ścianę",
+        "description": "Przeglądam zdjęcia z roku, wybieram i drukuję",
+        "goal": "Wybrane powieszone przed świętami"
+      },
+      {
+        "id": "p3",
+        "name": "Asia",
+        "face": "daughter",
+        "project": "Girlanda z papieru",
+        "description": "Sklejam wieczorami, każdego dnia dłuższa",
+        "goal": "Od okna do drzwi"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 15,
+      "p3": 20
+    },
+    "moods": {
+      "p1": "ggy",
+      "p2": "gg",
+      "p3": "gggy"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-11/week-1.svg"
+    }
+  }
+}

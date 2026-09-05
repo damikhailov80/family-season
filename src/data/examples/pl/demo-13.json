@@ -1,0 +1,92 @@
+{
+  "name": "Prezenty dla wszystkich",
+  "summary": "Kartki dla rodziny, tajemniczy Mikołaj, list z choinki życzeń i podziękowania.",
+  "note": "we czworo · sezon w pełni",
+  "palette": "wild-berry",
+  "icons": "craft",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasze ręce. Nasze prezenty. Nasz grudzień."
+    },
+    "theme": {
+      "subtitle": "Prezenty dla wszystkich",
+      "question": "Który prezent najprzyjemniej było oddać?"
+    },
+    "weeksNote": "4 tygodnie – prezenty swoim i nie swoim",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Robimy kartki dla całej rodziny"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Tajemniczy Mikołaj w rodzinie"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Choinka życzeń: list obcego dziecka"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Dziękujemy sprzątaczce, portierowi, lekarce"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Zrobić prezenty własnymi rękami i dać je nie tylko swoim.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Naprawiam lampki",
+        "description": "Przebieram żarówki w starych, żeby nie kupować nowych",
+        "goal": "Ani jednych nowych lampek"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Piekę na kiermasz",
+        "description": "Ciastka na szkolny kiermasz charytatywny",
+        "goal": "Zebrać na prezenty dla schroniska"
+      },
+      {
+        "id": "p3",
+        "name": "Stiopa",
+        "face": "son",
+        "project": "Oddaję swoje zabawki",
+        "description": "Sam wybieram, co oddać, nikt nie decyduje za mnie",
+        "goal": "Pudełko, które spakowałem sam"
+      },
+      {
+        "id": "p4",
+        "name": "Zoja",
+        "face": "daughter",
+        "project": "Kartki nauczycielom",
+        "description": "Każdemu inną, rysuję i podpisuję ręcznie",
+        "goal": "Kartka dla każdego nauczyciela"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 50,
+      "p2": 60,
+      "p3": 45,
+      "p4": 70
+    },
+    "moods": {
+      "p1": "ggyggygggyggyg",
+      "p2": "gyggggyggyggg",
+      "p3": "gggyggggyggygg",
+      "p4": "gygggyggyggg"
+    },
+    "summaryAnswer": "— Kartek wyszły dwadzieścia trzy, a na czterech Zoja narysowała nie tych krewnych.\n— W tajemniczym Mikołaju tata wylosował sam siebie, losowaliśmy jeszcze raz.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-13/week-1.svg",
+      "1": "/examples/demo-13/week-2.svg"
+    }
+  }
+}

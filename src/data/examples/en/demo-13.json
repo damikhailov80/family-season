@@ -1,0 +1,92 @@
+{
+  "name": "Presents for Everyone",
+  "summary": "Cards for the family, a secret Santa, a wish-tree letter and a thank you.",
+  "note": "four of us · season in full swing",
+  "palette": "wild-berry",
+  "icons": "craft",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our hands. Our presents. Our December."
+    },
+    "theme": {
+      "subtitle": "Presents for Everyone",
+      "question": "Which present was the best one to give away?"
+    },
+    "weeksNote": "4 weeks – presents for ours and not ours",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Making family cards for every relative"
+      },
+      {
+        "title": "Week 2",
+        "text": "A secret Santa inside the family"
+      },
+      {
+        "title": "Week 3",
+        "text": "The wish tree: a stranger child's letter"
+      },
+      {
+        "title": "Week 4",
+        "text": "Thanking the cleaner, the porter, the doctor"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Make the presents by hand and give them to more than our own.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Mending the lights",
+        "description": "Sorting bulbs in the old strings instead of buying new",
+        "goal": "Not one new string of lights"
+      },
+      {
+        "id": "p2",
+        "name": "Mum",
+        "face": "mom",
+        "project": "Baking for the fair",
+        "description": "Biscuits for the school charity fair",
+        "goal": "Enough for the shelter's presents"
+      },
+      {
+        "id": "p3",
+        "name": "Styopa",
+        "face": "son",
+        "project": "Giving my toys away",
+        "description": "I choose what goes, and nobody decides it for me",
+        "goal": "A box I packed myself"
+      },
+      {
+        "id": "p4",
+        "name": "Zoya",
+        "face": "daughter",
+        "project": "Cards for teachers",
+        "description": "One each, drawn and signed by hand",
+        "goal": "A card for every teacher"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 50,
+      "p2": 60,
+      "p3": 45,
+      "p4": 70
+    },
+    "moods": {
+      "p1": "ggyggygggyggyg",
+      "p2": "gyggggyggyggg",
+      "p3": "gggyggggyggygg",
+      "p4": "gygggyggyggg"
+    },
+    "summaryAnswer": "— The cards came to twenty-three, and on four of them Zoya drew the wrong relatives.\n— In the secret Santa Dad drew himself, so we drew again.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-13/week-1.svg",
+      "1": "/examples/demo-13/week-2.svg"
+    }
+  }
+}

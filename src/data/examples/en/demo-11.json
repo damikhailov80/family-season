@@ -1,0 +1,80 @@
+{
+  "name": "Cosy Month",
+  "summary": "Fixing, buying what was missing, decorating for the holiday — and staying in.",
+  "note": "three of us · season just started",
+  "palette": "brownie",
+  "icons": "home",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our home. Our hands. Our December."
+    },
+    "theme": {
+      "subtitle": "Cosy Month",
+      "question": "Which small thing changed the house the most?"
+    },
+    "weeksNote": "4 weeks – fixing, buying, decorating",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Fixing what has annoyed us for months"
+      },
+      {
+        "title": "Week 2",
+        "text": "Buying what was missing: a lamp, a shelf"
+      },
+      {
+        "title": "Week 3",
+        "text": "Decorating: windows, the tree, the lights"
+      },
+      {
+        "title": "Week 4",
+        "text": "An evening in: candles and a Christmas film"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Get the flat to a state where we want to stay in it for the holidays.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "The repairs list",
+        "description": "Wrote down everything that squeaks and drips; weekends only",
+        "goal": "An empty list by New Year"
+      },
+      {
+        "id": "p2",
+        "name": "Mum",
+        "face": "mom",
+        "project": "Photos on the wall",
+        "description": "Going through the year's pictures, choosing, printing",
+        "goal": "The chosen ones up before New Year"
+      },
+      {
+        "id": "p3",
+        "name": "Asya",
+        "face": "daughter",
+        "project": "A paper garland",
+        "description": "Gluing it in the evenings, longer every day",
+        "goal": "From the window to the door"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 15,
+      "p3": 20
+    },
+    "moods": {
+      "p1": "ggy",
+      "p2": "gg",
+      "p3": "gggy"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-11/week-1.svg"
+    }
+  }
+}

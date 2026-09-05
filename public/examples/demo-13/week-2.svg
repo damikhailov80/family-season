@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Тайный Санта внутри семьи</title>
+
+  <!-- Стол -->
+  <rect width="200" height="200" fill="#efe6d8"/>
+  <rect y="150" width="200" height="50" fill="#dccfb8"/>
+  <path d="M0 150 L200 150" stroke="#c3b39a" stroke-width="2"/>
+
+  <!-- Шапка с бумажками -->
+  <g transform="translate(72 148)">
+    <!-- Бумажки внутри -->
+    <g fill="#fdf8ef">
+      <rect x="-18" y="-56" width="18" height="12" rx="2" transform="rotate(-14 -9 -50)"/>
+      <rect x="0" y="-60" width="18" height="12" rx="2" transform="rotate(9 9 -54)"/>
+      <rect x="-8" y="-50" width="18" height="12" rx="2" transform="rotate(-3 1 -44)"/>
+    </g>
+    <!-- Колпак -->
+    <path d="M-40 0 q0 -46 40 -46 q40 0 40 46 Z" fill="#cb0000"/>
+    <path d="M-40 0 q0 -46 40 -46 q10 22 6 46 Z" fill="#a80000" opacity=".45"/>
+    <rect x="-44" y="-10" width="88" height="14" rx="7" fill="#fdf8ef"/>
+    <circle cx="42" cy="-40" r="9" fill="#fdf8ef"/>
+    <path d="M34 -44 q10 -10 8 -4" fill="none" stroke="#cb0000" stroke-width="3"/>
+  </g>
+
+  <!-- Вытянутая записка с именем -->
+  <g transform="translate(146 96) rotate(-8)">
+    <rect x="-30" y="-20" width="60" height="40" rx="3" fill="#fdf8ef"/>
+    <rect x="-30" y="-20" width="60" height="40" rx="3" fill="none" stroke="#d8cab6" stroke-width="1.6"/>
+    <g stroke="#50312f" stroke-width="2.6" stroke-linecap="round">
+      <path d="M-16 -2 L12 -2"/>
+    </g>
+    <g stroke="#c8bda9" stroke-width="2" stroke-linecap="round">
+      <path d="M-16 8 L4 8"/>
+    </g>
+  </g>
+
+  <!-- Подарок с биркой -->
+  <g transform="translate(152 168)">
+    <rect x="-30" y="-30" width="60" height="34" rx="3" fill="#c9a06a"/>
+    <rect x="-30" y="-38" width="60" height="10" rx="3" fill="#b98d55"/>
+    <path d="M-4 -38 L4 -38 L4 4 L-4 4 Z" fill="#3f6c45"/>
+    <path d="M-4 -38 q-14 -14 -4 -18 q10 -2 4 18 Z" fill="#3f6c45"/>
+    <path d="M4 -38 q14 -14 4 -18 q-10 -2 -4 18 Z" fill="#3f6c45"/>
+    <!-- Бирка -->
+    <g transform="translate(-34 -14) rotate(-18)">
+      <path d="M-12 -8 L8 -8 L14 0 L8 8 L-12 8 Z" fill="#e4ea8c"/>
+      <circle cx="8" cy="0" r="1.8" fill="#c3c96f"/>
+      <path d="M-8 0 L2 0" stroke="#8a8172" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Карандаш и обрезки -->
+  <g transform="translate(36 178) rotate(-24)">
+    <rect x="-3" y="-26" width="6" height="40" rx="2" fill="#3f6c45"/>
+    <path d="M-3 14 L3 14 L0 24 Z" fill="#e0c9a6"/>
+  </g>
+  <g fill="#fdf8ef">
+    <rect x="88" y="176" width="14" height="9" rx="2" transform="rotate(-12 95 180)"/>
+    <rect x="108" y="184" width="13" height="8" rx="2" transform="rotate(8 114 188)"/>
+  </g>
+</svg>

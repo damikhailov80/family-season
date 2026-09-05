@@ -1,0 +1,104 @@
+{
+  "name": "Miesiąc zimowych zabaw",
+  "summary": "Łyżwy, najlepsza górka w okolicy, śnieżna twierdza i fajerwerki w sylwestra.",
+  "note": "w piątkę · sezon przeżyty do końca",
+  "palette": "warm-cool",
+  "icons": "winter",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasze podwórko. Nasz śnieg. Nasz lód."
+    },
+    "theme": {
+      "subtitle": "Zimowe zabawy",
+      "question": "Co okazało się najlepszą zabawą tej zimy?"
+    },
+    "weeksNote": "4 tygodnie – lód, górka, twierdza, fajerwerki",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Łyżwy: całą rodziną na lód"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Sanki: szukamy najlepszej górki"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Śnieżna twierdza, całym podwórkiem"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Fajerwerki w sylwestra — idziemy patrzeć"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Spędzić grudzień na dworze: lód, górka, twierdza i fajerwerki.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Znowu na łyżwach",
+        "description": "Dwadzieścia lat nie stałem na lodzie, zaczynam przy bandzie",
+        "goal": "Okrążenie bez trzymania się"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Czapka dla Tasi",
+        "description": "Wieczorami, pierwszy raz z wzorem, a nie na gładko",
+        "goal": "Zdążyć przed mrozami"
+      },
+      {
+        "id": "p3",
+        "name": "Dima",
+        "face": "son",
+        "project": "Uczę się hamować",
+        "description": "Na lodowisku, przy bandzie, aż przestanę padać",
+        "goal": "Hamować, a nie wpadać"
+      },
+      {
+        "id": "p4",
+        "name": "Katia",
+        "face": "daughter",
+        "project": "Karmię ptaki",
+        "description": "Karmnik za oknem, ziarna co rano",
+        "goal": "Nie zapomnieć ani jednego ranka"
+      },
+      {
+        "id": "p5",
+        "name": "Tasia",
+        "face": "daughter",
+        "project": "Dekoruję okna",
+        "description": "Wycinam śnieżynki i przyklejam, okno po oknie",
+        "goal": "Wszystkie okna przed świętami"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 85,
+      "p2": 100,
+      "p3": 70,
+      "p4": 95,
+      "p5": 90
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggygggyggygggyggyg",
+      "p2": "gyggggyggygggyggggyggygggyggygg",
+      "p3": "gggyggggyggyggggyggygggyggygggy",
+      "p4": "gygggyrggyggggyggyrggyggggyggyg",
+      "p5": "ggyggggyggyggyggggyggygggyggygg"
+    },
+    "summaryAnswer": "— Tata pierwszy wszedł na lód i najdłużej trzymał się bandy.\n— Najlepszą górkę znaleźliśmy za trzecim razem — za garażami, i była z cudzego podwórka.\n— Twierdzę budowaliśmy we czwórkę, a wieczorem było na podwórku dwanaście osób.\n— Na fajerwerki wyszliśmy pół godziny wcześniej, zmarzliśmy, ale zajęliśmy najlepsze miejsce.",
+    "nextIdeas": "— Miesiąc nart: co weekend nowa trasa w parku.\n— Upiec piernikowy domek i nie zjeść go przed świętami.\n— Pojechać tam, gdzie latem się kąpaliśmy, i zobaczyć lód.\n— Miesiąc planszówek: wieczór przy stole zamiast wieczoru z telefonem.",
+    "photos": {
+      "0": "/examples/demo-12/week-1.svg",
+      "1": "/examples/demo-12/week-2.svg",
+      "2": "/examples/demo-12/week-3.svg",
+      "3": "/examples/demo-12/week-4.svg"
+    }
+  }
+}

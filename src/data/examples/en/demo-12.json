@@ -1,0 +1,104 @@
+{
+  "name": "Winter Fun Month",
+  "summary": "Skates, the best hill around, a snow fort and the fireworks on New Year's night.",
+  "note": "five of us · season lived to the end",
+  "palette": "warm-cool",
+  "icons": "winter",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our yard. Our snow. Our ice."
+    },
+    "theme": {
+      "subtitle": "Winter Fun Month",
+      "question": "What turned out to be the best fun of this winter?"
+    },
+    "weeksNote": "4 weeks – ice, hill, fort, fireworks",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Skates: onto the ice, the whole family"
+      },
+      {
+        "title": "Week 2",
+        "text": "Sledges: hunting the best hill around"
+      },
+      {
+        "title": "Week 3",
+        "text": "A snow fort in the yard, the whole yard"
+      },
+      {
+        "title": "Week 4",
+        "text": "Fireworks on New Year's night — off we go"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Spend December outside, not at the window: ice, hill, fort and fireworks.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "On skates again",
+        "description": "Twenty years off the ice, starting at the barrier",
+        "goal": "One lap without holding on"
+      },
+      {
+        "id": "p2",
+        "name": "Mum",
+        "face": "mom",
+        "project": "Knitting Tasya a hat",
+        "description": "In the evenings, my first one with a pattern",
+        "goal": "Done before the hard frosts"
+      },
+      {
+        "id": "p3",
+        "name": "Dima",
+        "face": "son",
+        "project": "Learning to stop",
+        "description": "At the rink, by the barrier, until I stop falling",
+        "goal": "Stopping instead of crashing"
+      },
+      {
+        "id": "p4",
+        "name": "Katya",
+        "face": "daughter",
+        "project": "Feeding the birds",
+        "description": "A feeder outside the window, seeds every morning",
+        "goal": "Not one morning missed"
+      },
+      {
+        "id": "p5",
+        "name": "Tasya",
+        "face": "daughter",
+        "project": "Decorating windows",
+        "description": "Cutting snowflakes and sticking them on, pane by pane",
+        "goal": "Every window before New Year"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 85,
+      "p2": 100,
+      "p3": 70,
+      "p4": 95,
+      "p5": 90
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggygggyggygggyggyg",
+      "p2": "gyggggyggygggyggggyggygggyggygg",
+      "p3": "gggyggggyggyggggyggygggyggygggy",
+      "p4": "gygggyrggyggggyggyrggyggggyggyg",
+      "p5": "ggyggggyggyggyggggyggygggyggygg"
+    },
+    "summaryAnswer": "— Dad was first onto the ice and held on to the barrier longer than anyone.\n— The best hill took three tries — behind the garages, and it belonged to another yard.\n— Four of us built the fort; by the evening there were twelve people in the yard.\n— We went out half an hour early for the fireworks, froze, and got the best spot in the yard.",
+    "nextIdeas": "— A month of skis: a new trail in the park every weekend.\n— Bake a gingerbread house and not eat it before the holiday.\n— Go where we swam in the summer and look at the ice.\n— A board game month: an evening at the table instead of an evening on the phone.",
+    "photos": {
+      "0": "/examples/demo-12/week-1.svg",
+      "1": "/examples/demo-12/week-2.svg",
+      "2": "/examples/demo-12/week-3.svg",
+      "3": "/examples/demo-12/week-4.svg"
+    }
+  }
+}

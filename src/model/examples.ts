@@ -10,6 +10,7 @@ import ruDemo9 from '../data/examples/ru/demo-9.json'
 import ruDemo10 from '../data/examples/ru/demo-10.json'
 import ruDemo11 from '../data/examples/ru/demo-11.json'
 import ruDemo12 from '../data/examples/ru/demo-12.json'
+import ruDemo13 from '../data/examples/ru/demo-13.json'
 import enDemo1 from '../data/examples/en/demo-1.json'
 import enDemo2 from '../data/examples/en/demo-2.json'
 import enDemo3 from '../data/examples/en/demo-3.json'
@@ -20,6 +21,9 @@ import enDemo7 from '../data/examples/en/demo-7.json'
 import enDemo8 from '../data/examples/en/demo-8.json'
 import enDemo9 from '../data/examples/en/demo-9.json'
 import enDemo10 from '../data/examples/en/demo-10.json'
+import enDemo11 from '../data/examples/en/demo-11.json'
+import enDemo12 from '../data/examples/en/demo-12.json'
+import enDemo13 from '../data/examples/en/demo-13.json'
 import plDemo1 from '../data/examples/pl/demo-1.json'
 import plDemo2 from '../data/examples/pl/demo-2.json'
 import plDemo3 from '../data/examples/pl/demo-3.json'
@@ -30,6 +34,9 @@ import plDemo7 from '../data/examples/pl/demo-7.json'
 import plDemo8 from '../data/examples/pl/demo-8.json'
 import plDemo9 from '../data/examples/pl/demo-9.json'
 import plDemo10 from '../data/examples/pl/demo-10.json'
+import plDemo11 from '../data/examples/pl/demo-11.json'
+import plDemo12 from '../data/examples/pl/demo-12.json'
+import plDemo13 from '../data/examples/pl/demo-13.json'
 import type { FaceVariant, IconSetId, PaletteId } from '../types'
 import { FACE_ORDER } from './accents'
 import { knownIconSet } from './icons'
@@ -82,6 +89,7 @@ const RAW: Record<Lang, Record<string, RawExample>> = {
     'demo-10': ruDemo10,
     'demo-11': ruDemo11,
     'demo-12': ruDemo12,
+    'demo-13': ruDemo13,
   },
   en: {
     'demo-1': enDemo1,
@@ -94,6 +102,9 @@ const RAW: Record<Lang, Record<string, RawExample>> = {
     'demo-8': enDemo8,
     'demo-9': enDemo9,
     'demo-10': enDemo10,
+    'demo-11': enDemo11,
+    'demo-12': enDemo12,
+    'demo-13': enDemo13,
   },
   pl: {
     'demo-1': plDemo1,
@@ -106,6 +117,9 @@ const RAW: Record<Lang, Record<string, RawExample>> = {
     'demo-8': plDemo8,
     'demo-9': plDemo9,
     'demo-10': plDemo10,
+    'demo-11': plDemo11,
+    'demo-12': plDemo12,
+    'demo-13': plDemo13,
   },
 }
 
@@ -134,6 +148,7 @@ const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
     'demo-10': SYSTEM_ID_BASE + 19,
     'demo-11': SYSTEM_ID_BASE + 22,
     'demo-12': SYSTEM_ID_BASE + 25,
+    'demo-13': SYSTEM_ID_BASE + 28,
   },
   en: {
     'demo-1': 4,
@@ -146,6 +161,9 @@ const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
     'demo-8': SYSTEM_ID_BASE + 14,
     'demo-9': SYSTEM_ID_BASE + 17,
     'demo-10': SYSTEM_ID_BASE + 20,
+    'demo-11': SYSTEM_ID_BASE + 23,
+    'demo-12': SYSTEM_ID_BASE + 26,
+    'demo-13': SYSTEM_ID_BASE + 29,
   },
   pl: {
     'demo-1': 7,
@@ -158,6 +176,9 @@ const PUBLIC_IDS: Record<Lang, Record<string, number>> = {
     'demo-8': SYSTEM_ID_BASE + 15,
     'demo-9': SYSTEM_ID_BASE + 18,
     'demo-10': SYSTEM_ID_BASE + 21,
+    'demo-11': SYSTEM_ID_BASE + 24,
+    'demo-12': SYSTEM_ID_BASE + 27,
+    'demo-13': SYSTEM_ID_BASE + 30,
   },
 }
 
