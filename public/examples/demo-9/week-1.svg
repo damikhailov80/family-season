@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Зал перед началом спектакля</title>
+
+  <!-- Зал -->
+  <rect width="200" height="200" fill="#2a2528"/>
+
+  <!-- Сцена -->
+  <rect x="24" y="46" width="152" height="80" fill="#c9a86a"/>
+  <rect x="24" y="46" width="152" height="80" fill="#8a6a3a" opacity=".35"/>
+  <circle cx="100" cy="92" r="26" fill="#e3c98f" opacity=".55"/>
+
+  <!-- Занавес -->
+  <path d="M18 34 L182 34 L182 44 L18 44 Z" fill="#5e161a"/>
+  <g fill="#882426">
+    <path d="M18 42 L18 138 q14 -8 14 -26 L32 42 Z"/>
+    <path d="M32 42 L32 128 q14 -10 14 -30 L46 42 Z"/>
+    <path d="M46 42 L46 118 q14 -12 14 -34 L60 42 Z"/>
+    <path d="M182 42 L182 138 q-14 -8 -14 -26 L168 42 Z"/>
+    <path d="M168 42 L168 128 q-14 -10 -14 -30 L154 42 Z"/>
+    <path d="M154 42 L154 118 q-14 -12 -14 -34 L140 42 Z"/>
+  </g>
+  <g fill="#6e1c20">
+    <path d="M25 42 L25 132 q7 -6 7 -22 L32 42 Z"/>
+    <path d="M175 42 L175 132 q-7 -6 -7 -22 L168 42 Z"/>
+  </g>
+
+  <!-- Ламбрекен -->
+  <path d="M18 34 q20 20 41 0 q20 20 41 0 q20 20 41 0 q20 20 41 0 L182 34 Z" fill="#882426"/>
+  <g fill="#c29545">
+    <circle cx="38" cy="50" r="3"/>
+    <circle cx="79" cy="50" r="3"/>
+    <circle cx="121" cy="50" r="3"/>
+    <circle cx="162" cy="50" r="3"/>
+  </g>
+
+  <!-- Рампа -->
+  <rect x="18" y="126" width="164" height="6" fill="#4a3f36"/>
+  <g fill="#e3c98f">
+    <circle cx="40" cy="129" r="2.5"/>
+    <circle cx="70" cy="129" r="2.5"/>
+    <circle cx="100" cy="129" r="2.5"/>
+    <circle cx="130" cy="129" r="2.5"/>
+    <circle cx="160" cy="129" r="2.5"/>
+  </g>
+
+  <!-- Ряд зрителей -->
+  <g fill="#1b1719">
+    <circle cx="36" cy="168" r="12"/>
+    <circle cx="72" cy="163" r="11"/>
+    <circle cx="106" cy="170" r="12"/>
+    <circle cx="142" cy="164" r="11"/>
+    <circle cx="176" cy="170" r="12"/>
+    <rect x="0" y="180" width="200" height="20"/>
+  </g>
+</svg>

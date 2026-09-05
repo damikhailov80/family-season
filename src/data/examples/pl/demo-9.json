@@ -1,0 +1,94 @@
+{
+  "name": "Miesiąc kultury",
+  "summary": "Teatr, balet, koncert — i własna melodia na gitarze z pianinem na koniec.",
+  "note": "we czworo · sezon przeżyty do końca",
+  "palette": "golden-noon",
+  "icons": "music",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasze miasto. Nasze wieczory. Nasza muzyka."
+    },
+    "theme": {
+      "subtitle": "Miesiąc kultury",
+      "question": "Co z tego, co zobaczyliśmy, chce się powtórzyć?"
+    },
+    "weeksNote": "4 tygodnie – trzy sale i własna scena",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Teatr — spektakl całą rodziną"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Balet: pierwszy raz w życiu"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Koncert: filharmonia albo organy"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Gramy sami: gitara i pianino razem"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Pójść tam, gdzie zwykle nie chodzimy, i na koniec zagrać coś swojego.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Wyjąłem gitarę",
+        "description": "Pół godziny wieczorami, zacząłem od starych akordów",
+        "goal": "Zagrać akompaniament bez potknięcia"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Wracam do pianina",
+        "description": "Pół godziny, gdy nikogo nie ma w domu: gamy i jeden utwór",
+        "goal": "Zagrać z tatą na koniec miesiąca"
+      },
+      {
+        "id": "p3",
+        "name": "Roma",
+        "face": "son",
+        "project": "Czytam o sztuce",
+        "description": "Czytam wcześniej i opowiadam wszystkim w drodze do teatru",
+        "goal": "Opowiedzieć przed, a nie po"
+      },
+      {
+        "id": "p4",
+        "name": "Julka",
+        "face": "daughter",
+        "project": "Ogarniam balet",
+        "description": "O czym jest i kto jest kim — żeby patrzeć i rozumieć",
+        "goal": "Znać fabułę przed pierwszym aktem"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 80,
+      "p2": 85,
+      "p3": 100,
+      "p4": 100
+    },
+    "moods": {
+      "p1": "ggyggygggyggyggygggyggygggyggy",
+      "p2": "gyggggyggygggyggggyggygggyggyg",
+      "p3": "gggyggggyggyggggyggygggyggyggg",
+      "p4": "gygggyrggyggggyggyrggyggggyggy"
+    },
+    "summaryAnswer": "— W teatrze Julka przesiedziała cały pierwszy akt na brzegu fotela, a w przerwie wyprosiła program.\n— Na balecie zasnął tata i teraz tylko to wszyscy pamiętają.\n— Organów słuchaliśmy w ciemności: Roma powiedział, że ściany drżały.\n— Ostatniego wieczoru zagraliśmy razem — za trzecim razem, ale do końca.",
+    "nextIdeas": "— Miesiąc filmowy: po filmie na tydzień, każdy wybiera swój wieczór.\n— Pojechać do sąsiedniego miasta na jeden dzień, bez planu.\n— Upiec coś trudnego razem, z jednego przepisu.\n— Miesiąc bez ekranu wieczorami — zobaczymy, co wtedy robimy.",
+    "photos": {
+      "0": "/examples/demo-9/week-1.svg",
+      "1": "/examples/demo-9/week-2.svg",
+      "2": "/examples/demo-9/week-3.svg",
+      "3": "/examples/demo-9/week-4.svg"
+    }
+  }
+}
