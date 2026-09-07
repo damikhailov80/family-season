@@ -3,16 +3,19 @@ import ruOctober from '../data/months/ru/october.json'
 import ruNovember from '../data/months/ru/november.json'
 import ruDecember from '../data/months/ru/december.json'
 import ruJanuary from '../data/months/ru/january.json'
+import ruFebruary from '../data/months/ru/february.json'
 import enSeptember from '../data/months/en/september.json'
 import enOctober from '../data/months/en/october.json'
 import enNovember from '../data/months/en/november.json'
 import enDecember from '../data/months/en/december.json'
 import enJanuary from '../data/months/en/january.json'
+import enFebruary from '../data/months/en/february.json'
 import plSeptember from '../data/months/pl/september.json'
 import plOctober from '../data/months/pl/october.json'
 import plNovember from '../data/months/pl/november.json'
 import plDecember from '../data/months/pl/december.json'
 import plJanuary from '../data/months/pl/january.json'
+import plFebruary from '../data/months/pl/february.json'
 import { exampleByKey, exampleKey } from './examples'
 import { shortCode } from './shortcode'
 import { LANGS, type Lang } from './lang'
@@ -42,6 +45,7 @@ const TEXTS: Record<Lang, Record<string, MonthText>> = {
     november: ruNovember,
     december: ruDecember,
     january: ruJanuary,
+    february: ruFebruary,
   },
   en: {
     september: enSeptember,
@@ -49,6 +53,7 @@ const TEXTS: Record<Lang, Record<string, MonthText>> = {
     november: enNovember,
     december: enDecember,
     january: enJanuary,
+    february: enFebruary,
   },
   pl: {
     september: plSeptember,
@@ -56,6 +61,7 @@ const TEXTS: Record<Lang, Record<string, MonthText>> = {
     november: plNovember,
     december: plDecember,
     january: plJanuary,
+    february: plFebruary,
   },
 }
 
@@ -69,6 +75,7 @@ const SEASONS: Record<string, string[]> = {
   november: ['demo-2', 'demo-9', 'demo-10'],
   december: ['demo-11', 'demo-12', 'demo-13'],
   january: ['demo-3', 'demo-14', 'demo-15'],
+  february: ['demo-16', 'demo-17', 'demo-18'],
 }
 
 // The card itself is read from the database by code (see ideasByCode): one source for what the
