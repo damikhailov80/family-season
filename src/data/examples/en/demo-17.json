@@ -1,0 +1,74 @@
+{
+  "name": "Taking Care of Ourselves",
+  "summary": "A barber, a massage, a whole day at the spa and the tests put off for two years.",
+  "note": "two of us · season lived to the end",
+  "palette": "spa",
+  "icons": "sport",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our time. Our sleep. Our shoulders."
+    },
+    "theme": {
+      "subtitle": "Taking Care of Us",
+      "question": "What should have been done long ago?"
+    },
+    "weeksNote": "4 weeks – four appointments in the diary",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Barber and hairdresser: style, not length"
+      },
+      {
+        "title": "Week 2",
+        "text": "Massage: both of us booked on the same day"
+      },
+      {
+        "title": "Week 3",
+        "text": "A whole day at the spa: phones in the locker"
+      },
+      {
+        "title": "Week 4",
+        "text": "The doctor, not the spa: the tests we put off"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Come first for once, not last: the barber, the massage, the spa and the doctor.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Kostya",
+        "face": "dad",
+        "project": "In bed by eleven",
+        "description": "The phone stays in the kitchen, an ordinary alarm clock",
+        "goal": "Seven nights in a row"
+      },
+      {
+        "id": "p2",
+        "name": "Marina",
+        "face": "mom",
+        "project": "Booking the doctors",
+        "description": "Three appointments I have put off for two years",
+        "goal": "Get to at least two of them"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 70,
+      "p2": 100
+    },
+    "moods": {
+      "p1": "ggyggggyggyggygggyggyggggyggygg",
+      "p2": "gyggygggyggygggyggyggggyygggygg"
+    },
+    "summaryAnswer": "— The spa was the best of it: six hours without a phone, and nobody died.\n— Marina got to all three doctors; Kostya made eleven o'clock four nights out of seven.",
+    "nextIdeas": "A month of moving: the pool, not the sofa.\nThe spa again, but with no talk about work.",
+    "photos": {
+      "0": "/examples/demo-17/week-1.svg",
+      "1": "/examples/demo-17/week-2.svg",
+      "2": "/examples/demo-17/week-3.svg",
+      "3": "/examples/demo-17/week-4.svg"
+    }
+  }
+}

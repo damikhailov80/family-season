@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Кресло барбера и новая стрижка</title>
+
+  <rect width="200" height="200" fill="#eef1ea"/>
+  <rect y="150" width="200" height="50" fill="#dfe4dd"/>
+  <path d="M0 150 L200 150" stroke="#c3ccc2" stroke-width="2"/>
+
+  <!-- Зеркало на стене -->
+  <g>
+    <rect x="112" y="18" width="72" height="96" rx="34" fill="#c9d6e4"/>
+    <rect x="118" y="24" width="60" height="84" rx="28" fill="#e6eef5"/>
+    <g fill="#8fa3b8" opacity="0.6">
+      <circle cx="148" cy="56" r="16"/>
+      <path d="M126 100 q22 -26 44 0 z"/>
+    </g>
+  </g>
+
+  <!-- Кресло -->
+  <g>
+    <rect x="26" y="70" width="70" height="14" rx="6" fill="#5b6d7e"/>
+    <rect x="24" y="84" width="74" height="40" rx="8" fill="#7c8fa0"/>
+    <rect x="34" y="42" width="54" height="34" rx="10" fill="#7c8fa0"/>
+    <rect x="54" y="124" width="12" height="34" fill="#5b6d7e"/>
+    <rect x="38" y="156" width="44" height="8" rx="4" fill="#5b6d7e"/>
+  </g>
+
+  <!-- Ножницы и расчёска на полке -->
+  <g transform="translate(46 176)">
+    <g stroke="#5b6d7e" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M-16 -8 L8 6"/>
+      <path d="M-16 6 L8 -8"/>
+      <circle cx="12" cy="9" r="5"/>
+      <circle cx="12" cy="-11" r="5"/>
+    </g>
+  </g>
+  <g transform="translate(120 176)">
+    <rect x="-26" y="-5" width="52" height="10" rx="2" fill="#ed5752"/>
+    <g stroke="#eef1ea" stroke-width="2">
+      <path d="M-20 -5 L-20 3"/><path d="M-14 -5 L-14 3"/><path d="M-8 -5 L-8 3"/>
+      <path d="M-2 -5 L-2 3"/><path d="M4 -5 L4 3"/><path d="M10 -5 L10 3"/><path d="M16 -5 L16 3"/>
+    </g>
+  </g>
+
+  <!-- Состриженные пряди на полу -->
+  <g fill="none" stroke="#a9b4a4" stroke-width="2.4" stroke-linecap="round">
+    <path d="M104 140 q8 -6 16 0"/>
+    <path d="M126 144 q8 -6 16 0"/>
+    <path d="M112 132 q6 -5 12 0"/>
+  </g>
+</svg>

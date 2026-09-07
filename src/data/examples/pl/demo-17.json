@@ -1,0 +1,74 @@
+{
+  "name": "Troska o siebie",
+  "summary": "Barber, masaż, cały dzień w spa i badania odkładane od dwóch lat.",
+  "note": "we dwoje · sezon przeżyty do końca",
+  "palette": "spa",
+  "icons": "sport",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasz czas. Nasz sen. Nasze barki."
+    },
+    "theme": {
+      "subtitle": "Troska o siebie",
+      "question": "Co trzeba było zrobić dawno temu?"
+    },
+    "weeksNote": "4 tygodnie – cztery wizyty w kalendarzu",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Barber i fryzjer: zmieniamy styl, nie długość"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Masaż: zapisujemy się oboje na ten sam dzień"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Cały dzień w spa: telefony do szafki"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Lekarz zamiast spa: badania, które odkładamy"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Zająć się sobą nie na końcu listy: barber, masaż, spa i lekarz.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Kostek",
+        "face": "dad",
+        "project": "Kładę się przed 23",
+        "description": "Telefon zostaje w kuchni, zwykły budzik",
+        "goal": "Siedem nocy z rzędu"
+      },
+      {
+        "id": "p2",
+        "name": "Marina",
+        "face": "mom",
+        "project": "Zapisuję do lekarzy",
+        "description": "Trzy wizyty, które odkładałam od dwóch lat",
+        "goal": "Dotrzeć chociaż do dwóch"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 70,
+      "p2": 100
+    },
+    "moods": {
+      "p1": "ggyggggyggyggygggyggyggggyggygg",
+      "p2": "gyggygggyggygggyggyggggyygggygg"
+    },
+    "summaryAnswer": "— Spa okazało się najlepsze: sześć godzin bez telefonu i nikt nie umarł.\n— Marina dotarła do wszystkich trzech lekarzy, Kostek przespał do jedenastej cztery noce z siedmiu.",
+    "nextIdeas": "Miesiąc ruchu: basen zamiast kanapy.\nPowtórzyć spa, ale bez rozmów o pracy.",
+    "photos": {
+      "0": "/examples/demo-17/week-1.svg",
+      "1": "/examples/demo-17/week-2.svg",
+      "2": "/examples/demo-17/week-3.svg",
+      "3": "/examples/demo-17/week-4.svg"
+    }
+  }
+}
