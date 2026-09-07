@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Коробка для сбора корма в подъезде</title>
+
+  <rect width="200" height="200" fill="#e6e8de"/>
+  <rect y="120" width="200" height="80" fill="#bcc7a6"/>
+  <path d="M0 118 L200 118" stroke="#8a9a76" stroke-width="4"/>
+
+  <!-- Объявление на стене -->
+  <g transform="translate(106 46) rotate(-3)">
+    <rect x="-56" y="-34" width="112" height="68" rx="2" fill="#f7f8f1"/>
+    <path d="M-40 -18 L40 -18" stroke="#375e97" stroke-width="5" stroke-linecap="round"/>
+    <g stroke="#9aa78a" stroke-width="2.6" stroke-linecap="round">
+      <path d="M-40 -4 L28 -4"/>
+      <path d="M-40 6 L36 6"/>
+      <path d="M-40 16 L14 16"/>
+    </g>
+    <g fill="#ffbb00">
+      <circle cx="44" cy="-28" r="6"/>
+    </g>
+  </g>
+
+  <!-- Коробка, уже не пустая -->
+  <g transform="translate(70 152)">
+    <path d="M-44 -28 L44 -28 L38 34 L-38 34 Z" fill="#c8955c"/>
+    <path d="M-44 -28 L44 -28 L44 -16 L-44 -16 Z" fill="#dcae76"/>
+    <path d="M-44 -28 L-58 -40 L-58 -28 Z" fill="#dcae76"/>
+    <path d="M44 -28 L58 -40 L58 -28 Z" fill="#dcae76"/>
+    <g stroke="#9c6f3f" stroke-width="2">
+      <path d="M-20 -16 L-22 34"/>
+      <path d="M14 -16 L16 34"/>
+    </g>
+  </g>
+
+  <!-- Пакеты корма, торчат из коробки -->
+  <g>
+    <rect x="34" y="104" width="26" height="24" rx="2" fill="#fb6542"/>
+    <path d="M34 104 L60 104 L56 96 L38 96 Z" fill="#e8532f"/>
+    <rect x="64" y="100" width="24" height="28" rx="2" fill="#375e97"/>
+    <path d="M64 100 L88 100 L84 92 L68 92 Z" fill="#2c4f7d"/>
+    <rect x="92" y="108" width="22" height="20" rx="2" fill="#ffbb00"/>
+  </g>
+
+  <!-- Вторая коробка рядом, пустая -->
+  <g transform="translate(164 168)">
+    <path d="M-26 -18 L26 -18 L22 22 L-22 22 Z" fill="#dcae76"/>
+    <path d="M-26 -18 L26 -18 L26 -10 L-26 -10 Z" fill="#c8955c"/>
+  </g>
+</svg>

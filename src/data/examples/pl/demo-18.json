@@ -1,0 +1,82 @@
+{
+  "name": "Miesiąc pomagania",
+  "summary": "Schronisko, zbiórka karmy, ubrania do punktu pomocy i rozmowa na koniec.",
+  "note": "we troje · sezon w pełni",
+  "palette": "meadow",
+  "icons": "pets",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasze ręce. Nasz czas. Nie tylko dla nas."
+    },
+    "theme": {
+      "subtitle": "Miesiąc pomagania",
+      "question": "Co z tego chcemy robić dalej?"
+    },
+    "weeksNote": "4 tygodnie – pomagamy sobą, nie pieniędzmi",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Schronisko: jak pomóc inaczej niż pieniędzmi"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Zbiórka karmy: prosimy klasę i sąsiadów"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Przeglądamy ubrania i niesiemy do punktu"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Siadamy razem: co każdy z nas poczuł"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Pomóc rękami i czasem, a nie przelewem — i zobaczyć, co było nasze.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Oddaję krew",
+        "description": "Pierwszy raz, okazało się, że mogę",
+        "goal": "Dojść do punktu krwiodawstwa"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Zbieram karmę",
+        "description": "Pudło na klatce i ogłoszenie na czacie",
+        "goal": "Jedno pełne pudło karmy"
+      },
+      {
+        "id": "p3",
+        "name": "Basia",
+        "face": "daughter",
+        "project": "Koło wolontariatu",
+        "description": "Zapisałam się w szkole na miesiąc, próbuję",
+        "goal": "Zrozumieć, czy to moje"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 50,
+      "p2": 65,
+      "p3": 45
+    },
+    "moods": {
+      "p1": "ggygggyggyggy",
+      "p2": "gyggggyggygggy",
+      "p3": "gggyggyggygg"
+    },
+    "summaryAnswer": "— W schronisku powiedzieli, że pieniądze mają, a rąk nie — i tak wyszło.\n— Pudło na klatce zapełniło się w cztery dni, ogłoszenia nikt nie zdjął.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-18/week-1.svg",
+      "1": "/examples/demo-18/week-2.svg"
+    }
+  }
+}

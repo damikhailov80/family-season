@@ -1,0 +1,82 @@
+{
+  "name": "Month of Helping",
+  "summary": "The shelter, a food drive, clothes to a charity point and a talk at the end.",
+  "note": "three of us · season in full swing",
+  "palette": "meadow",
+  "icons": "pets",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our hands. Our time. Not only ours."
+    },
+    "theme": {
+      "subtitle": "Month of Helping",
+      "question": "What do we want to keep doing?"
+    },
+    "weeksNote": "4 weeks – helping with ourselves, not money",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "The shelter: how to help other than money"
+      },
+      {
+        "title": "Week 2",
+        "text": "Collecting food: asking the class and neighbours"
+      },
+      {
+        "title": "Week 3",
+        "text": "Sorting clothes and taking them to charity"
+      },
+      {
+        "title": "Week 4",
+        "text": "Sitting down together: what each of us felt"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Help with hands and time rather than a transfer — and see what was ours.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Giving blood",
+        "description": "First time, and it turns out I am eligible",
+        "goal": "Get as far as the blood centre"
+      },
+      {
+        "id": "p2",
+        "name": "Mom",
+        "face": "mom",
+        "project": "Collecting food",
+        "description": "A box in the hallway and a notice in the chat",
+        "goal": "One box filled to the top"
+      },
+      {
+        "id": "p3",
+        "name": "Varya",
+        "face": "daughter",
+        "project": "The volunteer club",
+        "description": "Signed up at school for a month to try it",
+        "goal": "Work out whether it is mine"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 50,
+      "p2": 65,
+      "p3": 45
+    },
+    "moods": {
+      "p1": "ggygggyggyggy",
+      "p2": "gyggggyggygggy",
+      "p3": "gggyggyggygg"
+    },
+    "summaryAnswer": "— At the shelter they said money they have, hands they do not — and so it proved.\n— The box in the hallway filled up in four days and nobody took the notice down.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-18/week-1.svg",
+      "1": "/examples/demo-18/week-2.svg"
+    }
+  }
+}
