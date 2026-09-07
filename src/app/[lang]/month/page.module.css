@@ -57,6 +57,19 @@
   color: var(--ink-soft);
 }
 
+.soon {
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.mail {
+  color: var(--accent-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

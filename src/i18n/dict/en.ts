@@ -484,6 +484,8 @@ export const en: Dict = {
       'Every month has things of its own: September is still warm enough for the woods and the harvest is already in. Pick a month and take a ready plan — rewrite it for you and print it.',
     heading: 'Ideas month by month',
     lead: 'Every month has things of its own. Pick a month and you get ready plans inside: the weeks, a project for everybody and the goal of the month. Any of them can be rewritten for your family and printed on two A4 sheets.',
+    soon: 'The rest of the months are coming soon.',
+    soonInvite: 'Want to take part? Write to us:',
   },
 
   site: {

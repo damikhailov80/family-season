@@ -483,6 +483,8 @@ export const pl: Dict = {
       'Każdy miesiąc ma swoje sprawy: we wrześniu jest jeszcze ciepło na las, a zbiory już dojrzały. Wybierzcie miesiąc i weźcie gotowy plan — można go przepisać pod siebie i wydrukować.',
     heading: 'Pomysły na miesiące',
     lead: 'Każdy miesiąc ma swoje sprawy. Wybierzcie miesiąc, a w środku są gotowe plany: tygodnie, projekt dla każdego i cel miesiąca. Dowolny można przepisać pod swoją rodzinę i wydrukować na dwóch kartkach A4.',
+    soon: 'Pozostałe miesiące pojawią się wkrótce.',
+    soonInvite: 'Chcecie się przyłączyć? Napiszcie do nas:',
   },
 
   site: {

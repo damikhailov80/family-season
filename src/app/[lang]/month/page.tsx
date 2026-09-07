@@ -6,7 +6,7 @@ import { NewSeasonAction } from '../../../components/site/NewSeasonAction'
 import { getDict, getLang } from '../../../i18n/server'
 import { pageMeta } from '../../../model/meta'
 import { monthList } from '../../../model/months'
-import { monthHref, ROUTES } from '../../../model/site'
+import { CONTACT_EMAIL, monthHref, ROUTES } from '../../../model/site'
 import styles from './page.module.css'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -41,6 +41,13 @@ export default async function MonthsPage() {
             </li>
           ))}
         </ul>
+
+        <p className={styles.soon}>
+          {monthsPage.soon} {monthsPage.soonInvite}{' '}
+          <a className={styles.mail} href={`mailto:${CONTACT_EMAIL}`}>
+            {CONTACT_EMAIL}
+          </a>
+        </p>
 
         <div className={styles.actions}>
           <NewSeasonAction className={styles.primary}>{site.newSeason}</NewSeasonAction>
