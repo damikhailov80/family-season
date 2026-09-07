@@ -1,0 +1,82 @@
+{
+  "name": "Month of Guests",
+  "summary": "His classmates, grandma and grandpa, old coursemates and the neighbours.",
+  "note": "three of us · season in full swing",
+  "palette": "sunny-town",
+  "icons": "garden",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our table. Our door. Our guests."
+    },
+    "theme": {
+      "subtitle": "Month of Guests",
+      "question": "Who do we want to see again?"
+    },
+    "weeksNote": "4 weeks – opening the door four times",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "The son's classmates come round"
+      },
+      {
+        "title": "Week 2",
+        "text": "Off to grandma and grandpa, long overdue"
+      },
+      {
+        "title": "Week 3",
+        "text": "Rounding up the coursemates we lost"
+      },
+      {
+        "title": "Week 4",
+        "text": "Getting to know the neighbours"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Open the door four times: the children, the family, old friends, the neighbours.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Finding coursemates",
+        "description": "Writing to people I have not spoken to in ten years",
+        "goal": "Five of them at one table"
+      },
+      {
+        "id": "p2",
+        "name": "Mom",
+        "face": "mom",
+        "project": "Baking for neighbours",
+        "description": "Knocking with a pie, not with a conversation",
+        "goal": "Meet three flats on our landing"
+      },
+      {
+        "id": "p3",
+        "name": "Grisha",
+        "face": "son",
+        "project": "Planning the games",
+        "description": "Working out what to play when they come",
+        "goal": "Nobody sitting on their phone"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 40,
+      "p2": 55,
+      "p3": 70
+    },
+    "moods": {
+      "p1": "ggyggggyggygg",
+      "p2": "gygggyggyggygg",
+      "p3": "gggyggygggygg"
+    },
+    "summaryAnswer": "— Seven classmates came, ate everything in half an hour and played forfeits.\n— At grandma's the albums came out, and Grisha saw grandpa young for the first time.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-15/week-1.svg",
+      "1": "/examples/demo-15/week-2.svg"
+    }
+  }
+}

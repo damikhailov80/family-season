@@ -1,0 +1,82 @@
+{
+  "name": "Miesiąc gości",
+  "summary": "Koledzy syna z klasy, dziadkowie, znajomi ze studiów i sąsiedzi z klatki.",
+  "note": "we troje · sezon w pełni",
+  "palette": "sunny-town",
+  "icons": "garden",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasz stół. Nasze drzwi. Nasi goście."
+    },
+    "theme": {
+      "subtitle": "Miesiąc gości",
+      "question": "Z kim chcemy zobaczyć się znowu?"
+    },
+    "weeksNote": "4 tygodnie – cztery razy otwieramy drzwi",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Zapraszamy kolegów syna z klasy"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Jedziemy do dziadków, dawno nas nie było"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Zbieramy znajomych ze studiów"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Poznajemy sąsiadów z klatki"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Otworzyć drzwi cztery razy: dzieciom, rodzinie, starym znajomym i sąsiadom.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Szukam znajomych",
+        "description": "Piszę do tych, z którymi nie gadałem od lat",
+        "goal": "Zebrać chociaż pięcioro"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Piekę dla sąsiadów",
+        "description": "Pukam z ciastem, a nie z rozmową",
+        "goal": "Poznać trzy mieszkania"
+      },
+      {
+        "id": "p3",
+        "name": "Grzesiek",
+        "face": "son",
+        "project": "Wymyślam gry",
+        "description": "Zbieram, w co grać, kiedy przyjdą",
+        "goal": "Żeby nikt nie siedział w telefonie"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 40,
+      "p2": 55,
+      "p3": 70
+    },
+    "moods": {
+      "p1": "ggyggggyggygg",
+      "p2": "gygggyggyggygg",
+      "p3": "gggyggygggygg"
+    },
+    "summaryAnswer": "— Kolegów przyszło siedmioro, zjedli wszystko w pół godziny i grali w fanty.\n— U babci wyjęli albumy i Grzesiek pierwszy raz zobaczył dziadka młodego.",
+    "nextIdeas": "",
+    "photos": {
+      "0": "/examples/demo-15/week-1.svg",
+      "1": "/examples/demo-15/week-2.svg"
+    }
+  }
+}
