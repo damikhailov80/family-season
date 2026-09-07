@@ -2,14 +2,17 @@ import ruSeptember from '../data/months/ru/september.json'
 import ruOctober from '../data/months/ru/october.json'
 import ruNovember from '../data/months/ru/november.json'
 import ruDecember from '../data/months/ru/december.json'
+import ruJanuary from '../data/months/ru/january.json'
 import enSeptember from '../data/months/en/september.json'
 import enOctober from '../data/months/en/october.json'
 import enNovember from '../data/months/en/november.json'
 import enDecember from '../data/months/en/december.json'
+import enJanuary from '../data/months/en/january.json'
 import plSeptember from '../data/months/pl/september.json'
 import plOctober from '../data/months/pl/october.json'
 import plNovember from '../data/months/pl/november.json'
 import plDecember from '../data/months/pl/december.json'
+import plJanuary from '../data/months/pl/january.json'
 import { exampleByKey, exampleKey } from './examples'
 import { shortCode } from './shortcode'
 import { LANGS, type Lang } from './lang'
@@ -33,9 +36,27 @@ export interface MonthText {
 // language and the hreflang set between the translations is trivial. The price is a Russian
 // slug that would have read slightly better to Yandex, and it is accepted on purpose.
 const TEXTS: Record<Lang, Record<string, MonthText>> = {
-  ru: { september: ruSeptember, october: ruOctober, november: ruNovember, december: ruDecember },
-  en: { september: enSeptember, october: enOctober, november: enNovember, december: enDecember },
-  pl: { september: plSeptember, october: plOctober, november: plNovember, december: plDecember },
+  ru: {
+    september: ruSeptember,
+    october: ruOctober,
+    november: ruNovember,
+    december: ruDecember,
+    january: ruJanuary,
+  },
+  en: {
+    september: enSeptember,
+    october: enOctober,
+    november: enNovember,
+    december: enDecember,
+    january: enJanuary,
+  },
+  pl: {
+    september: plSeptember,
+    october: plOctober,
+    november: plNovember,
+    december: plDecember,
+    january: plJanuary,
+  },
 }
 
 // Which of our examples belong to a month. It lives here rather than in the example files
@@ -47,6 +68,7 @@ const SEASONS: Record<string, string[]> = {
   october: ['demo-1', 'demo-7', 'demo-8'],
   november: ['demo-2', 'demo-9', 'demo-10'],
   december: ['demo-11', 'demo-12', 'demo-13'],
+  january: ['demo-3', 'demo-14', 'demo-15'],
 }
 
 // The card itself is read from the database by code (see ideasByCode): one source for what the
