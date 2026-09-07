@@ -1,0 +1,78 @@
+{
+  "name": "Month About Ourselves",
+  "summary": "A week of silence, a week of thanks, the wheel of life and two days offline.",
+  "note": "three of us · season just started",
+  "palette": "dusk",
+  "icons": "space",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our silence. Our notes. Our findings."
+    },
+    "theme": {
+      "subtitle": "Month About Ourselves",
+      "question": "What came as news about ourselves?"
+    },
+    "weeksNote": "4 weeks – four ways to hear ourselves",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Meditation every evening: ten quiet minutes"
+      },
+      {
+        "title": "Week 2",
+        "text": "Thanks out loud: every evening, round we go"
+      },
+      {
+        "title": "Week 3",
+        "text": "The wheel of life: scoring eight parts of it"
+      },
+      {
+        "title": "Week 4",
+        "text": "A retreat at home: two days off the screens"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Spend the month paying attention: silence, notes, the wheel and two days offline.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Dad",
+        "face": "dad",
+        "project": "Off to a seminar",
+        "description": "One evening on how to talk to your children",
+        "goal": "Use at least one thing"
+      },
+      {
+        "id": "p2",
+        "name": "Mom",
+        "face": "mom",
+        "project": "Catching the anger",
+        "description": "Writing down what set me off and what came before",
+        "goal": "Find my three big buttons"
+      },
+      {
+        "id": "p3",
+        "name": "Sonya",
+        "face": "daughter",
+        "project": "Drawing what I feel",
+        "description": "When words do not come, I pick up a pencil",
+        "goal": "One notebook for the month"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 10,
+      "p3": 5
+    },
+    "moods": {
+      "p1": "gg",
+      "p2": "ggy",
+      "p3": "gg"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {}
+  }
+}

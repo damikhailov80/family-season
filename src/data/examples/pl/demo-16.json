@@ -1,0 +1,78 @@
+{
+  "name": "Miesiąc o sobie",
+  "summary": "Tydzień ciszy, tydzień wdzięczności, koło życia i dwa dni bez ekranów.",
+  "note": "we troje · sezon dopiero się zaczął",
+  "palette": "dusk",
+  "icons": "space",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasza cisza. Nasze zapiski. Nasze wnioski."
+    },
+    "theme": {
+      "subtitle": "Miesiąc o sobie",
+      "question": "Co okazało się nowością o nas samych?"
+    },
+    "weeksNote": "4 tygodnie – cztery sposoby, żeby się usłyszeć",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Medytacja co wieczór: dziesięć minut ciszy"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Wdzięczność na głos: co wieczór, po kolei"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Koło życia: oceniamy osiem stron życia"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Domowe odosobnienie: dwa dni bez ekranów"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Przeżyć miesiąc uważnie: cisza, zapiski, koło i dwa dni bez ekranów.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Tata",
+        "face": "dad",
+        "project": "Idę na seminarium",
+        "description": "Jeden wieczór o tym, jak rozmawiać z dziećmi",
+        "goal": "Zastosować chociaż jedno"
+      },
+      {
+        "id": "p2",
+        "name": "Mama",
+        "face": "mom",
+        "project": "Łapię irytację",
+        "description": "Zapisuję, co mnie wyprowadziło i co było przedtem",
+        "goal": "Poznać swoje trzy guziki"
+      },
+      {
+        "id": "p3",
+        "name": "Sonia",
+        "face": "daughter",
+        "project": "Rysuję, co czuję",
+        "description": "Kiedy brakuje słów — biorę ołówek",
+        "goal": "Zebrać miesiąc w jeden zeszyt"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 10,
+      "p3": 5
+    },
+    "moods": {
+      "p1": "gg",
+      "p2": "ggy",
+      "p3": "gg"
+    },
+    "summaryAnswer": "",
+    "nextIdeas": "",
+    "photos": {}
+  }
+}
