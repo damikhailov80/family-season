@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Обсуждаем прочитанное вечером на кухне</title>
+
+  <!-- Вечерняя кухня -->
+  <rect width="200" height="200" fill="#3b3038"/>
+  <rect y="126" width="200" height="74" fill="#5e4a3c"/>
+  <rect y="124" width="200" height="4" fill="#7a6350"/>
+
+  <!-- Лампа над столом -->
+  <g>
+    <path d="M100 0 L100 26" stroke="#2a2229" stroke-width="3"/>
+    <path d="M78 52 L122 52 L110 26 L90 26 Z" fill="#c9a06a"/>
+    <ellipse cx="100" cy="52" rx="22" ry="5" fill="#f0d9a8"/>
+    <path d="M62 60 L138 60 L160 124 L40 124 Z" fill="#e8cfa8" opacity="0.16"/>
+  </g>
+
+  <!-- Две книги: дочитаны, лежат корешками к друг другу -->
+  <g transform="translate(62 150) rotate(-6)">
+    <rect x="-30" y="-9" width="60" height="18" rx="2" fill="#6c2d2c"/>
+    <rect x="-30" y="-9" width="60" height="5" rx="2" fill="#8a3d3a"/>
+    <rect x="-26" y="-2" width="30" height="3" rx="1" fill="#d9b48a"/>
+  </g>
+  <g transform="translate(140 156) rotate(5)">
+    <rect x="-30" y="-9" width="60" height="18" rx="2" fill="#42313a"/>
+    <rect x="-30" y="-9" width="60" height="5" rx="2" fill="#584250"/>
+    <rect x="-26" y="-2" width="26" height="3" rx="1" fill="#e8cfa8"/>
+  </g>
+
+  <!-- Две чашки -->
+  <g transform="translate(72 108)">
+    <path d="M-16 -12 L16 -12 L13 12 L-13 12 Z" fill="#f3ece0"/>
+    <path d="M16 -6 q10 6 0 12" fill="none" stroke="#f3ece0" stroke-width="4"/>
+    <path d="M-14 -6 L14 -6" stroke="#9f4636" stroke-width="3"/>
+  </g>
+  <g transform="translate(130 112)">
+    <path d="M-16 -12 L16 -12 L13 12 L-13 12 Z" fill="#f3ece0"/>
+    <path d="M-16 -6 q-10 6 0 12" fill="none" stroke="#f3ece0" stroke-width="4"/>
+    <path d="M-14 -6 L14 -6" stroke="#42313a" stroke-width="3"/>
+  </g>
+
+  <!-- Пар: разговор идёт -->
+  <g fill="none" stroke="#e8cfa8" stroke-width="2.4" stroke-linecap="round" opacity="0.75">
+    <path d="M66 92 q6 -8 0 -16 q-6 -8 0 -14"/>
+    <path d="M78 92 q6 -8 0 -16 q-6 -8 0 -14"/>
+    <path d="M136 96 q6 -8 0 -16 q-6 -8 0 -14"/>
+  </g>
+</svg>

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img">
+  <title>Меняемся книгами: каждый выбрал другому</title>
+
+  <!-- Стол -->
+  <rect width="200" height="200" fill="#e7ded1"/>
+  <g stroke="#d6c9b8" stroke-width="2">
+    <path d="M0 58 L200 58"/>
+    <path d="M0 138 L200 138"/>
+  </g>
+
+  <!-- Его книга -->
+  <g transform="translate(58 104) rotate(-7)">
+    <rect x="-34" y="-48" width="68" height="96" rx="3" fill="#6c2d2c"/>
+    <rect x="-34" y="-48" width="10" height="96" fill="#5a2322"/>
+    <rect x="-18" y="-32" width="42" height="30" rx="2" fill="none" stroke="#d9b48a" stroke-width="2"/>
+    <g stroke="#d9b48a" stroke-width="2.4" stroke-linecap="round">
+      <path d="M-18 14 L20 14"/>
+      <path d="M-18 26 L6 26"/>
+    </g>
+  </g>
+
+  <!-- Её книга -->
+  <g transform="translate(140 96) rotate(6)">
+    <rect x="-34" y="-48" width="68" height="96" rx="3" fill="#42313a"/>
+    <rect x="-34" y="-48" width="10" height="96" fill="#332630"/>
+    <circle cx="0" cy="-16" r="15" fill="none" stroke="#e8cfa8" stroke-width="2"/>
+    <g stroke="#e8cfa8" stroke-width="2.4" stroke-linecap="round">
+      <path d="M-18 16 L18 16"/>
+      <path d="M-18 28 L2 28"/>
+    </g>
+  </g>
+
+  <!-- Записки-закладки: подписали друг другу -->
+  <g transform="translate(46 46) rotate(-10)">
+    <rect x="-24" y="-14" width="48" height="28" rx="2" fill="#f3ece0"/>
+    <g stroke="#9f8f7c" stroke-width="2" stroke-linecap="round">
+      <path d="M-14 -4 L14 -4"/>
+      <path d="M-14 5 L6 5"/>
+    </g>
+  </g>
+  <g transform="translate(152 40) rotate(9)">
+    <rect x="-24" y="-14" width="48" height="28" rx="2" fill="#f3ece0"/>
+    <g stroke="#9f8f7c" stroke-width="2" stroke-linecap="round">
+      <path d="M-14 -4 L14 -4"/>
+      <path d="M-14 5 L4 5"/>
+    </g>
+  </g>
+
+  <!-- Стрелки обмена -->
+  <g fill="none" stroke="#9f4636" stroke-width="3" stroke-linecap="round">
+    <path d="M74 172 L126 172"/>
+    <path d="M118 165 L126 172 L118 179"/>
+    <path d="M126 188 L74 188"/>
+    <path d="M82 181 L74 188 L82 195"/>
+  </g>
+</svg>

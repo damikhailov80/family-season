@@ -1,0 +1,74 @@
+{
+  "name": "Book Month",
+  "summary": "Swapping books, trying the club and putting a swap shelf in the hallway.",
+  "note": "two of us · season lived to the end",
+  "palette": "scholar",
+  "icons": "sea",
+  "template": {
+    "header": {
+      "title": "Family Season",
+      "ribbon": "Our books. Our club. Our shelf."
+    },
+    "theme": {
+      "subtitle": "Book Month",
+      "question": "Whose book turned out better — his or hers?"
+    },
+    "weeksNote": "4 weeks – two books, a club and a shelf",
+    "weeks": [
+      {
+        "title": "Week 1",
+        "text": "Swapping books: each picks for the other"
+      },
+      {
+        "title": "Week 2",
+        "text": "The reading club: we go and see if it is ours"
+      },
+      {
+        "title": "Week 3",
+        "text": "A swap shelf in the hallway, for neighbours"
+      },
+      {
+        "title": "Week 4",
+        "text": "Talking it over: did we agree or not"
+      }
+    ],
+    "projectsNote": "Our own goals and how they are going",
+    "goal": "Read what the other chose, get to the club and put a shelf up in the hallway.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Anton",
+        "face": "dad",
+        "project": "Building the shelf",
+        "description": "Knocking it together from old boards for the hallway",
+        "goal": "Up on the wall before February"
+      },
+      {
+        "id": "p2",
+        "name": "Olya",
+        "face": "mom",
+        "project": "Sorting the books",
+        "description": "What I will not read again goes on the shelf",
+        "goal": "Twenty books for the swap"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 100,
+      "p2": 90
+    },
+    "moods": {
+      "p1": "ggygggyggyggygggyggyggggyggyggy",
+      "p2": "gyggggyggygggyyggyggggyggyggygg"
+    },
+    "summaryAnswer": "— The club was not ours: they argued about books we had not read.\n— The shelf was emptied in a week and refilled with theirs — it is the neighbours' now.",
+    "nextIdeas": "A month of films: each watches what the other picks.\nInvite the neighbours we met at the shelf.",
+    "photos": {
+      "0": "/examples/demo-14/week-1.svg",
+      "1": "/examples/demo-14/week-2.svg",
+      "2": "/examples/demo-14/week-3.svg",
+      "3": "/examples/demo-14/week-4.svg"
+    }
+  }
+}

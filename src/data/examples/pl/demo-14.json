@@ -1,0 +1,74 @@
+{
+  "name": "Miesiąc książek",
+  "summary": "Wymieniamy się książkami, idziemy do klubu i stawiamy półkę na klatce.",
+  "note": "we dwoje · sezon przeżyty do końca",
+  "palette": "scholar",
+  "icons": "sea",
+  "template": {
+    "header": {
+      "title": "Sezon rodzinny",
+      "ribbon": "Nasze książki. Nasz klub. Nasza półka."
+    },
+    "theme": {
+      "subtitle": "Miesiąc książek",
+      "question": "Czyja książka okazała się lepsza — jego czy jej?"
+    },
+    "weeksNote": "4 tygodnie – dwie książki, klub i półka",
+    "weeks": [
+      {
+        "title": "Tydzień 1",
+        "text": "Wymieniamy się: każdy wybiera drugiemu"
+      },
+      {
+        "title": "Tydzień 2",
+        "text": "Klub czytelniczy: idziemy i sprawdzamy"
+      },
+      {
+        "title": "Tydzień 3",
+        "text": "Półka na klatce: wymiana książek z sąsiadami"
+      },
+      {
+        "title": "Tydzień 4",
+        "text": "Rozmawiamy o przeczytanym: zgoda czy nie"
+      }
+    ],
+    "projectsNote": "Nasze własne cele i postępy",
+    "goal": "Przeczytać wybór drugiego, dotrzeć do klubu i powiesić półkę na klatce.",
+    "people": [
+      {
+        "id": "p1",
+        "name": "Antek",
+        "face": "dad",
+        "project": "Robię półkę",
+        "description": "Zbijam ze starych desek, wieszam na klatce",
+        "goal": "Powiesić do końca miesiąca"
+      },
+      {
+        "id": "p2",
+        "name": "Ola",
+        "face": "mom",
+        "project": "Przeglądam książki",
+        "description": "Czego nie przeczytam drugi raz — idzie na wymianę",
+        "goal": "Dwadzieścia książek na wymianę"
+      }
+    ]
+  },
+  "fill": {
+    "percents": {
+      "p1": 100,
+      "p2": 90
+    },
+    "moods": {
+      "p1": "ggygggyggyggygggyggyggggyggyggy",
+      "p2": "gyggggyggygggyyggyggggyggyggygg"
+    },
+    "summaryAnswer": "— Klub nie okazał się nasz: spierali się o książki, których nie czytaliśmy.\n— Półkę opróżnili w tydzień i przynieśli swoje — teraz jest sąsiedzka.",
+    "nextIdeas": "Miesiąc kina: oglądamy to, co poleca drugie.\nZaprosić sąsiadów poznanych przy półce.",
+    "photos": {
+      "0": "/examples/demo-14/week-1.svg",
+      "1": "/examples/demo-14/week-2.svg",
+      "2": "/examples/demo-14/week-3.svg",
+      "3": "/examples/demo-14/week-4.svg"
+    }
+  }
+}
