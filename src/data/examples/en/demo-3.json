@@ -1,94 +1,75 @@
 {
-  "name": "Month of Firsts",
-  "summary": "Folding dumplings, a train to the next town, growing a crystal, writing to ourselves.",
-  "note": "five of us · season just started",
-  "palette": "wet-forest",
-  "icons": "forest",
+  "name": "Year in a Box",
+  "summary": "Letters to ourselves, a hundred things for the year and a photo to repeat.",
+  "note": "three of us · season just started",
+  "palette": "sea-wheat",
+  "icons": "tale",
   "template": {
     "header": {
       "title": "Family Season",
-      "ribbon": "Our home. Our team. Our road."
+      "ribbon": "Our letter. Our list. Our photo."
     },
     "theme": {
-      "subtitle": "Month of Firsts",
-      "question": "Which of the new things do we want to do again?"
+      "subtitle": "Year in a Box",
+      "question": "What was the hardest thing to put in the box?"
     },
-    "weeksNote": "4 weeks – 4 first times",
+    "weeksNote": "4 weeks – what we keep for a year",
     "weeks": [
       {
         "title": "Week 1",
-        "text": "Folding dumplings together — nobody knows how"
+        "text": "Watching last year: every photo in one evening"
       },
       {
         "title": "Week 2",
-        "text": "A train to the next town with no plan"
+        "text": "Letters to ourselves — open on 31 December"
       },
       {
         "title": "Week 3",
-        "text": "Growing a salt crystal on the windowsill"
+        "text": "A hundred things for the year, each our own"
       },
       {
         "title": "Week 4",
-        "text": "A letter to ourselves a year ahead — and hide it"
+        "text": "The photo we will take again next January"
       }
     ],
     "projectsNote": "Our own goals and how they are going",
-    "goal": "Try what we have never done and keep at least one of it for good.",
+    "goal": "Leave ourselves a letter, a list and a photo — and open the box on 31 December.",
     "people": [
       {
         "id": "p1",
         "name": "Dad",
         "face": "dad",
-        "project": "Still running",
-        "description": "Three times a week, no records",
-        "goal": "Not quit before the month is over"
+        "project": "Learning to edit",
+        "description": "Making a video about the year that just ended",
+        "goal": "Done before the holidays end"
       },
       {
         "id": "p2",
         "name": "Mom",
         "face": "mom",
-        "project": "Back to the guitar",
-        "description": "Half an hour in the evening, the old chords",
-        "goal": "Remember three songs all the way through"
+        "project": "Learning to drive",
+        "description": "Driving school, still only the practice yard",
+        "goal": "First drive into town with the instructor"
       },
       {
         "id": "p3",
         "name": "Kirill",
         "face": "son",
-        "project": "Fixing my writing",
-        "description": "Half a page of practice before bed",
-        "goal": "Write so I can read it myself"
-      },
-      {
-        "id": "p4",
-        "name": "Sonya",
-        "face": "daughter",
-        "project": "Still swimming",
-        "description": "The pool on Tuesdays, same as before",
-        "goal": "Two lengths more than now"
-      },
-      {
-        "id": "p5",
-        "name": "Grisha",
-        "face": "son",
-        "project": "Tying my laces",
-        "description": "Trying every morning, taking my time",
-        "goal": "Manage it alone at least once"
+        "project": "Learning the cube",
+        "description": "Layer by layer, with a video to peek at",
+        "goal": "Solve the whole cube at least once"
       }
     ]
   },
   "fill": {
     "percents": {
       "p1": 10,
-      "p3": 15,
-      "p5": 5
+      "p3": 15
     },
     "moods": {
       "p1": "ggy",
       "p2": "gg",
-      "p3": "gggy",
-      "p4": "gy",
-      "p5": "ggg"
+      "p3": "gggy"
     },
     "summaryAnswer": "",
     "nextIdeas": "",

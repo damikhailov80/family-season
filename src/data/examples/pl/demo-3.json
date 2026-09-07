@@ -1,94 +1,75 @@
 {
-  "name": "Miesiąc pierwszych razów",
-  "summary": "Lepimy pierogi, jedziemy do sąsiedniego miasta, hodujemy kryształ i piszemy list.",
-  "note": "w piątkę · sezon dopiero się zaczął",
-  "palette": "wet-forest",
-  "icons": "forest",
+  "name": "Kapsuła roku",
+  "summary": "Listy do siebie, sto rzeczy na rok i zdjęcie, które powtórzymy za rok.",
+  "note": "we troje · sezon dopiero się zaczął",
+  "palette": "sea-wheat",
+  "icons": "tale",
   "template": {
     "header": {
       "title": "Sezon rodzinny",
-      "ribbon": "Nasz dom. Nasza drużyna. Nasza droga."
+      "ribbon": "Nasz list. Nasza lista. Nasze zdjęcie."
     },
     "theme": {
-      "subtitle": "Miesiąc pierwszy raz",
-      "question": "Co z nowych rzeczy chcemy powtórzyć?"
+      "subtitle": "Kapsuła roku",
+      "question": "Co najtrudniej było włożyć do pudełka?"
     },
-    "weeksNote": "4 tygodnie – 4 pierwsze razy",
+    "weeksNote": "4 tygodnie – co zostawiamy sobie na rok",
     "weeks": [
       {
         "title": "Tydzień 1",
-        "text": "Lepimy pierogi całą rodziną — nikt nie umie"
+        "text": "Oglądamy miniony rok: wszystkie zdjęcia"
       },
       {
         "title": "Tydzień 2",
-        "text": "Pociąg do sąsiedniego miasta bez planu"
+        "text": "Piszemy listy do siebie — otworzyć 31 grudnia"
       },
       {
         "title": "Tydzień 3",
-        "text": "Hodujemy kryształ z soli na parapecie"
+        "text": "Sto rzeczy na rok, każdy swoją listę"
       },
       {
         "title": "Tydzień 4",
-        "text": "List do siebie za rok — i chowamy go"
+        "text": "Zdjęcie, które powtórzymy w przyszłym styczniu"
       }
     ],
     "projectsNote": "Nasze własne cele i postępy",
-    "goal": "Spróbować tego, czego nigdy nie robiliśmy, i zostawić sobie choć jedno.",
+    "goal": "Zostawić sobie list, listę i zdjęcie — pudełko otwieramy 31 grudnia.",
     "people": [
       {
         "id": "p1",
         "name": "Tata",
         "face": "dad",
-        "project": "Dalej biegam",
-        "description": "Trzy razy w tygodniu, bez rekordów",
-        "goal": "Nie rzucić do końca miesiąca"
+        "project": "Uczę się montować",
+        "description": "Robię filmik o minionym roku",
+        "goal": "Skończyć przed końcem ferii"
       },
       {
         "id": "p2",
         "name": "Mama",
         "face": "mom",
-        "project": "Znowu za gitarę",
-        "description": "Pół godziny wieczorami, stare akordy",
-        "goal": "Przypomnieć sobie trzy piosenki"
+        "project": "Uczę się jeździć",
+        "description": "Kurs prawa jazdy, na razie tylko plac",
+        "goal": "Pierwszy wyjazd w miasto z instruktorem"
       },
       {
         "id": "p3",
         "name": "Kirył",
         "face": "son",
-        "project": "Poprawiam charakter",
-        "description": "Pół strony ćwiczeń przed snem",
-        "goal": "Pisać tak, żebym sam odczytał"
-      },
-      {
-        "id": "p4",
-        "name": "Sonia",
-        "face": "daughter",
-        "project": "Dalej pływam",
-        "description": "Basen we wtorki, tak jak wcześniej",
-        "goal": "Przepłynąć o dwie długości więcej"
-      },
-      {
-        "id": "p5",
-        "name": "Grzesiek",
-        "face": "son",
-        "project": "Wiążę sznurówki",
-        "description": "Próbuję każdego ranka, nie spieszę się",
-        "goal": "Poradzić sobie sam choć raz"
+        "project": "Uczę się kostki",
+        "description": "Warstwa po warstwie, podglądam filmiki",
+        "goal": "Ułożyć całą kostkę choć raz"
       }
     ]
   },
   "fill": {
     "percents": {
       "p1": 10,
-      "p3": 15,
-      "p5": 5
+      "p3": 15
     },
     "moods": {
       "p1": "ggy",
       "p2": "gg",
-      "p3": "gggy",
-      "p4": "gy",
-      "p5": "ggg"
+      "p3": "gggy"
     },
     "summaryAnswer": "",
     "nextIdeas": "",
