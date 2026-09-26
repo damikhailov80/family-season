@@ -6,7 +6,8 @@ import { SectionBox } from '../../../../components/SectionBox'
 import { SeasonPreview } from '../../../../components/community/SeasonPreview'
 import { NewSeasonAction } from '../../../../components/site/NewSeasonAction'
 import { getDict, getLang } from '../../../../i18n/server'
-import { monthPage } from '../../../../model/months'
+import { pickTargetMonth } from '../../../../model/calendar'
+import { monthIndexForSlug, monthPage } from '../../../../model/months'
 import { pageMeta } from '../../../../model/meta'
 import { ROUTES, withLang } from '../../../../model/site'
 import { ideasByCode } from '../../../../server/publicSeasons'
@@ -49,6 +50,8 @@ export default async function MonthPage({ params }: { params: Promise<{ slug: st
   )
   const ideas = state.status === 'ok' ? state.ideas : []
   const summary = new Map(page.seasons.map((season) => [season.code, season.summary]))
+  const monthIndex = monthIndexForSlug(slug)
+  const month = monthIndex === null ? undefined : pickTargetMonth(new Date(), monthIndex)
 
   return (
     <PaperSheet>
@@ -79,7 +82,9 @@ export default async function MonthPage({ params }: { params: Promise<{ slug: st
         <h2 className={styles.head}>{text.actionHead}</h2>
         <p className={styles.text}>{text.actionText}</p>
         <div className={styles.actions}>
-          <NewSeasonAction className={styles.primary}>{text.action}</NewSeasonAction>
+          <NewSeasonAction className={styles.primary} month={month}>
+            {text.action}
+          </NewSeasonAction>
         </div>
 
         <p className={styles.text}>{text.moreText}</p>

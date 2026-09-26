@@ -78,6 +78,21 @@ const SEASONS: Record<string, string[]> = {
   february: ['demo-16', 'demo-17', 'demo-18'],
 }
 
+// The article is about one specific month, unlike the rolling current/next month a blank
+// otherwise gets - so "start a September season" must pin September, not today's date.
+const MONTH_INDEX: Record<string, number> = {
+  september: 8,
+  october: 9,
+  november: 10,
+  december: 11,
+  january: 0,
+  february: 1,
+}
+
+export function monthIndexForSlug(slug: string): number | null {
+  return slug in MONTH_INDEX ? MONTH_INDEX[slug] : null
+}
+
 // The card itself is read from the database by code (see ideasByCode): one source for what the
 // season is, and the showcase's own rules about what may be shown. What stays here is the line
 // under the card - editorial text about the idea, which is not part of any season.

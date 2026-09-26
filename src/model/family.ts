@@ -3,7 +3,7 @@ import { FACE_ORDER } from './accents'
 import { limitFor } from './limits'
 import { MAX_PEOPLE, MIN_PEOPLE } from './types'
 import { createEmptyTemplate, createPerson } from './templates'
-import type { Template } from './types'
+import type { MonthRef, Template } from './types'
 
 export interface FamilyMember {
   face: FaceVariant
@@ -48,8 +48,8 @@ export function familyNamed(family: FamilyPreset): boolean {
   return family.every((person) => person.name.trim() !== '')
 }
 
-export function templateForFamily(family: FamilyPreset): Template {
-  const template = createEmptyTemplate()
+export function templateForFamily(family: FamilyPreset, month?: MonthRef): Template {
+  const template = createEmptyTemplate(month)
   return {
     ...template,
     people: normalizeFamily(family).map((person, index) => ({

@@ -4,7 +4,7 @@ import { knownLang, type Lang } from './lang'
 import { defaultSeasonTitle, normalizeTitle } from './library'
 import { knownPalette } from './palettes'
 import { createEmptyTemplate } from './templates'
-import type { Template } from './types'
+import type { MonthRef, Template } from './types'
 import type { IconSetId, PaletteId } from '../types'
 
 const KEY = 'family-season:draft'
@@ -18,8 +18,8 @@ export interface Draft {
   savedAt: number
 }
 
-export function emptyDraft(lang: Lang): Draft {
-  const template = createEmptyTemplate()
+export function emptyDraft(lang: Lang, month?: MonthRef): Draft {
+  const template = createEmptyTemplate(month)
   return {
     title: defaultSeasonTitle(template, lang),
     template,
