@@ -22,6 +22,25 @@ async function analyticsStorage(page: Page): Promise<string> {
   })
 }
 
+// The banner hides at once and saves the answer in the background (a server action sets the
+// cookie in its response). A reload before that response aborts the request, so a test that
+// reloads waits for it first - a person does not reload within the same hundred milliseconds.
+// Other server actions run on the same page (LangSync on load), so the request is told apart by
+// the answer it carries.
+async function answer(page: Page, button: string, value: string): Promise<void> {
+  const saved = page.waitForResponse((response) => {
+    const request = response.request()
+    return (
+      Boolean(request.headers()['next-action']) && (request.postData() ?? '').includes(`"${value}"`)
+    )
+  })
+  await page
+    .getByRole('region', { name: DICTS.ru.consent.bannerAria })
+    .getByRole('button', { name: button })
+    .click()
+  await saved
+}
+
 test.beforeEach(async ({ context }) => {
   await context.route('**/googletagmanager.com/**', (route) => route.abort())
 })
@@ -37,7 +56,7 @@ test.describe('consent to analytics', () => {
 
     expect(await analyticsStorage(page)).toBe('denied')
 
-    await banner.getByRole('button', { name: DICTS.ru.consent.accept }).click()
+    await answer(page, DICTS.ru.consent.accept, 'granted')
 
     await expect(banner).toBeHidden()
     expect(await analyticsStorage(page)).toBe('granted')
@@ -51,7 +70,7 @@ test.describe('consent to analytics', () => {
     await page.goto('/ru')
 
     const banner = page.getByRole('region', { name: DICTS.ru.consent.bannerAria })
-    await banner.getByRole('button', { name: DICTS.ru.consent.decline }).click()
+    await answer(page, DICTS.ru.consent.decline, 'denied')
     await expect(banner).toBeHidden()
 
     await page.reload()
@@ -80,7 +99,7 @@ test.describe('consent to analytics', () => {
     await page.goto('/ru')
 
     const banner = page.getByRole('region', { name: DICTS.ru.consent.bannerAria })
-    await banner.getByRole('button', { name: DICTS.ru.consent.accept }).click()
+    await answer(page, DICTS.ru.consent.accept, 'granted')
     await expect(banner).toBeHidden()
 
     await page.context().clearCookies({ name: 'fs-consent' })
