@@ -39,6 +39,7 @@ import {
   consentOrNull,
   type Consent,
 } from '../model/consent'
+import { knownMonth } from '../model/calendar'
 import { familyNamed, normalizeFamily, templateForFamily } from '../model/family'
 import { DEFAULT_ICON_SET, knownIconSet } from '../model/icons'
 import { knownLang, LANG_COOKIE, LANG_COOKIE_MAX_AGE } from '../model/lang'
@@ -143,10 +144,10 @@ export async function storeSeason(
   return created
 }
 
-export async function createSeason(title: unknown, value: unknown) {
+export async function createSeason(title: unknown, value: unknown, month?: unknown) {
   const lang = knownLang(value)
   const family = await readFamily()
-  const template = templateForFamily(family ?? [])
+  const template = templateForFamily(family ?? [], knownMonth(month))
   const result = await createUserSeason({
     template,
     title: normalizeTitle(title, defaultSeasonTitle(template, lang)),
