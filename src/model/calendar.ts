@@ -2,12 +2,8 @@ import { DICTS } from '../i18n/dict'
 import type { Lang } from './lang'
 import type { MonthRef } from './types'
 
-export const MONTH_SWITCH_DAY = 10
-
-export function pickTargetMonth(now: Date = new Date()): MonthRef {
-  const shift = now.getDate() < MONTH_SWITCH_DAY ? 0 : 1
-  const date = new Date(now.getFullYear(), now.getMonth() + shift, 1)
-  return { year: date.getFullYear(), monthIndex: date.getMonth() }
+export function currentMonth(now: Date = new Date()): MonthRef {
+  return { year: now.getFullYear(), monthIndex: now.getMonth() }
 }
 
 export function daysInMonth({ year, monthIndex }: MonthRef): number {

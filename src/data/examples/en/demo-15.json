@@ -10,6 +10,7 @@
       "ribbon": "Our table. Our door. Our guests."
     },
     "theme": {
+      "monthIndex": 0,
       "subtitle": "Month of Guests",
       "question": "Who do we want to see again?"
     },

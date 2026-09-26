@@ -10,6 +10,7 @@
       "ribbon": "Nasza cisza. Nasze zapiski. Nasze wnioski."
     },
     "theme": {
+      "monthIndex": 1,
       "subtitle": "Miesiąc o sobie",
       "question": "Co okazało się nowością o nas samych?"
     },

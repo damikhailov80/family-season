@@ -1,11 +1,11 @@
-import { pickTargetMonth } from './calendar'
+import { currentMonth } from './calendar'
 import type { Person, Template } from './types'
 import { WEEKS_COUNT } from './types'
 
 export function createEmptyTemplate(): Template {
   return {
     header: { title: '', ribbon: '' },
-    theme: { ...pickTargetMonth(), subtitle: '', question: '' },
+    theme: { ...currentMonth(), subtitle: '', question: '' },
     weeksNote: '',
     weeks: Array.from({ length: WEEKS_COUNT }, () => ({ title: '', text: '' })),
     projectsNote: '',

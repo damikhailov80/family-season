@@ -10,6 +10,7 @@
       "ribbon": "Nasz dom. Nasze ręce. Nasz grudzień."
     },
     "theme": {
+      "monthIndex": 11,
       "subtitle": "Miesiąc przytulności",
       "question": "Który drobiazg zmienił dom najbardziej?"
     },

@@ -10,6 +10,7 @@
       "ribbon": "Nasz czas. Nasz sen. Nasze barki."
     },
     "theme": {
+      "monthIndex": 1,
       "subtitle": "Troska o siebie",
       "question": "Co trzeba było zrobić dawno temu?"
     },

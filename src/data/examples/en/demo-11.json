@@ -10,6 +10,7 @@
       "ribbon": "Our home. Our hands. Our December."
     },
     "theme": {
+      "monthIndex": 11,
       "subtitle": "Cosy Month",
       "question": "Which small thing changed the house the most?"
     },

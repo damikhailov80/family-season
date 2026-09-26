@@ -16,7 +16,7 @@ import plNovember from '../data/months/pl/november.json'
 import plDecember from '../data/months/pl/december.json'
 import plJanuary from '../data/months/pl/january.json'
 import plFebruary from '../data/months/pl/february.json'
-import { exampleByKey, exampleKey } from './examples'
+import { examplesFor } from './examples'
 import { shortCode } from './shortcode'
 import { LANGS, type Lang } from './lang'
 
@@ -65,17 +65,15 @@ const TEXTS: Record<Lang, Record<string, MonthText>> = {
   },
 }
 
-// Which of our examples belong to a month. It lives here rather than in the example files
-// because a publication has no month of its own on purpose - an idea is taken as filling for
-// somebody's month, and whose month it was is beside the point (see "The showcase: publishing").
-// The month page is what groups them, so the grouping is the month page's business.
-const SEASONS: Record<string, string[]> = {
-  september: ['demo-4', 'demo-5', 'demo-6'],
-  october: ['demo-1', 'demo-7', 'demo-8'],
-  november: ['demo-2', 'demo-9', 'demo-10'],
-  december: ['demo-11', 'demo-12', 'demo-13'],
-  january: ['demo-3', 'demo-14', 'demo-15'],
-  february: ['demo-16', 'demo-17', 'demo-18'],
+// The month an example belongs to lies in the example itself (theme.monthIndex); the slug only
+// names which month a page is about.
+const MONTH_INDEX: Record<string, number> = {
+  september: 8,
+  october: 9,
+  november: 10,
+  december: 11,
+  january: 0,
+  february: 1,
 }
 
 // The card itself is read from the database by code (see ideasByCode): one source for what the
@@ -96,12 +94,11 @@ export function monthPage(lang: Lang, slug: string): MonthPage | null {
   const text = TEXTS[lang][slug]
   if (!text) return null
 
-  const seasons = (SEASONS[slug] ?? [])
-    .map((id) => exampleByKey(exampleKey(lang, id)))
-    .filter((example) => Boolean(example))
+  const seasons = examplesFor(lang)
+    .filter((example) => example.template().theme.monthIndex === MONTH_INDEX[slug])
     .map((example) => ({
-      code: shortCode('public', example!.publicId),
-      summary: example!.summary,
+      code: shortCode('public', example.publicId),
+      summary: example.summary,
     }))
 
   return { slug, text, seasons }

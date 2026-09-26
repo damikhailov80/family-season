@@ -38,7 +38,7 @@ try {
 
     await client.query(
       `insert into public_seasons
-         (id, code, author_key, content, names, palette, icon_set, language, fill_id, rolling_month)
+         (id, code, author_key, content, names, palette, icon_set, language, fill_id, rolling_year)
        values ($1, $2, null, $3, $4, $5, $6, $7, $8, true)
        on conflict (id) do update set
          content   = excluded.content,

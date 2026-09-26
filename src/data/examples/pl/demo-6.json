@@ -10,6 +10,7 @@
       "ribbon": "Nasz dom. Nasze podwórko. Nasze miasto."
     },
     "theme": {
+      "monthIndex": 8,
       "subtitle": "Ekomiesiąc",
       "question": "Co z oddanych rzeczy przydało się komuś bardziej niż nam?"
     },

@@ -10,6 +10,7 @@
       "ribbon": "Nasze ręce. Nasz czas. Nie tylko dla nas."
     },
     "theme": {
+      "monthIndex": 1,
       "subtitle": "Miesiąc pomagania",
       "question": "Co z tego chcemy robić dalej?"
     },

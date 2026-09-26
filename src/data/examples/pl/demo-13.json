@@ -10,6 +10,7 @@
       "ribbon": "Nasze ręce. Nasze prezenty. Nasz grudzień."
     },
     "theme": {
+      "monthIndex": 11,
       "subtitle": "Prezenty dla wszystkich",
       "question": "Który prezent najprzyjemniej było oddać?"
     },

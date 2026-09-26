@@ -10,6 +10,7 @@
       "ribbon": "Our city. Our evenings. Our music."
     },
     "theme": {
+      "monthIndex": 10,
       "subtitle": "Culture Month",
       "question": "What of all we saw did we want to see again?"
     },

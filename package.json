@@ -11,6 +11,8 @@
     "palettes": "node tools/palettes/build.mjs",
     "icons": "node tools/icons/build.mjs",
     "qr": "node --import tsx tools/qr/build.ts",
+    "db:up": "bash tools/db/up.sh",
+    "db:studio": "bash tools/db/studio.sh",
     "db:migrate": "node --env-file-if-exists=.env.local tools/db/migrate.mjs",
     "logo": "node tools/logo/build.mjs",
     "og": "node --import tsx tools/og/build.ts",

@@ -79,7 +79,8 @@ npm run dev       # http://localhost:3000
 | `npm run db:migrate` | Apply the migrations (on dev; for production see "Deployment") |
 | `npm run db:seed` | Put the examples into `public_seasons` |
 | `npm run db:reports` | The report queue; `-- --block <code> "why"` closes a publication |
-| `docker start family-season-db` | Bring the local postgres up |
+| `npm run db:up` | Bring the local postgres up in docker (creates it on first run) |
+| `npm run db:studio` | Browse the dev database in Prisma Studio at `localhost:5555` |
 
 **Generated files** — edit the source, then rebuild
 
@@ -114,7 +115,7 @@ The tests need a **separate** database: before every run its schema is dropped a
 from the migrations and the example seed. It is created next to the dev database:
 
 ```bash
-docker exec family-season-db createdb -U postgres family_season_e2e
+npm run db:up   # creates family_season_e2e as well
 # and a line in .env.local, see .env.example:
 # E2E_DATABASE_URL=postgres://postgres:local@localhost:5432/family_season_e2e
 ```
@@ -227,15 +228,14 @@ author but not deleted: a report must point at what it was filed against.
 Locally the easiest way is to bring the database up in docker:
 
 ```bash
-docker run -d --name family-season-db \
-  -e POSTGRES_PASSWORD=local -e POSTGRES_DB=family_season \
-  -p 5432:5432 -v family-season-pgdata:/var/lib/postgresql \
-  postgres:18-alpine
+npm run db:up        # tools/db/up.sh: creates the container on first run, starts it afterwards
+npm run db:migrate
+npm run db:seed
 
 # DATABASE_URL=postgres://postgres:local@localhost:5432/family_season
 ```
 
-The volume is mounted at `/var/lib/postgresql` and **not** at `/var/lib/postgresql/data`: since
+`db:up` refuses to start while another container holds port 5432 and names it. The volume is mounted at `/var/lib/postgresql` and **not** at `/var/lib/postgresql/data`: since
 version 18 the image keeps its data in a subdirectory named after the version, and it rejects
 the old path with an error. To wipe everything including the data —
 `docker rm -f family-season-db && docker volume rm family-season-pgdata`.
@@ -351,7 +351,7 @@ dialog leave the default margins: the layout is designed for 10 mm margins (`@pa
    showcase** — everyone sees it there; when publishing you can replace the family names with
    random ones.
 6. **Fork** is there for your own season too: next month is convenient to build out of the last
-   one, and the last one stays where it is.
+   one, and the last one stays where it is. A fork, like a new season, takes the current month.
 7. On someone else's published season the left side has a **star** (save it for yourself), a
    **heart** (like) and a **flag** (report — with a comment, which goes to us, not to the
    author).

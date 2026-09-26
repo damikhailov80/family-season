@@ -10,6 +10,7 @@
       "ribbon": "Nasz las. Nasze ścieżki. Nasz wrzesień."
     },
     "theme": {
+      "monthIndex": 8,
       "subtitle": "Miesiąc lasu",
       "question": "Co w lesie okazało się inne, niż myśleliśmy?"
     },

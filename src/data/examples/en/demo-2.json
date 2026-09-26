@@ -10,6 +10,7 @@
       "ribbon": "Our days. Our weekends. Our memories."
     },
     "theme": {
+      "monthIndex": 10,
       "subtitle": "Board Game Month",
       "question": "Which game stayed in the family for good?"
     },

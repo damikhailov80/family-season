@@ -10,6 +10,7 @@
       "ribbon": "Nasze miasto. Nasze wieczory. Nasza muzyka."
     },
     "theme": {
+      "monthIndex": 10,
       "subtitle": "Miesiąc kultury",
       "question": "Co z tego, co zobaczyliśmy, chce się powtórzyć?"
     },

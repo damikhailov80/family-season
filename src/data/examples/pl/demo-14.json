@@ -10,6 +10,7 @@
       "ribbon": "Nasze książki. Nasz klub. Nasza półka."
     },
     "theme": {
+      "monthIndex": 0,
       "subtitle": "Miesiąc książek",
       "question": "Czyja książka okazała się lepsza — jego czy jej?"
     },

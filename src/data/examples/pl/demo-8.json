@@ -10,6 +10,7 @@
       "ribbon": "Nasze miasto. Nasze trasy. Nasze odkrycia."
     },
     "theme": {
+      "monthIndex": 9,
       "subtitle": "Poznaj swoje miasto",
       "question": "Co w swoim mieście zobaczyliśmy po raz pierwszy?"
     },

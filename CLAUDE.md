@@ -152,7 +152,8 @@ Verified by: `e2e/site/lang.spec.ts`.
   season's language, not the viewer's** — five places: the showcase preview, the two account rows,
   the transition after publishing, the duplicate link in the publish dialog. This does **not**
   apply to `/season/<code>` or `/p/<token>`.
-- **Uniqueness of a publication counts the language**: `content_key = md5(language || content)`.
+- **Uniqueness of a publication counts the language**: `content_key = md5(language || content)`
+  (with the year blanked out).
   Changing the language in the publish dialog recomputes the showcase's answer.
 - **Anonymising takes names from the season's language** (`anonymousNames(count, lang)`).
 - **The examples are translated whole** — one file per language (`src/data/examples/<lang>/demo-N.json`),
@@ -198,9 +199,18 @@ No auto-translation of content, no language inside `Template`, no separate domai
 
 `src/model/calendar.ts`. Stored as numbers (`year`, `monthIndex`); the name comes from the
 **season's** dictionary (`monthName(month, lang)`), the length from `daysInMonth`. There is no
-"days in the month" field. A new sheet takes its month from `pickTargetMonth` (before
-`MONTH_SWITCH_DAY` = the 10th, the current one; after, the next). The heading's width is held by a
-hidden spacer with `longestMonth(lang)`, so the arrows do not jump.
+"days in the month" field. The heading's width is held by a hidden spacer with `longestMonth(lang)`,
+so the arrows do not jump.
+
+- **Viewing shows the month the season was saved with** — draft, own season, private link and
+  publication alike. Nothing substitutes it on the way to the screen.
+- **A new season and a fork take the current month** (`currentMonth`, literally today's month; a
+  fork goes through `withCurrentMonth`, the dialog's default name included).
+- **Our examples store only the month** (`theme.monthIndex` in the example's JSON); the year is
+  substituted with the current one when read (`rolling_year` → `withCurrentYear`). The month page
+  groups examples by that same `monthIndex`.
+
+Verified by: `e2e/site/month.spec.ts`.
 
 ## Colour themes
 
@@ -431,7 +441,7 @@ One wrapper for the whole site: `src/components/dialog/Dialog.tsx` and `Dialog.m
 
 - **There is no uniqueness of content here** — a fork is a lawful second row. Uniqueness is a rule
   of the showcase only.
-- **"Fork" exists on your own season too** (next month from the last one), but not in edit mode.
+- **"Fork" exists on your own season too** (with the current month), but not in edit mode.
 - **A row is always looked up together with its owner** (`where code = $1 and account_key = $2`):
   someone else's code is indistinguishable from an invented one.
 - **A draft has a name and a date and is visible in the list.** It is drawn by the client only
@@ -472,8 +482,9 @@ One wrapper for the whole site: `src/components/dialog/Dialog.tsx` and `Dialog.m
 - **Publishing is a copy, not a pointer**: edits, renames and deletion of the personal season do
   not touch the publication. Only a **saved** season can be published.
 - **No identical contents on the showcase**: `content_key` is a unique generated
-  `md5(language || content::text)`. Theme, icons, names and title do not enter the comparison; the
-  language does.
+  `md5(language || jsonb_set(content, '{2,0}', 'null')::text)`. Theme, icons, names, title and the
+  year do not enter the comparison; the language and the month do. The expression lives twice — the
+  column (`007_month_in_key.sql`) and `contentKey` in `publicSeasons.ts` — and must match.
 - **Publishing brings your own withdrawn row back and never touches someone else's**
   (`republishPublic`). A **visible** duplicate answers `duplicate` **with a code** and the person is
   taken to it; a withdrawn one answers without a code and a single toast. Branch order: a visible
@@ -509,7 +520,7 @@ About `/ideas`:
   `Date.now()` — that is an impure call during render).
 - **The preview is a mini-poster and therefore carries `data-palette`** — the only exception to
   "cards do not carry a theme". It has no storylines, moods, wrap-up, month or caption.
-- **System seasons are ordinary showcase rows** without an author, with a rolling month, and they
+- **System seasons are ordinary showcase rows** without an author, with a rolling year, and they
   **cannot be reported** — so they carry no flag either (`Idea.system`, from `author_key is null`).
 - **From the showcase you can report but not like.** Sign-in is asked **before** the report dialog.
 - **If the showcase was not read — emptiness and a toast.**
@@ -665,7 +676,8 @@ Verified by: `e2e/site/meta.spec.ts`.
   and the page whole, with no toast.
 - **The editorial line under each card lives in the registry**, beside the code: it is not part of
   any season.
-- **The grouping "which seasons belong to September" lives here**, since a publication has no month.
+- **Which examples belong to September is the examples' own month** (`theme.monthIndex`); the
+  registry only maps the slug to a month index.
 - **A month exists only when it has been written** — `monthPage` returns `null` and the page is a
   404. No empty or templated month pages.
 - **The texts are not in the dictionaries** (long, one per month); they lie next to the examples.

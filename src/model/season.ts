@@ -1,4 +1,4 @@
-import { pickTargetMonth } from './calendar'
+import { currentMonth } from './calendar'
 import { posterText } from './labels'
 import type { Lang } from './lang'
 import { pack, unpack, type Packed, type PackedPerson } from './codec'
@@ -35,8 +35,12 @@ function blankName(person: unknown): PackedPerson {
   return row
 }
 
-export function withTargetMonth(template: Template): Template {
-  return { ...template, theme: { ...template.theme, ...pickTargetMonth() } }
+export function withCurrentMonth(template: Template): Template {
+  return { ...template, theme: { ...template.theme, ...currentMonth() } }
+}
+
+export function withCurrentYear(template: Template): Template {
+  return { ...template, theme: { ...template.theme, year: currentMonth().year } }
 }
 
 export function anonymousNames(count: number, lang: Lang): string[] {

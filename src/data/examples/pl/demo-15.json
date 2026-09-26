@@ -10,6 +10,7 @@
       "ribbon": "Nasz stół. Nasze drzwi. Nasi goście."
     },
     "theme": {
+      "monthIndex": 0,
       "subtitle": "Miesiąc gości",
       "question": "Z kim chcemy zobaczyć się znowu?"
     },

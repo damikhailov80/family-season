@@ -13,7 +13,7 @@ import { knownIconSet } from '../model/icons'
 import { knownLang, type Lang } from '../model/lang'
 import { defaultSeasonTitle, ideaTitle, LIBRARY_LIMIT, type LibrarySort } from '../model/library'
 import { knownPalette } from '../model/palettes'
-import { anonymousNames, joinSeason, withTargetMonth } from '../model/season'
+import { anonymousNames, joinSeason, withCurrentYear } from '../model/season'
 import { codeOrNull, shortCode } from '../model/shortcode'
 import type { Template } from '../model/types'
 import type { IconSetId, PaletteId } from '../types'
@@ -45,7 +45,7 @@ interface Row {
   icon_set: string
   language: string
   fill_id: string | null
-  rolling_month: boolean
+  rolling_year: boolean
   author_key: string | null
   hidden_at: Date | null
   blocked_at: Date | null
@@ -53,6 +53,12 @@ interface Row {
   liked: boolean
   reported: boolean
   favorited: boolean
+}
+
+// The generated content_key column from 007_month_in_key.sql, computed for a row not yet published:
+// the year is blanked out, the month stays.
+function contentKey(lang: string): string {
+  return `md5(${lang} || jsonb_set((select content from mine), '{2,0}', 'null')::text)`
 }
 
 export const readPublicSeason = cache(
@@ -64,7 +70,7 @@ export const readPublicSeason = cache(
     const me = session?.accountKey ?? ''
     const result = await query<Row>(
       'public:read',
-      `select p.code, p.content, p.names, p.palette, p.icon_set, p.language, p.fill_id, p.rolling_month,
+      `select p.code, p.content, p.names, p.palette, p.icon_set, p.language, p.fill_id, p.rolling_year,
             p.author_key, p.hidden_at, p.blocked_at,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes,
             exists(select 1 from public_likes l
@@ -90,7 +96,7 @@ export const readPublicSeason = cache(
       status: 'ok',
       season: {
         code: row.code,
-        template: row.rolling_month ? withTargetMonth(template) : template,
+        template: row.rolling_year ? withCurrentYear(template) : template,
         palette: knownPalette(row.palette),
         iconSet: knownIconSet(row.icon_set),
         lang: knownLang(row.language),
@@ -147,7 +153,7 @@ export async function previewPublish(
      existing as (
        select code, hidden_at, blocked_at, author_key = $2 as own
          from public_seasons
-        where content_key = md5($4 || (select content from mine)::text)
+        where content_key = ${contentKey('$4')}
      ),
      room as (
        select count(*) < $3 as ok from public_seasons
@@ -215,7 +221,7 @@ export async function publishSeason(
     `with mine as (
        select content, palette, icon_set from user_seasons where code = $1 and account_key = $2
      ),
-     key as (select md5($7 || (select content from mine)::text) as value),
+     key as (select ${contentKey('$7')} as value),
      existing as (
        select code, blocked_at, hidden_at
          from public_seasons where content_key = (select value from key)
@@ -385,12 +391,12 @@ export async function randomIdeas(lang: Lang): Promise<IdeasState> {
     names: unknown
     palette: string
     language: string
-    rolling_month: boolean
+    rolling_year: boolean
     likes: number
     system: boolean
   }>(
     'public:ideas',
-    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_month,
+    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_year,
             p.author_key is null as system,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes
        from public_seasons p
@@ -412,7 +418,7 @@ export async function randomIdeas(lang: Lang): Promise<IdeasState> {
     status: 'ok',
     ideas: result.rows.map((row) => {
       const template = joinSeason(row.content, row.names)
-      const shown = row.rolling_month ? withTargetMonth(template) : template
+      const shown = row.rolling_year ? withCurrentYear(template) : template
       return {
         code: row.code,
         title: ideaTitle(shown, knownLang(row.language)),
@@ -440,12 +446,12 @@ export async function ideasByCode(codes: string[], lang: Lang): Promise<IdeasSta
     names: unknown
     palette: string
     language: string
-    rolling_month: boolean
+    rolling_year: boolean
     likes: number
     system: boolean
   }>(
     'public:ideas:codes',
-    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_month,
+    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_year,
             p.author_key is null as system,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes
        from public_seasons p
@@ -462,7 +468,7 @@ export async function ideasByCode(codes: string[], lang: Lang): Promise<IdeasSta
   const found = new Map(
     result.rows.map((row) => {
       const template = joinSeason(row.content, row.names)
-      const shown = row.rolling_month ? withTargetMonth(template) : template
+      const shown = row.rolling_year ? withCurrentYear(template) : template
       return [
         row.code,
         {
@@ -672,12 +678,12 @@ export async function listFavorites(
     names: unknown
     palette: string
     language: string
-    rolling_month: boolean
+    rolling_year: boolean
     hidden_at: Date | null
     created_at: Date
   }>(
     'public:favorites',
-    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_month, p.hidden_at,
+    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_year, p.hidden_at,
             f.created_at
        from public_favorites f
        join public_seasons p on p.id = f.public_id
@@ -693,7 +699,7 @@ export async function listFavorites(
 
   const entries = result.rows.map((row) => {
     const template = joinSeason(row.content, row.names)
-    const shown = row.rolling_month ? withTargetMonth(template) : template
+    const shown = row.rolling_year ? withCurrentYear(template) : template
     return {
       code: row.code,
       title: defaultSeasonTitle(shown, knownLang(row.language)),
@@ -744,7 +750,7 @@ export async function listPublished(
     names: unknown
     palette: string
     language: string
-    rolling_month: boolean
+    rolling_year: boolean
     hidden_at: Date | null
     blocked_at: Date | null
     created_at: Date
@@ -753,7 +759,7 @@ export async function listPublished(
     forks: number
   }>(
     'public:mine',
-    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_month,
+    `select p.code, p.content, p.names, p.palette, p.language, p.rolling_year,
             p.hidden_at, p.blocked_at, p.created_at,
             (select count(*) from public_likes l where l.public_id = p.id)::int as likes,
             (select count(*) from public_favorites f where f.public_id = p.id)::int as favorites,
@@ -771,7 +777,7 @@ export async function listPublished(
 
   const entries = result.rows.map((row) => {
     const template = joinSeason(row.content, row.names)
-    const shown = row.rolling_month ? withTargetMonth(template) : template
+    const shown = row.rolling_year ? withCurrentYear(template) : template
     return {
       code: row.code,
       title: defaultSeasonTitle(shown, knownLang(row.language)),

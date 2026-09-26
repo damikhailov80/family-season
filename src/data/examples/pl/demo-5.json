@@ -10,6 +10,7 @@
       "ribbon": "Nasz ogród. Nasza kuchnia. Nasz wrzesień."
     },
     "theme": {
+      "monthIndex": 8,
       "subtitle": "Miesiąc zbiorów",
       "question": "Co z tego stanie się naszym jesiennym zwyczajem?"
     },

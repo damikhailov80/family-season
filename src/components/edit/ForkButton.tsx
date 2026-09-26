@@ -5,6 +5,7 @@ import { useDict, useLang } from '../../i18n/context'
 import { fill } from '../../i18n/fill'
 import { readDraft, writeDraft, type Draft } from '../../model/draft'
 import { defaultSeasonTitle, libraryText } from '../../model/library'
+import { withCurrentMonth } from '../../model/season'
 import { seasonHref, sheetHref } from '../../model/site'
 import { storeSeason } from '../../server/actions'
 import { useDoc } from '../../state/docContext'
@@ -27,14 +28,15 @@ export function ForkButton({
   const [busy, setBusy] = useState(false)
 
   const fork = async (title: string) => {
+    const forked = withCurrentMonth(template)
     if (!signedIn) {
-      writeDraft({ title, template, palette, iconSet, lang })
+      writeDraft({ title, template: forked, palette, iconSet, lang })
       location.assign(sheetHref(uiLang, 'edit'))
       return
     }
 
     setBusy(true)
-    const result = await storeSeason({ title, template, palette, iconSet, lang, from })
+    const result = await storeSeason({ title, template: forked, palette, iconSet, lang, from })
     setBusy(false)
     setAsking(null)
     if (result.status === 'ok' && result.code) {
@@ -61,7 +63,7 @@ export function ForkButton({
           warning={
             asking.draft ? fill(dialogs.draftWillBeLost, { title: asking.draft.title }) : undefined
           }
-          initialTitle={defaultSeasonTitle(template, lang)}
+          initialTitle={defaultSeasonTitle(withCurrentMonth(template), lang)}
           busy={busy}
           onDismiss={() => setAsking(null)}
           onSubmit={(title) => void fork(title)}

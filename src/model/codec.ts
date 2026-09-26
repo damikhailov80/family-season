@@ -1,5 +1,5 @@
 import { FACE_ORDER } from './accents'
-import { pickTargetMonth } from './calendar'
+import { currentMonth } from './calendar'
 import { limitFor } from './limits'
 import type { Person, Template } from './types'
 import { MAX_PEOPLE, MIN_PEOPLE, WEEKS_COUNT } from './types'
@@ -86,7 +86,7 @@ export function normalizeTemplate(input: unknown): Template {
   const raw = (input ?? {}) as Record<string, unknown>
   const header = (raw.header ?? {}) as Record<string, unknown>
   const theme = (raw.theme ?? {}) as Record<string, unknown>
-  const fallbackMonth = pickTargetMonth()
+  const fallbackMonth = currentMonth()
 
   const weeks = Array.isArray(raw.weeks) ? raw.weeks : []
   const people = Array.isArray(raw.people) ? raw.people : []

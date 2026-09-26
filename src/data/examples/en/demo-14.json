@@ -10,6 +10,7 @@
       "ribbon": "Our books. Our club. Our shelf."
     },
     "theme": {
+      "monthIndex": 0,
       "subtitle": "Book Month",
       "question": "Whose book turned out better — his or hers?"
     },

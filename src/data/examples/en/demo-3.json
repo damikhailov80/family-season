@@ -10,6 +10,7 @@
       "ribbon": "Our letter. Our list. Our photo."
     },
     "theme": {
+      "monthIndex": 0,
       "subtitle": "Year in a Box",
       "question": "What was the hardest thing to put in the box?"
     },

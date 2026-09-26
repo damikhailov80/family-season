@@ -15,6 +15,7 @@ import type { Lang } from '../../../../model/lang'
 import { posterText } from '../../../../model/labels'
 import { defaultSeasonTitle, libraryText, normalizeTitle } from '../../../../model/library'
 import type { SharedLink } from '../../../../model/qr'
+import { withCurrentMonth } from '../../../../model/season'
 import { publicSeasonHref, seasonHref } from '../../../../model/site'
 import {
   previewShare,
@@ -69,7 +70,13 @@ export function OwnBar({
 
   const fork = async (title: string) => {
     setBusy(true)
-    const result = await storeSeason({ title, template, palette, iconSet, lang })
+    const result = await storeSeason({
+      title,
+      template: withCurrentMonth(template),
+      palette,
+      iconSet,
+      lang,
+    })
     setBusy(false)
     setForkOpen(false)
     if (result.status === 'ok' && result.code) {
@@ -219,7 +226,7 @@ export function OwnBar({
       {forkOpen && (
         <NewSeasonDialog
           heading={dialogs.fork}
-          initialTitle={defaultSeasonTitle(template, lang)}
+          initialTitle={defaultSeasonTitle(withCurrentMonth(template), lang)}
           busy={busy}
           onDismiss={() => setForkOpen(false)}
           onSubmit={(title) => void fork(title)}
