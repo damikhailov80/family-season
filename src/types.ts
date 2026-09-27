@@ -7,6 +7,6 @@ export type IconSetId = (typeof ICON_SETS)[number][0]
 
 export type AccentSlot = 'deep' | 'theme' | 'weeks' | 'goal' | 'projects'
 
-export type FaceVariant = 'dad' | 'mom' | 'son' | 'daughter'
+export type FaceVariant = 'dad' | 'mom' | 'son' | 'daughter' | 'cap' | 'ponytail'
 
 export type MoodValue = 'good' | 'ok' | 'bad' | null

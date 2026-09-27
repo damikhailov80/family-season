@@ -214,7 +214,7 @@ Verified by: `e2e/site/month.spec.ts`.
 
 ## Colour themes
 
-A hundred themes, four paints each.
+A hundred themes, four paints each, plus six colours for people.
 
 | What | Where |
 | --- | --- |
@@ -244,7 +244,11 @@ A hundred themes, four paints each.
   so a swatch can carry its own theme.
 - **The example cards on the landing page do not carry a theme** — they are part of the site.
 - **There is deliberately no dark theme.**
-- A person's colour is derived from their drawing into `var(--person-${face})`.
+- A person's colour is derived from their drawing into `var(--person-${face})`, and those are
+  **their own six colours** `--p1`..`--p6`, not the darks: in a one-hue theme the darks are ~0.02
+  apart in OKLab and two children would read as one. `build.mjs` picks them inside the theme (its
+  hues and the hues between close ones, no louder than its loudest paint), spread as far apart as
+  the theme allows, the first being `--d1`; below `MIN_PERSON_DISTANCE` the build fails.
 - **The switcher throws you into a random theme** (`randomPalette`, the current one excluded) and
   is visible in **all three states of the poster**, examples included. It is a floating button
   (`FloatingControls`), not part of the toolbar.
@@ -846,10 +850,14 @@ the on-screen `max-width` media queries (`rule.media.mediaText = 'not all'`) and
 
 ## Drawings
 
-`src/components/AvatarFace.tsx` — four avatars in one `viewBox="0 0 64 64"`. Adults and children
+`src/components/AvatarFace.tsx` — six avatars in one `viewBox="0 0 64 64"`: two grown-ups and four
+children, so two boys or two girls in one family get different drawings and colours. They
 differ by **silhouette**, not by details (in the mood table an avatar is 20 px): dad has a beard,
-mum a bob and earrings, the children noticeably smaller heads (r 13 against 15+), a cowlick and
-pigtails. Small details on the hair are drawn in white with a stroke.
+mum a bob and earrings, the children noticeably smaller heads (r 13 against 15+) — a fringe
+swept to the side, pigtails, a cap, a high ponytail. Small details on the hair are drawn in
+white with a stroke.
+**A face is stored as its index in `FACE_ORDER`**, so a new one goes to the end. Adding a person
+gives the first child face the family does not have yet (`freeChildFace`).
 
 Drawings (`src/components/doodles/`) are inline SVG on `currentColor`; there are no raster images
 in the layout. Two kinds, not to be confused:

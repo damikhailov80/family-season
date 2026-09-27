@@ -8,6 +8,13 @@ const root = resolve(here, '../..')
 const MAX_PAINT_L = 0.95
 const MAX_DARK_L = 0.45
 const MIN_WHITE_CONTRAST = 4
+const PERSON_LIGHTNESS = [0.24, 0.3, 0.36, 0.42, 0.48, 0.54]
+const PERSON_CHROMA = [0.7, 1, 1.4]
+const PERSON_HUE_SPAN = 60
+const PERSON_COUNT = 6
+// OKLab distance between the two closest people of a theme. The one-hue themes land just above
+// it; the darks in those themes are 0.02 apart, which reads as one colour.
+const MIN_PERSON_DISTANCE = 0.05
 
 const toLinear = (v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)
 const toGamma = (v) => (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055)
@@ -102,7 +109,64 @@ function buildPalette(colors) {
     return hexOf({ L: MAX_DARK_L, C, h: color.h })
   })
 
-  return { paints, onPaints, darks }
+  const { people, gap } = personColors(sorted, darks[0])
+  return { paints, onPaints, darks, people, gap }
+}
+
+function oklab(hex) {
+  const { L, C, h } = rgbToOklch(parseHex(hex))
+  const rad = (h * Math.PI) / 180
+  return [L, C * Math.cos(rad), C * Math.sin(rad)]
+}
+
+const distance = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])
+
+function midHue(a, b) {
+  const delta = ((b - a + 540) % 360) - 180
+  return (a + delta / 2 + 360) % 360
+}
+
+// People get colours of their own, not the darks: in a theme built on one hue the darks are
+// nearly the same colour, and two children would be told apart by nothing. The colours stay
+// inside the theme - its own hues and the hues between close ones, no louder than its loudest
+// paint - and are spread as far apart as
+// the theme allows, starting from the darkest dark so the first person keeps the theme's ink.
+function personColors(sorted, first) {
+  const maxC = Math.max(...sorted.map((color) => color.C))
+  const hues = sorted.map((color) => ({ h: color.h, C: Math.max(color.C, 0.03) }))
+  for (let i = 0; i < sorted.length; i += 1) {
+    for (let j = i + 1; j < sorted.length; j += 1) {
+      if (Math.abs(((sorted[j].h - sorted[i].h + 540) % 360) - 180) > PERSON_HUE_SPAN) continue
+      hues.push({ h: midHue(sorted[i].h, sorted[j].h), C: (hues[i].C + hues[j].C) / 2 })
+    }
+  }
+  const candidates = hues
+    .flatMap(({ h, C }) =>
+      PERSON_LIGHTNESS.flatMap((L) =>
+        PERSON_CHROMA.map((k) => hexOf({ L, C: Math.min(C * k, maxC * 1.1), h })),
+      ),
+    )
+    .filter((hex) => contrastWithWhite(parseHex(hex)) >= MIN_WHITE_CONTRAST)
+    .map((hex) => ({ hex, lab: oklab(hex) }))
+
+  const people = [first]
+  const taken = [oklab(first)]
+  let gap = Infinity
+  while (people.length < PERSON_COUNT) {
+    let best = candidates[0]
+    let bestGap = -1
+    for (const candidate of candidates) {
+      const nearest = Math.min(...taken.map((other) => distance(candidate.lab, other)))
+      if (nearest > bestGap) {
+        best = candidate
+        bestGap = nearest
+      }
+    }
+    people.push(best.hex)
+    taken.push(best.lab)
+    gap = Math.min(gap, bestGap)
+  }
+  return { people, gap }
 }
 
 const source = JSON.parse(readFileSync(resolve(here, 'source.json'), 'utf8'))
@@ -120,11 +184,15 @@ for (const { id, label } of source) {
 const quote = (value) => `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 
 const cssBlocks = source.map(({ id, label, colors }) => {
-  const { paints, onPaints, darks } = buildPalette(colors)
+  const { paints, onPaints, darks, people, gap } = buildPalette(colors)
+  if (gap < MIN_PERSON_DISTANCE) {
+    throw new Error(`palette "${id}": two people are ${gap.toFixed(3)} apart in OKLab`)
+  }
   const lines = [
     ...paints.map((hex, i) => `  --c${i + 1}: ${hex};`),
     ...onPaints.map((value, i) => `  --on-c${i + 1}: ${value};`),
     ...darks.map((hex, i) => `  --d${i + 1}: ${hex};`),
+    ...people.map((hex, i) => `  --p${i + 1}: ${hex};`),
   ]
   return `/* ${label.en} */\n[data-palette='${id}'] {\n${lines.join('\n')}\n}`
 })

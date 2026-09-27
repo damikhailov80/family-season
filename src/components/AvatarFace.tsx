@@ -16,6 +16,8 @@ const FACE: Record<FaceVariant, FaceGeometry> = {
   mom: { cy: 39, r: 15 },
   son: { cy: 42, r: 13 },
   daughter: { cy: 42, r: 13 },
+  cap: { cy: 42, r: 13 },
+  ponytail: { cy: 42, r: 13 },
 }
 
 const HAIR_BACK: Record<FaceVariant, React.ReactNode> = {
@@ -31,15 +33,31 @@ const HAIR_BACK: Record<FaceVariant, React.ReactNode> = {
       <path d="M32 15c10 0 16.5 7 16.5 18 0 4-.5 8-1.5 11.5h-4.5c1.5-6 1.5-11 0-14.5-4.5 3.5-16 3.5-21 0-1.5 3.5-1.5 8.5 0 14.5H17c-1-3.5-1.5-7.5-1.5-11.5 0-11 6.5-18 16.5-18Z" />
     </>
   ),
+  cap: null,
+  ponytail: (
+    <>
+      <path d="M35 27c.5-8.5 6.5-14 13.5-13 4.5.6 7 4.5 6.5 9-.5 5-3 9.5-6.5 12.5.5-5-1.5-9-5.5-10-2.5-.6-5.5-.2-8 1.5Z" />
+      <path d="M17 42c0-10.5 6.5-16.5 15-16.5S47 31.5 47 42h-4c0-7-4.5-11.5-11-11.5S21 35 21 42Z" />
+    </>
+  ),
 }
 
 const HAIR_FRONT: Record<FaceVariant, React.ReactNode> = {
   dad: <path d="M18 33c0-11.5 6-18 14-18s14 6.5 14 18c-2.5-7.5-7-11-14-11s-11.5 3.5-14 11Z" />,
   mom: <path d="M20 29.5c3-5.5 7-8.5 12-8.5s9 3 12 8.5c-3.5-3.5-7.5-5-12-5s-8.5 1.5-12 5Z" />,
   son: (
-    <path d="M20 36c0-10 5-16 12-16s12 6 12 16c-1.5-6-4-9.5-7.5-11 1 3 0 5.5-1.5 6.5-3.5-3-7.5-3.5-11-2-2.5 1.5-3.5 4-4 6.5Z" />
+    <path d="M19.5 39C19 27.5 24.5 21 32 21s13 6.5 12.5 18c-.8-3.5-2-5.8-3.8-7.2-4.5 3.4-12 5.2-21.2 7.2Z" />
   ),
   daughter: null,
+  cap: (
+    <>
+      <path d="M18.5 37C18.5 28 24.5 22.5 32 22.5S45.5 28 45.5 37Z" />
+      <path d="M40 34.5h13c1.8 0 2 3 0 3H40Z" />
+    </>
+  ),
+  ponytail: (
+    <path d="M19.5 38.5c1-7.5 6-11.5 12.5-11.5 5.5 0 9.5 3 11.5 8.5-4-3-9-4-13.5-2.5-4 1.2-7.5 3-10.5 5.5Z" />
+  ),
 }
 
 const DETAILS: Record<FaceVariant, React.ReactNode> = {
@@ -75,6 +93,10 @@ const DETAILS: Record<FaceVariant, React.ReactNode> = {
       <circle cx="52" cy="36" r="2.4" />
     </g>
   ),
+  cap: <circle cx="32" cy="22.5" r="2" fill="#fff" stroke="currentColor" strokeWidth="1.6" />,
+  ponytail: (
+    <circle cx="37" cy="26.5" r="2.6" fill="#fff" stroke="currentColor" strokeWidth="1.6" />
+  ),
 }
 
 const MOUTH: Record<FaceVariant, string> = {
@@ -82,6 +104,8 @@ const MOUTH: Record<FaceVariant, string> = {
   mom: 'M26.5 45c2.4 3.6 8.6 3.6 11 0',
   son: 'M27 47c2 3 8 3 10 0',
   daughter: 'M27 47c2 3 8 3 10 0',
+  cap: 'M27 47c2 3 8 3 10 0',
+  ponytail: 'M27 47c2 3 8 3 10 0',
 }
 
 export function AvatarFace({ variant, size = 56, className }: AvatarFaceProps) {

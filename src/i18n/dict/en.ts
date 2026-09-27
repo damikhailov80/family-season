@@ -41,6 +41,8 @@ export const en: Dict = {
       mom: 'grown-up',
       son: 'boy',
       daughter: 'girl',
+      cap: 'boy in a cap',
+      ponytail: 'girl with a ponytail',
     },
     months: [
       'January',

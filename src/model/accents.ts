@@ -2,7 +2,10 @@ import { posterText } from './labels'
 import type { Lang } from './lang'
 import type { FaceVariant } from '../types'
 
-export const FACE_ORDER: FaceVariant[] = ['dad', 'mom', 'son', 'daughter']
+// A face is stored as its index in this list, so new ones go to the end.
+export const FACE_ORDER: FaceVariant[] = ['dad', 'mom', 'son', 'daughter', 'cap', 'ponytail']
+
+const CHILD_FACES: FaceVariant[] = ['son', 'daughter', 'cap', 'ponytail']
 
 export function faceLabels(lang: Lang): Record<FaceVariant, string> {
   return posterText(lang).faces
@@ -11,4 +14,8 @@ export function faceLabels(lang: Lang): Record<FaceVariant, string> {
 export function nextFace(face: FaceVariant): FaceVariant {
   const index = FACE_ORDER.indexOf(face)
   return FACE_ORDER[(index + 1) % FACE_ORDER.length]
+}
+
+export function freeChildFace(used: FaceVariant[]): FaceVariant {
+  return CHILD_FACES.find((face) => !used.includes(face)) ?? 'son'
 }

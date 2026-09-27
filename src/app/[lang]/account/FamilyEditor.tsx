@@ -4,7 +4,7 @@ import { useActionState, useEffect, useState } from 'react'
 import { AvatarFace } from '../../../components/AvatarFace'
 import { useDict, useLang } from '../../../i18n/context'
 import { fill } from '../../../i18n/fill'
-import { faceLabels, nextFace } from '../../../model/accents'
+import { faceLabels, freeChildFace, nextFace } from '../../../model/accents'
 import { familyNamed, NAME_LIMIT, type FamilyPreset } from '../../../model/family'
 import { MAX_PEOPLE, MIN_PEOPLE } from '../../../model/types'
 import { saveFamily } from '../../../server/actions'
@@ -61,7 +61,9 @@ export function FamilyEditor({ initial }: { initial: FamilyPreset }) {
 
   const add = () =>
     setPeople((current) =>
-      current.length >= MAX_PEOPLE ? current : [...current, { face: 'son', name: '' }],
+      current.length >= MAX_PEOPLE
+        ? current
+        : [...current, { face: freeChildFace(current.map((person) => person.face)), name: '' }],
     )
 
   return (

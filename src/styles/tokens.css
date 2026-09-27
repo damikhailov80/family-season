@@ -50,6 +50,8 @@
   --person-mom: #454b54;
   --person-son: #5b626c;
   --person-daughter: #767c85;
+  --person-cap: #3a3f47;
+  --person-ponytail: #686e78;
 
   --tape: #e3e5e8;
   --photo-frame: #fff;
@@ -80,10 +82,12 @@
 
   --accent-warm: oklch(from var(--c4) 0.68 calc(c * 0.95) h);
 
-  --person-dad: var(--d1);
-  --person-mom: var(--d2);
-  --person-son: var(--d3);
-  --person-daughter: var(--d4);
+  --person-dad: var(--p1);
+  --person-mom: var(--p2);
+  --person-son: var(--p3);
+  --person-daughter: var(--p4);
+  --person-cap: var(--p5);
+  --person-ponytail: var(--p6);
 
   --ink: oklch(from var(--d1) 0.22 calc(c * 0.45) h);
   --ink-soft: oklch(from var(--d1) 0.42 calc(c * 0.35) h);

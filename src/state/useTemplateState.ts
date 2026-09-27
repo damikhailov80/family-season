@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import { nextFace } from '../model/accents'
+import { freeChildFace, nextFace } from '../model/accents'
 import { shiftMonth } from '../model/calendar'
 import { templateDays } from '../model/fill'
 import { limitFor } from '../model/limits'
@@ -67,7 +67,13 @@ export function useTemplateState(initial: Template): TemplateState {
           ? current
           : {
               ...current,
-              people: [...current.people, createPerson(nextPersonId(current.people), 'son')],
+              people: [
+                ...current.people,
+                createPerson(
+                  nextPersonId(current.people),
+                  freeChildFace(current.people.map((person) => person.face)),
+                ),
+              ],
             },
       ),
     [update],
