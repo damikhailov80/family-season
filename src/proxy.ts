@@ -56,6 +56,6 @@ function remember(response: NextResponse, lang: Lang) {
 
 export const config = {
   matcher: [
-    '/((?!_next|api|.*\\.(?:ico|svg|png|jpg|jpeg|gif|webp|txt|xml|webmanifest|woff2?)$).*)',
+    '/((?!_next|api|.*\\.(?:html|htm|ico|svg|png|jpg|jpeg|gif|webp|txt|xml|webmanifest|woff2?)$).*)',
   ],
 }
