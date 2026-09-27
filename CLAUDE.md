@@ -79,8 +79,9 @@ lives inside `[lang]`. The only exception is `/api/*` — route handlers get no 
   soft transition, so an unwritten edit reaches the server.
 - Only four client components live in the site frame, all deliberate: `Toast`, `NewSeasonButton`,
   `DraftClaimer`, `LangSync`.
-- Fonts are `next/font/google`; `tokens.css` uses `--font-nunito`, `--font-caveat`,
-  `--font-marck-script`. `subsets` must name `cyrillic` and `latin-ext` explicitly, as literals.
+- **Two fonts, no more**: `next/font/google` Nunito (`--font-ui`) and Caveat (`--font-hand`, both
+  the hand-drawn headings and the blank's own text). `subsets` must name `cyrillic` and
+  `latin-ext` explicitly, as literals.
 - In `.oxlintrc.json`, `react/only-export-components` is off for `src/app/**`.
 
 ## Languages

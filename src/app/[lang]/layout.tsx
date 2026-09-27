@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Caveat, Marck_Script, Nunito } from 'next/font/google'
+import { Caveat, Nunito } from 'next/font/google'
 import { headers } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import { lang as rootLang } from 'next/root-params'
@@ -31,13 +31,6 @@ const caveat = Caveat({
   subsets: ['cyrillic', 'latin', 'latin-ext'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-caveat',
-  display: 'swap',
-})
-
-const marckScript = Marck_Script({
-  subsets: ['cyrillic', 'latin', 'latin-ext'],
-  weight: '400',
-  variable: '--font-marck-script',
   display: 'swap',
 })
 
@@ -89,7 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html lang={lang} className={`${nunito.variable} ${caveat.variable} ${marckScript.variable}`}>
+    <html lang={lang} className={`${nunito.variable} ${caveat.variable}`}>
       <body>
         <div id="root">
           <LangProvider value={{ lang, dict }}>

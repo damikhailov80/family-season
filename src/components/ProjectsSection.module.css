@@ -156,7 +156,7 @@
 .description {
   margin-top: 6px;
   min-height: 24px;
-  font-family: var(--font-script);
+  font-family: var(--font-hand);
   font-size: 17px;
   line-height: 1.4;
   color: var(--ink);
@@ -186,7 +186,7 @@
 }
 
 .goalText {
-  font-family: var(--font-script);
+  font-family: var(--font-hand);
   font-size: 17px;
   color: var(--ink);
 }

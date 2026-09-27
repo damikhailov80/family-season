@@ -24,7 +24,7 @@
 .text {
   flex: 1;
   min-height: 36px;
-  font-family: var(--font-script);
+  font-family: var(--font-hand);
   font-size: clamp(18px, 2.4vw, 24px);
   line-height: 1.5;
   color: var(--ink);

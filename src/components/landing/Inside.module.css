@@ -32,7 +32,7 @@
 }
 
 .text {
-  font-family: var(--font-script);
+  font-family: var(--font-hand);
   font-size: 17px;
   line-height: 1.4;
   color: var(--ink);

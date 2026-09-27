@@ -5,7 +5,6 @@
 
   --font-ui: var(--font-nunito), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-hand: var(--font-caveat), var(--font-nunito), cursive;
-  --font-script: var(--font-marck-script), var(--font-caveat), cursive;
 
   --mood-good: #4f9c3a;
   --mood-ok: #e8b52f;
