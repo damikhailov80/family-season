@@ -211,14 +211,14 @@ export function PublicBar({
           />
         )}
 
-        <span className={styles.hint}>
+        <h1 className={styles.hint}>
           {hidden
             ? ideaTitle(template, lang)
             : fill(bars.withTitle, {
                 place: demo ? bars.placeExample : bars.placePublic,
                 title: ideaTitle(template, lang),
               })}
-        </span>
+        </h1>
 
         <span className={styles.actions}>
           <ForkButton

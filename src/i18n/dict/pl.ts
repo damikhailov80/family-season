@@ -176,7 +176,7 @@ export const pl: Dict = {
       },
       {
         title: 'Wydrukujcie afisz',
-        text: 'Dokładnie dwie strony A3 — układ sprawdzony na rodzinie pięcioosobowej i miesiącu o 31 dniach.',
+        text: 'Dokładnie dwie strony A4 — układ sprawdzony na rodzinie pięcioosobowej i miesiącu o 31 dniach.',
       },
       {
         title: 'Powieście na lodówce',

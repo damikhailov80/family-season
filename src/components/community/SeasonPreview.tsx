@@ -28,7 +28,7 @@ export function SeasonPreview({ idea }: { idea: Idea }) {
           <span className={styles.week} key={week.title || index}>
             <b className={styles.weekTitle}>
               {shown(week.title, `${placeholders.weekTitle} ${index + 1}`)}
-            </b>
+            </b>{' '}
             <span className={styles.weekText}>{shown(week.text, placeholders.weekText)}</span>
           </span>
         ))}

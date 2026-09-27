@@ -13,7 +13,7 @@ export async function Hero() {
       <div className={styles.titleRow}>
         <SparkleRays className={styles.rays} />
         <h1 className={styles.title}>
-          <span className={styles.brand}>{landing.heroTitle}</span>
+          <span className={styles.brand}>{landing.heroTitle}</span>{' '}
           <span className={styles.tail}>{landing.heroTitleTail}</span>
         </h1>
         <SparkleRays className={`${styles.rays} ${styles.raysRight}`} />

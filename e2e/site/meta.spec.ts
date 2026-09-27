@@ -129,7 +129,10 @@ test.describe('a month has a page of its own', () => {
     await expect(page.getByRole('heading', { level: 2 })).not.toHaveCount(0)
 
     // The cards come from the showcase, so they carry its addresses.
-    await expect(page.locator('a[href^="/ru/s/"]')).toHaveCount(3)
+    const cards = page.locator('a[href^="/ru/s/"]')
+    await expect(cards).toHaveCount(3)
+    // Flex hides a missing gap on screen, but a search snippet glues the words together.
+    await expect(cards.first()).toContainText('Неделя 1 Гербарий')
   })
 
   test('a month we have not written about is not a page', async ({ request }) => {
@@ -182,12 +185,26 @@ test.describe('the page has a readable outline', () => {
 
     const h1 = page.getByRole('heading', { level: 1 })
     await expect(h1).toHaveCount(1)
-    await expect(h1).toContainText(DICTS.ru.landing.heroTitle)
-    await expect(h1).toContainText(DICTS.ru.landing.heroTitleTail)
+    await expect(h1).toContainText('Семейный сезон планер на месяц')
     await expect(page.getByRole('heading', { level: 2 })).not.toHaveCount(0)
 
     // The cards come from the showcase, so they carry its addresses.
     await expect(page.locator('a[href^="/ru/s/"]')).toHaveCount(3)
+  })
+
+  test('a publication is headed by its idea, not by the brand', async ({ page }) => {
+    await page.goto(RU_EXAMPLE)
+
+    const h1 = page.getByRole('heading', { level: 1 })
+    await expect(h1).toHaveCount(1)
+    await expect(h1).toContainText('Месяц Человека-паука')
+  })
+
+  test('the spacer that holds the month heading is not text of the page', async ({ page }) => {
+    await page.goto(RU_EXAMPLE)
+
+    // An October example; the longest Russian month name is the spacer.
+    await expect(page.locator('main')).not.toContainText('Сентябрь')
   })
 
   test('the showcase has a heading of its own', async ({ page }) => {

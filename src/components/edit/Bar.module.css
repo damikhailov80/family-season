@@ -29,6 +29,7 @@
 .hint {
   margin-right: auto;
   font-size: 13px;
+  font-weight: inherit;
   color: var(--ink-muted);
 }
 

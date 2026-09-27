@@ -40,9 +40,11 @@ export function MonthTheme() {
             </button>
           )}
           <p className={styles.month}>
-            <span className={styles.monthSizer} aria-hidden="true">
-              {longestMonth(lang)}
-            </span>
+            <span
+              className={styles.monthSizer}
+              data-sizer={longestMonth(lang)}
+              aria-hidden="true"
+            />
             <span>{monthName(template.theme, lang)}</span>
           </p>
           {editing && (

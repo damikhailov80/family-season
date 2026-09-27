@@ -4,7 +4,7 @@ import { PosterIcon } from './doodles/PosterIcon'
 import { EditableText } from './edit/EditableText'
 import styles from './Header.module.css'
 
-export function Header() {
+export function Header({ titleAs = 'h1' }: { titleAs?: 'h1' | 'p' }) {
   const { field } = useDoc()
   const { placeholders } = usePoster()
 
@@ -16,7 +16,7 @@ export function Header() {
       <div className={styles.titleRow}>
         <SparkleRays className={styles.rays} />
         <EditableText
-          as="h1"
+          as={titleAs}
           className={styles.title}
           placeholder={placeholders.title}
           {...field('header.title')}

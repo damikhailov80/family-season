@@ -11,14 +11,16 @@ import { IconSetContext } from './doodles/iconSetContext'
 import type { QrMatrix } from '../model/qr'
 import { useDoc } from '../state/docContext'
 
-export function Poster({ qr }: { qr?: QrMatrix }) {
+// On a publication the page is headed by the bar, which names the idea; the poster's own title
+// is usually the placeholder, and fifty pages headed by the brand read as duplicates.
+export function Poster({ qr, titleAs }: { qr?: QrMatrix; titleAs?: 'h1' | 'p' }) {
   const { palette, iconSet } = useDoc()
 
   return (
     <IconSetContext value={iconSet}>
       <PaperSheet palette={palette}>
         <PrintPage>
-          <Header />
+          <Header titleAs={titleAs} />
           <MonthTheme />
           <WeeksSection />
           <MonthGoal qr={qr} />

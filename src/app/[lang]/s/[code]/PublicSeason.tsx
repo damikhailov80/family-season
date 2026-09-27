@@ -45,7 +45,7 @@ export function PublicSeason({
         }}
       />
       <FloatingControls />
-      <Poster />
+      <Poster titleAs="p" />
     </SeasonProvider>
   )
 }

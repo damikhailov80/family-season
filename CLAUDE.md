@@ -200,7 +200,8 @@ No auto-translation of content, no language inside `Template`, no separate domai
 `src/model/calendar.ts`. Stored as numbers (`year`, `monthIndex`); the name comes from the
 **season's** dictionary (`monthName(month, lang)`), the length from `daysInMonth`. There is no
 "days in the month" field. The heading's width is held by a hidden spacer with `longestMonth(lang)`,
-so the arrows do not jump.
+so the arrows do not jump. The spacer is drawn by `::before` from `data-sizer`, not as text: as
+a text node it reached search snippets ("Сентябрь Февраль").
 
 - **Viewing shows the month the season was saved with** — draft, own season, private link and
   publication alike. Nothing substitutes it on the way to the screen.
@@ -656,6 +657,13 @@ Printed to the right of "Our goal for the month". It leads to the site, or to th
   for the month, print, free.
 - **A page must have an outline**: `SectionBox` renders its label as a heading only through the
   `heading` prop (`'h1'` on `/ideas`, `'h2'` on landing sections). **The poster keeps the span.**
+- **A publication is headed by its bar**: on `/s/<code>` the hint (it names the idea) is the
+  `<h1>` and the poster title drops to `p` (`Poster titleAs`) — the title is usually the brand
+  placeholder, and fifty pages under one heading read as duplicates. Elsewhere the poster title
+  stays the `h1`.
+- **Words next to each other in markup carry a space** (`{' '}` between the hero's two spans,
+  after a week's number in the preview): flex hides the missing gap on screen, but a search
+  snippet glues the words ("сезонпланер").
 - The landing `<h1>` is the brand plus `heroTitleTail`, not the brand alone.
 - **`metadataBase` is built from `SITE_URL`** — the address is never written twice.
 

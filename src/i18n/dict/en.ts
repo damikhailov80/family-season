@@ -176,7 +176,7 @@ export const en: Dict = {
       },
       {
         title: 'Print the playbill',
-        text: 'Exactly two A3 pages — the layout is checked on a family of five and a month of 31 days.',
+        text: 'Exactly two A4 pages — the layout is checked on a family of five and a month of 31 days.',
       },
       {
         title: 'Put it on the fridge',
