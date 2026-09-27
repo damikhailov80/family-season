@@ -34,12 +34,12 @@
   margin-top: 14px;
 }
 
+/* The width is computed, not left to the picture: with `auto` a sheet not yet loaded took no
+   room and the dialog jumped when it arrived. */
 .large {
   display: block;
-  width: auto;
+  width: min(calc((100vw - 48px - 48px - 12px) / 2), calc((100dvh - 210px) * var(--ratio)));
   height: auto;
-  max-width: calc((100vw - 48px - 48px - 12px) / 2);
-  max-height: calc(100dvh - 210px);
   border: 1px solid var(--sheet-border);
 }
 
@@ -59,7 +59,5 @@
 
   .large {
     width: 100%;
-    max-width: none;
-    max-height: none;
   }
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDict } from '../../i18n/context'
 import { Dialog } from '../dialog/Dialog'
 import dialogStyles from '../dialog/Dialog.module.css'
@@ -24,11 +24,25 @@ export function PosterZoom({
 }) {
   const { dialogs, printable } = useDict()
   const [open, setOpen] = useState(false)
+  const thumb = useRef<HTMLImageElement>(null)
+
+  // The rest of the sheets are fetched as soon as the thumbnail is in: opened on demand, the
+  // second one arrived after the dialog and popped in beside the first.
+  useEffect(() => {
+    const img = thumb.current
+    const warm = () => {
+      for (const page of pages.slice(1)) new Image().src = page.src
+    }
+    if (img.complete) warm()
+    else img.addEventListener('load', warm, { once: true })
+    return () => img.removeEventListener('load', warm)
+  }, [pages])
 
   return (
     <>
       <button type="button" className={styles.zoom} onClick={() => setOpen(true)}>
         <img
+          ref={thumb}
           className={styles.thumb}
           src={pages[0].src}
           alt={pages[0].alt}
@@ -54,7 +68,10 @@ export function PosterZoom({
             </>
           }
         >
-          <div className={styles.pages}>
+          <div
+            className={styles.pages}
+            style={{ '--ratio': size.width / size.height } as React.CSSProperties}
+          >
             {pages.map((page) => (
               <img
                 className={styles.large}
