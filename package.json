@@ -16,6 +16,7 @@
     "db:migrate": "node --env-file-if-exists=.env.local tools/db/migrate.mjs",
     "logo": "node tools/logo/build.mjs",
     "og": "node --import tsx tools/og/build.ts",
+    "posters": "npm run e2e:db && npm run build && node --import tsx tools/posters/build.ts",
     "og:check": "node --import tsx tools/og/check.ts",
     "typecheck": "tsc --noEmit",
     "db:status": "node --env-file-if-exists=.env.local tools/db/migrate.mjs --status",

@@ -7,6 +7,7 @@ import { iconSetOrNull } from '../../../../model/icons'
 import { ideaDescription, ideaTitle } from '../../../../model/library'
 import { pageMeta } from '../../../../model/meta'
 import { paletteOrNull } from '../../../../model/palettes'
+import { POSTER_IMAGE, posterPages } from '../../../../model/posters'
 import { ROUTES } from '../../../../model/site'
 import { auth } from '../../../../server/auth'
 import { readPublicSeason } from '../../../../server/publicSeasons'
@@ -19,8 +20,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { code } = await params
   const lang = await getLang()
-  const [state, { pages, site }] = await Promise.all([readPublicSeason(code, lang), getDict()])
+  const [state, { pages, site, printable }] = await Promise.all([
+    readPublicSeason(code, lang),
+    getDict(),
+  ])
   const season = state.status === 'ok' ? state.season : null
+  const sheets = posterPages(code)
 
   return pageMeta({
     lang,
@@ -39,6 +44,16 @@ export async function generateMetadata({
     siteName: site.brand,
     ogAlt: site.ogAlt,
     alternates: 'self',
+    // Our examples preview as their own sheet: that is the picture a person saving a printable
+    // plan wants to see. A person's publication keeps the site picture - there is no shot of it.
+    image:
+      season && sheets
+        ? {
+            url: sheets[0],
+            alt: fill(printable.alt, { title: ideaTitle(season.template, lang) }),
+            ...POSTER_IMAGE,
+          }
+        : undefined,
   })
 }
 

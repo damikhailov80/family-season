@@ -145,6 +145,8 @@ const boxes = await page.$$eval('main ul li > a', (n) =>
 `src/data/examples/{ru,en,pl}/demo-N.json`, фотографии `public/examples/demo-N/week-N.svg`, реестр
 `src/model/examples.ts` (`RAW` и `PUBLIC_IDS` — учти, что prettier переносит их в столбик).
 **Реестр правится в том же коммите, что и файлы примера**, иначе промежуточный коммит не собирается.
+После этого — `npm run posters`: картинки обоих листов примера для страницы месяца, иначе
+`e2e/site/posters.spec.ts` упадёт на новом коде.
 
 ## Что править для новой страницы месяца
 

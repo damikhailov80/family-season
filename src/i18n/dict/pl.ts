@@ -489,6 +489,14 @@ export const pl: Dict = {
     soonInvite: 'Chcecie się przyłączyć? Napiszcie do nas:',
   },
 
+  printable: {
+    head: 'Jak wygląda na papierze',
+    text: 'Każdy plan drukuje się na dwóch kartkach A4. Otwórz przykład, zmień go pod swoją rodzinę i wydrukuj — nastroje, postępy i notatki wpisuje się długopisem.',
+    alt: '{title} — plan rodzinny na miesiąc, plakat do druku na A4',
+    altSecond: '{title} — druga strona plakatu',
+    open: 'Otwórz przykład',
+  },
+
   site: {
     brand: 'Sezon rodzinny',
     alternateName: 'Sezon rodzinny — planer na miesiąc dla rodziny',

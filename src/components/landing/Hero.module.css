@@ -75,6 +75,28 @@
   clip-path: polygon(1% 3%, 99% 0, 100% 95%, 2% 100%);
 }
 
+/* The text and one of our posters side by side: what the site makes is shown, not only told. */
+.intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: 36px;
+  max-width: 820px;
+  margin-top: 4px;
+  text-align: left;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.poster {
+  transform: rotate(2deg);
+}
+
 .lead {
   max-width: 620px;
   font-size: 18px;
@@ -112,6 +134,21 @@
 @media (max-width: 820px) {
   .hero {
     padding: 6px 0 0;
+  }
+
+  .intro {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .text {
+    align-items: center;
+  }
+
+  .poster {
+    width: 180px;
   }
 
   .heart,

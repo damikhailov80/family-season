@@ -1,0 +1,65 @@
+.zoom {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.thumb {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--sheet-border);
+  border-radius: 6px;
+}
+
+.zoom:hover .thumb {
+  border-color: var(--accent-deep);
+}
+
+.zoom:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent-theme) 60%, transparent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Both sheets side by side, as a spread, each as large as the window lets it be: stacked, the
+   second one sat below the fold of the dialog and was taken for missing. */
+.pages {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.large {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc((100vw - 48px - 48px - 12px) / 2);
+  max-height: calc(100dvh - 210px);
+  border: 1px solid var(--sheet-border);
+}
+
+.open {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+/* Two sheets side by side are too small on a phone: there they stack and scroll. */
+@media (max-width: 640px) {
+  .pages {
+    grid-template-columns: 1fr;
+    max-height: calc(100dvh - 210px);
+    overflow-y: auto;
+  }
+
+  .large {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+  }
+}

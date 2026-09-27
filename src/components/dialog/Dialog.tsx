@@ -8,11 +8,13 @@ export function Dialog({
   onDismiss,
   actions,
   children,
+  wide = false,
 }: {
   title: string
   onDismiss: () => void
   actions: ReactNode
   children?: ReactNode
+  wide?: boolean
 }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const titleId = useId()
@@ -38,7 +40,7 @@ export function Dialog({
 
   return (
     <dialog
-      className={styles.dialog}
+      className={wide ? `${styles.dialog} ${styles.wide}` : styles.dialog}
       ref={dialog}
       onClose={onDismiss}
       onKeyDown={handleKeyDown}

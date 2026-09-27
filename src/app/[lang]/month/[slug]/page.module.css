@@ -74,6 +74,15 @@
   color: var(--ink-soft);
 }
 
+.posters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+  list-style: none;
+  padding-inline-start: 0px;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

@@ -15,6 +15,7 @@ export interface PageMeta {
   ogAlt: string
   index?: boolean
   alternates?: 'all' | 'self' | 'none'
+  image?: { url: string; alt: string; width: number; height: number }
 }
 
 // Next inherits the whole openGraph block from the layout and never fills og:title from the
@@ -29,9 +30,9 @@ export function pageMeta({
   ogAlt,
   index = true,
   alternates = 'all',
+  image = { url: `/og-${lang}.png`, alt: ogAlt, ...OG_IMAGE },
 }: PageMeta): Metadata {
   const url = withLang(lang, path)
-  const image = { url: `/og-${lang}.png`, alt: ogAlt, ...OG_IMAGE }
   const scope = index ? alternates : 'none'
 
   return {

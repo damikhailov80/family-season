@@ -15,6 +15,11 @@
   flex-direction: column;
 }
 
+/* A dialog that shows pictures, not a question: the 560px ceiling is about a row of buttons. */
+.wide {
+  max-width: calc(100vw - 48px);
+}
+
 .dialog::backdrop {
   background: rgb(0 0 0 / 35%);
 }

@@ -426,6 +426,7 @@ One wrapper for the whole site: `src/components/dialog/Dialog.tsx` and `Dialog.m
 - The heading links itself with `useId`; the scroll is locked once for the site by
   `html:has(dialog:modal)` with `scrollbar-gutter: stable`.
 - The 560px width is a ceiling for **three** buttons; if a fourth does not fit, it does not belong.
+  The one wider dialog is `wide`, for pictures (`PosterZoom`): it holds sheets, not buttons.
 - The button row is pressed to the bottom by `.dialog[open] { display: flex; flex-direction: column }`
   plus `margin-top: auto`. `[open]` matters: a bare `.dialog` would show it before `showModal()`.
 
@@ -634,8 +635,9 @@ Printed to the right of "Our goal for the month". It leads to the site, or to th
 - **The mark is drawn at two scales**: `tight` geometry for the small PNGs, the original for SVG
   and everything from 120 px. `apple-icon.png` is rendered with `radius: 0`.
 - **The preview picture is common to the site; only the text is per page.** A mini-poster is
-  impossible — satori knows neither CSS Modules nor `var()` nor `color-mix`.
-- **The season's content never goes into the preview** (a messenger's server fetches the page).
+  impossible — satori knows neither CSS Modules nor `var()` nor `color-mix`. **The exception is
+  our examples**: they preview as their own sheet (see "Poster pictures of our examples").
+- **A person's season never goes into the preview** (a messenger's server fetches the page).
 - **Three pictures, one per language**, carrying `landing.heroLead` (not `site.description`); the
   script imports the dictionaries directly. Change the lead → `npm run og` → look at the picture.
 - **Fonts are inlined as data URIs** in the screenshot page, or the shot silently comes out in a
@@ -668,6 +670,44 @@ Printed to the right of "Our goal for the month". It leads to the site, or to th
 - **`metadataBase` is built from `SITE_URL`** — the address is never written twice.
 
 Verified by: `e2e/site/meta.spec.ts`.
+
+## Poster pictures of our examples
+
+A picture of each of the two sheets of every example, filled in: for the image search, for
+Pinterest and for the link preview.
+
+| What | Where |
+| --- | --- |
+| Sizes, which codes have them | `src/model/posters.ts` (`posterPages`, `POSTER_IMAGE`) |
+| Build (`npm run posters`) | `tools/posters/build.ts` |
+| Generated | `public/posters/<code>-1.jpg`, `<code>-2.jpg` |
+| Where they are shown | the landing hero (one at random), the month page (the first sheet, both in the dialog), `og:image` on `/s/<code>` (the first), the sitemap (both) |
+
+- **There is no ready PDF, on purpose.** People change an example for their family before they
+  print it, so a file of our example is taken by nobody. The path is look → open → fork →
+  print, and **printing stays on every example** (the bar's button).
+- **Only our examples.** A person's publication changes and lives in the database only; nothing
+  shoots it, so it keeps the site's preview.
+- **The landing hero shows one at random** (`randomPoster`), picked from the registry, not the
+  database: the landing page must stand when the database is down.
+- **The pictures are the printout at the end of the month**: the print layout with the fill layer
+  written in — moods, progress, photos, the wrap-up. The fill layer exists only for examples, and
+  this is what it is for. Print media would hide it, so the tool applies the print rules as
+  ordinary styles, skipping `display: none` (in the poster's print rules it hides only the fill
+  layer and edit controls).
+- **The frame is 1072 px, not the 1039 px of a page**: the written-in fill layer grows a sheet by
+  up to ~26 px (a long English wrap-up). The tool refuses a sheet taller than the frame.
+- **Shot from the real poster**: `npm run posters` rebuilds the e2e database from the example
+  files, builds the app and shoots it with Playwright on its own port. Change an example, a
+  layout or the print rules → `npm run posters` → look at a picture.
+- **`posterPages` stays on the server**: the module reads the examples registry, which must not
+  end up in a client bundle, so `PosterZoom` gets the size as a prop.
+- **A thumbnail is looked at before anything else**: pressing it opens both sheets large in a
+  `wide` dialog (`PosterZoom`) — side by side, as a spread, so the second is seen at once
+  (stacked, it sat below the fold and was taken for missing); on a phone they stack and scroll.
+  "Open the example" inside leads on.
+
+Verified by: `e2e/site/posters.spec.ts`.
 
 ## The month pages
 
@@ -881,8 +921,8 @@ in the layout. Two kinds, not to be confused:
 imported by server components.
 
 **The site's raster pictures live in `public/` and are all generated** (`npm run logo`,
-`npm run og`); none of them is in the markup. The example photographs
-(`public/examples/<id>/week-N.svg`) are the only pictures kept as files: they belong to the **fill
+`npm run og`, `npm run posters`); only the posters of our examples are in the markup. The example
+photographs (`public/examples/<id>/week-N.svg`) are the only pictures kept as files: they belong to the **fill
 layer**, are painted in their own colours and know nothing of the themes.
 
 ## Tests

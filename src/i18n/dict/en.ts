@@ -490,6 +490,14 @@ export const en: Dict = {
     soonInvite: 'Want to take part? Write to us:',
   },
 
+  printable: {
+    head: 'How it looks on paper',
+    text: 'Each plan prints on two A4 sheets. Open an example, change it for your family and print it — moods, progress and notes are filled in with a pen.',
+    alt: '{title} — a family plan for the month, a printable A4 poster',
+    altSecond: '{title} — page two of the poster',
+    open: 'Open the example',
+  },
+
   site: {
     brand: 'Family Season',
     alternateName: 'Family Season — printable family planner',

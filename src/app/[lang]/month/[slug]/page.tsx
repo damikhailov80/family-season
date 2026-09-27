@@ -3,12 +3,15 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { PaperSheet } from '../../../../components/PaperSheet'
 import { SectionBox } from '../../../../components/SectionBox'
+import { PosterZoom } from '../../../../components/community/PosterZoom'
 import { SeasonPreview } from '../../../../components/community/SeasonPreview'
 import { NewSeasonAction } from '../../../../components/site/NewSeasonAction'
+import { fill } from '../../../../i18n/fill'
 import { getDict, getLang } from '../../../../i18n/server'
 import { monthPage } from '../../../../model/months'
 import { pageMeta } from '../../../../model/meta'
-import { ROUTES, withLang } from '../../../../model/site'
+import { POSTER_IMAGE, posterPages } from '../../../../model/posters'
+import { ROUTES, publicSeasonHref, withLang } from '../../../../model/site'
 import { ideasByCode } from '../../../../server/publicSeasons'
 import styles from './page.module.css'
 
@@ -39,6 +42,7 @@ export default async function MonthPage({ params }: { params: Promise<{ slug: st
   if (!page) notFound()
 
   const { text } = page
+  const { printable } = await getDict()
   // The article is the page; the seasons are read from the showcase and are a bonus. A quiet
   // database, or a season taken off the showcase, leaves the block undrawn - it does not leave
   // the page broken. No toast here either: on the showcase a person came for the seasons, here
@@ -49,6 +53,10 @@ export default async function MonthPage({ params }: { params: Promise<{ slug: st
   )
   const ideas = state.status === 'ok' ? state.ideas : []
   const summary = new Map(page.seasons.map((season) => [season.code, season.summary]))
+  const pictures = ideas.flatMap((idea) => {
+    const pages = posterPages(idea.code)
+    return pages ? [{ idea, pages }] : []
+  })
 
   return (
     <PaperSheet>
@@ -70,6 +78,29 @@ export default async function MonthPage({ params }: { params: Promise<{ slug: st
                 <li className={styles.card} key={idea.code}>
                   <SeasonPreview idea={idea} />
                   <p className={styles.summary}>{summary.get(idea.code)}</p>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        {pictures.length > 0 && (
+          <>
+            <h2 className={styles.head}>{printable.head}</h2>
+            <p className={styles.text}>{printable.text}</p>
+
+            <ul className={styles.posters}>
+              {pictures.map(({ idea, pages: [first, second] }) => (
+                <li key={idea.code}>
+                  <PosterZoom
+                    title={idea.title}
+                    pages={[
+                      { src: first, alt: fill(printable.alt, { title: idea.title }) },
+                      { src: second, alt: fill(printable.altSecond, { title: idea.title }) },
+                    ]}
+                    href={publicSeasonHref(idea.lang, idea.code)}
+                    size={POSTER_IMAGE}
+                  />
                 </li>
               ))}
             </ul>
